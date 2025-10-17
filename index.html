@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatehpur Hubs</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #f5f5f5; }
+        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
+        
+        header { 
+            background: linear-gradient(135deg, #1e3c72, #2a5298); 
+            color: white; padding: 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        header h1 { display: flex; align-items: center; gap: 10px; font-size: 1.4em; }
+        #auth-info { font-size: 0.9em; font-weight: 600; text-align: right; max-width: 150px; }
+        
+        .screen { display: none; padding: 15px; }
+        .screen.active { display: block; }
+        
+        #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px 0; }
+        
+        .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; }
+        .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
+        
+        .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin: 10px 0 0 10px; cursor: pointer; }
+        
+        .back-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer; }
+        
+        .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
+        .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
+        .share-btn, .more-app-btn { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        
+        .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .ad-label { font-size: 0.8em; color: #666; margin-bottom: 5px; }
+        
+        #promo-section { background: linear-gradient(135deg, #ff9a9e, #fad0c4); padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; }
+        #banner-area img { width: 100%; border-radius: 8px; margin-top: 10px; }
+        
+        h3 { color: #2a5298; margin: 15px 0 10px 0; }
+    </style>
+</head>
+<body>
+    <!-- Top Ad -->
+    <div class="ad-container">
+        <div class="ad-label">Advertisement</div>
+        <script type="text/javascript">atOptions = {'key' : '133c7a35b2ef8e3d6cceadc47a619105','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/133c7a35b2ef8e3d6cceadc47a619105/invoke.js"></script>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>
+                <img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;">
+                <span>Fatehpur Hubs</span>
+            </h1>
+            <div id="auth-info">Fatehpur ke sabhi services ek jagah</div>
+        </header>
+        
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen active">
+            <input type="text" id="main-search-bar" placeholder="Service Search Karein (Plumber, Electrician...)">
+            
+            <!-- Middle Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Sponsored</div>
+                <script type="text/javascript">atOptions = {'key' : '133c7a35b2ef8e3d6cceadc47a619105','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/133c7a35b2ef8e3d6cceadc47a619105/invoke.js"></script>
+            </div>
+            
+            <h3>Popular Services</h3>
+            <div id="mistri-categories" class="categories-list">
+                <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
+                <button class="cat-btn" data-cat="Electrician">⚡ Electrician</button>
+                <button class="cat-btn" data-cat="Carpenter">🔨 Carpenter</button>
+                <button class="cat-btn" data-cat="Mason">🧱 Mason</button>
+                <button class="cat-btn" data-cat="Painter">🎨 Painter</button>
+                <button class="cat-btn" data-cat="AC Mechanic">❄️ AC Mech.</button>
+                <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
+                <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">More...</button>
+            </div>
+
+            <div id="promo-section">
+                <h3>✨ Offers aur Promotions ✨</h3>
+                <div id="banner-area">
+                    <img src="https://via.placeholder.com/350x80?text=Your+Ad+Space+Here" alt="Promotion Ad">
+                </div>
+            </div>
+
+            <div id="mistri-list">
+                <h3>Available Services</h3>
+            </div>
+            
+            <!-- Bottom Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <script type="text/javascript">atOptions = {'key' : '133c7a35b2ef8e3d6cceadc47a619105','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/133c7a35b2ef8e3d6cceadc47a619105/invoke.js"></script>
+            </div>
+            
+            <div style="height: 80px;"></div>
+        </div>
+
+        <!-- Search Screen -->
+        <div id="search-screen" class="screen">
+            <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+            <h2>Sabhi Services</h2>
+            
+            <!-- Search Screen Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Advertisement</div>
+                <script type="text/javascript">atOptions = {'key' : '133c7a35b2ef8e3d6cceadc47a619105','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/133c7a35b2ef8e3d6cceadc47a619105/invoke.js"></script>
+            </div>
+            
+            <div id="all-categories-list" class="categories-list"></div> 
+            <div id="mistri-list-full"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
+            <button class="share-btn" onclick="shareApp()">📤 Share</button>
+            <button class="more-app-btn" onclick="openMoreApps()">➕ More</button>
+        </div>
+    </div>
+
+    <!-- Bottom Ad -->
+    <div class="ad-container">
+        <div class="ad-label">Advertisement</div>
+        <script type="text/javascript">atOptions = {'key' : '133c7a35b2ef8e3d6cceadc47a619105','format' : 'iframe','height' : 50,'width' : 320,'params' : {}};</script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/133c7a35b2ef8e3d6cceadc47a619105/invoke.js"></script>
+    </div>
+
+    <script>
+        const serviceProviders = [
+            { name: "Raju Prajapati", category: "Tiler", phone: "8009461283", area: "Fatehpur", experience: "22 Years", rating: "⭐️⭐️⭐️⭐️" },
+            { name: "Kamal", category: "Tiler", phone: "8400281832", area: "Fatehpur", experience: "17 Years", rating: "⭐️⭐️⭐️⭐️⭐️" },
+            { name: "Harishchandra", category: "Tiler", phone: "8953122424", area: "Fatehpur", experience: "10 Years", rating: "⭐️⭐️⭐️⭐️" },
+            { name: "Prem", category: "Tiler", phone: "6388514241", area: "Fatehpur", experience: "12 Years", rating: "⭐️⭐️⭐️⭐️⭐️" },
+            { name: "Puttan Maurya", category: "Tiler", phone: "9369751366", area: "Fatehpur", experience: "23 Years", rating: "⭐️⭐️⭐️⭐️" },
+            { name: "Safahad Khan", category: "Tiler", phone: "7355341184", area: "Fatehpur", experience: "13 Years", rating: "⭐️⭐️⭐️⭐️⭐️" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadServiceProviders();
+            loadAllCategories();
+            
+            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
+                if(button.id !== 'more-cat-btn') {
+                    button.addEventListener('click', (e) => {
+                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => btn.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        filterByCategory(e.target.dataset.cat, 'mistri-list');
+                    });
+                }
+            });
+        });
+
+        function loadServiceProviders() {
+            const mistriListDiv = document.getElementById('mistri-list');
+            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+            
+            serviceProviders.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = `
+                    <h3>${provider.name} ${provider.rating}</h3>
+                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                    <p>Experience: ${provider.experience}</p>
+                    <div>
+                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                    </div>
+                `;
+                mistriListDiv.appendChild(card);
+            });
+        }
+
+        function callNumber(phone) { window.location.href = `tel:+91${phone}`; }
+        function openWhatsApp(phone) { 
+            const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
+            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        const ALL_CATEGORIES = [
+            { cat: 'Plumber', icon: '💧' }, { cat: 'Electrician', icon: '⚡' }, { cat: 'Carpenter', icon: '🔨' },
+            { cat: 'Mason', icon: '🧱' }, { cat: 'Painter', icon: '🎨' }, { cat: 'AC Mechanic', icon: '❄️' },
+            { cat: 'TV Mechanic', icon: '📺' }, { cat: 'Tiler', icon: '◻️' }, { cat: 'Private Teacher', icon: '🎓' },
+            { cat: 'Welder', icon: '🔥' }, { cat: 'Computer Repair', icon: '💻' }
+        ];
+
+        function loadAllCategories() {
+            const allCatList = document.getElementById('all-categories-list');
+            if (!allCatList) return;
+            allCatList.innerHTML = '';
+            
+            ALL_CATEGORIES.forEach(item => {
+                const button = document.createElement('button');
+                button.className = 'cat-btn';
+                button.dataset.cat = item.cat;
+                button.innerHTML = `${item.icon} ${item.cat}`;
+                button.addEventListener('click', (e) => filterByCategory(e.target.dataset.cat, 'mistri-list-full'));
+                allCatList.appendChild(button);
+            });
+        }
+
+        function filterByCategory(category, listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+            mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
+            
+            const filteredProviders = serviceProviders.filter(p => p.category === category);
+            
+            if (filteredProviders.length === 0) {
+                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is category mein koi service nahi hai.</p>';
+                return;
+            }
+
+            filteredProviders.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = `
+                    <h3>${provider.name} ${provider.rating}</h3>
+                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                    <p>Experience: ${provider.experience}</p>
+                    <div>
+                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                    </div>
+                `;
+                mistriListDiv.appendChild(card);
+            });
+        }
+
+        function shareApp() {
+            if (navigator.share) {
+                navigator.share({ title: 'Fatehpur Hubs', text: 'Fatehpur mein sabhi Services ek jagah!', url: window.location.href });
+            } else { alert("App link: " + window.location.href); }
+        }
+
+        function openMoreApps() { alert("More Apps coming soon!"); }
+
+        document.getElementById('main-search-bar').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const mistriListDiv = document.getElementById('mistri-list');
+            mistriListDiv.innerHTML = '<h3>Search Results</h3>';
+            
+            const filtered = serviceProviders.filter(provider => 
+                provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filtered.length === 0) {
+                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili.</p>';
+                return;
+            }
+
+            filtered.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = `
+                    <h3>${provider.name} ${provider.rating}</h3>
+                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                    <p>Experience: ${provider.experience}</p>
+                    <div>
+                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                    </div>
+                `;
+                mistriListDiv.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

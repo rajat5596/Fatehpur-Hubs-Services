@@ -1,0 +1,465 @@
+/* GLOBAL RESET AND FONT */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+.app-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+header h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 0;
+}
+
+#auth-info {
+    color: #cce5ff;
+    font-size: 0.9em;
+}
+
+/* SCREEN LAYOUT */
+.screen {
+    padding: 20px;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.active {
+    opacity: 1;
+}
+
+h2, h3 {
+    color: #007bff;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+/* MAIN HOME SCREEN ELEMENTS */
+#main-search-bar {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* CATEGORY ICONS */
+.categories-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cat-btn {
+    background: #e9ecef;
+    color: #495057;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+.cat-btn.selected, .cat-btn:hover {
+    background: #007bff;
+    color: white;
+    font-weight: 600;
+}
+
+/* PROFILE CARDS */
+.profile-card {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.profile-card h3 {
+    color: #333;
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 5px;
+    border-bottom: none;
+}
+
+.profile-card p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #6c757d;
+}
+
+/* BUTTONS */
+.contact-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.contact-btn:hover {
+    background-color: #138496;
+}
+
+.whatsapp-btn {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-left: 10px;
+}
+
+.whatsapp-btn:hover {
+    background-color: #128C7E;
+}
+
+/* QUICK REGISTRATION FORM */
+#quick-register-form input,
+#quick-register-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+#quick-register-form button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+#quick-register-form button:hover {
+    background-color: #1e7e34;
+}
+
+/* FOOTER AND ADS */
+.ad-banner {
+    text-align: center;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.top-ad {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px dashed #ffe08a;
+}
+
+.bottom-ad {
+    background: #d4edda;
+    color: #155724;
+    border: 1px dashed #c3e6cb;
+}
+
+.footer-actions {
+    padding: 10px 0 20px 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+}
+
+.footer-actions button, .footer-actions a {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 5px;
+}
+
+.premium-btn {
+    background-color: #f7a81b;
+    color: white;
+}
+
+.share-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+.more-app-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.premium-btn:hover { 
+    background-color: #e86800; 
+}
+
+.share-btn:hover { 
+    background-color: #0056b3; 
+}
+
+.more-app-btn:hover { 
+    background-color: #1e7e34; 
+}
+
+.back-btn {
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    color: #333;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+/* Uplabdh Services list ko shuru mein chhupane ke liye */
+.hidden-on-start {
+    display: none;
+}
+
+/* Promotional Section (Ads) ke liye basic styling */
+#promo-section {
+    padding: 15px;
+    margin: 20px 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    background-color: #fff8e1;
+}
+
+#promo-section h3 {
+    color: #e65100;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: none;
+}
+/* Registration Form Styles */
+#service-registration-form input,
+#service-registration-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+#service-registration-form .button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+#service-registration-form .button:hover {
+    background-color: #1e7e34;
+}
+/* Scrolling Fix */
+.app-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#home-screen {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px; /* Footer ke liye space */
+}
+
+/* Mistri List ko limited height denge */
+#mistri-list {
+    max-height: 50vh; /* Screen ki 50% height */
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+/* Better scrollbar */
+#mistri-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#mistri-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#mistri-list::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 10px;
+}
+
+#mistri-list::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Footer ko fixed rakhenge */
+.footer-actions {
+    padding: 10px 0 20px 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 500px;
+    margin: 0 auto;
+    z-index: 100;
+}
+/* Footer ko fixed rakhenge - UPDATED */
+.footer-actions {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    z-index: 100;
+    box-sizing: border-box;
+}
+/* === FOOTER FIX - UPDATED === */
+
+/* Footer ko safe area mein rakhenge */
+.footer-actions {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-around;
+    gap: 5px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    z-index: 100;
+    box-sizing: border-box;
+    /* Safe area for mobile */
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+}
+
+/* Footer buttons ko chota aur fit rakhenge */
+.footer-actions button, 
+.footer-actions a {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.75em;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 40px;
+}
+/* === SIMPLE SCROLL FIX === */
+#mistri-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+/* Simple scrollbar */
+#mistri-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#mistri-list::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 10px;
+}
+.footer-actions {
+    padding: 15px 0;
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.footer-actions button, 
+.footer-actions a {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
