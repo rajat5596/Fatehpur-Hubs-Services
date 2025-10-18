@@ -1,4 +1,11 @@
-// Global variables are now defined in index.html (db, auth, loggedInUser, verificationId)
+// Global array: Yahaan aapko apna saara maujooda data paste karna hai
+const serviceProviders = [
+    // Kripya yahaan apna saara maujooda (existing) provider data paste karein:
+    // Example: { name: "Suresh", category: "Plumber", phone: "9876543210", area: "Fatehpur", experience: "10 Years", rating: "⭐️⭐️⭐️⭐️" },
+    // Example: { name: "Raju", category: "Electrician", phone: "9792722000", area: "Fatehpur", experience: "5 Years", rating: "⭐️⭐️⭐️" },
+    // ... Aur baaki sabhi providers ...
+];
+
 
 // --- SCREEN MANAGEMENT ---
 function showScreen(screenId) {
@@ -13,115 +20,42 @@ function showScreen(screenId) {
         activeScreen.classList.add('active');
         
         if (screenId === 'home-screen') {
-            loadMistrisFromFirebase('All', 'mistri-list');
+            loadServiceProviders('mistri-list');
+            // Old loadMistrisFromFirebase code hata diya gaya hai
         } else if (screenId === 'search-screen') {
             loadAllCategories();
-            loadMistrisFromFirebase('All', 'mistri-list-full');
+            loadServiceProviders('mistri-list-full');
+            // Old loadMistrisFromFirebase code hata diya gaya hai
         }
     }
 }
 
-// --- AUTHENTICATION (OTP) LOGIC ---
+// --- INITIALIZATION (App Load Hone Par) ---
 document.addEventListener('DOMContentLoaded', () => {
-    showScreen('login-screen');
-    initializeRecaptcha();
+    // Show login screen ya home screen (jo aapka default ho)
+    // showScreen('login-screen'); // Agar login se shuru karna hai
+    showScreen('home-screen'); // Seedhe home screen se shuru karein
 });
 
-function initializeRecaptcha() {
-    try {
-        const recaptchaContainer = document.getElementById('recaptcha-container');
-        if (recaptchaContainer) {
-            recaptchaContainer.innerHTML = '';
-        }
-        
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'normal',
-            'callback': function(response) {
-                console.log('reCAPTCHA solved successfully');
-                document.getElementById('login-error').textContent = 'reCAPTCHA verified! Now click Send OTP.';
-            }
-        });
-        
-        window.recaptchaVerifier.render();
-        
-    } catch (error) {
-        console.error("reCAPTCHA initialization failed:", error);
-    }
-}
+/*
+// --- AUTHENTICATION (OTP) LOGIC ---
+// OTP aur Firebase Auth functions yahaan comments mein hain. 
+// Agar aapne Firebase setup kiya hai, toh inhein '/*' aur '*/' hata kar use kar sakte hain
+// Abhi Registration button chalane ke liye inhein ignore kar rahe hain
 
+function initializeRecaptcha() { /* ... */ }
 const sendOtpBtn = document.getElementById('send-otp-btn');
 const verifyOtpBtn = document.getElementById('verify-otp-btn');
 const phoneNumberInput = document.getElementById('phone-number');
 const otpCodeInput = document.getElementById('otp-code');
 const loginError = document.getElementById('login-error');
 
-sendOtpBtn.addEventListener('click', async () => {
-    const phoneNumber = phoneNumberInput.value.trim();
-    
-    if (!phoneNumber || phoneNumber.length !== 10 || !/^[6-9]\d{9}$/.test(phoneNumber)) {
-        loginError.textContent = 'Kripya sahi 10-digit Indian mobile number daalein.';
-        loginError.style.color = 'red';
-        return;
-    }
-    
-    const fullPhoneNumber = `+91${phoneNumber}`;
-    
-    if (!window.recaptchaVerifier) {
-        initializeRecaptcha();
-        return;
-    }
+// sendOtpBtn.addEventListener('click', async () => { /* ... */ }); 
+// verifyOtpBtn.addEventListener('click', async () => { /* ... */ });
+*/
 
-    sendOtpBtn.disabled = true;
-    loginError.textContent = 'OTP bhej raha hoon...';
-    loginError.style.color = 'blue';
 
-    try {
-        const confirmationResult = await auth.signInWithPhoneNumber(fullPhoneNumber, window.recaptchaVerifier);
-        
-        window.confirmationResult = confirmationResult;
-        sendOtpBtn.style.display = 'none';
-        phoneNumberInput.disabled = true;
-        otpCodeInput.style.display = 'block';
-        verifyOtpBtn.style.display = 'block';
-        loginError.style.color = 'green';
-        loginError.textContent = '✅ OTP successfully bhej diya gaya!';
-        
-    } catch (error) {
-        console.error("Firebase Auth Error:", error);
-        loginError.style.color = 'red';
-        loginError.textContent = `Error: ${error.message}`;
-        sendOtpBtn.disabled = false;
-    }
-});
-
-// ... rest of the code (same as before)
-// Service Registration Form
-document.getElementById('service-registration-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('reg-name').value.trim();
-    const phone = document.getElementById('reg-phone').value.trim();
-    const category = document.getElementById('reg-category').value;
-    const area = document.getElementById('reg-area').value.trim();
-    const experience = document.getElementById('reg-experience').value.trim();
-    
-    if (!name || !phone || !category || !area) {
-        alert("Kripya sabhi fields bharein");
-        return;
-    }
-    
-    // WhatsApp message format
-    const message = `*New Service Registration:*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Category:* ${category}%0A*Area:* ${area}%0A*Experience:* ${experience}%0A%0A_Fatehpur Hubs App se register kiya gaya hai_`;
-    
-    // Open WhatsApp
-    window.open(`https://wa.me/919876543210?text=${message}`, '_blank');
-    
-    // Form reset
-    this.reset();
-    
-    alert("Registration successful! Aapka data admin ko bhej diya gaya hai.");
-});
-// Function jo form submit hone par chalega
+// --- SERVICE REGISTRATION LOGIC (Final Working Function) ---
 function registerService() {
     // 1. Inputs ki values lena
     const name = document.getElementById('providerName').value;
@@ -142,23 +76,86 @@ function registerService() {
         category: category,
         phone: phone,
         area: area,
-        experience: experience, // Experience ko direct use kar rahe hain (e.g., "5 Years")
+        experience: experience, 
         rating: "⭐️⭐️⭐️⭐️"
     };
     
     // 4. Global array mein naya data jodna
     serviceProviders.push(newProvider);
     
-    // 5. Success message aur List ko update karna
-    alert('✅ Service registered successfully! Ab aap services list mein dikhenge।');
+    // 5. Success message aur Page Reload
+    alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
     
-    // Services list ko refresh karna (taaki naya data turant dikhe)
-    loadServiceProviders();
+    // Services list ko refresh karne ke liye, hum page ko reload kar denge
+    window.location.reload(); 
+}
+
+
+// --- LOADER AND FILTER LOGIC ---
+function loadServiceProviders(listId = 'mistri-list', filter = 'All') {
+    const listElement = document.getElementById(listId);
+    if (!listElement) return;
+
+    listElement.innerHTML = ''; // List ko khali karein
+
+    const filteredProviders = serviceProviders.filter(provider => {
+        return filter === 'All' || provider.category === filter;
+    });
+
+    if (filteredProviders.length === 0) {
+        listElement.innerHTML = `<div style="text-align:center; padding: 20px;">इस श्रेणी में अभी कोई सेवा प्रदाता नहीं है।</div>`;
+        return;
+    }
+
+    filteredProviders.forEach(provider => {
+        const card = document.createElement('div');
+        card.className = 'mistri-card';
+        card.innerHTML = `
+            <h4>${provider.name} | ${provider.rating}</h4>
+            <p>${provider.category} | ${provider.area}</p>
+            <p>Experience: ${provider.experience}</p>
+            <div class="actions">
+                <a href="tel:${provider.phone}" class="call-btn">📞 Call Now</a>
+                <a href="https://wa.me/91${provider.phone}?text=Namaste, mujhe aapki ${provider.category} service chahiye।" target="_blank" class="whatsapp-btn">💬 WhatsApp</a>
+            </div>
+        `;
+        listElement.appendChild(card);
+    });
+}
+
+function filterByCategory(category) {
+    loadServiceProviders('mistri-list', category); 
+    const searchScreen = document.getElementById('search-screen');
+    if (searchScreen && searchScreen.classList.contains('active')) {
+        loadServiceProviders('mistri-list-full', category);
+    }
+}
+
+function loadAllCategories() {
+    const allCatList = document.getElementById('all-categories-list');
+    if (!allCatList) return;
+
+    allCatList.innerHTML = '';
+    const uniqueCategories = [...new Set(serviceProviders.map(p => p.category))];
     
-    // 6. Form ko khali karna
-    document.getElementById('providerName').value = '';
-    document.getElementById('providerPhone').value = '';
-    document.getElementById('serviceCategory').value = ''; // Dropdown ko bhi reset kar sakte hain
-    document.getElementById('providerArea').value = '';
-    document.getElementById('providerExperience').value = '';
-} 
+    uniqueCategories.forEach(category => {
+        const button = document.createElement('button');
+        button.className = 'cat-btn';
+        button.textContent = category;
+        button.onclick = () => filterByCategory(category);
+        allCatList.appendChild(button);
+    });
+}
+
+// --- FOOTER BUTTONS ---
+function shareApp() {
+    const appLink = "https://www.fatehpurhubs.co.in"; 
+    const message = `Fatehpur Hubs App Download Karein! Fatehpur ke sabhi services jaise Plumber, Electrician, Carpenter ab ek jagah! Link: ${appLink}`;
+    
+    // Seedhe WhatsApp share
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+function openMoreApps() {
+    alert("More Apps section jald hi aayega!");
+}
