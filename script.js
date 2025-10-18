@@ -154,5 +154,5 @@ function registerService() {
     document.getElementById('serviceCategory').value = '';
     document.getElementById('providerExperience').value = '';
     
-    alert('✅ Service registered successfully!');
+    alert('✅ Service registered successfully! You will appear in the services list.');
 }
