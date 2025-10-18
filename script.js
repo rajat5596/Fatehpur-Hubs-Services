@@ -121,38 +121,44 @@ document.getElementById('service-registration-form').addEventListener('submit', 
     
     alert("Registration successful! Aapka data admin ko bhej diya gaya hai.");
 });
+// Function jo form submit hone par chalega
 function registerService() {
+    // 1. Inputs ki values lena
     const name = document.getElementById('providerName').value;
     const phone = document.getElementById('providerPhone').value;
     const category = document.getElementById('serviceCategory').value;
+    const area = document.getElementById('providerArea').value;
     const experience = document.getElementById('providerExperience').value;
     
-    if (!name || !phone || !category || !experience) {
-        alert('❌ Please fill all fields');
+    // 2. Validation check
+    if (!name || !phone || !category || !area || !experience) {
+        alert('❌ Kripya sabhi fields bharein।');
         return;
     }
     
-    // New service provider
+    // 3. Naya Provider Object banana
     const newProvider = {
         name: name,
         category: category,
         phone: phone,
-        area: "Fatehpur",
-        experience: experience,
+        area: area,
+        experience: experience, // Experience ko direct use kar rahe hain (e.g., "5 Years")
         rating: "⭐️⭐️⭐️⭐️"
     };
     
-    // Add to array
+    // 4. Global array mein naya data jodna
     serviceProviders.push(newProvider);
     
-    // Refresh display
+    // 5. Success message aur List ko update karna
+    alert('✅ Service registered successfully! Ab aap services list mein dikhenge।');
+    
+    // Services list ko refresh karna (taaki naya data turant dikhe)
     loadServiceProviders();
     
-    // Clear form
+    // 6. Form ko khali karna
     document.getElementById('providerName').value = '';
     document.getElementById('providerPhone').value = '';
-    document.getElementById('serviceCategory').value = '';
+    document.getElementById('serviceCategory').value = ''; // Dropdown ko bhi reset kar sakte hain
+    document.getElementById('providerArea').value = '';
     document.getElementById('providerExperience').value = '';
-    
-    alert('✅ Service registered successfully! You will appear in the services list.');
-}
+} 
