@@ -20,8 +20,6 @@ function showScreen(screenId) {
         }
     }
 }
-});
-};  // ye serviceProviders array khatam hone ka hai
 
 // YAHAN ADD KARO - Service Registration Function
 function registerService() {
@@ -58,4 +56,27 @@ function registerService() {
     
     alert('✅ Service registered successfully!');
     return false;
+}
+
+// Load Service Providers Function (ADD THIS)
+function loadServiceProviders() {
+    const mistriListDiv = document.getElementById('mistri-list');
+    if (!mistriListDiv) return;
+    
+    mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+    
+    serviceProviders.forEach(provider => {
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.innerHTML = `
+            <h3>${provider.name} ${provider.rating}</h3>
+            <p><strong>${provider.category}</strong> | ${provider.area}</p>
+            <p>Experience: ${provider.experience}</p>
+            <div>
+                <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+            </div>
+        `;
+        mistriListDiv.appendChild(card);
+    });
 }
