@@ -1,12 +1,3 @@
-// Global array: Yahaan aapko apna saara maujooda data paste karna hai
-const serviceProviders = [
-    // Kripya yahaan apna saara maujooda (existing) provider data paste karein:
-    // Example: { name: "Suresh", category: "Plumber", phone: "9876543210", area: "Fatehpur", experience: "10 Years", rating: "⭐️⭐️⭐️⭐️" },
-    // Example: { name: "Raju", category: "Electrician", phone: "9792722000", area: "Fatehpur", experience: "5 Years", rating: "⭐️⭐️⭐️" },
-    // ... Aur baaki sabhi providers ...
-];
-
-
 // --- SCREEN MANAGEMENT ---
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(screen => {
@@ -106,18 +97,6 @@ function loadServiceProviders(listId = 'mistri-list', filter = 'All') {
         listElement.innerHTML = `<div style="text-align:center; padding: 20px;">इस श्रेणी में अभी कोई सेवा प्रदाता नहीं है।</div>`;
         return;
     }
-
-    filteredProviders.forEach(provider => {
-        const card = document.createElement('div');
-        card.className = 'mistri-card';
-        card.innerHTML = `
-            <h4>${provider.name} | ${provider.rating}</h4>
-            <p>${provider.category} | ${provider.area}</p>
-            <p>Experience: ${provider.experience}</p>
-            <div class="actions">
-                <a href="tel:${provider.phone}" class="call-btn">📞 Call Now</a>
-                <a href="https://wa.me/91${provider.phone}?text=Namaste, mujhe aapki ${provider.category} service chahiye।" target="_blank" class="whatsapp-btn">💬 WhatsApp</a>
-            </div>
         `;
         listElement.appendChild(card);
     });
