@@ -121,3 +121,38 @@ document.getElementById('service-registration-form').addEventListener('submit', 
     
     alert("Registration successful! Aapka data admin ko bhej diya gaya hai.");
 });
+function registerService() {
+    const name = document.getElementById('providerName').value;
+    const phone = document.getElementById('providerPhone').value;
+    const category = document.getElementById('serviceCategory').value;
+    const experience = document.getElementById('providerExperience').value;
+    
+    if (!name || !phone || !category || !experience) {
+        alert('❌ Please fill all fields');
+        return;
+    }
+    
+    // New service provider
+    const newProvider = {
+        name: name,
+        category: category,
+        phone: phone,
+        area: "Fatehpur",
+        experience: experience,
+        rating: "⭐️⭐️⭐️⭐️"
+    };
+    
+    // Add to array
+    serviceProviders.push(newProvider);
+    
+    // Refresh display
+    loadServiceProviders();
+    
+    // Clear form
+    document.getElementById('providerName').value = '';
+    document.getElementById('providerPhone').value = '';
+    document.getElementById('serviceCategory').value = '';
+    document.getElementById('providerExperience').value = '';
+    
+    alert('✅ Service registered successfully!');
+}
