@@ -463,3 +463,24 @@ h2, h3 {
     text-decoration: none;
     display: inline-block;
 }
+<style>
+    /* ... Aapka maujooda CSS yahaan ... */
+    
+    /* Sticky Footer Ad ka CSS - 5th unit ke liye */
+    #sticky-footer-ad {
+        position: fixed; 
+        bottom: 0;      
+        left: 50%;      
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 400px;
+        z-index: 1000;  
+        padding: 0; 
+        border: none;
+        background: transparent;
+    }
+    /* Content ko upar uthayein taaki ad uske neeche na chhipe */
+    .container { 
+        padding-bottom: 70px; /* 50px ad + 20px space = 70px */
+    }
+</style>
