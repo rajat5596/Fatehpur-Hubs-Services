@@ -9,6 +9,9 @@
         body { background: #f5f5f5; }
         .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
         
+        /* NEW STYLE FOR ADVERTISE CONTACT SECTION */
+        #advertise-contact-section { margin-left: 15px; margin-right: 15px; }
+
         header { 
             background: linear-gradient(135deg, #1e3c72, #2a5298); 
             color: white; padding: 15px; 
@@ -139,15 +142,24 @@
 
 
 <div id="promo-section">
-    </div>
-
-            <div id="promo-section">
                 <h3>✨ Offers aur Promotions ✨</h3>
                 <div id="banner-area">
                     <img src="https://via.placeholder.com/350x80?text=Your+Ad+Space+Here" alt="Promotion Ad">
                 </div>
             </div>
 
+            <div id="advertise-contact-section" style="margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2;">
+                <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">
+                    ⭐ Apne Business ko Fatehpur Hubs par Promote Karein!
+                </h4>
+                <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">
+                    Apni dukaan, business, ya service ka Ad yahaan lagwayein aur zyada grahak paayein।
+                </p>
+                <button onclick="contactForAd('9876543210')" 
+                        style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
+                    📞 Advertisement Ke Liye Sampark Karein
+                </button>
+            </div>
             <div id="mistri-list">
                 <h3>Available Services</h3>
             </div>
@@ -188,9 +200,8 @@
 	};
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
-
-    <script>
+	</div>
+	<script>
         // Old hardcoded data
         const initialServiceProviders = [
             { name: "Raju Prajapati", category: "Tiler", phone: "8009461283", area: "Fatehpur", experience: "22 Years", rating: "⭐️⭐️⭐️⭐️" },
@@ -212,7 +223,7 @@
             { name: "Safahad Khan", category: "Tiler", phone: "7355341184", area: "Fatehpur", experience: "13 Years", rating: "⭐️⭐️⭐️⭐️⭐️" }
         ];
 
-        // NEW: Function to get all providers (hardcoded + saved in local storage)
+        // Function to get all providers (hardcoded + saved in local storage)
         function getServiceProviders() {
             const savedProviders = localStorage.getItem('newServiceProviders');
             let providers = [...initialServiceProviders]; // Start with hardcoded list
@@ -289,6 +300,15 @@
             window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
+        // **NEW FUNCTION for AD CONTACT**
+        function contactForAd(phone) { 
+            // Yeh message advertisement ke liye hai
+            const message = "Namaste, Main Fatehpur Hubs par advertisement ke liye sampark kar raha/rahi hoon। Kripya details bhejein।";
+            // 'phone' variable upar wale button se aapka number lega
+            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+        // **********************************
+
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -355,7 +375,7 @@
 
         function openMoreApps() { alert("More Apps coming soon!"); } 
         
-        // **** registerService FUNCTION (Now saves data to Local Storage) ****
+        // **** registerService FUNCTION (Saves data to Local Storage) ****
         function registerService() {
             const name = document.getElementById('providerName').value;
             const phone = document.getElementById('providerPhone').value;
@@ -374,7 +394,7 @@
                 phone: phone,
                 area: area,
                 experience: experience, 
-                rating: "⭐️⭐️⭐️" // Naye providers ko thoda kam rating dete hain
+                rating: "⭐️⭐️⭐️"
             };
             
             // 1. Data ko Local Storage se load karte hain
@@ -390,7 +410,6 @@
             // 4. Success message aur Page Reload
             alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
             
-            // Services list ko refresh karne ke liye, hum page ko reload kar denge
             window.location.reload(); 
         }
 
