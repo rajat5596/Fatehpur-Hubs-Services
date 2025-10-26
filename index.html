@@ -46,7 +46,6 @@
     </style>
 </head>
 <body>
-    <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
@@ -70,11 +69,9 @@
             <div id="auth-info">Fatehpur ke sabhi services ek jagah</div>
         </header>
         
-        <!-- Home Screen -->
         <div id="home-screen" class="screen active">
             <input type="text" id="main-search-bar" placeholder="Service Search Karein (Plumber, Electrician...)">
             
-            <!-- Middle Ad -->
             <div class="ad-container">
                 <div class="ad-label">Sponsored</div>
                 <script type="text/javascript">
@@ -100,11 +97,8 @@
                 <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
                 <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">More...</button>
             </div>
-			<!-- Categories List -->
-<div id="mistri-categories" class="categories-list">
-    <!-- categories buttons -->
-</div>
-<!-- Service Registration Form -->
+			<div id="mistri-categories" class="categories-list">
+    </div>
 <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
     <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
     
@@ -144,10 +138,8 @@
 </div>
 
 
-<!-- Promo Section -->
 <div id="promo-section">
-    <!-- existing promo content -->
-</div>
+    </div>
 
             <div id="promo-section">
                 <h3>✨ Offers aur Promotions ✨</h3>
@@ -168,7 +160,6 @@
             <div style="height: 80px;"></div>
         </div>
 
-        <!-- Search Screen -->
         <div id="search-screen" class="screen">
             <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
             <h2>Sabhi Services</h2>
@@ -178,7 +169,6 @@
             <div id="mistri-list-full"></div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
             <button class="share-btn" onclick="shareApp()">📤 Share</button>
@@ -186,7 +176,6 @@
         </div>
     </div>
 
-    <!-- Bottom Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
@@ -202,7 +191,8 @@
     </div>
 
     <script>
-        const serviceProviders = [
+        // Old hardcoded data
+        const initialServiceProviders = [
             { name: "Raju Prajapati", category: "Tiler", phone: "8009461283", area: "Fatehpur", experience: "22 Years", rating: "⭐️⭐️⭐️⭐️" },
             { name: "Rajendra", category: "Tiler", phone: "8808521794", area: "Fatehpur", experience: "8 Years", rating: "⭐️⭐️⭐️⭐️" },
             { name: "Rasid", category: "Plumber", phone: "9026724223", area: "Fatehpur", experience: "8 Years", rating: "⭐️⭐️⭐️⭐️" },
@@ -222,8 +212,28 @@
             { name: "Safahad Khan", category: "Tiler", phone: "7355341184", area: "Fatehpur", experience: "13 Years", rating: "⭐️⭐️⭐️⭐️⭐️" }
         ];
 
+        // NEW: Function to get all providers (hardcoded + saved in local storage)
+        function getServiceProviders() {
+            const savedProviders = localStorage.getItem('newServiceProviders');
+            let providers = [...initialServiceProviders]; // Start with hardcoded list
+            
+            if (savedProviders) {
+                try {
+                    // Add saved providers to the list
+                    providers = providers.concat(JSON.parse(savedProviders));
+                } catch (e) {
+                    console.error("Error parsing saved providers:", e);
+                }
+            }
+            return providers;
+        }
+
+        // Global Variable: Now serviceProviders is dynamically loaded
+        let serviceProviders = getServiceProviders();
+
+
         document.addEventListener('DOMContentLoaded', function() {
-            loadServiceProviders();
+            loadServiceProviders('mistri-list');
             loadAllCategories();
             
             document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
@@ -237,24 +247,40 @@
             });
         });
 
-        function loadServiceProviders() {
-            const mistriListDiv = document.getElementById('mistri-list');
-            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-            
-            serviceProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = `
-                    <h3>${provider.name} ${provider.rating}</h3>
-                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
-                    <p>Experience: ${provider.experience}</p>
-                    <div>
-                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
-                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                    </div>
-                `;
-                mistriListDiv.appendChild(card);
-            });
+        // loadServiceProviders function (Final version - only uses listId)
+        function loadServiceProviders(listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+
+            // Re-fetch the current list including any saved data
+            serviceProviders = getServiceProviders(); 
+
+            // Sirf Home Screen ('mistri-list') par hi header aur saara data load karenge
+            if (listId === 'mistri-list') { 
+                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+                
+                const providersToLoad = serviceProviders;
+
+                if (providersToLoad.length === 0) {
+                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is list mein koi service nahi hai.</p>';
+                    return;
+                }
+
+                providersToLoad.forEach(provider => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = `
+                        <h3>${provider.name} ${provider.rating}</h3>
+                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                        <p>Experience: ${provider.experience}</p>
+                        <div>
+                            <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                            <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                        </div>
+                    `;
+                    mistriListDiv.appendChild(card);
+                });
+            }
         }
 
         function callNumber(phone) { window.location.href = `tel:+91${phone}`; }
@@ -295,6 +321,9 @@
             if (!mistriListDiv) return;
             mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
             
+            // Re-fetch serviceProviders
+            serviceProviders = getServiceProviders(); 
+            
             const filteredProviders = serviceProviders.filter(p => p.category === category);
             
             if (filteredProviders.length === 0) {
@@ -324,13 +353,56 @@
             } else { alert("App link: " + window.location.href); }
         }
 
-        function openMoreApps() { alert("More Apps coming soon!"); }
+        function openMoreApps() { alert("More Apps coming soon!"); } 
+        
+        // **** registerService FUNCTION (Now saves data to Local Storage) ****
+        function registerService() {
+            const name = document.getElementById('providerName').value;
+            const phone = document.getElementById('providerPhone').value;
+            const category = document.getElementById('serviceCategory').value;
+            const area = document.getElementById('providerArea').value;
+            const experience = document.getElementById('providerExperience').value;
+            
+            if (!name || !phone || !category || !area || !experience) {
+                alert('❌ Kripya sabhi fields bharein।');
+                return;
+            }
+            
+            const newProvider = {
+                name: name,
+                category: category,
+                phone: phone,
+                area: area,
+                experience: experience, 
+                rating: "⭐️⭐️⭐️" // Naye providers ko thoda kam rating dete hain
+            };
+            
+            // 1. Data ko Local Storage se load karte hain
+            const savedProviders = localStorage.getItem('newServiceProviders');
+            let newProvidersList = savedProviders ? JSON.parse(savedProviders) : [];
+            
+            // 2. Naya data jodte hain
+            newProvidersList.push(newProvider);
+            
+            // 3. Updated data ko Local Storage mein save karte hain
+            localStorage.setItem('newServiceProviders', JSON.stringify(newProvidersList));
+            
+            // 4. Success message aur Page Reload
+            alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
+            
+            // Services list ko refresh karne ke liye, hum page ko reload kar denge
+            window.location.reload(); 
+        }
+
 
         document.getElementById('main-search-bar').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const mistriListDiv = document.getElementById('mistri-list');
             mistriListDiv.innerHTML = '<h3>Search Results</h3>';
             
+            // Re-fetch serviceProviders
+            serviceProviders = getServiceProviders(); 
+
             const filtered = serviceProviders.filter(provider => 
                 provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
             );
