@@ -140,7 +140,6 @@
     </form>
 </div>
 
-
 <div id="promo-section">
                 <h3>✨ Offers aur Promotions ✨</h3>
                 <div id="banner-area">
@@ -153,19 +152,17 @@
                     ⭐ Apne Business ko Fatehpur Hubs par Promote Karein!
                 </h4>
                 <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">
-                    Apni dukaan, business, ya service ka Ad yahaan lagwayein aur zyada grahak paayein।
+                    Apni dukaan, business, ya service ka Ad yahaan lagwaye aur zyada grahak paye।
                 </p>
-                <button onclick="contactForAd('9876543210')" 
+                <button onclick="contactForAd('9889904191')" 
                         style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
-                    📞 Advertisement Ke Liye Sampark Karein
+                    📞 Advertisement Ke Liye Sampark Kare
                 </button>
             </div>
             <div id="mistri-list">
                 <h3>Available Services</h3>
-            </div>
-            
-    
-</script>
+			</div> 
+			</script>
 <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
             </div>
             
@@ -200,8 +197,8 @@
 	};
 </script>
 <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-	</div>
-	<script>
+    </div>
+<script>
         // Old hardcoded data
         const initialServiceProviders = [
             { name: "Raju Prajapati", category: "Tiler", phone: "8009461283", area: "Fatehpur", experience: "22 Years", rating: "⭐️⭐️⭐️⭐️" },
@@ -258,7 +255,7 @@
             });
         });
 
-        // loadServiceProviders function (Final version - only uses listId)
+        // loadServiceProviders function (FINAL CORRECTED VERSION with Share Button)
         function loadServiceProviders(listId) {
             const mistriListDiv = document.getElementById(listId);
             if (!mistriListDiv) return;
@@ -280,6 +277,8 @@
                 providersToLoad.forEach(provider => {
                     const card = document.createElement('div');
                     card.className = 'profile-card';
+                    
+                    // CORRECTED HTML: Share button is correctly placed here
                     card.innerHTML = `
                         <h3>${provider.name} ${provider.rating}</h3>
                         <p><strong>${provider.category}</strong> | ${provider.area}</p>
@@ -287,12 +286,14 @@
                         <div>
                             <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
                             <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                            <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
                         </div>
                     `;
                     mistriListDiv.appendChild(card);
                 });
             }
         }
+
 
         function callNumber(phone) { window.location.href = `tel:+91${phone}`; }
         function openWhatsApp(phone) { 
@@ -367,13 +368,40 @@
             });
         }
 
+        // Function for App Share (UPDATED to use a proper message)
         function shareApp() {
+            const appLink = window.location.href; // Yahi link share hoga
+            const shareText = `✨ Fatehpur Hubs: Fatehpur ki sabhi services ek jagah!\n\nPlumber, Electrician, Carpenter, aur bohot kuch. Abhi app dekhein:\n${appLink}`;
+
             if (navigator.share) {
-                navigator.share({ title: 'Fatehpur Hubs', text: 'Fatehpur mein sabhi Services ek jagah!', url: window.location.href });
-            } else { alert("App link: " + window.location.href); }
+                navigator.share({
+                    title: 'Fatehpur Hubs App',
+                    text: shareText,
+                    url: appLink
+                });
+            } else {
+                // Fallback for desktop (opens WhatsApp with the message)
+                window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+            }
         }
 
         function openMoreApps() { alert("More Apps coming soon!"); } 
+                
+        // NEW FUNCTION for Provider Share
+        function shareProvider(name, category, phone) {
+            const message = `✨ Fatehpur Hubs Par ${category} Service!\n\n👨‍🔧 Naam: ${name}\n📞 Phone: ${phone}\n\nFatehpur mein sabhi local services ke liye app download karein।`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Service Provider: ${name}`,
+                    text: message,
+                    url: window.location.href 
+                });
+            } else {
+                // Fallback for desktop/old browsers (opens WhatsApp with the message)
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
         
         // **** registerService FUNCTION (Saves data to Local Storage) ****
         function registerService() {
