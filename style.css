@@ -150,6 +150,17 @@ h2, h3 {
     transition: background 0.3s;
     margin-left: 10px;
 }
+/* NEW STYLE FOR INLINE SHARE BUTTON */
+.share-btn-inline { 
+    background: #007bff; /* Blue color */
+    color: white; 
+    border: none; 
+    padding: 8px 15px; 
+    border-radius: 20px; 
+    margin: 10px 0 0 10px; 
+    cursor: pointer;
+}
+
 
 .whatsapp-btn:hover {
     background-color: #128C7E;
@@ -462,25 +473,4 @@ h2, h3 {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-}
-<style>
-    /* ... Aapka maujooda CSS yahaan ... */
-    
-    /* Sticky Footer Ad ka CSS - 5th unit ke liye */
-    #sticky-footer-ad {
-        position: fixed; 
-        bottom: 0;      
-        left: 50%;      
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 400px;
-        z-index: 1000;  
-        padding: 0; 
-        border: none;
-        background: transparent;
     }
-    /* Content ko upar uthayein taaki ad uske neeche na chhipe */
-    .container { 
-        padding-bottom: 70px; /* 50px ad + 20px space = 70px */
-    }
-</style>
