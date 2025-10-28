@@ -6,6 +6,11 @@
     <title>फतेहपुर हब्स - सर्विस प्रोवाइडर</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs - Mandatory -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <!-- AUTH SDK जोड़ा गया -->
+
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
         .service-card { transition: transform 0.2s, box-shadow 0.2s; }
@@ -23,11 +28,6 @@
     </style>
 </head>
 <body class="min-h-screen">
-
-    <!-- Firebase SDKs - Mandatory -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <div id="app-container" class="max-w-4xl mx-auto p-4 md:p-6">
         <!-- Header -->
@@ -137,9 +137,9 @@
 
         // --------------- 2. Global Variables and Init ---------------
         let db, auth;
-        let allProviders = []; // सभी प्रोवाइडर्स का डेटा स्टोर करने के लिए
-        let currentFilter = ''; // वर्तमान में लागू किया गया फ़िल्टर
-        let isAuthReady = false; // ऑथेंटिकेशन तैयार है या नहीं
+        let allProviders = []; 
+        let currentFilter = ''; 
+        let isAuthReady = false; 
 
         // Utility function to show custom alert
         function showAlertModal(title, message) {
@@ -170,6 +170,7 @@
                             .then(() => {
                                 console.log("Authentication: Signed in Anonymously.");
                                 isAuthReady = true;
+                                startFirebaseListener(); // Auth होने के बाद लिसनर शुरू करें
                             })
                             .catch(error => {
                                 console.error("Authentication Error:", error);
@@ -179,11 +180,7 @@
                         // User is signed in (either anonymously or otherwise)
                         console.log("Authentication: User is signed in.", user.uid);
                         isAuthReady = true;
-                    }
-
-                    // Once auth is ready, start listening for data
-                    if (isAuthReady) {
-                        startFirebaseListener();
+                        startFirebaseListener(); // Auth होने के बाद लिसनर शुरू करें
                     }
                 });
 
@@ -196,6 +193,8 @@
         // --------------- 4. Data Listening (Real-Time Read) ---------------
         function startFirebaseListener() {
             const providersRef = db.ref('service_providers');
+            // सुनिश्चित करें कि लिसनर केवल एक बार सेट हो
+            providersRef.off('value'); 
             providersRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 const providersArray = [];
@@ -218,7 +217,7 @@
             });
         }
         
-        // --------------- 5. Data Rendering and Filtering ---------------
+        // --------------- 5. Data Rendering and Filtering (SAME AS BEFORE) ---------------
 
         const categories = ["Plumber", "Electrician", "Carpenter", "Mechanic", "AC Repair", "Other"];
         const categoryFilterDiv = document.getElementById('category-filter');
@@ -307,7 +306,7 @@
             
             // Format phone number for WhatsApp URL
             const whatsappNumber = provider.phone.replace(/[^0-9]/g, '');
-            const whatsappUrl = `https://wa.me/91${whatsappNumber}?text=नमस्ते, मैंने आपको फतेहपुर हब्स पर देखा। क्या आप [Service] के लिए उपलब्ध हैं?`;
+            const whatsappUrl = `https://wa.me/91${whatsappNumber}?text=नमस्ते, मैंने आपको फतेहपुर हब्स पर देखा। क्या आप ${provider.category} के लिए उपलब्ध हैं?`;
             
             // Star rating visualization (basic for now)
             const rating = provider.rating || 5; // Default to 5 if not set
@@ -374,6 +373,7 @@
                 area: area,
                 // Add current user's UID for security/future editing features
                 uid: auth.currentUser.uid, 
+                experience: 'नया',
                 rating: 5, // Default rating
                 reviews: 0,
                 timestamp: Date.now()
