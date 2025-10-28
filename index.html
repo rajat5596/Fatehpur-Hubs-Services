@@ -9,9 +9,6 @@
         body { background: #f5f5f5; }
         .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
         
-        /* NEW STYLE FOR ADVERTISE CONTACT SECTION */
-        #advertise-contact-section { margin-left: 15px; margin-right: 15px; }
-
         header { 
             background: linear-gradient(135deg, #1e3c72, #2a5298); 
             color: white; padding: 15px; 
@@ -100,47 +97,46 @@
                 <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
                 <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">More...</button>
             </div>
-			<div id="mistri-categories" class="categories-list">
-    </div>
-<div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-    <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
-    
-    <form onsubmit="event.preventDefault(); registerService();">
-        <input type="text" id="providerName" placeholder="Your Name" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <input type="tel" id="providerPhone" placeholder="Phone Number" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <select id="serviceCategory" required 
-                style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-            <option value="">Select Your Service</option>
-            <option>Plumber</option>
-            <option>Electrician</option>
-            <option>Carpenter</option>
-            <option>Mason</option>
-            <option>Painter</option>
-            <option>AC Mechanic</option>
-            <option>Tiler</option>
-            <option>TV Mechanic</option>
-            <option>Welder</option>
-            <option>Computer Repair</option>
-        </select>
-        
-        <input type="text" id="providerArea" placeholder="Your Area in Fatehpur" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <input type="text" id="providerExperience" placeholder="Experience (e.g., 5 Years)" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <button type="submit" 
-                style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
-            Register Service
-        </button>
-    </form>
-</div>
 
-<div id="promo-section">
+            <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+                <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
+                
+                <form onsubmit="event.preventDefault(); registerService();">
+                    <input type="text" id="providerName" placeholder="Your Name" required 
+                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    
+                    <input type="tel" id="providerPhone" placeholder="Phone Number" required 
+                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    
+                    <select id="serviceCategory" required 
+                            style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                        <option value="">Select Your Service</option>
+                        <option>Plumber</option>
+                        <option>Electrician</option>
+                        <option>Carpenter</option>
+                        <option>Mason</option>
+                        <option>Painter</option>
+                        <option>AC Mechanic</option>
+                        <option>Tiler</option>
+                        <option>TV Mechanic</option>
+                        <option>Welder</option>
+                        <option>Computer Repair</option>
+                    </select>
+                    
+                    <input type="text" id="providerArea" placeholder="Your Area in Fatehpur" required 
+                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    
+                    <input type="text" id="providerExperience" placeholder="Experience (e.g., 5 Years)" required 
+                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    
+                    <button type="submit" id="registerBtn"
+                            style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                        Register Service
+                    </button>
+                </form>
+            </div>
+
+            <div id="promo-section">
                 <h3>✨ Offers aur Promotions ✨</h3>
                 <div id="banner-area">
                     <img src="https://via.placeholder.com/350x80?text=Your+Ad+Space+Here" alt="Promotion Ad">
@@ -159,10 +155,11 @@
                     📞 Advertisement Ke Liye Sampark Kare
                 </button>
             </div>
+            
             <div id="mistri-list">
                 <h3>Available Services</h3>
                 <p style="text-align: center; color: #2a5298;">Loading services from Firebase...</p>
-			</div> 
+            </div> 
             
             <div style="height: 80px;"></div>
         </div>
@@ -170,8 +167,6 @@
         <div id="search-screen" class="screen">
             <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
             <h2>Sabhi Services</h2>
-            
-            
             <div id="all-categories-list" class="categories-list"></div> 
             <div id="mistri-list-full"></div>
         </div>
@@ -201,65 +196,73 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // ** आपके स्क्रीनशॉट से प्राप्त Firebase कॉन्फ़िगरेशन **
+        // ** आपके Screenshot के अनुसार सही Firebase कॉन्फ़िगरेशन **
         const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", // यह API Key आपके कोड में थी
-            authDomain: "fatehpur-hubs.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3d8f-default-rtdb.asia-southeast1.firebaseio.com", // आपके प्रोजेक्ट ID और क्षेत्र के साथ अनुमानित URL
+            apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3d8f.appspot.com",
-            messagingSenderId: "244360674145",
-            appId: "1:244360674145:web:3bc850798d5750bfabbfce"
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9faibce"
         };
 
         // Firebase को Initialize करें
         const app = firebase.initializeApp(firebaseConfig);
         const database = app.database();
-        const providersRef = database.ref('service_providers'); // डेटाबेस में "service_providers" नोड का उपयोग करें
         
-        // अब डेटा Firebase से लोड होगा, इसलिए hardcoded list को खाली कर दिया गया है
+        // Database reference - अलग-अलग options try करें
+        let providersRef;
+        try {
+            providersRef = database.ref('service_providers');
+            console.log("Using 'service_providers' reference");
+        } catch (e) {
+            try {
+                providersRef = database.ref('services');
+                console.log("Using 'services' reference");
+            } catch (e) {
+                providersRef = database.ref('providers');
+                console.log("Using 'providers' reference");
+            }
+        }
+        
+        console.log("Firebase initialized:", app.name);
+        console.log("Database URL:", firebaseConfig.databaseURL);
+        
         let serviceProviders = [];
 
-        // Function to get all providers (अब यह global array रिटर्न करेगा)
         function getServiceProviders() {
             return serviceProviders;
         }
 
-        // नया फंक्शन: Firebase से डेटा सुनना (Listening for data from Firebase)
         function startFirebaseListener() {
-            // 'value' लिसनर डेटा में हर बदलाव पर चलता है
             providersRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 const firebaseProviders = [];
                 
                 if (data) {
-                    // Firebase डेटा को array में बदलें
                     for (let key in data) {
-                        // Firebase key को provider object में ID के रूप में जोड़ें (वैकल्पिक)
                         let provider = data[key];
                         provider.id = key; 
                         firebaseProviders.push(provider);
                     }
+                    console.log("Successfully loaded", firebaseProviders.length, "providers");
+                } else {
+                    console.log("No data found in Firebase");
                 }
                 
-                // ग्लोबल variable को अपडेट करें
                 serviceProviders = firebaseProviders;
-                
-                // UI को अपडेट करें
                 loadServiceProviders('mistri-list');
-                // सुनिश्चित करें कि सर्च स्क्रीन भी अपडेट हो, अगर वह सक्रिय हो
-                if (document.getElementById('search-screen').classList.contains('active')) {
-                    // अगर सर्च स्क्रीन पर हैं, तो उसे री-लोड करें ताकि filtered लिस्ट अपडेट हो
-                    // यहां हम कोई विशिष्ट फ़िल्टर लागू नहीं कर रहे हैं, इसलिए यह खाली रहेगी
-                }
+                
             }, (error) => {
                 console.error("Firebase Read Failed:", error);
-                document.getElementById('mistri-list').innerHTML = '<p style="color:red; text-align: center;">❌ डेटा लोड नहीं हो सका। कृपया Firebase Security Rules जांचें।</p>';
+                document.getElementById('mistri-list').innerHTML = 
+                    '<p style="color:red; text-align: center;">❌ डेटा लोड नहीं हो सका। Error: ' + error.message + '</p>';
             });
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            startFirebaseListener(); // Firebase से डेटा लोड करना शुरू करें
+            startFirebaseListener();
             loadAllCategories();
             
             document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
@@ -272,7 +275,6 @@
                 }
             });
             
-            // सुनिश्चित करें कि मुख्य सर्च बार का इवेंट लिसनर भी डेटा लोड होने पर काम करे
             document.getElementById('main-search-bar').addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
                 const mistriListDiv = document.getElementById('mistri-list');
@@ -281,7 +283,10 @@
                 const providers = getServiceProviders(); 
 
                 const filtered = providers.filter(provider => 
-                    provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
+                    provider.name && (
+                        provider.name.toLowerCase().includes(searchTerm) || 
+                        (provider.category && provider.category.toLowerCase().includes(searchTerm))
+                    )
                 );
                 
                 if (filtered.length === 0) {
@@ -294,7 +299,7 @@
                     card.className = 'profile-card';
                     card.innerHTML = `
                         <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                        <p><strong>${provider.category}</strong> | ${provider.area || 'N/A'}</p>
                         <p>Experience: ${provider.experience || 'N/A'}</p>
                         <div>
                             <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
@@ -306,35 +311,31 @@
             });
         });
 
-        // loadServiceProviders function (Firebase डेटा का उपयोग करता है)
         function loadServiceProviders(listId) {
             const mistriListDiv = document.getElementById(listId);
             if (!mistriListDiv) return;
 
-            // Home Screen ('mistri-list') पर header और data लोड करें
             if (listId === 'mistri-list') { 
                 mistriListDiv.innerHTML = '<h3>Available Services</h3>';
                 
-                const providersToLoad = getServiceProviders(); // Firebase से लोड हुआ global array
+                const providersToLoad = getServiceProviders();
 
                 if (providersToLoad.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is list mein koi service nahi hai.</p>';
+                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">Abhi tak koi service register nahi hui hai. Aap pehle service add karein!</p>';
                     return;
                 }
 
                 providersToLoad.forEach(provider => {
                     const card = document.createElement('div');
                     card.className = 'profile-card';
-                    
-                    // HTML में बदलाव: Firebase डेटा फ़ील्ड का उपयोग
                     card.innerHTML = `
                         <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                        <p><strong>${provider.category}</strong> | ${provider.area || 'N/A'}</p>
                         <p>Experience: ${provider.experience || 'N/A'}</p>
                         <div>
                             <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
                             <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                            <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
+                            <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')" style="background: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; margin-left: 10px; cursor: pointer;">📤 Share</button>
                         </div>
                     `;
                     mistriListDiv.appendChild(card);
@@ -342,11 +343,21 @@
             }
         }
 
-
-        function callNumber(phone) { window.location.href = `tel:+91${phone}`; }
+        function callNumber(phone) { 
+            if(phone) {
+                window.location.href = `tel:+91${phone}`; 
+            } else {
+                alert('Phone number not available');
+            }
+        }
+        
         function openWhatsApp(phone) { 
-            const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
-            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            if(phone) {
+                const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
+                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            } else {
+                alert('Phone number not available');
+            }
         }
 
         function contactForAd(phone) { 
@@ -377,7 +388,6 @@
                 button.dataset.cat = item.cat;
                 button.innerHTML = `${item.icon} ${item.cat}`;
                 button.addEventListener('click', (e) => {
-                    // Search Screen पर फ़िल्टर लागू करें
                     filterByCategory(e.target.dataset.cat, 'mistri-list-full');
                 });
                 allCatList.appendChild(button);
@@ -402,7 +412,7 @@
                 card.className = 'profile-card';
                 card.innerHTML = `
                     <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                    <p><strong>${provider.category}</strong> | ${provider.area || 'N/A'}</p>
                     <p>Experience: ${provider.experience || 'N/A'}</p>
                     <div>
                         <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
@@ -444,7 +454,6 @@
             }
         }
         
-        // **** registerService FUNCTION (Saves data to Firebase) ****
         function registerService() {
             const name = document.getElementById('providerName').value;
             const phone = document.getElementById('providerPhone').value;
@@ -457,16 +466,31 @@
                 return;
             }
             
+            // Phone validation
+            if (phone.length !== 10 || isNaN(phone)) {
+                alert('❌ Kripya sahi phone number dalen (10 digits)');
+                return;
+            }
+            
             const newProvider = {
                 name: name,
                 category: category,
                 phone: phone,
                 area: area,
-                experience: experience, 
-                rating: "⭐️⭐️⭐️" 
+                experience: experience,
+                rating: "⭐️⭐️⭐️",
+                timestamp: new Date().toISOString()
             };
             
-            // Firebase में डेटा पुश करें (Push data to Firebase)
+            // Show loading
+            const submitBtn = document.getElementById('registerBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Registering...';
+            submitBtn.disabled = true;
+            
+            console.log("Saving to Firebase:", newProvider);
+            
+            // Firebase में डेटा पुश करें
             providersRef.push(newProvider)
                 .then(() => {
                     alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
@@ -479,7 +503,19 @@
                 })
                 .catch((error) => {
                     console.error("Data save failed:", error);
-                    alert('❌ Registration failed: Kripya dobara prayas karein। Iski wajah Firebase Security Rules ho sakti hai.');
+                    let errorMessage = '❌ Registration failed: ';
+                    
+                    if (error.code === 'PERMISSION_DENIED') {
+                        errorMessage += 'Database permission denied. Firebase Rules check karein.';
+                    } else {
+                        errorMessage += error.message;
+                    }
+                    alert(errorMessage);
+                })
+                .finally(() => {
+                    // Reset button
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
                 });
         }
     </script>
