@@ -105,10 +105,10 @@
 			<div id="mistri-categories" class="categories-list">
     </div>
 <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-    <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
+    <h3 style="color: white; text-align: center;">➕ Apni Service Register Karein</h3>
     
     <form onsubmit="event.preventDefault(); registerService();">
-        <input type="text" id="providerName" placeholder="Your Name" required 
+        <input type="text" id="providerName" placeholder="Aapka Naam" required 
                style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
         
         <input type="tel" id="providerPhone" placeholder="Phone Number" required 
@@ -116,7 +116,7 @@
         
         <select id="serviceCategory" required 
                 style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-            <option value="">Select Your Service</option>
+            <option value="">Apni Service Chunein</option>
             <option>Plumber</option>
             <option>Electrician</option>
             <option>Carpenter</option>
@@ -129,10 +129,10 @@
             <option>Computer Repair</option>
         </select>
         
-        <input type="text" id="providerArea" placeholder="Your Area in Fatehpur" required 
+        <input type="text" id="providerArea" placeholder="Fatehpur Mein Aapka Area" required 
                style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
         
-        <input type="text" id="providerExperience" placeholder="Experience (e.g., 5 Years)" required 
+        <input type="text" id="providerExperience" placeholder="Anubhav (Jaise, 5 Saal)" required 
                style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
         
         <button type="submit" 
@@ -163,7 +163,7 @@
             </div>
             <div id="mistri-list">
                 <h3>Available Services</h3>
-                <p style="text-align: center; color: #2a5298;">Loading services from Firebase...</p>
+                <p style="text-align: center; color: #2a5298;">Firebase se services load ho rahi hain...</p>
 			</div> 
             
             <div style="height: 80px;"></div>
@@ -205,19 +205,22 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // **** UPDATED FIREBASE CONFIGURATION (Based on your new project ID fatehpur-hubs-a3a9f) ****
+        // **** UPDATED FIREBASE CONFIGURATION (सटीक URL) ****
         const firebaseConfig = {
             // New API Key from your latest screenshot
             apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", 
             authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            // New Database URL based on the new Project ID
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebaseio.com", 
+            // आपके द्वारा प्रदान किया गया सटीक क्षेत्रीय URL:
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", 
             projectId: "fatehpur-hubs-a3a9f",
             storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
             messagingSenderId: "294360741451",
             appId: "1:294360741451:web:3bc85078805750b9fabfce",
-            measurementId: "G-R8N7DVEHML" // Optional but included for completeness
+            measurementId: "G-R8N7DVEHML" 
         };
+
+        // कॉन्फिग को कंसोल में प्रिंट करें ताकि आप जांच सकें
+        console.log("Firebase Configuration Loaded:", firebaseConfig);
 
         // Firebase को Initialize करें
         const app = firebase.initializeApp(firebaseConfig);
@@ -250,6 +253,7 @@
                 loadServiceProviders('mistri-list');
 
             }, (error) => {
+                // यह एरर तब आएगी जब Read Permission नहीं होगी
                 console.error("Firebase Read Failed:", error);
                 document.getElementById('mistri-list').innerHTML = '<p style="color:red; text-align: center;">❌ डेटा लोड नहीं हो सका। कृपया Firebase Security Rules जांचें।</p>';
             });
@@ -281,7 +285,7 @@
                 );
                 
                 if (filtered.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili.</p>';
+                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili।</p>';
                     return;
                 }
 
@@ -302,7 +306,6 @@
             });
         });
 
-        // loadServiceProviders function (Firebase डेटा का उपयोग करता है)
         function loadServiceProviders(listId) {
             const mistriListDiv = document.getElementById(listId);
             if (!mistriListDiv) return;
@@ -313,7 +316,7 @@
                 const providersToLoad = getServiceProviders(); 
 
                 if (providersToLoad.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is list mein koi service nahi hai.</p>';
+                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">Is list mein koi service nahi hai।</p>';
                     return;
                 }
 
@@ -386,7 +389,7 @@
             const filteredProviders = providers.filter(p => p.category === category);
             
             if (filteredProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is category mein koi service nahi hai.</p>';
+                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is category mein koi service nahi hai।</p>';
                 return;
             }
 
@@ -408,7 +411,7 @@
 
         function shareApp() {
             const appLink = window.location.href; 
-            const shareText = `✨ Fatehpur Hubs: Fatehpur ki sabhi services ek jagah!\n\nPlumber, Electrician, Carpenter, aur bohot kuch. Abhi app dekhein:\n${appLink}`;
+            const shareText = `✨ Fatehpur Hubs: Fatehpur ki sabhi services ek jagah!\n\nPlumber, Electrician, Carpenter, aur bohot kuch। Abhi app dekhein:\n${appLink}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -470,7 +473,8 @@
                 })
                 .catch((error) => {
                     console.error("Data save failed:", error);
-                    alert('❌ Registration failed: Kripya dobara prayas karein। Iski wajah Firebase Security Rules ho sakti hai.');
+                    // यह अलर्ट सबसे अधिक संभावना है कि PERMISSION_DENIED त्रुटि के कारण आता है।
+                    alert('❌ Registration failed: Kripya dobara prayas karein। Agar problem aati hai to console mein error dekhein।');
                 });
         }
     </script>
