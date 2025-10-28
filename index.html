@@ -3,480 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatehpur Hubs</title>
+    <title>फतेहपुर हब्स - सर्विस प्रोवाइडर</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
-        body { background: #f5f5f5; }
-        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
-        
-        /* NEW STYLE FOR ADVERTISE CONTACT SECTION */
-        #advertise-contact-section { margin-left: 15px; margin-right: 15px; }
-
-        header { 
-            background: linear-gradient(135deg, #1e3c72, #2a5298); 
-            color: white; padding: 15px; 
-            display: flex; justify-content: space-between; align-items: center;
+        body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
+        .service-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .service-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); }
+        .btn-primary { background-color: #4CAF50; transition: background-color 0.2s; }
+        .btn-primary:hover { background-color: #45a049; }
+        .btn-secondary { background-color: #e5e7eb; color: #1f2937; transition: background-color 0.2s; }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        /* Custom modal for alerts */
+        #alert-modal {
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
         }
-        header h1 { display: flex; align-items: center; gap: 10px; font-size: 1.4em; }
-        #auth-info { font-size: 0.9em; font-weight: 600; text-align: right; max-width: 150px; }
-        
-        .screen { display: none; padding: 15px; }
-        .screen.active { display: block; }
-        
-        #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px 0; }
-        
-        .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; }
-        .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
-        
-        .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
-        .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
-        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin: 10px 0 0 10px; cursor: pointer; }
-        
-        .back-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer; }
-        
-        .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
-        .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
-        .share-btn, .more-app-btn { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
-        
-        .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
-        .ad-label { font-size: 0.8em; color: #666; margin-bottom: 5px; }
-        
-        #promo-section { background: linear-gradient(135deg, #ff9a9e, #fad0c4); padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; }
-        #banner-area img { width: 100%; border-radius: 8px; margin-top: 10px; }
-        
-        h3 { color: #2a5298; margin: 15px 0 10px 0; }
     </style>
 </head>
-<body>
-    <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
-        <!-- Ad Script 1 -->
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
+<body class="min-h-screen">
 
-    <div class="container">
-        <header>
-            <h1>
-                <img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;">
-                <span>Fatehpur Hubs</span>
-            </h1>
-            <div id="auth-info">Fatehpur ke sabhi services ek jagah</div>
+    <!-- Firebase SDKs - Mandatory -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <div id="app-container" class="max-w-4xl mx-auto p-4 md:p-6">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800">फतेहपुर हब्स</h1>
+            <p class="text-gray-600 mt-1">आपकी सभी सेवाओं का विश्वसनीय स्रोत</p>
         </header>
-        
-        <div id="home-screen" class="screen active">
-            <input type="text" id="main-search-bar" placeholder="Service Search Karein (Plumber, Electrician...)">
+
+        <!-- Search and Filter Section -->
+        <section class="mb-8 p-4 bg-white rounded-xl shadow-lg">
+            <input type="text" id="search-input" placeholder="सर्विस, नाम या एरिया खोजें..."
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 mb-4 text-gray-700">
             
-            <div class="ad-container">
-                <div class="ad-label">Sponsored</div>
-                <!-- Ad Script 2 -->
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : 'd65603602583bbe6bc3308e8ee8ab792',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
+            <div id="category-filter" class="flex flex-wrap gap-2 justify-center">
+                <!-- Buttons will be added here -->
             </div>
-            
-            <h3>Popular Services</h3>
-            <div id="mistri-categories" class="categories-list">
-                <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
-                <button class="cat-btn" data-cat="Electrician">⚡ Electrician</button>
-                <button class="cat-btn" data-cat="Carpenter">🔨 Carpenter</button>
-                <button class="cat-btn" data-cat="Mason">🧱 Mason</button>
-                <button class="cat-btn" data-cat="Painter">🎨 Painter</button>
-                <button class="cat-btn" data-cat="AC Mechanic">❄️ AC Mech.</button>
-                <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
-                <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">More...</button>
+        </section>
+
+        <!-- Service List -->
+        <section>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">उपलब्ध सर्विस प्रोवाइडर</h2>
+            <div id="services-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Service Cards will be injected here -->
             </div>
-			<div id="mistri-categories" class="categories-list">
-    </div>
-<div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-    <h3 style="color: white; text-align: center;">➕ Apni Service Register Karein</h3>
-    
-    <form onsubmit="event.preventDefault(); registerService();">
-        <input type="text" id="providerName" placeholder="Aapka Naam" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <input type="tel" id="providerPhone" placeholder="Phone Number" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <select id="serviceCategory" required 
-                style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-            <option value="">Apni Service Chunein</option>
-            <option>Plumber</option>
-            <option>Electrician</option>
-            <option>Carpenter</option>
-            <option>Mason</option>
-            <option>Painter</option>
-            <option>AC Mechanic</option>
-            <option>Tiler</option>
-            <option>TV Mechanic</option>
-            <option>Welder</option>
-            <option>Computer Repair</option>
-        </select>
-        
-        <input type="text" id="providerArea" placeholder="Fatehpur Mein Aapka Area" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <input type="text" id="providerExperience" placeholder="Anubhav (Jaise, 5 Saal)" required 
-               style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-        
-        <button type="submit" 
-                style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
-            Register Service
+            <p id="no-results" class="text-center text-gray-500 mt-8 hidden">कोई परिणाम नहीं मिला।</p>
+        </section>
+
+        <!-- Register Button -->
+        <button id="register-btn" class="fixed bottom-6 right-6 p-4 rounded-full shadow-2xl text-white font-bold text-lg btn-primary hover:scale-105 transform transition-transform"
+                onclick="showRegistrationModal()">
+            + सर्विस रजिस्टर करें
         </button>
-    </form>
-</div>
+    </div>
 
-<div id="promo-section">
-                <h3>✨ Offers aur Promotions ✨</h3>
-                <div id="banner-area">
-                    <img src="https://via.placeholder.com/350x80?text=Your+Ad+Space+Here" alt="Promotion Ad">
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="fixed inset-0 flex items-center justify-center p-4 hidden" style="z-index: 50;">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 transform transition-all">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800">नई सर्विस रजिस्टर करें</h3>
+            
+            <form id="registration-form" onsubmit="return false;">
+                
+                <div class="mb-4">
+                    <label for="provider-name" class="block text-sm font-medium text-gray-700">आपका नाम</label>
+                    <input type="text" id="provider-name" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
                 </div>
-            </div>
+                
+                <div class="mb-4">
+                    <label for="provider-phone" class="block text-sm font-medium text-gray-700">फ़ोन नंबर (WhatsApp)</label>
+                    <input type="tel" id="provider-phone" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+                </div>
 
-            <div id="advertise-contact-section" style="margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2;">
-                <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">
-                    ⭐ Apne Business ko Fatehpur Hubs par Promote Karein!
-                </h4>
-                <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">
-                    Apni dukaan, business, ya service ka Ad yahaan lagwaye aur zyada grahak paye।
-                </p>
-                <button onclick="contactForAd('9889904191')" 
-                        style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
-                    📞 Advertisement Ke Liye Sampark Kare
+                <div class="mb-4">
+                    <label for="provider-category" class="block text-sm font-medium text-gray-700">सर्विस कैटेगरी</label>
+                    <select id="provider-category" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+                        <option value="">-- चुनें --</option>
+                        <option value="Plumber">प्लम्बर (Plumber)</option>
+                        <option value="Electrician">इलेक्ट्रीशियन (Electrician)</option>
+                        <option value="Carpenter">बढ़ई (Carpenter)</option>
+                        <option value="Mechanic">मैकेनिक (Mechanic)</option>
+                        <option value="AC Repair">एसी रिपेयर (AC Repair)</option>
+                        <option value="Other">अन्य (Other)</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="provider-area" class="block text-sm font-medium text-gray-700">सर्विस एरिया (जैसे: सिविल लाइन्स, कॉलेज रोड)</label>
+                    <input type="text" id="provider-area" required class="mt-1 w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideRegistrationModal()" class="px-4 py-2 font-semibold rounded-lg btn-secondary">
+                        कैंसिल
+                    </button>
+                    <button type="submit" onclick="registerService(event)" class="px-4 py-2 font-semibold rounded-lg text-white btn-primary">
+                        रजिस्टर करें
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Message Modal -->
+    <div id="alert-modal" class="fixed inset-0 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all">
+            <h4 id="alert-title" class="text-xl font-bold mb-3 text-gray-800"></h4>
+            <p id="alert-message" class="text-gray-600 mb-6"></p>
+            <div class="flex justify-end">
+                <button type="button" onclick="hideAlertModal()" class="px-4 py-2 font-semibold rounded-lg btn-primary text-white">
+                    ठीक है
                 </button>
             </div>
-            <div id="mistri-list">
-                <h3>Available Services</h3>
-                <p style="text-align: center; color: #2a5298;">Firebase se services load ho rahi hain...</p>
-			</div> 
-            
-            <div style="height: 80px;"></div>
-        </div>
-
-        <div id="search-screen" class="screen">
-            <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
-            <h2>Sabhi Services</h2>
-            
-            
-            <div id="all-categories-list" class="categories-list"></div> 
-            <div id="mistri-list-full"></div>
-        </div>
-
-        <div class="footer">
-            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
-            <button class="share-btn" onclick="shareApp()">📤 Share</button>
-            <button class="more-app-btn" onclick="openMoreApps()">➕ More</button>
         </div>
     </div>
 
-    <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
-        <!-- Ad Script 3 -->
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
-    
-    <!-- 1. FIREBASE SDKs AND CONFIGURATION -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
+    <!-- Main Application Script -->
     <script>
-        // **** UPDATED FIREBASE CONFIGURATION (सटीक URL) ****
+        // --------------- 1. Firebase Configuration ---------------
         const firebaseConfig = {
-            // New API Key from your latest screenshot
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", 
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
             authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            // आपके द्वारा प्रदान किया गया सटीक क्षेत्रीय URL:
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", 
             projectId: "fatehpur-hubs-a3a9f",
             storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
             messagingSenderId: "294360741451",
             appId: "1:294360741451:web:3bc85078805750b9fabfce",
-            measurementId: "G-R8N7DVEHML" 
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app" // सही URL
         };
 
-        // कॉन्फिग को कंसोल में प्रिंट करें ताकि आप जांच सकें
-        console.log("Firebase Configuration Loaded:", firebaseConfig);
+        // --------------- 2. Global Variables and Init ---------------
+        let db, auth;
+        let allProviders = []; // सभी प्रोवाइडर्स का डेटा स्टोर करने के लिए
+        let currentFilter = ''; // वर्तमान में लागू किया गया फ़िल्टर
+        let isAuthReady = false; // ऑथेंटिकेशन तैयार है या नहीं
 
-        // Firebase को Initialize करें
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
-        const providersRef = database.ref('service_providers'); // डेटाबेस में "service_providers" नोड का उपयोग करें
-        
-        let serviceProviders = [];
-
-        function getServiceProviders() {
-            return serviceProviders;
+        // Utility function to show custom alert
+        function showAlertModal(title, message) {
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-message').textContent = message;
+            document.getElementById('alert-modal').classList.remove('hidden');
         }
 
-        // नया फंक्शन: Firebase से डेटा सुनना (Listening for data from Firebase)
+        function hideAlertModal() {
+            document.getElementById('alert-modal').classList.add('hidden');
+        }
+
+        // --------------- 3. Firebase Initialization and Authentication ---------------
+        function initializeFirebase() {
+            try {
+                // Initialize Firebase App
+                const app = firebase.initializeApp(firebaseConfig);
+                
+                // Get Database and Auth instances
+                db = app.database();
+                auth = app.auth();
+
+                // Set up Auth State Listener (Crucial for secure write)
+                auth.onAuthStateChanged(user => {
+                    if (!user) {
+                        // User is not signed in, sign in anonymously
+                        auth.signInAnonymously()
+                            .then(() => {
+                                console.log("Authentication: Signed in Anonymously.");
+                                isAuthReady = true;
+                            })
+                            .catch(error => {
+                                console.error("Authentication Error:", error);
+                                showAlertModal("❌ ऑथेंटिकेशन फेल", "रजिस्ट्रेशन के लिए आवश्यक लॉगिन विफल रहा।");
+                            });
+                    } else {
+                        // User is signed in (either anonymously or otherwise)
+                        console.log("Authentication: User is signed in.", user.uid);
+                        isAuthReady = true;
+                    }
+
+                    // Once auth is ready, start listening for data
+                    if (isAuthReady) {
+                        startFirebaseListener();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase Initialization Failed:", error);
+                showAlertModal("❌ ऐप लोड एरर", "Firebase शुरू करने में विफल रहा। कृपया कंसोल देखें।");
+            }
+        }
+
+        // --------------- 4. Data Listening (Real-Time Read) ---------------
         function startFirebaseListener() {
-            // 'value' लिसनर डेटा में हर बदलाव पर चलता है
+            const providersRef = db.ref('service_providers');
             providersRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                const firebaseProviders = [];
-                
+                const providersArray = [];
+
                 if (data) {
+                    // Convert the object structure from Firebase into a useful array
                     for (let key in data) {
-                        let provider = data[key];
-                        provider.id = key; 
-                        firebaseProviders.push(provider);
+                        providersArray.push({
+                            id: key, // Firebase key
+                            ...data[key]
+                        });
                     }
                 }
                 
-                serviceProviders = firebaseProviders;
+                allProviders = providersArray; // Store all data globally
+                console.log(`Data received. Total providers: ${allProviders.length}`);
                 
-                loadServiceProviders('mistri-list');
-
-            }, (error) => {
-                // यह एरर तब आएगी जब Read Permission नहीं होगी
-                console.error("Firebase Read Failed:", error);
-                document.getElementById('mistri-list').innerHTML = '<p style="color:red; text-align: center;">❌ डेटा लोड नहीं हो सका। कृपया Firebase Security Rules जांचें।</p>';
+                // Show the list based on the current filter
+                filterAndRenderList();
             });
         }
         
-        document.addEventListener('DOMContentLoaded', function() {
-            startFirebaseListener(); 
-            loadAllCategories();
-            
-            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
-                if(button.id !== 'more-cat-btn') {
-                    button.addEventListener('click', (e) => {
-                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => btn.classList.remove('selected'));
-                        e.target.classList.add('selected');
-                        filterByCategory(e.target.dataset.cat, 'mistri-list');
-                    });
-                }
-            });
-            
-            document.getElementById('main-search-bar').addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                const mistriListDiv = document.getElementById('mistri-list');
-                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-                
-                const providers = getServiceProviders(); 
+        // --------------- 5. Data Rendering and Filtering ---------------
 
-                const filtered = providers.filter(provider => 
-                    provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
-                );
-                
-                if (filtered.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili।</p>';
-                    return;
-                }
+        const categories = ["Plumber", "Electrician", "Carpenter", "Mechanic", "AC Repair", "Other"];
+        const categoryFilterDiv = document.getElementById('category-filter');
+        const servicesListDiv = document.getElementById('services-list');
+        const noResults = document.getElementById('no-results');
 
-                filtered.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = `
-                        <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
-                        <p>Experience: ${provider.experience || 'N/A'}</p>
-                        <div>
-                            <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
-                            <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                        </div>
-                    `;
-                    mistriListDiv.appendChild(card);
-                });
-            });
+        // Create initial filter buttons
+        categories.forEach(category => {
+            const button = document.createElement('button');
+            button.textContent = category;
+            button.className = 'px-3 py-1 text-sm font-semibold rounded-full btn-secondary';
+            button.setAttribute('data-category', category);
+            button.onclick = () => toggleFilter(category, button);
+            categoryFilterDiv.appendChild(button);
         });
 
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
+        // Toggle filter functionality
+        function toggleFilter(category, button) {
+            // Check if the same category is clicked again
+            if (currentFilter === category) {
+                currentFilter = ''; // Remove filter
+                // Reset all buttons' styling
+                document.querySelectorAll('.btn-secondary').forEach(btn => {
+                    btn.classList.remove('btn-primary', 'text-white');
+                    btn.classList.add('btn-secondary');
+                });
+            } else {
+                currentFilter = category; // Set new filter
+                // Reset all buttons' styling
+                document.querySelectorAll('.btn-secondary').forEach(btn => {
+                    btn.classList.remove('btn-primary', 'text-white');
+                    btn.classList.add('btn-secondary');
+                });
+                // Highlight the selected button
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary', 'text-white');
+            }
+            filterAndRenderList();
+        }
 
-            if (listId === 'mistri-list') { 
-                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+        // Main filter function
+        function filterAndRenderList() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            let filteredList = allProviders;
+
+            // 1. Apply Category Filter
+            if (currentFilter) {
+                filteredList = filteredList.filter(p => p.category === currentFilter);
+            }
+
+            // 2. Apply Search Filter
+            if (searchText) {
+                filteredList = filteredList.filter(p => 
+                    p.name.toLowerCase().includes(searchText) ||
+                    p.area.toLowerCase().includes(searchText) ||
+                    p.category.toLowerCase().includes(searchText)
+                );
+            }
+
+            renderList(filteredList);
+        }
+
+        // Render the filtered list to the UI
+        function renderList(list) {
+            servicesListDiv.innerHTML = ''; // Clear existing list
+
+            if (list.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
                 
-                const providersToLoad = getServiceProviders(); 
-
-                if (providersToLoad.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">Is list mein koi service nahi hai।</p>';
-                    return;
-                }
-
-                providersToLoad.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    
-                    card.innerHTML = `
-                        <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
-                        <p>Experience: ${provider.experience || 'N/A'}</p>
-                        <div>
-                            <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
-                            <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                            <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
-                        </div>
-                    `;
-                    mistriListDiv.appendChild(card);
+                list.forEach(provider => {
+                    const card = createServiceCard(provider);
+                    servicesListDiv.appendChild(card);
                 });
             }
         }
 
+        // Search input listener
+        document.getElementById('search-input').addEventListener('input', filterAndRenderList);
 
-        function callNumber(phone) { window.location.href = `tel:+91${phone}`; }
-        function openWhatsApp(phone) { 
-            const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
-            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        // Helper function to create the card UI
+        function createServiceCard(provider) {
+            const card = document.createElement('div');
+            card.className = 'service-card bg-white p-6 rounded-xl shadow-lg border border-gray-100';
+            
+            // Format phone number for WhatsApp URL
+            const whatsappNumber = provider.phone.replace(/[^0-9]/g, '');
+            const whatsappUrl = `https://wa.me/91${whatsappNumber}?text=नमस्ते, मैंने आपको फतेहपुर हब्स पर देखा। क्या आप [Service] के लिए उपलब्ध हैं?`;
+            
+            // Star rating visualization (basic for now)
+            const rating = provider.rating || 5; // Default to 5 if not set
+            const stars = Array(Math.round(rating)).fill('⭐').join('');
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-bold text-gray-900">${provider.name}</h3>
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${provider.category}</span>
+                </div>
+                <p class="text-sm text-yellow-500 mb-2">${stars} (${rating.toFixed(1)})</p>
+                <div class="text-gray-700 space-y-1 text-sm">
+                    <p>📍 एरिया: <span class="font-medium">${provider.area}</span></p>
+                    <p>🛠️ अनुभव: <span class="font-medium">${provider.experience || 'ज्ञात नहीं'}</span></p>
+                </div>
+                
+                <div class="mt-4 flex space-x-3">
+                    <a href="tel:${provider.phone}" class="flex-1 px-4 py-2 text-center rounded-lg text-white font-semibold btn-primary shadow-md">
+                        📞 कॉल करें
+                    </a>
+                    <a href="${whatsappUrl}" target="_blank" class="flex-1 px-4 py-2 text-center rounded-lg text-white font-semibold bg-green-500 hover:bg-green-600 shadow-md">
+                        💬 WhatsApp
+                    </a>
+                </div>
+            `;
+            return card;
         }
 
-        function contactForAd(phone) { 
-            const message = "Namaste, Main Fatehpur Hubs par advertisement ke liye sampark kar raha/rahi hoon। Kripya details bhejein।";
-            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
+        // --------------- 6. Registration Functions (Write) ---------------
         
-        const ALL_CATEGORIES = [
-            { cat: 'Plumber', icon: '💧' }, { cat: 'Electrician', icon: '⚡' }, { cat: 'Carpenter', icon: '🔨' },
-            { cat: 'Mason', icon: '🧱' }, { cat: 'Painter', icon: '🎨' }, { cat: 'AC Mechanic', icon: '❄️' },
-            { cat: 'TV Mechanic', icon: '📺' }, { cat: 'Tiler', icon: '◻️' }, { cat: 'Private Teacher', icon: '🎓' },
-            { cat: 'Welder', icon: '🔥' }, { cat: 'Computer Repair', icon: '💻' }
-        ];
-
-        function loadAllCategories() {
-            const allCatList = document.getElementById('all-categories-list');
-            if (!allCatList) return;
-            allCatList.innerHTML = '';
-            
-            ALL_CATEGORIES.forEach(item => {
-                const button = document.createElement('button');
-                button.className = 'cat-btn';
-                button.dataset.cat = item.cat;
-                button.innerHTML = `${item.icon} ${item.cat}`;
-                button.addEventListener('click', (e) => {
-                    filterByCategory(e.target.dataset.cat, 'mistri-list-full');
-                });
-                allCatList.appendChild(button);
-            });
+        function showRegistrationModal() {
+            document.getElementById('registration-modal').classList.remove('hidden');
         }
 
-        function filterByCategory(category, listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-            mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
-            
-            const providers = getServiceProviders(); 
-            const filteredProviders = providers.filter(p => p.category === category);
-            
-            if (filteredProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is category mein koi service nahi hai।</p>';
+        function hideRegistrationModal() {
+            document.getElementById('registration-modal').classList.add('hidden');
+            document.getElementById('registration-form').reset();
+        }
+
+        async function registerService(event) {
+            event.preventDefault(); // Stop form submission
+
+            // Check if authentication is complete
+            if (!isAuthReady || !auth.currentUser) {
+                showAlertModal("⏳ कृपया प्रतीक्षा करें", "सिस्टम अभी भी सुरक्षा जाँच (Authentication) कर रहा है। एक सेकंड में पुनः प्रयास करें।");
                 return;
             }
 
-            filteredProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = `
-                    <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
-                    <p>Experience: ${provider.experience || 'N/A'}</p>
-                    <div>
-                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
-                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                    </div>
-                `;
-                mistriListDiv.appendChild(card);
-            });
-        }
+            const name = document.getElementById('provider-name').value.trim();
+            const phone = document.getElementById('provider-phone').value.trim();
+            const category = document.getElementById('provider-category').value;
+            const area = document.getElementById('provider-area').value.trim();
 
-        function shareApp() {
-            const appLink = window.location.href; 
-            const shareText = `✨ Fatehpur Hubs: Fatehpur ki sabhi services ek jagah!\n\nPlumber, Electrician, Carpenter, aur bohot kuch। Abhi app dekhein:\n${appLink}`;
-
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Fatehpur Hubs App',
-                    text: shareText,
-                    url: appLink
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-        }
-
-        function openMoreApps() { alert("More Apps coming soon!"); } 
-                
-        function shareProvider(name, category, phone) {
-            const message = `✨ Fatehpur Hubs Par ${category} Service!\n\n👨‍🔧 Naam: ${name}\n📞 Phone: ${phone}\n\nFatehpur mein sabhi local services ke liye app download karein।`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: `Service Provider: ${name}`,
-                    text: message,
-                    url: window.location.href 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-        
-        // **** registerService FUNCTION (Saves data to Firebase) ****
-        function registerService() {
-            const name = document.getElementById('providerName').value;
-            const phone = document.getElementById('providerPhone').value;
-            const category = document.getElementById('serviceCategory').value;
-            const area = document.getElementById('providerArea').value;
-            const experience = document.getElementById('providerExperience').value;
-            
-            if (!name || !phone || !category || !area || !experience) {
-                alert('❌ Kripya sabhi fields bharein।');
+            if (!name || !phone || !category || !area) {
+                showAlertModal("❌ त्रुटि", "सभी फ़ील्ड भरना आवश्यक है।");
                 return;
             }
             
+            // Data to be saved
             const newProvider = {
                 name: name,
-                category: category,
                 phone: phone,
+                category: category,
                 area: area,
-                experience: experience, 
-                rating: "⭐️⭐️⭐️" 
+                // Add current user's UID for security/future editing features
+                uid: auth.currentUser.uid, 
+                rating: 5, // Default rating
+                reviews: 0,
+                timestamp: Date.now()
             };
-            
-            providersRef.push(newProvider)
-                .then(() => {
-                    alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
-                    document.getElementById('providerName').value = '';
-                    document.getElementById('providerPhone').value = '';
-                    document.getElementById('serviceCategory').value = '';
-                    document.getElementById('providerArea').value = '';
-                    document.getElementById('providerExperience').value = '';
-                })
-                .catch((error) => {
-                    console.error("Data save failed:", error);
-                    // यह अलर्ट सबसे अधिक संभावना है कि PERMISSION_DENIED त्रुटि के कारण आता है।
-                    alert('❌ Registration failed: Kripya dobara prayas karein। Agar problem aati hai to console mein error dekhein।');
-                });
+
+            const providersRef = db.ref('service_providers');
+
+            try {
+                await providersRef.push(newProvider); // Push data to Firebase
+                hideRegistrationModal();
+                showAlertModal("✅ सफल", `सर्विस "${name}" सफलतापूर्वक रजिस्टर हो गई है!`);
+            } catch (error) {
+                console.error("Registration failed:", error);
+                // The most common error here is PERMISSION_DENIED (if rules are wrong)
+                showAlertModal("❌ रजिस्ट्रेशन फेल", "सर्विस रजिस्टर करने में समस्या आई। (Permission/Connection Error)");
+            }
         }
+
+
+        // --------------- 7. App Start ---------------
+        window.onload = initializeFirebase;
+
     </script>
 </body>
 </html>
