@@ -3,52 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatehpur Hubs - Professional Services</title>
+    <title>Fatehpur Hubs</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
         body { background: #f5f5f5; }
         .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
-        
-        header { 
-            background: linear-gradient(135deg, #1e3c72, #2a5298); 
-            color: white; padding: 15px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        header h1 { display: flex; align-items: center; gap: 10px; font-size: 1.4em; }
-        #auth-info { font-size: 0.9em; font-weight: 600; text-align: right; max-width: 150px; }
-        
+        header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .screen { display: none; padding: 15px; }
         .screen.active { display: block; }
-        
         #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px 0; }
-        
         .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; }
         .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
-        
         .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
-        .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-top: 10px; cursor: pointer; }
-        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin: 10px 0 0 10px; cursor: pointer; }
-        
-        .back-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer; }
-        
+        .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
+        .share-btn-inline { background: #f8f9fa; color: #333; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
-        .share-btn, .more-app-btn { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
-        
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
-        .ad-label { font-size: 0.8em; color: #666; margin-bottom: 5px; }
         
-        #promo-section { background: linear-gradient(135deg, #ff9a9e, #fad0c4); padding: 15px; border-radius: 10px; margin: 20px 0; text-align: center; }
-        #banner-area img { width: 100%; border-radius: 8px; margin-top: 10px; }
+        /* Promotion Section Styles */
+        .promotion-section { margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 10px; text-align: center; }
+        .promotion-banner { width: 100%; border-radius: 8px; margin-top: 10px; }
         
-        h3 { color: #2a5298; margin: 15px 0 10px 0; }
-        
-        .pro-badge { background: #2a5298; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; }
-        .secure-badge { background: #25D366; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+        /* Contact for Ads Section */
+        .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
 <body>
+    <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
@@ -65,16 +49,14 @@
 
     <div class="container">
         <header>
-            <h1>
-                <img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;">
-                <span>Fatehpur Hubs</span>
-            </h1>
+            <h1><img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;"> <span>Fatehpur Hubs</span></h1>
             <div id="auth-info">Fatehpur ke Professional Services</div>
         </header>
         
         <div id="home-screen" class="screen active">
-            <input type="text" id="main-search-bar" placeholder="🔍 Professional Service Search...">
+            <input type="text" id="main-search-bar" placeholder="🔍 Search Plumber, Electrician...">
             
+            <!-- Middle Ad -->
             <div class="ad-container">
                 <div class="ad-label">Sponsored</div>
                 <script type="text/javascript">
@@ -89,109 +71,84 @@
                 <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
             </div>
             
-            <h3>🚀 Popular Professional Services</h3>
+            <h3>🚀 Popular Services</h3>
             <div id="mistri-categories" class="categories-list">
-                <button class="cat-btn" data-cat="Plumber">💧 Professional Plumber</button>
-                <button class="cat-btn" data-cat="Electrician">⚡ Certified Electrician</button>
-                <button class="cat-btn" data-cat="Carpenter">🔨 Expert Carpenter</button>
-                <button class="cat-btn" data-cat="Mason">🧱 Skilled Mason</button>
-                <button class="cat-btn" data-cat="Painter">🎨 Professional Painter</button>
-                <button class="cat-btn" data-cat="AC Mechanic">❄️ AC Specialist</button>
-                <button class="cat-btn" data-cat="Tiler">◻️ Expert Tiler</button>
-                <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">📋 More Services...</button>
+                <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
+                <button class="cat-btn" data-cat="Electrician">⚡ Electrician</button>
+                <button class="cat-btn" data-cat="Carpenter">🔨 Carpenter</button>
+                <button class="cat-btn" data-cat="Mason">🧱 Mason</button>
+                <button class="cat-btn" data-cat="Painter">🎨 Painter</button>
+                <button class="cat-btn" data-cat="AC Mechanic">❄️ AC Mech.</button>
+                <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
+                <button id="more-cat-btn" class="cat-btn" onclick="showScreen('search-screen')">More...</button>
             </div>
 
-            <!-- Professional Service Registration -->
+            <!-- PROMOTION ADS SECTION - यहाँ Businesses की Ads Show होंगी -->
+            <div class="promotion-section">
+                <h3>✨ Special Offers & Promotions ✨</h3>
+                <div id="promotion-banner-area">
+                    <!-- यहाँ आपकी promotion ads automatically show होंगी -->
+                    <img src="https://via.placeholder.com/350x100/4CAF50/white?text=Business+Promotion+Ad+1" alt="Promotion Ad 1" class="promotion-banner">
+                    <img src="https://via.placeholder.com/350x100/2196F3/white?text=Business+Promotion+Ad+2" alt="Promotion Ad 2" class="promotion-banner" style="margin-top: 10px;">
+                </div>
+                <p style="font-size: 12px; margin-top: 8px; color: #666;">Sponsored Businesses</p>
+            </div>
+
             <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-                <h3 style="color: white; text-align: center;">➕ Professional Service Register</h3>
-                
+                <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
                 <form onsubmit="event.preventDefault(); registerService();">
-                    <input type="text" id="providerName" placeholder="Full Professional Name" required 
-                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    
-                    <input type="tel" id="providerPhone" placeholder="10-digit Phone Number" required 
-                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    
-                    <select id="serviceCategory" required 
-                            style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                        <option value="">Select Professional Service</option>
-                        <option>Plumber</option>
-                        <option>Electrician</option>
-                        <option>Carpenter</option>
-                        <option>Mason</option>
-                        <option>Painter</option>
-                        <option>AC Mechanic</option>
-                        <option>Tiler</option>
-                        <option>TV Mechanic</option>
-                        <option>Welder</option>
-                        <option>Computer Repair</option>
+                    <input type="text" id="providerName" placeholder="Your Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <select id="serviceCategory" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                        <option value="">Select Service</option>
+                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option>
+                        <option>Painter</option><option>AC Mechanic</option><option>Tiler</option><option>TV Mechanic</option>
+                        <option>Welder</option><option>Computer Repair</option>
                     </select>
-                    
-                    <input type="text" id="providerArea" placeholder="Working Area in Fatehpur" required 
-                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    
-                    <input type="text" id="providerExperience" placeholder="Professional Experience" required 
-                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    
-                    <input type="text" id="providerAddress" placeholder="Full Business Address" 
-                           style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    
-                    <textarea id="providerSkills" placeholder="Special Skills & Professional Services" 
-                              style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; height: 60px;"></textarea>
-                    
-                    <button type="submit" id="registerBtn"
-                            style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                        ✅ Register Professional Service
-                    </button>
-                    
-                    <p style="font-size: 12px; text-align: center; margin-top: 10px;">
-                        🔒 Secure & Verified Professional Registration
-                    </p>
+                    <input type="text" id="providerArea" placeholder="Your Area" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="text" id="providerExperience" placeholder="Experience" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <button type="submit" id="registerBtn" style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Register Service</button>
                 </form>
             </div>
 
-            <div id="promo-section">
-                <h3>✨ Professional Offers & Promotions ✨</h3>
-                <div id="banner-area">
-                    <img src="https://via.placeholder.com/350x80?text=Professional+Business+Ads+Here" alt="Promotion Ad">
-                </div>
-            </div>
-
-            <div id="advertise-contact-section" style="margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2;">
-                <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">
-                    ⭐ Promote Your Business on Fatehpur Hubs!
-                </h4>
+            <!-- CONTACT FOR ADS SECTION - नई Ads लगवाने के लिए -->
+            <div class="contact-ads-section">
+                <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">📢 Want to Promote Your Business?</h4>
                 <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">
-                    Get more customers with professional advertising on Fatehpur's leading service platform.
+                    Show your ad to thousands of users in Fatehpur!<br>
+                    Contact us for advertising space.
                 </p>
-                <button onclick="contactForAd('9889904191')" 
-                        style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
-                    📞 Contact for Professional Ads
+                <button onclick="contactForAds()" style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
+                    📞 Contact for Advertising
                 </button>
+                <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                    WhatsApp: 9889904191
+                </p>
             </div>
             
             <div id="mistri-list">
-                <h3>✅ Verified Professional Services</h3>
-                <p style="text-align: center; color: #2a5298;">Loading professional services...</p>
+                <h3>Available Services</h3>
+                <p style="text-align: center; color: #2a5298;">Loading services...</p>
             </div> 
             
             <div style="height: 80px;"></div>
         </div>
 
         <div id="search-screen" class="screen">
-            <button class="back-btn" onclick="showScreen('home-screen')">← Back to Home</button>
-            <h2>📋 All Professional Services</h2>
+            <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
+            <h2>All Services</h2>
             <div id="all-categories-list" class="categories-list"></div> 
             <div id="mistri-list-full"></div>
         </div>
 
         <div class="footer">
-            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Go Premium</a>
-            <button class="share-btn" onclick="shareApp()">📤 Share App</button>
-            <button class="more-app-btn" onclick="openMoreApps()">➕ More</button>
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
+            <button class="share-btn-inline" onclick="shareApp()">📤 Share App</button>
+            <button class="share-btn-inline" onclick="openMoreApps()">➕ More</button>
         </div>
     </div>
 
+    <!-- Bottom Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
@@ -210,7 +167,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // ** Professional Firebase Configuration **
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
             authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -226,72 +183,81 @@
         const database = app.database();
         const providersRef = database.ref('service_providers');
         
-        console.log("Professional Firebase App Initialized");
-        
         let serviceProviders = [];
 
-        function getServiceProviders() {
-            return serviceProviders;
-        }
-
+        // Load data from Firebase
         function startFirebaseListener() {
             providersRef.on('value', (snapshot) => {
                 const data = snapshot.val();
-                const firebaseProviders = [];
-                
+                serviceProviders = [];
                 if (data) {
                     for (let key in data) {
                         let provider = data[key];
                         provider.id = key; 
-                        firebaseProviders.push(provider);
+                        serviceProviders.push(provider);
                     }
-                    console.log("Loaded professional services:", firebaseProviders.length);
-                } else {
-                    console.log("No professional services found");
                 }
-                
-                serviceProviders = firebaseProviders;
                 loadServiceProviders('mistri-list');
-                
-            }, (error) => {
-                console.error("Professional data load failed:", error);
-                document.getElementById('mistri-list').innerHTML = 
-                    '<p style="color:red; text-align: center;">❌ Professional services load failed. Please try again.</p>';
             });
         }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            startFirebaseListener();
-            loadAllCategories();
-            
-            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
-                if(button.id !== 'more-cat-btn') {
-                    button.addEventListener('click', (e) => {
-                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => btn.classList.remove('selected'));
-                        e.target.classList.add('selected');
-                        filterByCategory(e.target.dataset.cat, 'mistri-list');
-                    });
+
+        // Create service card
+        function createProfessionalCard(provider) {
+            return `
+                <h3>${provider.name} ⭐️⭐️⭐️⭐️</h3>
+                <p><strong>${provider.category}</strong> | 📍 ${provider.area || 'Fatehpur'}</p>
+                <p>🛠️ Experience: ${provider.experience || 'Professional'}</p>
+                <div style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                    <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
+                </div>
+            `;
+        }
+
+        // Load services in list
+        function loadServiceProviders(listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+
+            if (listId === 'mistri-list') { 
+                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+                
+                if (serviceProviders.length === 0) {
+                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+                    return;
                 }
-            });
-            
+
+                serviceProviders.forEach(provider => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = createProfessionalCard(provider);
+                    mistriListDiv.appendChild(card);
+                });
+            }
+        }
+
+        // Search functionality
+        function setupSearch() {
             document.getElementById('main-search-bar').addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
                 const mistriListDiv = document.getElementById('mistri-list');
-                mistriListDiv.innerHTML = '<h3>🔍 Search Results</h3>';
                 
-                const providers = getServiceProviders(); 
-
-                const filtered = providers.filter(provider => 
-                    provider.name && (
+                if (!searchTerm.trim()) {
+                    loadServiceProviders('mistri-list');
+                    return;
+                }
+                
+                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
+                const filtered = serviceProviders.filter(provider => 
+                    provider && provider.name && (
                         provider.name.toLowerCase().includes(searchTerm) || 
-                        (provider.category && provider.category.toLowerCase().includes(searchTerm)) ||
-                        (provider.area && provider.area.toLowerCase().includes(searchTerm)) ||
-                        (provider.skills && provider.skills.toLowerCase().includes(searchTerm))
+                        (provider.category && provider.category.toLowerCase().includes(searchTerm))
                     )
                 );
                 
                 if (filtered.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No professional services found.</p>';
+                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
                     return;
                 }
 
@@ -302,130 +268,59 @@
                     mistriListDiv.appendChild(card);
                 });
             });
-        });
-
-        function createProfessionalCard(provider) {
-            return `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="margin: 0; color: #2a5298;">${provider.name}</h3>
-                    <span class="pro-badge">PRO</span>
-                </div>
-                <p><strong>${provider.category}</strong> | 📍 ${provider.area || 'Fatehpur'}</p>
-                <p>🛠️ Experience: ${provider.experience || 'Professional'}</p>
-                ${provider.skills && provider.skills !== 'General services' ? `<p>💼 Skills: ${provider.skills}</p>` : ''}
-                ${provider.address ? `<p>🏠 Address: ${provider.address}</p>` : ''}
-                <div style="margin-top: 15px;">
-                    <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Professional Call</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                </div>
-                <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                    <span class="secure-badge">🔒 SECURE</span> Verified Professional Service
-                </p>
-            `;
         }
 
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
+        // Contact for Ads Function
+        function contactForAds() {
+            const message = "Hello, I'm interested in advertising my business on Fatehpur Hubs. Please share details about ad spaces, pricing, and duration.";
+            window.open(`https://wa.me/919889904191?text=${encodeURIComponent(message)}`, '_blank');
+        }
 
-            if (listId === 'mistri-list') { 
-                mistriListDiv.innerHTML = '<h3>✅ Verified Professional Services</h3>';
-                
-                const providersToLoad = getServiceProviders();
-
-                if (providersToLoad.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 20px;">No professional services registered yet. Be the first to register!</p>';
-                    return;
-                }
-
-                providersToLoad.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = createProfessionalCard(provider);
-                    mistriListDiv.appendChild(card);
+        // Share function
+        function shareProvider(name, category, phone) {
+            const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${category} Service - Fatehpur Hubs`,
+                    text: message
+                }).catch(() => {
+                    fallbackShare(message);
                 });
+            } else {
+                fallbackShare(message);
             }
         }
 
+        function fallbackShare(message) {
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Other functions
         function callNumber(phone) { 
-            if(phone) {
-                window.location.href = `tel:+91${phone}`; 
-            } else {
-                alert('Professional contact number not available');
-            }
+            if(phone) window.location.href = `tel:+91${phone}`; 
         }
         
         function openWhatsApp(phone) { 
             if(phone) {
-                const message = "Hello, I need your professional service from Fatehpur Hubs app. Please contact me with details.";
+                const message = "Hello, I need your service from Fatehpur Hubs app.";
                 window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            } else {
-                alert('Professional contact number not available');
             }
-        }
-
-        function contactForAd(phone) { 
-            const message = "Hello, I'm interested in professional advertising on Fatehpur Hubs. Please share details and pricing.";
-            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
-        
-        const ALL_CATEGORIES = [
-            { cat: 'Plumber', icon: '💧' }, { cat: 'Electrician', icon: '⚡' }, { cat: 'Carpenter', icon: '🔨' },
-            { cat: 'Mason', icon: '🧱' }, { cat: 'Painter', icon: '🎨' }, { cat: 'AC Mechanic', icon: '❄️' },
-            { cat: 'TV Mechanic', icon: '📺' }, { cat: 'Tiler', icon: '◻️' }, { cat: 'Private Teacher', icon: '🎓' },
-            { cat: 'Welder', icon: '🔥' }, { cat: 'Computer Repair', icon: '💻' }
-        ];
-
-        function loadAllCategories() {
-            const allCatList = document.getElementById('all-categories-list');
-            if (!allCatList) return;
-            allCatList.innerHTML = '';
-            
-            ALL_CATEGORIES.forEach(item => {
-                const button = document.createElement('button');
-                button.className = 'cat-btn';
-                button.dataset.cat = item.cat;
-                button.innerHTML = `${item.icon} ${item.cat}`;
-                button.addEventListener('click', (e) => {
-                    filterByCategory(e.target.dataset.cat, 'mistri-list-full');
-                });
-                allCatList.appendChild(button);
-            });
-        }
-
-        function filterByCategory(category, listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-            mistriListDiv.innerHTML = `<h3>${category} Professionals</h3>`;
-            
-            const providers = getServiceProviders(); 
-            const filteredProviders = providers.filter(p => p.category === category);
-            
-            if (filteredProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No professional services in this category.</p>';
-                return;
-            }
-
-            filteredProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = createProfessionalCard(provider);
-                mistriListDiv.appendChild(card);
-            });
-        }
 
         function shareApp() {
             const appLink = window.location.href; 
-            const shareText = `✨ Fatehpur Hubs: Fatehpur's Professional Services Platform!\n\nFind verified plumbers, electricians, carpenters and all professional services in Fatehpur.\n\nDownload now: ${appLink}`;
-
+            const shareText = `Fatehpur Hubs: Find all services in Fatehpur!\n\nPlumber, Electrician, Carpenter & more\n\nDownload: ${appLink}`;
+            
             if (navigator.share) {
                 navigator.share({
-                    title: 'Fatehpur Hubs - Professional Services',
+                    title: 'Fatehpur Hubs',
                     text: shareText,
                     url: appLink
                 });
@@ -435,53 +330,66 @@
         }
 
         function openMoreApps() { 
-            alert("More professional apps coming soon!"); 
+            alert("More apps coming soon!"); 
         }
-                
-        function shareProvider(name, category, phone) {
-            const message = `✨ Professional ${category} Service on Fatehpur Hubs!\n\n👨‍🔧 Professional: ${name}\n📞 Contact: ${phone}\n🏠 Platform: Fatehpur Hubs\n\nFind all professional services in Fatehpur!`;
+
+        // Categories
+        const ALL_CATEGORIES = [
+            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
+            'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'
+        ];
+
+        function loadAllCategories() {
+            const allCatList = document.getElementById('all-categories-list');
+            if (!allCatList) return;
+            allCatList.innerHTML = '';
             
-            if (navigator.share) {
-                navigator.share({
-                    title: `Professional: ${name}`,
-                    text: message,
-                    url: window.location.href 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-            }
+            ALL_CATEGORIES.forEach(cat => {
+                const button = document.createElement('button');
+                button.className = 'cat-btn';
+                button.textContent = cat;
+                button.onclick = () => {
+                    const mistriListDiv = document.getElementById('mistri-list-full');
+                    mistriListDiv.innerHTML = `<h3>${cat} Services</h3>`;
+                    const filtered = serviceProviders.filter(p => p.category === cat);
+                    
+                    if (filtered.length === 0) {
+                        mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
+                        return;
+                    }
+
+                    filtered.forEach(provider => {
+                        const card = document.createElement('div');
+                        card.className = 'profile-card';
+                        card.innerHTML = createProfessionalCard(provider);
+                        mistriListDiv.appendChild(card);
+                    });
+                };
+                allCatList.appendChild(button);
+            });
         }
-        
-        // Professional Service Registration Function
+
+        // Service Registration
         function registerService() {
             const name = document.getElementById('providerName').value.trim();
             const phone = document.getElementById('providerPhone').value.trim();
             const category = document.getElementById('serviceCategory').value;
             const area = document.getElementById('providerArea').value.trim();
             const experience = document.getElementById('providerExperience').value.trim();
-            const address = document.getElementById('providerAddress').value.trim();
-            const skills = document.getElementById('providerSkills').value.trim();
             
-            // Professional Validation
             if (!name || !phone || !category || !area || !experience) {
-                alert('❌ All professional details are required for registration');
+                alert('Please fill all fields');
                 return;
             }
             
             if (phone.length !== 10 || isNaN(phone)) {
-                alert('❌ Please enter valid 10-digit professional phone number');
+                alert('Enter valid 10-digit phone number');
                 return;
             }
             
-            if (name.length < 2) {
-                alert('❌ Please enter valid professional name');
-                return;
-            }
-            
-            // Show professional loading
             const submitBtn = document.getElementById('registerBtn');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = '🔐 Secure Professional Registration...';
+            submitBtn.textContent = 'Registering...';
             submitBtn.disabled = true;
             
             const newProvider = {
@@ -490,38 +398,57 @@
                 phone: phone,
                 area: area,
                 experience: experience,
-                address: address || 'Fatehpur',
-                skills: skills || 'Professional services',
                 rating: "⭐️⭐️⭐️⭐️",
-                timestamp: new Date().toISOString(),
-                status: "active",
-                verified: false
+                timestamp: new Date().toISOString()
             };
             
-            console.log("Saving professional service:", newProvider);
-            
-            // Save to Firebase
             providersRef.push(newProvider)
                 .then(() => {
-                    alert('✅ Professional Service Registered Successfully!\n\nYour service will appear in professional listing shortly.');
-                    // Clear form
+                    alert('Service Registered Successfully!');
                     document.getElementById('providerName').value = '';
                     document.getElementById('providerPhone').value = '';
                     document.getElementById('serviceCategory').value = '';
                     document.getElementById('providerArea').value = '';
                     document.getElementById('providerExperience').value = '';
-                    document.getElementById('providerAddress').value = '';
-                    document.getElementById('providerSkills').value = '';
-                })
-                .catch((error) => {
-                    console.error("Professional registration failed:", error);
-                    alert('❌ Professional registration failed. Please check your details and try again.');
                 })
                 .finally(() => {
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
                 });
         }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            startFirebaseListener();
+            loadAllCategories();
+            setupSearch();
+            
+            // Category buttons
+            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
+                if(button.id !== 'more-cat-btn') {
+                    button.addEventListener('click', (e) => {
+                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => btn.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        const category = e.target.dataset.cat;
+                        const mistriListDiv = document.getElementById('mistri-list');
+                        mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
+                        const filtered = serviceProviders.filter(p => p.category === category);
+                        
+                        if (filtered.length === 0) {
+                            mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
+                            return;
+                        }
+
+                        filtered.forEach(provider => {
+                            const card = document.createElement('div');
+                            card.className = 'profile-card';
+                            card.innerHTML = createProfessionalCard(provider);
+                            mistriListDiv.appendChild(card);
+                        });
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>
