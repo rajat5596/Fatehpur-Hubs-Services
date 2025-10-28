@@ -51,6 +51,7 @@
 <body>
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
+        <!-- Ad Script 1 -->
         <script type="text/javascript">
             atOptions = {
                 'key' : '969a80a2e6bea9f00173f36024f32cb2',
@@ -77,6 +78,7 @@
             
             <div class="ad-container">
                 <div class="ad-label">Sponsored</div>
+                <!-- Ad Script 2 -->
                 <script type="text/javascript">
                     atOptions = {
                         'key' : 'd65603602583bbe6bc3308e8ee8ab792',
@@ -185,6 +187,7 @@
 
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
+        <!-- Ad Script 3 -->
         <script type="text/javascript">
             atOptions = {
                 'key' : '969a80a2e6bea9f00173f36024f32cb2',
@@ -197,19 +200,23 @@
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
     
+    <!-- 1. FIREBASE SDKs AND CONFIGURATION -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // ** आपके स्क्रीनशॉट से प्राप्त Firebase कॉन्फ़िगरेशन **
+        // **** UPDATED FIREBASE CONFIGURATION (Based on your new project ID fatehpur-hubs-a3a9f) ****
         const firebaseConfig = {
-            apiKey: "AIzaSyBJZtUJG-kypzSSwp47p3uN9612345", // यह API Key आपके कोड में थी
-            authDomain: "fatehpur-hubs.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3d8f-default-rtdb.asia-southeast1.firebaseio.com", // आपके प्रोजेक्ट ID और क्षेत्र के साथ अनुमानित URL
-            projectId: "fatehpur-hubs-a3d8f",
-            storageBucket: "fatehpur-hubs-a3d8f.appspot.com",
-            messagingSenderId: "244360674145",
-            appId: "1:244360674145:web:3bc850798d5750bfabbfce"
+            // New API Key from your latest screenshot
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", 
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            // New Database URL based on the new Project ID
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebaseio.com", 
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce",
+            measurementId: "G-R8N7DVEHML" // Optional but included for completeness
         };
 
         // Firebase को Initialize करें
@@ -217,10 +224,8 @@
         const database = app.database();
         const providersRef = database.ref('service_providers'); // डेटाबेस में "service_providers" नोड का उपयोग करें
         
-        // अब डेटा Firebase से लोड होगा, इसलिए hardcoded list को खाली कर दिया गया है
         let serviceProviders = [];
 
-        // Function to get all providers (अब यह global array रिटर्न करेगा)
         function getServiceProviders() {
             return serviceProviders;
         }
@@ -233,20 +238,17 @@
                 const firebaseProviders = [];
                 
                 if (data) {
-                    // Firebase डेटा को array में बदलें
                     for (let key in data) {
-                        firebaseProviders.push(data[key]);
+                        let provider = data[key];
+                        provider.id = key; 
+                        firebaseProviders.push(provider);
                     }
                 }
                 
-                // ग्लोबल variable को अपडेट करें
                 serviceProviders = firebaseProviders;
                 
-                // डेटा लोड होने के बाद UI को अपडेट करें
-                // सुनिश्चित करें कि केवल होम स्क्रीन लोड हो, अगर कोई फ़िल्टर active न हो
-                if (document.getElementById('home-screen').classList.contains('active')) {
-                    loadServiceProviders('mistri-list');
-                }
+                loadServiceProviders('mistri-list');
+
             }, (error) => {
                 console.error("Firebase Read Failed:", error);
                 document.getElementById('mistri-list').innerHTML = '<p style="color:red; text-align: center;">❌ डेटा लोड नहीं हो सका। कृपया Firebase Security Rules जांचें।</p>';
@@ -254,7 +256,7 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            startFirebaseListener(); // Firebase से डेटा लोड करना शुरू करें
+            startFirebaseListener(); 
             loadAllCategories();
             
             document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
@@ -266,6 +268,38 @@
                     });
                 }
             });
+            
+            document.getElementById('main-search-bar').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const mistriListDiv = document.getElementById('mistri-list');
+                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
+                
+                const providers = getServiceProviders(); 
+
+                const filtered = providers.filter(provider => 
+                    provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
+                );
+                
+                if (filtered.length === 0) {
+                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili.</p>';
+                    return;
+                }
+
+                filtered.forEach(provider => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = `
+                        <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
+                        <p><strong>${provider.category}</strong> | ${provider.area}</p>
+                        <p>Experience: ${provider.experience || 'N/A'}</p>
+                        <div>
+                            <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
+                            <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                        </div>
+                    `;
+                    mistriListDiv.appendChild(card);
+                });
+            });
         });
 
         // loadServiceProviders function (Firebase डेटा का उपयोग करता है)
@@ -273,11 +307,10 @@
             const mistriListDiv = document.getElementById(listId);
             if (!mistriListDiv) return;
 
-            // Home Screen ('mistri-list') पर header और data लोड करें
             if (listId === 'mistri-list') { 
                 mistriListDiv.innerHTML = '<h3>Available Services</h3>';
                 
-                const providersToLoad = getServiceProviders(); // Firebase से लोड हुआ global array
+                const providersToLoad = getServiceProviders(); 
 
                 if (providersToLoad.length === 0) {
                     mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Is list mein koi service nahi hai.</p>';
@@ -288,7 +321,6 @@
                     const card = document.createElement('div');
                     card.className = 'profile-card';
                     
-                    // HTML में बदलाव: Firebase डेटा फ़ील्ड का उपयोग
                     card.innerHTML = `
                         <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
                         <p><strong>${provider.category}</strong> | ${provider.area}</p>
@@ -339,7 +371,6 @@
                 button.dataset.cat = item.cat;
                 button.innerHTML = `${item.icon} ${item.cat}`;
                 button.addEventListener('click', (e) => {
-                    // Search Screen पर फ़िल्टर लागू करें
                     filterByCategory(e.target.dataset.cat, 'mistri-list-full');
                 });
                 allCatList.appendChild(button);
@@ -391,7 +422,8 @@
         }
 
         function openMoreApps() { alert("More Apps coming soon!"); } 
-		function shareProvider(name, category, phone) {
+                
+        function shareProvider(name, category, phone) {
             const message = `✨ Fatehpur Hubs Par ${category} Service!\n\n👨‍🔧 Naam: ${name}\n📞 Phone: ${phone}\n\nFatehpur mein sabhi local services ke liye app download karein।`;
             
             if (navigator.share) {
@@ -427,11 +459,9 @@
                 rating: "⭐️⭐️⭐️" 
             };
             
-            // Firebase में डेटा पुश करें (Push data to Firebase)
             providersRef.push(newProvider)
                 .then(() => {
                     alert('✅ Service registered successfully! Ab aapki service list mein dikhegi।');
-                    // Form fields clear करें
                     document.getElementById('providerName').value = '';
                     document.getElementById('providerPhone').value = '';
                     document.getElementById('serviceCategory').value = '';
@@ -440,44 +470,9 @@
                 })
                 .catch((error) => {
                     console.error("Data save failed:", error);
-                    alert('❌ Registration failed: Kripya dobara prayas karein।');
+                    alert('❌ Registration failed: Kripya dobara prayas karein। Iski wajah Firebase Security Rules ho sakti hai.');
                 });
         }
-
-
-        document.getElementById('main-search-bar').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const mistriListDiv = document.getElementById('mistri-list');
-            mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-            
-            const providers = getServiceProviders(); 
-
-            const filtered = providers.filter(provider => 
-                provider.name.toLowerCase().includes(searchTerm) || provider.category.toLowerCase().includes(searchTerm)
-            );
-            
-            if (filtered.length === 0) {
-                mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">Koi service nahi mili.</p>';
-                return;
-            }
-
-            filtered.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = `
-                    <h3>${provider.name} ${provider.rating || '⭐️⭐️⭐️'}</h3>
-                    <p><strong>${provider.category}</strong> | ${provider.area}</p>
-                    <p>Experience: ${provider.experience || 'N/A'}</p>
-                    <div>
-                        <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call Now</button>
-                        <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                    </div>
-                `;
-                mistriListDiv.appendChild(card);
-            });
-        });
     </script>
 </body>
 </html>
-
-           
