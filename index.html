@@ -9,7 +9,7 @@
     <!-- Firebase SDKs - Mandatory -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <!-- AUTH SDK जोड़ा गया -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <!-- Auth SDK जरूरी है -->
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
@@ -24,6 +24,17 @@
             z-index: 100;
             background-color: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(2px);
+        }
+        /* Style for the additional action buttons */
+        .btn-action { 
+            background-color: #f3f4f6;
+            color: #4b5563;
+            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+        }
+        .btn-action:hover {
+            background-color: #e5e7eb;
         }
     </style>
 </head>
@@ -132,7 +143,7 @@
             storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
             messagingSenderId: "294360741451",
             appId: "1:294360741451:web:3bc85078805750b9fabfce",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app" // सही URL
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
         // --------------- 2. Global Variables and Init ---------------
@@ -155,64 +166,50 @@
         // --------------- 3. Firebase Initialization and Authentication ---------------
         function initializeFirebase() {
             try {
-                // Initialize Firebase App
                 const app = firebase.initializeApp(firebaseConfig);
-                
-                // Get Database and Auth instances
                 db = app.database();
                 auth = app.auth();
+                
+                // NEW: तुरंत डेटा लोड करें, जैसा पहले होता था
+                startFirebaseListener();
 
-                // Set up Auth State Listener (Crucial for secure write)
-                auth.onAuthStateChanged(user => {
-                    if (!user) {
-                        // User is not signed in, sign in anonymously
-                        auth.signInAnonymously()
-                            .then(() => {
-                                console.log("Authentication: Signed in Anonymously.");
-                                isAuthReady = true;
-                                startFirebaseListener(); // Auth होने के बाद लिसनर शुरू करें
-                            })
-                            .catch(error => {
-                                console.error("Authentication Error:", error);
-                                showAlertModal("❌ ऑथेंटिकेशन फेल", "रजिस्ट्रेशन के लिए आवश्यक लॉगिन विफल रहा।");
-                            });
-                    } else {
-                        // User is signed in (either anonymously or otherwise)
-                        console.log("Authentication: User is signed in.", user.uid);
-                        isAuthReady = true;
-                        startFirebaseListener(); // Auth होने के बाद लिसनर शुरू करें
-                    }
-                });
+                // Authentication शुरू करें (Write Security के लिए)
+                auth.signInAnonymously()
+                    .then(() => {
+                        console.log("Authentication: Signed in Anonymously.");
+                        isAuthReady = true; // अब रजिस्ट्रेशन काम करेगा
+                    })
+                    .catch(error => {
+                        console.error("Authentication Error:", error);
+                        // लिस्ट अब भी दिखनी चाहिए, लेकिन रजिस्ट्रेशन फेल हो सकता है
+                    });
 
             } catch (error) {
                 console.error("Firebase Initialization Failed:", error);
-                showAlertModal("❌ ऐप लोड एरर", "Firebase शुरू करने में विफल रहा। कृपया कंसोल देखें।");
+                showAlertModal("❌ ऐप लोड एरर", "Firebase शुरू करने में विफल रहा।");
             }
         }
 
         // --------------- 4. Data Listening (Real-Time Read) ---------------
         function startFirebaseListener() {
             const providersRef = db.ref('service_providers');
-            // सुनिश्चित करें कि लिसनर केवल एक बार सेट हो
             providersRef.off('value'); 
             providersRef.on('value', (snapshot) => {
                 const data = snapshot.val();
                 const providersArray = [];
 
                 if (data) {
-                    // Convert the object structure from Firebase into a useful array
                     for (let key in data) {
                         providersArray.push({
-                            id: key, // Firebase key
+                            id: key, 
                             ...data[key]
                         });
                     }
                 }
                 
-                allProviders = providersArray; // Store all data globally
+                allProviders = providersArray; 
                 console.log(`Data received. Total providers: ${allProviders.length}`);
                 
-                // Show the list based on the current filter
                 filterAndRenderList();
             });
         }
@@ -236,22 +233,18 @@
 
         // Toggle filter functionality
         function toggleFilter(category, button) {
-            // Check if the same category is clicked again
             if (currentFilter === category) {
-                currentFilter = ''; // Remove filter
-                // Reset all buttons' styling
+                currentFilter = ''; 
                 document.querySelectorAll('.btn-secondary').forEach(btn => {
                     btn.classList.remove('btn-primary', 'text-white');
                     btn.classList.add('btn-secondary');
                 });
             } else {
-                currentFilter = category; // Set new filter
-                // Reset all buttons' styling
+                currentFilter = category; 
                 document.querySelectorAll('.btn-secondary').forEach(btn => {
                     btn.classList.remove('btn-primary', 'text-white');
                     btn.classList.add('btn-secondary');
                 });
-                // Highlight the selected button
                 button.classList.remove('btn-secondary');
                 button.classList.add('btn-primary', 'text-white');
             }
@@ -263,12 +256,10 @@
             const searchText = document.getElementById('search-input').value.toLowerCase();
             let filteredList = allProviders;
 
-            // 1. Apply Category Filter
             if (currentFilter) {
                 filteredList = filteredList.filter(p => p.category === currentFilter);
             }
 
-            // 2. Apply Search Filter
             if (searchText) {
                 filteredList = filteredList.filter(p => 
                     p.name.toLowerCase().includes(searchText) ||
@@ -282,10 +273,10 @@
 
         // Render the filtered list to the UI
         function renderList(list) {
-            servicesListDiv.innerHTML = ''; // Clear existing list
+            servicesListDiv.innerHTML = ''; 
 
             if (list.length === 0) {
-                noResults.classList.remove('hidden');
+                noResults.classList.add('hidden'); 
             } else {
                 noResults.classList.add('hidden');
                 
@@ -304,12 +295,10 @@
             const card = document.createElement('div');
             card.className = 'service-card bg-white p-6 rounded-xl shadow-lg border border-gray-100';
             
-            // Format phone number for WhatsApp URL
             const whatsappNumber = provider.phone.replace(/[^0-9]/g, '');
             const whatsappUrl = `https://wa.me/91${whatsappNumber}?text=नमस्ते, मैंने आपको फतेहपुर हब्स पर देखा। क्या आप ${provider.category} के लिए उपलब्ध हैं?`;
             
-            // Star rating visualization (basic for now)
-            const rating = provider.rating || 5; // Default to 5 if not set
+            const rating = provider.rating || 5; 
             const stars = Array(Math.round(rating)).fill('⭐').join('');
 
             card.innerHTML = `
@@ -331,9 +320,39 @@
                         💬 WhatsApp
                     </a>
                 </div>
+                
+                <!-- ORIGINAL CODE ADDITIONS: Ads, Share, Promotion -->
+                <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+                    <span class="text-xs text-red-500 italic">Google Ad Unit 1</span>
+                    <button onclick="shareService('${provider.name}', '${provider.category}', '${provider.area}')" class="btn-action rounded-full">
+                        📲 शेयर करें
+                    </button>
+                    <button onclick="showAlertModal('प्रमोशन', 'इस सर्विस को प्रमोट करने के लिए संपर्क करें।')" class="btn-action rounded-full">
+                        🚀 प्रमोशन
+                    </button>
+                </div>
+                
             `;
             return card;
         }
+
+        // Share Functionality 
+        function shareService(name, category, area) {
+            const shareText = `फतेहपुर हब्स पर ${category} सर्विस प्रोवाइडर: ${name}, एरिया: ${area}\n\nसर्विस इस्तेमाल करें और रेटिंग दें!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'फतेहपुर हब्स सर्विस',
+                    text: shareText,
+                    url: window.location.href 
+                }).catch(error => console.log('Error sharing', error));
+            } else {
+                navigator.clipboard.writeText(shareText + ' - ' + window.location.href)
+                    .then(() => showAlertModal("✅ शेयर लिंक कॉपी", "शेयर लिंक और मैसेज क्लिपबोर्ड पर कॉपी हो गया है।"))
+                    .catch(() => showAlertModal("❌ एरर", "शेयर लिंक कॉपी नहीं हो सका।"));
+            }
+        }
+
 
         // --------------- 6. Registration Functions (Write) ---------------
         
@@ -347,9 +366,9 @@
         }
 
         async function registerService(event) {
-            event.preventDefault(); // Stop form submission
+            event.preventDefault(); 
 
-            // Check if authentication is complete
+            // NEW: Check if authentication is complete
             if (!isAuthReady || !auth.currentUser) {
                 showAlertModal("⏳ कृपया प्रतीक्षा करें", "सिस्टम अभी भी सुरक्षा जाँच (Authentication) कर रहा है। एक सेकंड में पुनः प्रयास करें।");
                 return;
@@ -365,16 +384,14 @@
                 return;
             }
             
-            // Data to be saved
             const newProvider = {
                 name: name,
                 phone: phone,
                 category: category,
                 area: area,
-                // Add current user's UID for security/future editing features
                 uid: auth.currentUser.uid, 
                 experience: 'नया',
-                rating: 5, // Default rating
+                rating: 5, 
                 reviews: 0,
                 timestamp: Date.now()
             };
@@ -382,13 +399,12 @@
             const providersRef = db.ref('service_providers');
 
             try {
-                await providersRef.push(newProvider); // Push data to Firebase
+                await providersRef.push(newProvider); 
                 hideRegistrationModal();
                 showAlertModal("✅ सफल", `सर्विस "${name}" सफलतापूर्वक रजिस्टर हो गई है!`);
             } catch (error) {
                 console.error("Registration failed:", error);
-                // The most common error here is PERMISSION_DENIED (if rules are wrong)
-                showAlertModal("❌ रजिस्ट्रेशन फेल", "सर्विस रजिस्टर करने में समस्या आई। (Permission/Connection Error)");
+                showAlertModal("❌ रजिस्ट्रेशन फेल", "सर्विस रजिस्टर करने में समस्या आई।");
             }
         }
 
@@ -399,3 +415,4 @@
     </script>
 </body>
 </html>
+
