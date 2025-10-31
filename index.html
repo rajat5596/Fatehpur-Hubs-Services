@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fatehpur Hubs</title>
     <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#ff6666">
+    <meta name="theme-color" content="#ff6666">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
@@ -87,14 +87,12 @@
             </div>
 
             <div class="promotion-section" style="padding: 10px; background-color: #f7f7f7; border-radius: 8px; margin-bottom: 15px;">
-    <h3 style="text-align: center; font-size: 1.1em; color: #333; margin-top: 0;">✨ Special Offers & Promotions ✨</h3> 
-    
-    <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;">
-        </div>
-</div>
-<script src="ads.js"></script>
-
-            <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+                <h3 style="text-align: center; font-size: 1.1em; color: #333; margin-top: 0;">✨ Special Offers & Promotions ✨</h3> 
+                
+                <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;">
+                </div>
+            </div>
+                        <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
                 <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
                 <form onsubmit="event.preventDefault(); registerService();">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
@@ -163,13 +161,16 @@
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
     
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="script.js"></script>
+    <script src="ads.js"></script>
+    
     <script>
-        // Firebase Config
+        // Firebase Config - APNI COMPLETE API KEY DAALEN
         const firebaseConfig = {
-            apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
+            apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3YOUR_COMPLETE_API_KEY_HERE",
             authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
             databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "fatehpur-hubs-a3a9f",
@@ -181,98 +182,58 @@
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = app.database();
-        const providersRef = database.ref('service_providers');
         
-        <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="script.js"></script>
-<script>
-    // Firebase Config (यह कॉन्फ़िगरेशन ठीक है)
-    const firebaseConfig = {
-        apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
-        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "fatehpur-hubs-a3a9f",
-        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-        messagingSenderId: "294360741451",
-        appId: "1:294360741451:web:3bc85078805750b9faibce"
-    };
+        // Global references
+        const providersRef = database.ref('service_providers');
+        const jobsRef = database.ref('jobs');
+        
+        window.providersRef = providersRef;
+        window.jobsRef = jobsRef;
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = app.database();
-    
-    // Providers Ref ko global banaein (script.js ko chahiye)
-    window.providersRef = database.ref('service_providers');
-    const providersRef = window.providersRef;
+        // Global variables
+        let serviceProviders = [];
 
-    // Local Jobs Ref ko global banaein (Jobs feature ke liye)
-    window.jobsRef = database.ref('jobs');
-    const jobsRef = window.jobsRef;
+        // Categories
+        const ALL_CATEGORIES = [
+            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
+            'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'
+        ];
 
-
-    // ACTION: Fire Listener from index.html
-    if (typeof startFirebaseListener === 'function') {
-        startFirebaseListener(providersRef, jobsRef); 
-    }
-    
-</script>
-
-
-
-        // Load services in list
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-
-            if (listId === 'mistri-list') { 
-                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-                
-                if (serviceProviders.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet.</p>';
-                    return;
-                }
-
-                serviceProviders.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = createProfessionalCard(provider);
-                    mistriListDiv.appendChild(card);
-                });
-            }
+        // Create professional card HTML
+        function createProfessionalCard(provider) {
+            if (!provider) return '';
+            
+            return `
+                <div style="margin-bottom: 10px;">
+                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${provider.name || 'No Name'}</h4>
+                    <p style="margin: 2px 0; color: #666;">📌 ${provider.category || 'Service'} | ${provider.area || 'Area'}</p>
+                    <p style="margin: 2px 0; color: #666;">⏱️ ${provider.experience || 'Experience'}</p>
+                    <p style="margin: 2px 0; color: #666;">${provider.rating || '⭐️⭐️⭐️⭐️'}</p>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
+                    <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
+                </div>
+            `;
         }
 
-        // Search functionality
-        function setupSearch() {
-            document.getElementById('main-search-bar').addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                const mistriListDiv = document.getElementById('mistri-list');
-                
-                if (!searchTerm.trim()) {
-                    loadServiceProviders('mistri-list');
-                    return;
-                }
-                
-                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-                const filtered = serviceProviders.filter(provider => 
-                    provider && provider.name && (
-                        provider.name.toLowerCase().includes(searchTerm) || 
-                        (provider.category && provider.category.toLowerCase().includes(searchTerm))
-                    )
-                );
-                
-                if (filtered.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
-                    return;
-                }
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
 
-                filtered.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = createProfessionalCard(provider);
-                    mistriListDiv.appendChild(card);
-                });
-            });
+        // Contact functions
+        function callNumber(phone) { 
+            if(phone) window.location.href = `tel:+91${phone}`; 
+        }
+        
+        function openWhatsApp(phone) { 
+            if(phone) {
+                const message = "Hello, I need your service from Fatehpur Hubs app.";
+                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
         }
 
         // Contact for Ads Function
@@ -281,7 +242,7 @@
             window.open(`https://wa.me/919889904191?text=${encodeURIComponent(message)}`, '_blank');
         }
 
-        // Share function
+        // Share functions
         function shareProvider(name, category, phone) {
             const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
             
@@ -302,33 +263,23 @@
             window.open(whatsappUrl, '_blank');
         }
 
-        // Other functions
-        function callNumber(phone) { 
-            if(phone) window.location.href = `tel:+91${phone}`; 
-        }
-        
-        function openWhatsApp(phone) { 
-            if(phone) {
-                const message = "Hello, I need your service from Fatehpur Hubs app.";
-                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        function shareApp() {
+            const message = "Check out Fatehpur Hubs - Find all professional services in Fatehpur! Download the app now.";
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Fatehpur Hubs',
+                    text: message
+                });
+            } else {
+                fallbackShare(message);
             }
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
         }
 
         function openMoreApps() { 
             alert("More apps coming soon!"); 
         }
 
-        // Categories
-        const ALL_CATEGORIES = [
-            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
-            'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'
-        ];
-
+        // Load all categories
         function loadAllCategories() {
             const allCatList = document.getElementById('all-categories-list');
             if (!allCatList) return;
@@ -341,7 +292,7 @@
                 button.onclick = () => {
                     const mistriListDiv = document.getElementById('mistri-list-full');
                     mistriListDiv.innerHTML = `<h3>${cat} Services</h3>`;
-                    const filtered = serviceProviders.filter(p => p.category === cat);
+                    const filtered = serviceProviders.filter(p => p && p.category === cat);
                     
                     if (filtered.length === 0) {
                         mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
@@ -356,6 +307,68 @@
                     });
                 };
                 allCatList.appendChild(button);
+            });
+        }
+
+        // Load services in list
+        function loadServiceProviders(listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+
+            if (listId === 'mistri-list') { 
+                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+                
+                if (serviceProviders.length === 0) {
+                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+                    return;
+                }
+
+                serviceProviders.forEach(provider => {
+                    if (!provider) return;
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = createProfessionalCard(provider);
+                    mistriListDiv.appendChild(card);
+                });
+            }
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchBar = document.getElementById('main-search-bar');
+            if (!searchBar) return;
+            
+            searchBar.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const mistriListDiv = document.getElementById('mistri-list');
+                
+                if (!mistriListDiv) return;
+                
+                if (!searchTerm.trim()) {
+                    loadServiceProviders('mistri-list');
+                    return;
+                }
+                
+                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
+                const filtered = serviceProviders.filter(provider => 
+                    provider && provider.name && (
+                        provider.name.toLowerCase().includes(searchTerm) || 
+                        (provider.category && provider.category.toLowerCase().includes(searchTerm)) ||
+                        (provider.area && provider.area.toLowerCase().includes(searchTerm))
+                    )
+                );
+                
+                if (filtered.length === 0) {
+                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
+                    return;
+                }
+
+                filtered.forEach(provider => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = createProfessionalCard(provider);
+                    mistriListDiv.appendChild(card);
+                });
             });
         }
 
@@ -401,10 +414,27 @@
                     document.getElementById('providerArea').value = '';
                     document.getElementById('providerExperience').value = '';
                 })
+                .catch(error => {
+                    alert('Error registering service: ' + error.message);
+                })
                 .finally(() => {
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
                 });
+        }
+
+        // Start Firebase Listener
+        function startFirebaseListener() {
+            providersRef.on('value', (snapshot) => {
+                serviceProviders = [];
+                snapshot.forEach((childSnapshot) => {
+                    const provider = childSnapshot.val();
+                    if (provider) {
+                        serviceProviders.push(provider);
+                    }
+                });
+                loadServiceProviders('mistri-list');
+            });
         }
 
         // Initialize everything when page loads
@@ -421,8 +451,10 @@
                         e.target.classList.add('selected');
                         const category = e.target.dataset.cat;
                         const mistriListDiv = document.getElementById('mistri-list');
+                        if (!mistriListDiv) return;
+                        
                         mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
-                        const filtered = serviceProviders.filter(p => p.category === category);
+                        const filtered = serviceProviders.filter(p => p && p.category === category);
                         
                         if (filtered.length === 0) {
                             mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
