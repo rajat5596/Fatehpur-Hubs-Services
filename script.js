@@ -338,8 +338,11 @@ function shareProvider(name, category, phone) {
                 mistriListDiv.appendChild(card);
             });
         }
+// script.js mein shareMyApp() ko shareApp() se badal dein
 
-function shareApp() 
+function shareApp() { // <-- Naam badla gaya
+    // Play Store par publish hone ke baad isse badalna hai
+    // (Aapne kaha ki app abhi Play Store par nahi hai, phir bhi hum final link daal rahe hain)
     const appLink = "https://play.google.com/store/apps/details?id=in.co.fatehpur.hubs"; 
     
     // Check karein ki user mobile par hai aur native sharing API ko support karta hai
@@ -357,3 +360,4 @@ function shareApp()
         alert("App share karne ke liye Play Store link copy karein: " + appLink); // <-- Yeh link show hoga
     }
 }
+
