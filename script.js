@@ -338,13 +338,8 @@ function shareProvider(name, category, phone) {
                 mistriListDiv.appendChild(card);
             });
         }
-        
-        document.getElementById('main-search-bar').addEventListener('input', searchProviders);
-// script.js ke ant mein (ya jahan bhi aapke anya functions hain)
-// Share App button ke liye function
-function shareMyApp() {
-    // Play Store par publish hone ke baad, aap is link ko apne Play Store link se badal denge.
-    // (Example Package ID: in.co.fatehpur.hubs)
+
+function shareApp() 
     const appLink = "https://play.google.com/store/apps/details?id=in.co.fatehpur.hubs"; 
     
     // Check karein ki user mobile par hai aur native sharing API ko support karta hai
@@ -353,13 +348,12 @@ function shareMyApp() {
         navigator.share({
             title: 'Fatehpur Hubs - Local Services App',
             text: 'Fatehpur ki sabhi local services ek hi jagah! Abhi download karein.',
-            url: appLink,
+            url: appLink, // <-- Yeh link share hoga
         })
         .then(() => console.log('Successful share'))
         .catch((error) => console.log('Error sharing', error));
     } else {
         // Desktop ya purane browsers ke liye (Ek alert box dega)
-        alert("App share karne ke liye Play Store link copy karein: " + appLink);
+        alert("App share karne ke liye Play Store link copy karein: " + appLink); // <-- Yeh link show hoga
     }
 }
-
