@@ -213,20 +213,6 @@
     
 </script>
 
-        // Create service card
-        function createProfessionalCard(provider) {
-            return `
-                <h3>${provider.name} ⭐️⭐️⭐️⭐️</h3>
-                <p><strong>${provider.category}</strong> | 📍 ${provider.area || 'Fatehpur'}</p>
-                <p>🛠️ Experience: ${provider.experience || 'Professional'}</p>
-                <div style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                    <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
-                </div>
-            `;
-        }
-
         // Load services in list
         function loadServiceProviders(listId) {
             const mistriListDiv = document.getElementById(listId);
