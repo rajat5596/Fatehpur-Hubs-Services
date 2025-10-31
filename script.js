@@ -1,7 +1,8 @@
-// **SCRIPT.JS - FINAL CORRECTED CODE**
+// **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs**
 
 // Global Variables (Firebase se data aane tak khali rakhein)
 let serviceProviders = [];
+let jobListings = [];
 
 // All Categories List (Used for search screen and registration form)
 const ALL_CATEGORIES = [
@@ -19,11 +20,12 @@ const ALL_CATEGORIES = [
 ];
 
 
-// **FIREBASE DATA LOADING FUNCTION**
-// NOTE: Is function ko call karne ke liye aapke index.html mein Firebase initialize hona chahiye.
-// Yeh function index.html mein startFirebaseListener() ke roop mein tha, ise ab yahan define kar rahe hain.
-function startFirebaseListener(providersRef) { // providersRef ko index.html se pass kiya jayega
-    console.log("Starting Firebase Listener...");
+// **FIREBASE DATA LISTENER FUNCTION (Called from index.html)**
+// providersRef aur jobsRef ko index.html se pass kiya jayega
+function startFirebaseListener(providersRef, jobsRef) { 
+    console.log("Starting Firebase Listeners...");
+    
+    // 1. Service Providers Listener
     providersRef.on('value', (snapshot) => {
         const data = snapshot.val();
         serviceProviders = []; // Array ko har baar khali karein
@@ -35,20 +37,30 @@ function startFirebaseListener(providersRef) { // providersRef ko index.html se 
             }
         }
         // Data load hone ke baad hi list ko update karein
-        loadServiceProviders();
-        console.log(`Data Loaded: ${serviceProviders.length} providers.`);
+        loadServiceProviders('mistri-list');
+        console.log(`Providers Loaded: ${serviceProviders.length}`);
+    });
+
+    // 2. Jobs Listener (New)
+    jobsRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        jobListings = []; // Array ko har baar khali karein
+        if (data) {
+            for (let key in data) {
+                let job = data[key];
+                job.id = key;
+                jobListings.push(job);
+            }
+        }
+        loadJobListings();
+        console.log(`Jobs Loaded: ${jobListings.length}`);
     });
 }
 
 
 // Initialize services on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // NOTE: startFirebaseListener() ko ab index.html ke script tag mein call kiya jayega!
     
-    // Check if service list div exists before loading data
-    if (document.getElementById('mistri-list')) {
-        // loadServiceProviders(); <-- Isko yahan se hata diya hai, ab yeh Firebase listener se call hoga
-    }
     loadAllCategories();
     populateRegistrationCategories(); // Loads categories into the registration form select dropdown
     
@@ -71,14 +83,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-     // Optional: Add search event listener here again just in case
+     // Add search event listener 
      document.getElementById('main-search-bar').addEventListener('input', searchProviders);
 });
 
 // Function to load the main list of service providers
-function loadServiceProviders() {
-    console.log("Loading service providers into Home Screen list...");
-    const mistriListDiv = document.getElementById('mistri-list');
+function loadServiceProviders(listId) {
+    const mistriListDiv = document.getElementById(listId);
     if (!mistriListDiv) return;
     
     mistriListDiv.innerHTML = '<h3>Available Services</h3>';
@@ -91,10 +102,9 @@ function loadServiceProviders() {
         const card = createProfileCard(provider);
         mistriListDiv.appendChild(card);
     });
-    console.log(`Loaded ${serviceProviders.length} providers.`);
 }
 
-// Helper function to create a profile card
+// Helper function to create a profile card (Includes SHARE option)
 function createProfileCard(provider) {
     const card = document.createElement('div');
     card.className = 'profile-card';
@@ -102,12 +112,15 @@ function createProfileCard(provider) {
         <h3>${provider.name} ${provider.rating}</h3>
         <p><strong>${provider.category}</strong> | ${provider.area}</p>
         <p>Experience: ${provider.experience}</p>
-        <div style="margin-top: 10px;">
+        <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="contact-btn" onclick="callNumber('${provider.phone}')">
                 📞 Call Now
             </button>
             <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">
                 💬 WhatsApp
+            </button>
+            <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">
+                📤 Share
             </button>
         </div>
     `;
@@ -126,7 +139,7 @@ function openWhatsApp(phone) {
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 
-// **FINAL CORRECTED Share App Function (Play Store Link)**
+// Share App Function (Play Store Link)
 function shareApp() {
     const appLink = "https://play.google.com/store/apps/details?id=in.co.fatehpur.hubs"; 
     
@@ -139,7 +152,9 @@ function shareApp() {
         .then(() => console.log('Successful share'))
         .catch((error) => console.log('Error sharing', error));
     } else {
-        alert("App share karne ke liye Play Store link copy karein: " + appLink);
+        // Fallback for desktop (opens WhatsApp with the message)
+        const shareText = `Fatehpur Hubs - Local Services App\nFatehpur ki sabhi local services ek hi jagah! Abhi download karein:\n${appLink}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
     }
 }
 
@@ -231,10 +246,16 @@ function filterByCategory(category, listId) {
     });
 }
 
-// FUNCTION: Handle Service Registration (The actual form submission logic)
-// NOTE: Is function ko ab Firebase se data bhejne ke liye update karna hoga.
+// FUNCTION: Handle Service Registration (Saves data to Firebase)
 function handleServiceRegistration(e) {
     if (e) e.preventDefault(); 
+    
+    // Get providersRef from the global window object (set in index.html)
+    const providersRef = window.providersRef;
+    if (!providersRef) {
+        console.error("Firebase providers reference not found.");
+        return;
+    }
     
     const regMessage = document.getElementById('registration-message');
     regMessage.textContent = 'Submitting... (जमा हो रहा है...)';
@@ -259,28 +280,30 @@ function handleServiceRegistration(e) {
         area: area,
         experience: experience,
         rating: "New", 
+        timestamp: firebase.database.ServerValue.TIMESTAMP 
     };
     
-    // Yahan hum local array mein daalne ke bajaye Firebase mein daalenge
-    // *** NOTE: Yeh code abhi Firebase call nahi karta hai! Iske liye aapko 'providersRef' ki zaroorat padegi. ***
-    
-    regMessage.textContent = '✅ Registration Successful! आपकी सर्विस लिस्ट में जोड़ दी गई है।';
-    regMessage.style.color = 'green';
+    // Save to Firebase
+    providersRef.push(newProvider)
+        .then(() => {
+            regMessage.textContent = '✅ Registration Successful! आपकी सर्विस लिस्ट में जोड़ दी गई है।';
+            regMessage.style.color = 'green';
 
-    // Clear form and go to Home Screen after 1.5 seconds
-    document.getElementById('service-registration-form').reset();
-    setTimeout(() => {
-        showScreen('home-screen');
-    }, 1500);
+            // Clear form and go to Home Screen after 1.5 seconds
+            document.getElementById('service-registration-form').reset();
+            setTimeout(() => {
+                showScreen('home-screen');
+            }, 1500);
+        })
+        .catch(error => {
+            regMessage.textContent = `❌ Error: ${error.message}`;
+            regMessage.style.color = 'red';
+            console.error("Error registering service provider: ", error);
+        });
     
     return false; 
 }
 
-
-// Utility Functions (Purana shareApp aur openMoreApps hata diye hain)
-function openMoreApps() {
-    alert("More Apps feature jald hi aayega!");
-}
 
 // Search Functionality
 function searchProviders(e) {
@@ -303,4 +326,126 @@ function searchProviders(e) {
         const card = createProfileCard(provider);
         mistriListDiv.appendChild(card);
     });
-            }
+}
+
+
+// **********************************************
+// ********* LOCAL JOBS FUNCTIONALITY ***********
+// **********************************************
+
+// Function to load job listings
+function loadJobListings() {
+    const jobListDiv = document.getElementById('job-listings');
+    if (!jobListDiv) return;
+
+    jobListDiv.innerHTML = ''; 
+
+    if (jobListings.length === 0) {
+        jobListDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 15px;">Currently no job postings available.</p>';
+        return;
+    }
+
+    // Newest job first
+    jobListings.reverse().forEach(job => { 
+        const card = createJobCard(job);
+        jobListDiv.appendChild(card);
+    });
+}
+
+// Helper function to create a job card
+function createJobCard(job) {
+    const card = document.createElement('div');
+    card.className = 'profile-card job-card'; // Reusing profile-card style
+    card.style.marginBottom = '15px';
+    card.innerHTML = `
+        <h4 style="color: #2a5298; font-weight: bold;">${job.title}</h4>
+        <p style="margin-bottom: 5px;">📍 **Location:** ${job.location}</p>
+        <p style="margin-bottom: 10px;">${job.description}</p>
+        <div style="font-size: 14px; color: #666;">
+            Posted: ${new Date(job.timestamp).toLocaleDateString('en-IN')}
+        </div>
+        <div style="margin-top: 10px;">
+            <button class="contact-btn" style="background: #e91e63;" onclick="callNumber('${job.contact.match(/\d+/)[0]}')">
+                📞 Call Contact
+            </button>
+            <button class="whatsapp-btn" onclick="openWhatsAppForJob('${job.contact}', '${job.title}')">
+                💬 Message
+            </button>
+        </div>
+    `;
+    return card;
+}
+
+// WhatsApp for Job Function
+function openWhatsAppForJob(contactInfo, jobTitle) {
+    // Attempt to extract only the phone number
+    const phoneMatch = contactInfo.match(/\d{10}/); // Assuming 10-digit Indian number
+    const phone = phoneMatch ? phoneMatch[0] : null;
+
+    if (!phone) {
+        // Since we cannot use alert(), log error to console for debug
+        console.error("Contact number not clearly found. Please dial manually: " + contactInfo);
+        // Fallback UI message (if implemented) is better than nothing
+        return;
+    }
+
+    const message = `Hello, I saw your job posting "${jobTitle}" on Fatehpur Hubs and am interested. Please tell me more about the job.`;
+    window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+// Function to post a new job
+function postJob(e) {
+    if (e) e.preventDefault();
+
+    // Get jobsRef from the global window object (set in index.html)
+    const jobsRef = window.jobsRef; 
+    if (!jobsRef) {
+        console.error("Firebase jobs reference not found.");
+        document.getElementById('postJobBtn').textContent = '❌ Error posting job.';
+        return;
+    }
+
+    const title = document.getElementById('jobTitle').value.trim();
+    const description = document.getElementById('jobDescription').value.trim();
+    const contact = document.getElementById('jobContact').value.trim();
+    const location = document.getElementById('jobLocation').value.trim();
+    const postJobBtn = document.getElementById('postJobBtn');
+
+    if (!title || !description || !contact || !location) {
+        // Since we cannot use alert(), log error to console for debug
+        console.error("Please fill all job posting fields.");
+        return false;
+    }
+
+    postJobBtn.textContent = 'Posting...';
+    postJobBtn.disabled = true;
+
+    const newJob = {
+        title: title,
+        description: description,
+        contact: contact,
+        location: location,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    jobsRef.push(newJob)
+        .then(() => {
+            postJobBtn.textContent = '✅ Job Posted!';
+            setTimeout(() => {
+                postJobBtn.textContent = 'Post Job';
+                postJobBtn.disabled = false;
+                document.getElementById('jobTitle').value = '';
+                document.getElementById('jobDescription').value = '';
+                document.getElementById('jobContact').value = '';
+                document.getElementById('jobLocation').value = '';
+                // The job listener will automatically reload the job listings
+            }, 1500);
+        })
+        .catch(error => {
+            postJobBtn.textContent = '❌ Error posting job. Try again.';
+            postJobBtn.disabled = false;
+            console.error("Error posting job: ", error);
+        });
+
+    return false;
+}
