@@ -183,23 +183,35 @@
         const database = app.database();
         const providersRef = database.ref('service_providers');
         
-        let serviceProviders = [];
+        <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+<script>
+    // Firebase Config (Yah theek hai)
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "fatehpur-hubs-a3a9f",
+        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+        messagingSenderId: "294360741451",
+        appId: "1:294360741451:web:3bc85078805750b9faibce"
+    };
 
-        // Load data from Firebase
-        function startFirebaseListener() {
-            providersRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                serviceProviders = [];
-                if (data) {
-                    for (let key in data) {
-                        let provider = data[key];
-                        provider.id = key; 
-                        serviceProviders.push(provider);
-                    }
-                }
-                loadServiceProviders('mistri-list');
-            });
-        }
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = app.database();
+    const providersRef = database.ref('service_providers');
+    
+    // **NEW: Local Jobs Ref**
+    const jobsRef = database.ref('jobs'); // <--- यह नई लाइन जोड़ें
+
+    // **ACTION: Fire Listener from index.html**
+    if (typeof startFirebaseListener === 'function') {
+        startFirebaseListener(providersRef, jobsRef); // <--- jobsRef को भी पास करें
+    }
+    
+</script>
 
         // Create service card
         function createProfessionalCard(provider) {
