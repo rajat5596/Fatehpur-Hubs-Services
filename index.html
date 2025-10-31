@@ -314,21 +314,6 @@
             document.getElementById(screenId).classList.add('active');
         }
 
-        function shareApp() {
-            const appLink = window.location.href; 
-            const shareText = `Fatehpur Hubs: Find all services in Fatehpur!\n\nPlumber, Electrician, Carpenter & more\n\nDownload: ${appLink}`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Fatehpur Hubs',
-                    text: shareText,
-                    url: appLink
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-            }
-        }
-
         function openMoreApps() { 
             alert("More apps coming soon!"); 
         }
