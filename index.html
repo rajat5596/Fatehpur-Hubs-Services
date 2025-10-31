@@ -166,57 +166,156 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="script.js"></script>
     <script src="ads.js"></script>
+    <!-- SCRIPTS -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+<script src="ads.js"></script>
+
+<script>
+    // ✅ CORRECTED FIREBASE CONFIG
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "fatehpur-hubs-a3a9f",
+        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+        messagingSenderId: "294360741451",
+        appId: "1:294360741451:web:3bc85078805750b9fabfce" // ✅ CORRECTED: 'faibce' -> 'fabfce'
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = app.database();
     
-    <script>
-        // Firebase Config - APNI COMPLETE API KEY DAALEN
-        const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9faibce"
-        };
+    // Global references
+    const providersRef = database.ref('service_providers');
+    const jobsRef = database.ref('jobs');
+    
+    window.providersRef = providersRef;
+    window.jobsRef = jobsRef;
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
+    // Global variables
+    let serviceProviders = [];
+
+    // Categories
+    const ALL_CATEGORIES = [
+        'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
+        'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'
+    ];
+
+    // Create professional card HTML (with error handling)
+    function createProfessionalCard(provider) {
+        if (!provider) return '';
         
-        // Global references
-        const providersRef = database.ref('service_providers');
-        const jobsRef = database.ref('jobs');
+        // Safe variable handling
+        const name = provider.name || 'No Name';
+        const category = provider.category || 'Service';
+        const area = provider.area || 'Area';
+        const experience = provider.experience || 'Experience';
+        const rating = provider.rating || '⭐️⭐️⭐️⭐️';
+        const phone = provider.phone || '';
         
-        window.providersRef = providersRef;
-        window.jobsRef = jobsRef;
+        return `
+            <div style="margin-bottom: 10px;">
+                <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
+                <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
+                <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
+                <p style="margin: 2px 0; color: #666;">${rating}</p>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
+                <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+                <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
+            </div>
+        `;
+    }
 
-        // Global variables
-        let serviceProviders = [];
-
-        // Categories
-        const ALL_CATEGORIES = [
-            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
-            'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'
-        ];
-
-        // Create professional card HTML
-        function createProfessionalCard(provider) {
-            if (!provider) return '';
-            
-            return `
-                <div style="margin-bottom: 10px;">
-                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${provider.name || 'No Name'}</h4>
-                    <p style="margin: 2px 0; color: #666;">📌 ${provider.category || 'Service'} | ${provider.area || 'Area'}</p>
-                    <p style="margin: 2px 0; color: #666;">⏱️ ${provider.experience || 'Experience'}</p>
-                    <p style="margin: 2px 0; color: #666;">${provider.rating || '⭐️⭐️⭐️⭐️'}</p>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button class="contact-btn" onclick="callNumber('${provider.phone}')">📞 Call</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${provider.phone}')">💬 WhatsApp</button>
-                    <button class="share-btn-inline" onclick="shareProvider('${provider.name}', '${provider.category}', '${provider.phone}')">📤 Share</button>
-                </div>
-            `;
+    // ✅ ADD MISSING FUNCTIONS
+    function callNumber(phone) { 
+        if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
+    }
+    
+    function openWhatsApp(phone) { 
+        if(phone && phone.length === 10) {
+            const message = "Hello, I need your service from Fatehpur Hubs app.";
+            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
         }
+    }
+
+    function shareProvider(name, category, phone) {
+        const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: `${category} Service - Fatehpur Hubs`,
+                text: message
+            }).catch(() => {
+                fallbackShare(message);
+            });
+        } else {
+            fallbackShare(message);
+        }
+    }
+
+    function fallbackShare(message) {
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+
+    // ✅ ADD START FIREBASE LISTENER FUNCTION
+    function startFirebaseListener() {
+        providersRef.on('value', (snapshot) => {
+            console.log("Firebase Data Received:", snapshot.val());
+            serviceProviders = [];
+            
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const provider = childSnapshot.val();
+                    if (provider) {
+                        serviceProviders.push(provider);
+                    }
+                });
+                loadServiceProviders('mistri-list');
+            } else {
+                document.getElementById('mistri-list').innerHTML = 
+                    '<p style="text-align: center; color: #666;">No services registered yet. Be the first to register!</p>';
+            }
+        }, (error) => {
+            console.error("Firebase Error:", error);
+            document.getElementById('mistri-list').innerHTML = 
+                '<p style="color:red; text-align: center;">Error loading services. Please refresh.</p>';
+        });
+    }
+
+    // ✅ ADD LOAD SERVICE PROVIDERS FUNCTION
+    function loadServiceProviders(listId) {
+        const mistriListDiv = document.getElementById(listId);
+        if (!mistriListDiv) return;
+
+        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+        
+        if (serviceProviders.length === 0) {
+            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
+            return;
+        }
+
+        serviceProviders.forEach(provider => {
+            const card = document.createElement('div');
+            card.className = 'profile-card';
+            card.innerHTML = createProfessionalCard(provider);
+            mistriListDiv.appendChild(card);
+        });
+    }
+
+    // ✅ INITIALIZE WHEN PAGE LOADS
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Initializing Firebase...");
+        startFirebaseListener();
+    });
+
+</script>
+    
 
         // Screen navigation
         function showScreen(screenId) {
