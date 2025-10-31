@@ -187,7 +187,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 <script src="script.js"></script>
 <script>
-    // Firebase Config (Yah theek hai)
+    // Firebase Config (यह कॉन्फ़िगरेशन ठीक है)
     const firebaseConfig = {
         apiKey: "AIzaSyA37JuLUIC-kypZ56wqb1Tp3",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -201,17 +201,24 @@
     // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = app.database();
-    const providersRef = database.ref('service_providers');
     
-    // **NEW: Local Jobs Ref**
-    const jobsRef = database.ref('jobs'); // <--- यह नई लाइन जोड़ें
+    // Providers Ref ko global banaein (script.js ko chahiye)
+    window.providersRef = database.ref('service_providers');
+    const providersRef = window.providersRef;
 
-    // **ACTION: Fire Listener from index.html**
+    // Local Jobs Ref ko global banaein (Jobs feature ke liye)
+    window.jobsRef = database.ref('jobs');
+    const jobsRef = window.jobsRef;
+
+
+    // ACTION: Fire Listener from index.html
     if (typeof startFirebaseListener === 'function') {
-        startFirebaseListener(providersRef, jobsRef); // <--- jobsRef को भी पास करें
+        startFirebaseListener(providersRef, jobsRef); 
     }
     
 </script>
+
+
 
         // Load services in list
         function loadServiceProviders(listId) {
