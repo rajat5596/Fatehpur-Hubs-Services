@@ -261,7 +261,7 @@
             `;
         }
 
-        // ✅ REGISTER SERVICE
+                // ✅ REGISTER SERVICE WITH DUPLICATE CHECK
         function registerService() {
             const name = document.getElementById('providerName').value.trim();
             const phone = document.getElementById('providerPhone').value.trim();
@@ -270,40 +270,61 @@
             const experience = document.getElementById('providerExperience').value.trim();
             
             if (!name || !phone || !category || !area || !experience) {
-                alert('Please fill all fields'); return false;
+                alert('Please fill all fields'); 
+                return false;
             }
+            
             if (phone.length !== 10 || isNaN(phone)) {
-                alert('Enter valid 10-digit phone number'); return false;
+                alert('Enter valid 10-digit phone number');
+                return false;
             }
             
             const submitBtn = document.getElementById('registerBtn');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Registering...';
+            submitBtn.textContent = 'Checking...';
             submitBtn.disabled = true;
             
-            const newProvider = { 
-                name: name, 
-                category: category, 
-                phone: phone, 
-                area: area, 
-                experience: experience, 
-                rating: "⭐️⭐️⭐️⭐️", 
-                timestamp: new Date().toISOString() 
-            };
+            // ✅ DUPLICATE CHECK - Same phone number already exists?
+            providersRef.orderByChild('phone').equalTo(phone).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert('❌ This phone number is already registered! One phone can register only once.');
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    
+                    // ✅ If not duplicate, register service
+                    const newProvider = { 
+                        name: name, 
+                        category: category, 
+                        phone: phone, 
+                        area: area, 
+                        experience: experience, 
+                        rating: "⭐️⭐️⭐️⭐️", 
+                        timestamp: new Date().toISOString() 
+                    };
+                    
+                    return providersRef.push(newProvider);
+                })
+                .then((result) => {
+                    if (result) {
+                        alert('✅ Service Registered Successfully!');
+                        document.getElementById('providerName').value = '';
+                        document.getElementById('providerPhone').value = '';
+                        document.getElementById('serviceCategory').value = '';
+                        document.getElementById('providerArea').value = '';
+                        document.getElementById('providerExperience').value = '';
+                    }
+                })
+                .catch(error => {
+                    alert('❌ Error: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
             
-            providersRef.push(newProvider).then(() => {
-                alert('✅ Service Registered Successfully!');
-                document.getElementById('providerName').value = '';
-                document.getElementById('providerPhone').value = '';
-                document.getElementById('serviceCategory').value = '';
-                document.getElementById('providerArea').value = '';
-                document.getElementById('providerExperience').value = '';
-            }).catch(error => {
-                alert('❌ Error: ' + error.message);
-            }).finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
             return false;
         }
 
