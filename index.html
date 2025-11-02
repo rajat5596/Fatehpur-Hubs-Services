@@ -25,12 +25,7 @@
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
-        
-        /* Promotion Section Styles */
         .promotion-section { margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 10px; text-align: center; }
-        .promotion-banner { width: 100%; border-radius: 8px; margin-top: 10px; }
-        
-        /* Contact for Ads Section */
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
@@ -39,13 +34,7 @@
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
-            atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
@@ -63,13 +52,7 @@
             <div class="ad-container">
                 <div class="ad-label">Sponsored</div>
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : 'd65603602583bbe6bc3308e8ee8ab792',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
             </div>
@@ -88,13 +71,11 @@
 
             <div class="promotion-section" style="padding: 10px; background-color: #f7f7f7; border-radius: 8px; margin-bottom: 15px;">
                 <h3 style="text-align: center; font-size: 1.1em; color: #333; margin-top: 0;">✨ Special Offers & Promotions ✨</h3> 
-                
-                <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;">
-                </div>
-            </div>
+                <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;"></div>
+            </div> 
                         <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
                 <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
-                <form onsubmit="event.preventDefault(); registerService();">
+                <form id="serviceForm">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
                     <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
                     <select id="serviceCategory" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
@@ -109,19 +90,12 @@
                 </form>
             </div>
 
-            <!-- CONTACT FOR ADS SECTION - नई Ads लगवाने के लिए -->
+            <!-- CONTACT FOR ADS SECTION -->
             <div class="contact-ads-section">
                 <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">📢 Want to Promote Your Business?</h4>
-                <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">
-                    Show your ad to thousands of users in Fatehpur!<br>
-                    Contact us for advertising space.
-                </p>
-                <button onclick="contactForAds()" style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">
-                    📞 Contact for Advertising
-                </button>
-                <p style="font-size: 12px; margin-top: 10px; color: #666;">
-                    WhatsApp: 9889904191
-                </p>
+                <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">Show your ad to thousands of users in Fatehpur!<br>Contact us for advertising space.</p>
+                <button onclick="contactForAds()" style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">📞 Contact for Advertising</button>
+                <p style="font-size: 12px; margin-top: 10px; color: #666;">WhatsApp: 9889904191</p>
             </div>
             
             <div id="mistri-list">
@@ -150,194 +124,189 @@
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
-            atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
-    
-    <!-- SCRIPTS -->
+        <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="script.js"></script>
-    <script src="ads.js"></script>
-    <!-- SCRIPTS -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="script.js"></script>
-<script src="ads.js"></script>
+    
     <script>
-    // ✅ CORRECTED FIREBASE CONFIG
-    const firebaseConfig = {
-        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "fatehpur-hubs-a3a9f",
-        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-        messagingSenderId: "294360741451",
-        appId: "1:294360741451:web:3bc85078805750b9fabfce"
-    };
+        // ✅ FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = app.database();
-    
-    // Global references
-    const providersRef = database.ref('service_providers');
-    
-    window.providersRef = providersRef;
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = app.database();
+        const providersRef = database.ref('service_providers');
+        window.providersRef = providersRef;
 
-    // Global variables
-    let serviceProviders = [];
+        // ✅ GLOBAL VARIABLES
+        let serviceProviders = [];
+        const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
 
-    // ✅ DEBUG VERSION - DATA LOADING
-    function startFirebaseListener() {
-        console.log("🔥 Firebase Listener Started...");
-        console.log("📡 Database Path:", providersRef.toString());
-        
-        providersRef.on('value', (snapshot) => {
-            console.log("✅ Firebase Data Received:", snapshot.val());
-            console.log("📊 Data exists:", snapshot.exists());
-            console.log("🔢 Children count:", snapshot.numChildren());
-            
-            serviceProviders = [];
-            
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const provider = childSnapshot.val();
-                    console.log("👨‍🔧 Provider found:", provider);
-                    if (provider && provider.name) {
-                        serviceProviders.push(provider);
-                    }
-                });
-                console.log("🎯 Total providers loaded:", serviceProviders.length);
-                loadServiceProviders('mistri-list');
-            } else {
-                console.log("❌ No data found in database");
-                document.getElementById('mistri-list').innerHTML = 
-                    '<p style="text-align: center; color: #666;">Database connected but no services found.</p>';
-            }
-        }, (error) => {
-            console.error("💥 Firebase Error:", error);
-            console.error("🔧 Error details:", error.message, error.code);
-            document.getElementById('mistri-list').innerHTML = 
-                '<p style="color:red; text-align: center;">Database connection error. Check console.</p>';
-        });
-    }
-
-    // ✅ LOAD SERVICE PROVIDERS FUNCTION
-    function loadServiceProviders(listId) {
-        const mistriListDiv = document.getElementById(listId);
-        if (!mistriListDiv) {
-            console.log("❌ Element not found:", listId);
-            return;
-        }
-
-        console.log("🔄 Loading services to HTML...");
-        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-        
-        if (serviceProviders.length === 0) {
-            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services to display.</p>';
-            return;
-        }
-
-        serviceProviders.forEach((provider, index) => {
-            console.log(`📝 Creating card ${index + 1}:`, provider.name);
-            const card = document.createElement('div');
-            card.className = 'profile-card';
-            card.innerHTML = createProfessionalCard(provider);
-            mistriListDiv.appendChild(card);
-        });
-        
-        console.log("✅ All services loaded to page");
-    }
-
-    // Create professional card HTML
-    function createProfessionalCard(provider) {
-        if (!provider) return '';
-        
-        const name = provider.name || 'No Name';
-        const category = provider.category || 'Service';
-        const area = provider.area || 'Area';
-        const experience = provider.experience || 'Experience';
-        const rating = provider.rating || '⭐️⭐️⭐️⭐️';
-        const phone = provider.phone || '';
-        
-        return `
-            <div style="margin-bottom: 10px;">
-                <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
-                <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
-                <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
-                <p style="margin: 2px 0; color: #666;">${rating}</p>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
-                <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
-                <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
-            </div>
-        `;
-    }
-
-    // Other functions remain same...
-    function callNumber(phone) { 
-        if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
-    }
-    
-    function openWhatsApp(phone) { 
-        if(phone && phone.length === 10) {
-            const message = "Hello, I need your service from Fatehpur Hubs app.";
-            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-        }
-    }
-
-    function shareProvider(name, category, phone) {
-        const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: `${category} Service - Fatehpur Hubs`,
-                text: message
-            }).catch(() => {
-                fallbackShare(message);
+        // ✅ FIREBASE LISTENER
+        function startFirebaseListener() {
+            providersRef.on('value', (snapshot) => {
+                serviceProviders = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const provider = childSnapshot.val();
+                        if (provider) serviceProviders.push(provider);
+                    });
+                    loadServiceProviders('mistri-list');
+                } else {
+                    document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+                }
             });
-        } else {
-            fallbackShare(message);
         }
-    }
 
-    function fallbackShare(message) {
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
-    }
+        // ✅ LOAD SERVICES
+        function loadServiceProviders(listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+            if (serviceProviders.length === 0) {
+                mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
+                return;
+            }
+            serviceProviders.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = createProfessionalCard(provider);
+                mistriListDiv.appendChild(card);
+            });
+        }
 
-    // ✅ INITIALIZE WHEN PAGE LOADS
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("🚀 DOM Loaded - Starting Firebase...");
-        startFirebaseListener();
-    });
+        // ✅ CREATE CARD
+        function createProfessionalCard(provider) {
+            if (!provider) return '';
+            const name = provider.name || 'No Name';
+            const category = provider.category || 'Service';
+            const area = provider.area || 'Area';
+            const experience = provider.experience || 'Experience';
+            const rating = provider.rating || '⭐️⭐️⭐️⭐️';
+            const phone = provider.phone || '';
+            return `
+                <div style="margin-bottom: 10px;">
+                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
+                    <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
+                    <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
+                    <p style="margin: 2px 0; color: #666;">${rating}</p>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+                    <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
+                </div>
+            `;
+        }
 
+        // ✅ REGISTER SERVICE
+        function registerService() {
+            const name = document.getElementById('providerName').value.trim();
+            const phone = document.getElementById('providerPhone').value.trim();
+            const category = document.getElementById('serviceCategory').value;
+            const area = document.getElementById('providerArea').value.trim();
+            const experience = document.getElementById('providerExperience').value.trim();
+            
+            if (!name || !phone || !category || !area || !experience) {
+                alert('Please fill all fields'); return false;
+            }
+            if (phone.length !== 10 || isNaN(phone)) {
+                alert('Enter valid 10-digit phone number'); return false;
+            }
+            
+            const submitBtn = document.getElementById('registerBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Registering...';
+            submitBtn.disabled = true;
+            
+            const newProvider = { 
+                name: name, 
+                category: category, 
+                phone: phone, 
+                area: area, 
+                experience: experience, 
+                rating: "⭐️⭐️⭐️⭐️", 
+                timestamp: new Date().toISOString() 
+            };
+            
+            providersRef.push(newProvider).then(() => {
+                alert('✅ Service Registered Successfully!');
+                document.getElementById('providerName').value = '';
+                document.getElementById('providerPhone').value = '';
+                document.getElementById('serviceCategory').value = '';
+                document.getElementById('providerArea').value = '';
+                document.getElementById('providerExperience').value = '';
+            }).catch(error => {
+                alert('❌ Error: ' + error.message);
+            }).finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+            return false;
+        }
+                // ✅ OTHER FUNCTIONS
+        function callNumber(phone) { 
+            if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
+        }
+        
+        function openWhatsApp(phone) { 
+            if(phone && phone.length === 10) {
+                const message = "Hello, I need your service from Fatehpur Hubs app.";
+                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+        
+        function shareProvider(name, category, phone) {
+            const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
+            if (navigator.share) {
+                navigator.share({ 
+                    title: `${category} Service - Fatehpur Hubs`, 
+                    text: message 
+                });
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+        
+        function contactForAds() {
+            const message = "Hello, I'm interested in advertising my business on Fatehpur Hubs. Please share details about ad spaces, pricing, and duration.";
+            window.open(`https://wa.me/919889904191?text=${encodeURIComponent(message)}`, '_blank');
+        }
+        
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+        
         function shareApp() {
             const message = "Check out Fatehpur Hubs - Find all professional services in Fatehpur! Download the app now.";
             if (navigator.share) {
-                navigator.share({
-                    title: 'Fatehpur Hubs',
-                    text: message
+                navigator.share({ 
+                    title: 'Fatehpur Hubs', 
+                    text: message 
                 });
             } else {
-                fallbackShare(message);
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
-
+        
         function openMoreApps() { 
             alert("More apps coming soon!"); 
         }
 
-        // Load all categories
+        // ✅ LOAD ALL CATEGORIES (For Search Screen)
         function loadAllCategories() {
             const allCatList = document.getElementById('all-categories-list');
             if (!allCatList) return;
@@ -368,166 +337,24 @@
             });
         }
 
-        // Load services in list
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-
-            if (listId === 'mistri-list') { 
-                mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-                
-                if (serviceProviders.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet.</p>';
-                    return;
-                }
-
-                serviceProviders.forEach(provider => {
-                    if (!provider) return;
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = createProfessionalCard(provider);
-                    mistriListDiv.appendChild(card);
-                });
-            }
-        }
-
-        // Search functionality
-        function setupSearch() {
-            const searchBar = document.getElementById('main-search-bar');
-            if (!searchBar) return;
-            
-            searchBar.addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase();
-                const mistriListDiv = document.getElementById('mistri-list');
-                
-                if (!mistriListDiv) return;
-                
-                if (!searchTerm.trim()) {
-                    loadServiceProviders('mistri-list');
-                    return;
-                }
-                
-                mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-                const filtered = serviceProviders.filter(provider => 
-                    provider && provider.name && (
-                        provider.name.toLowerCase().includes(searchTerm) || 
-                        (provider.category && provider.category.toLowerCase().includes(searchTerm)) ||
-                        (provider.area && provider.area.toLowerCase().includes(searchTerm))
-                    )
-                );
-                
-                if (filtered.length === 0) {
-                    mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
-                    return;
-                }
-
-                filtered.forEach(provider => {
-                    const card = document.createElement('div');
-                    card.className = 'profile-card';
-                    card.innerHTML = createProfessionalCard(provider);
-                    mistriListDiv.appendChild(card);
-                });
-            });
-        }
-
-        // Service Registration
-        function registerService() {
-            const name = document.getElementById('providerName').value.trim();
-            const phone = document.getElementById('providerPhone').value.trim();
-            const category = document.getElementById('serviceCategory').value;
-            const area = document.getElementById('providerArea').value.trim();
-            const experience = document.getElementById('providerExperience').value.trim();
-            
-            if (!name || !phone || !category || !area || !experience) {
-                alert('Please fill all fields');
-                return;
-            }
-            
-            if (phone.length !== 10 || isNaN(phone)) {
-                alert('Enter valid 10-digit phone number');
-                return;
-            }
-            
-            const submitBtn = document.getElementById('registerBtn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Registering...';
-            submitBtn.disabled = true;
-            
-            const newProvider = {
-                name: name,
-                category: category,
-                phone: phone,
-                area: area,
-                experience: experience,
-                rating: "⭐️⭐️⭐️⭐️",
-                timestamp: new Date().toISOString()
-            };
-            
-            providersRef.push(newProvider)
-                .then(() => {
-                    alert('Service Registered Successfully!');
-                    document.getElementById('providerName').value = '';
-                    document.getElementById('providerPhone').value = '';
-                    document.getElementById('serviceCategory').value = '';
-                    document.getElementById('providerArea').value = '';
-                    document.getElementById('providerExperience').value = '';
-                })
-                .catch(error => {
-                    alert('Error registering service: ' + error.message);
-                })
-                .finally(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                });
-        }
-
-        // Start Firebase Listener
-        function startFirebaseListener() {
-            providersRef.on('value', (snapshot) => {
-                serviceProviders = [];
-                snapshot.forEach((childSnapshot) => {
-                    const provider = childSnapshot.val();
-                    if (provider) {
-                        serviceProviders.push(provider);
-                    }
-                });
-                loadServiceProviders('mistri-list');
-            });
-        }
-
-        // Initialize everything when page loads
+        // ✅ INITIALIZE APP
         document.addEventListener('DOMContentLoaded', function() {
-            startFirebaseListener();
-            loadAllCategories();
-            setupSearch();
+            console.log("🚀 App Started - No Errors!");
             
-            // Category buttons
-            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
-                if(button.id !== 'more-cat-btn') {
-                    button.addEventListener('click', (e) => {
-                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => btn.classList.remove('selected'));
-                        e.target.classList.add('selected');
-                        const category = e.target.dataset.cat;
-                        const mistriListDiv = document.getElementById('mistri-list');
-                        if (!mistriListDiv) return;
-                        
-                        mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
-                        const filtered = serviceProviders.filter(p => p && p.category === category);
-                        
-                        if (filtered.length === 0) {
-                            mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
-                            return;
-                        }
-
-                        filtered.forEach(provider => {
-                            const card = document.createElement('div');
-                            card.className = 'profile-card';
-                            card.innerHTML = createProfessionalCard(provider);
-                            mistriListDiv.appendChild(card);
-                        });
-                    });
-                }
-            });
+            // Form event listener
+            const serviceForm = document.getElementById('serviceForm');
+            if (serviceForm) {
+                serviceForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    registerService();
+                });
+            }
+            
+            // Load categories for search screen
+            loadAllCategories();
+            
+            // Start Firebase
+            startFirebaseListener();
         });
     </script>
 </body>
