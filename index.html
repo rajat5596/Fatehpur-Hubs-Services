@@ -72,8 +72,8 @@
             <div class="promotion-section" style="padding: 10px; background-color: #f7f7f7; border-radius: 8px; margin-bottom: 15px;">
                 <h3 style="text-align: center; font-size: 1.1em; color: #333; margin-top: 0;">✨ Special Offers & Promotions ✨</h3> 
                 <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;"></div>
-            </div> 
-                        <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+            </div>
+            <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
                 <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
                 <form id="serviceForm">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
@@ -106,11 +106,41 @@
             <div style="height: 80px;"></div>
         </div>
 
+        <!-- SEARCH SCREEN -->
         <div id="search-screen" class="screen">
             <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
             <h2>All Services</h2>
             <div id="all-categories-list" class="categories-list"></div> 
             <div id="mistri-list-full"></div>
+        </div>
+
+        <!-- JOBS SCREEN -->
+        <div id="jobs-screen" class="screen">
+            <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
+            <h2>🏢 Local Jobs</h2>
+            
+            <!-- Job Posting Form -->
+            <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
+                <h3 style="color: white; text-align: center;">➕ Post a Job</h3>
+                <form id="jobForm">
+                    <input type="text" id="jobTitle" placeholder="Job Title (e.g., Sales Girl, Helper)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="text" id="shopName" placeholder="Shop/Business Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="tel" id="jobPhone" placeholder="Phone Number" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="text" id="jobLocation" placeholder="Location/Area" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <input type="text" id="jobSalary" placeholder="Salary (e.g., ₹8000/month)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                    <select id="jobType" style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
+                        <option value="full-time">Full Time</option>
+                        <option value="part-time">Part Time</option>
+                    </select>
+                    <textarea id="jobDescription" placeholder="Job Description (e.g., Required for clothing shop, timing 10AM-7PM)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; height: 80px;"></textarea>
+                    <button type="submit" id="postJobBtn" style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Post Job</button>
+                </form>
+            </div>
+            
+            <!-- Jobs List -->
+            <div id="jobs-list">
+                <p style="text-align: center; color: #2a5298;">Loading jobs...</p>
+            </div>
         </div>
 
         <div class="footer">
@@ -128,9 +158,10 @@
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
-        <!-- SCRIPTS -->
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="ads.js"></script>
     
     <script>
         // ✅ FIREBASE CONFIG
@@ -153,6 +184,9 @@
         // ✅ GLOBAL VARIABLES
         let serviceProviders = [];
         const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+
+        // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
+        const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
 
         // ✅ FIREBASE LISTENER
         function startFirebaseListener() {
@@ -256,7 +290,33 @@
             });
             return false;
         }
-                // ✅ OTHER FUNCTIONS
+
+        // ✅ SHARE FUNCTIONS WITH PLAY STORE LINK
+        function shareProvider(name, category, phone) {
+            const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app: ${PLAY_STORE_LINK}`;
+            if (navigator.share) {
+                navigator.share({ 
+                    title: `${category} Service - Fatehpur Hubs`, 
+                    text: message 
+                });
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        function shareApp() {
+            const message = `Check out Fatehpur Hubs - Find all professional services in Fatehpur!\n\nDownload the app now: ${PLAY_STORE_LINK}`;
+            if (navigator.share) {
+                navigator.share({ 
+                    title: 'Fatehpur Hubs', 
+                    text: message 
+                });
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        // ✅ CONTACT FUNCTIONS
         function callNumber(phone) { 
             if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
         }
@@ -265,18 +325,6 @@
             if(phone && phone.length === 10) {
                 const message = "Hello, I need your service from Fatehpur Hubs app.";
                 window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-        
-        function shareProvider(name, category, phone) {
-            const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app for more services!`;
-            if (navigator.share) {
-                navigator.share({ 
-                    title: `${category} Service - Fatehpur Hubs`, 
-                    text: message 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
         
@@ -289,21 +337,124 @@
             document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
-        
-        function shareApp() {
-            const message = "Check out Fatehpur Hubs - Find all professional services in Fatehpur! Download the app now.";
+        // ✅ JOBS FUNCTIONS
+        function openMoreApps() { 
+            showScreen('jobs-screen');
+            loadLocalJobs();
+        }
+
+        function postJob() {
+            const jobTitle = document.getElementById('jobTitle').value.trim();
+            const shopName = document.getElementById('shopName').value.trim();
+            const jobPhone = document.getElementById('jobPhone').value.trim();
+            const jobLocation = document.getElementById('jobLocation').value.trim();
+            const jobSalary = document.getElementById('jobSalary').value.trim();
+            const jobDescription = document.getElementById('jobDescription').value.trim();
+            const jobType = document.getElementById('jobType').value;
+            
+            if (!jobTitle || !shopName || !jobPhone || !jobLocation || !jobSalary || !jobDescription) {
+                alert('Please fill all fields');
+                return false;
+            }
+            
+            if (jobPhone.length !== 10 || isNaN(jobPhone)) {
+                alert('Enter valid 10-digit phone number');
+                return false;
+            }
+            
+            const submitBtn = document.getElementById('postJobBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Posting...';
+            submitBtn.disabled = true;
+            
+            const newJob = {
+                title: jobTitle,
+                shopName: shopName,
+                phone: jobPhone,
+                location: jobLocation,
+                salary: jobSalary,
+                description: jobDescription,
+                type: jobType,
+                timestamp: new Date().toISOString()
+            };
+            
+            const jobsRef = database.ref('local_jobs');
+            jobsRef.push(newJob)
+                .then(() => {
+                    alert('✅ Job Posted Successfully!');
+                    // Clear form
+                    document.getElementById('jobTitle').value = '';
+                    document.getElementById('shopName').value = '';
+                    document.getElementById('jobPhone').value = '';
+                    document.getElementById('jobLocation').value = '';
+                    document.getElementById('jobSalary').value = '';
+                    document.getElementById('jobDescription').value = '';
+                    document.getElementById('jobType').value = 'full-time';
+                    
+                    // Refresh jobs list
+                    loadLocalJobs();
+                })
+                .catch(error => {
+                    alert('❌ Error: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                });
+        }
+        function loadLocalJobs() {
+            const jobsRef = database.ref('local_jobs');
+            const jobsListDiv = document.getElementById('jobs-list');
+            
+            jobsRef.on('value', (snapshot) => {
+                jobsListDiv.innerHTML = '<h3>🏢 Local Jobs</h3>';
+                
+                if (!snapshot.exists()) {
+                    jobsListDiv.innerHTML += '<p style="text-align: center; color: #666;">No jobs posted yet. Be the first to post a job!</p>';
+                    return;
+                }
+                
+                snapshot.forEach((childSnapshot) => {
+                    const job = childSnapshot.val();
+                    const jobCard = document.createElement('div');
+                    jobCard.className = 'profile-card';
+                    jobCard.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <h4 style="margin: 0 0 5px 0; color: #2a5298;">${job.title}</h4>
+                            <p style="margin: 2px 0; color: #666;">🏪 ${job.shopName}</p>
+                            <p style="margin: 2px 0; color: #666;">📍 ${job.location}</p>
+                            <p style="margin: 2px 0; color: #666;">💰 ${job.salary}</p>
+                            <p style="margin: 2px 0; color: #666;">${job.type === 'full-time' ? '⏰ Full Time' : '⏱️ Part Time'}</p>
+                            <p style="margin: 2px 0; color: #666;">${job.description}</p>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button class="contact-btn" onclick="callNumber('${job.phone}')">📞 Call</button>
+                            <button class="whatsapp-btn" onclick="openJobWhatsApp('${job.phone}', '${job.title}', '${job.shopName}')">💬 Apply</button>
+                            <button class="share-btn-inline" onclick="shareJob('${job.title}', '${job.shopName}', '${job.phone}')">📤 Share</button>
+                        </div>
+                    `;
+                    jobsListDiv.appendChild(jobCard);
+                });
+            });
+        }
+
+        function openJobWhatsApp(phone, jobTitle, shopName) {
+            if(phone && phone.length === 10) {
+                const message = `Hello, I'm interested in the ${jobTitle} position at ${shopName}. I found this job on Fatehpur Hubs app.`;
+                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
+
+        function shareJob(jobTitle, shopName, phone) {
+            const message = `Job Opportunity in Fatehpur!\n\n🏢 ${shopName}\n📋 ${jobTitle}\n📞 ${phone}\n\nDownload Fatehpur Hubs App: ${PLAY_STORE_LINK}`;
             if (navigator.share) {
                 navigator.share({ 
-                    title: 'Fatehpur Hubs', 
+                    title: 'Job Opportunity - Fatehpur Hubs', 
                     text: message 
                 });
             } else {
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
             }
-        }
-        
-        function openMoreApps() { 
-            alert("More apps coming soon!"); 
         }
 
         // ✅ LOAD ALL CATEGORIES (For Search Screen)
@@ -347,6 +498,15 @@
                 serviceForm.addEventListener('submit', function(event) {
                     event.preventDefault();
                     registerService();
+                });
+            }
+            
+            // Job form event listener
+            const jobForm = document.getElementById('jobForm');
+            if (jobForm) {
+                jobForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    postJob();
                 });
             }
             
