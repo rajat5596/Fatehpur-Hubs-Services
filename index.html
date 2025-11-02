@@ -456,8 +456,8 @@
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
-
-        // ✅ LOAD ALL CATEGORIES (For Search Screen)
+        
+// ✅ LOAD ALL CATEGORIES (For Search Screen)
         function loadAllCategories() {
             const allCatList = document.getElementById('all-categories-list');
             if (!allCatList) return;
@@ -510,11 +510,14 @@
                 });
             }
             
-            // Load categories for search screen
+                        // Load categories for search screen
             loadAllCategories();
             
             // Start Firebase
             startFirebaseListener();
+            
+            // ✅ YE LINE ADD HO GAYI
+            setupCategoryFilters();
         });
     </script>
 </body>
