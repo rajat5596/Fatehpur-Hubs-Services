@@ -356,15 +356,25 @@
 
         // ✅ CONTACT FUNCTIONS
         function callNumber(phone) { 
-            if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
-        }
-        
-        function openWhatsApp(phone) { 
-            if(phone && phone.length === 10) {
-                const message = "Hello, I need your service from Fatehpur Hubs app.";
-                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
+    // ✅ CLEAN PHONE NUMBER - Remove +91, spaces, hyphens
+    const cleanPhone = phone.replace(/[\s\-+]/g, '').replace(/^91/, '');
+    if(cleanPhone.length === 10 && !isNaN(cleanPhone)) {
+        window.location.href = `tel:+91${cleanPhone}`;
+    } else {
+        alert('Invalid phone number: ' + phone);
+    }
+}
+
+function openWhatsApp(phone) { 
+    // ✅ CLEAN PHONE NUMBER - Remove +91, spaces, hyphens
+    const cleanPhone = phone.replace(/[\s\-+]/g, '').replace(/^91/, '');
+    if(cleanPhone.length === 10 && !isNaN(cleanPhone)) {
+        const message = "Hello, I need your service from Fatehpur Hubs app.";
+        window.open(`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+        alert('Invalid phone number: ' + phone);
+    }
+}
         
         function contactForAds() {
             const message = "Hello, I'm interested in advertising my business on Fatehpur Hubs. Please share details about ad spaces, pricing, and duration.";
