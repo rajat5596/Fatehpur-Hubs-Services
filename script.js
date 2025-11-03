@@ -449,3 +449,15 @@ function postJob(e) {
 
     return false;
 }
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = app.database();
+
+// ✅ ANONYMOUS AUTHENTICATION ADD KAREIN
+firebase.auth().signInAnonymously()
+    .then(() => {
+        console.log("User automatically signed in anonymously");
+    })
+    .catch(error => {
+        console.log("Auth error:", error);
+    });
