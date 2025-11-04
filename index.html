@@ -28,7 +28,7 @@
         .promotion-section { margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 10px; text-align: center; }
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
-    </head>
+</head>
 <body>
     <!-- Top Ad -->
     <div class="ad-container">
@@ -56,6 +56,7 @@
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
             </div>
+            
             <h3>🚀 Popular Services</h3>
             <div id="mistri-categories" class="categories-list">
                 <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
@@ -148,6 +149,18 @@
             <button class="share-btn-inline" onclick="openMoreApps()">➕ More</button>
         </div>
     </div>
+    <!-- Jobs List -->
+            <div id="jobs-list">
+                <p style="text-align: center; color: #2a5298;">Loading jobs...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
+            <button class="share-btn-inline" onclick="shareApp()">📤 Share App</button>
+            <button class="share-btn-inline" onclick="openMoreApps()">➕ More</button>
+        </div>
+    </div>
 
     <!-- Bottom Ad -->
     <div class="ad-container">
@@ -164,14 +177,16 @@
 <script src="ads.js"></script>
     
     <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyA37JaLU0bkypZ5cwjQLTp3WKHgNt2iwY", // YAHI SAHI KEY HAI
-    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-    projectId: "fatehpur-hubs-a3a9f", 
-    storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
-    messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:73f7b8222249493afabfce"
-};
+        // ✅ FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
 
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
@@ -258,8 +273,7 @@
                 </div>
             `;
         }
-
-                // ✅ REGISTER SERVICE WITH DUPLICATE CHECK
+// ✅ REGISTER SERVICE WITH DUPLICATE CHECK
         function registerService() {
             const name = document.getElementById('providerName').value.trim();
             const phone = document.getElementById('providerPhone').value.trim();
@@ -427,7 +441,6 @@ function openWhatsApp(phone) {
                 }
             });
         }
-
         // ✅ LOAD ALL CATEGORIES (For Search Screen)
         function loadAllCategories() {}
 
