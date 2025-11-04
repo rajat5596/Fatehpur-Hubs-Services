@@ -461,33 +461,46 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// Simple OTP Functions
+// OTP Functions
 function sendOTP() {
-    alert('Send OTP button clicked!');
-    
     const phoneNumber = document.getElementById('phone-number').value;
+    
     if (!phoneNumber) {
         alert('Please enter phone number');
         return;
     }
+
+    // Recaptcha setup
+    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal'
+    });
     
-    alert('Phone number entered: ' + phoneNumber);
-    document.getElementById('otp-section').style.display = 'block';
+    // Send OTP
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(confirmationResult => {
+            window.confirmationResult = confirmationResult;
+            document.getElementById('otp-section').style.display = 'block';
+            alert('OTP sent successfully!');
+        })
+        .catch(error => {
+            console.error('OTP Error:', error);
+            alert('Error: ' + error.message);
+        });
 }
 
 function verifyOTP() {
-    alert('Verify OTP button clicked!');
-    
     const otp = document.getElementById('otp-input').value;
+    
     if (!otp) {
         alert('Please enter OTP');
         return;
     }
-    
-    alert('OTP entered: ' + otp);
-    
-    // Temporary login success
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-    alert('Login successful!');
+
+    confirmationResult.confirm(otp).then(result => {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        alert('Login successful!');
+    }).catch(error => {
+        alert('Invalid OTP!');
+    });
 }
