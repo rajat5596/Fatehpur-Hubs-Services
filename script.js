@@ -461,13 +461,3 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-function sendOTP() {
-    alert('OTP would be sent to: ' + document.getElementById('phone-number').value);
-    document.getElementById('otp-section').style.display = 'block';
-}
-
-function verifyOTP() {
-    alert('Login successful!');
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-}
