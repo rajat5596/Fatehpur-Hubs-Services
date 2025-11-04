@@ -29,90 +29,34 @@
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
-<body>
-    <div class="otp-box">
-  <h3>Phone Verification</h3>
 
-  <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
-  <div id="recaptcha-container"></div>
-  <button onclick="sendOTP()">Send OTP</button>
 
-  <br><br>
-  <input type="text" id="otp" placeholder="Enter OTP" />
-  <button onclick="verifyOTP()">Verify OTP</button>
-</div>
+    <body>
 
-<style>
-.otp-box {
-  border: 1px solid #ccc;
-  width: 300px;
-  padding: 15px;
-  margin: 40px auto;
-  border-radius: 10px;
-  text-align: center;
-  background: #f9f9f9;
-}
-.otp-box input {
-  width: 90%;
-  padding: 8px;
-  margin: 6px 0;
-}
-.otp-box button {
-  padding: 8px 15px;
-  margin-top: 5px;
-  cursor: pointer;
-  border-radius: 6px;
-  border: none;
-  background-color: #007bff;
-  color: #fff;
-}
-</style>
-    <!-- Firebase SDKs (Firebase v10 ke CDN links) -->
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
+  <!-- ✅ OTP Login Screen -->
+  <div id="loginSection" class="otp-box">
+    <h3>Phone Verification</h3>
+    <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
+    <div id="recaptcha-container"></div>
+    <button onclick="sendOTP()">Send OTP</button>
+    <br><br>
+    <input type="text" id="otp" placeholder="Enter OTP" />
+    <button onclick="verifyOTP()">Verify OTP</button>
+  </div>
 
-<script>
-  // 🔥 Firebase Config (Tumhara original config)
-  const firebaseConfig = {
-    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-    messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce",
-    measurementId: "G-R8N7DVEHML"
-  };
+  <!-- ✅ Actual App Content (ye tab dikhega jab OTP verify ho jaye) -->
+  <div id="mainApp" style="display:none;">
+      <!-- Yahan tumhara poora app ka content rahega -->
+      <div class="ad-container">
+          <div class="ad-label">Advertisement</div>
+          <script type="text/javascript">
+              atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+          </script>
+          <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+      </div>
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
-    <!-- Top Ad -->
-    <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
-        <script type="text/javascript">
-            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
-
-    <div class="container">
-        <header>
-            <h1><img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;"> <span>Fatehpur Hubs</span></h1>
-            <div id="auth-info">Fatehpur ke Professional Services</div>
-        </header>
-        
-        <div id="home-screen" class="screen active">
-            <input type="text" id="main-search-bar" placeholder="🔍 Search Plumber, Electrician...">
-            
-            <!-- Middle Ad -->
-            <div class="ad-container">
-                <div class="ad-label">Sponsored</div>
-                <script type="text/javascript">
-                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
-            </div>
+      <!-- Tumhara existing index.html ka main code (cards, service list, etc.) -->
+  </div>
             
             <h3>🚀 Popular Services</h3>
             <div id="mistri-categories" class="categories-list">
