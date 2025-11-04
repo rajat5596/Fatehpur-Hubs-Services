@@ -461,3 +461,47 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// Wait until window loads (important for reCAPTCHA)
+window.onload = function () {
+  // reCAPTCHA widget create
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'normal',
+    callback: function(response) {
+      console.log('reCAPTCHA verified');
+    },
+    'expired-callback': function() {
+      alert('reCAPTCHA expired. Please try again.');
+    }
+  });
+};
+
+// OTP bhejne ka function
+function sendOTP() {
+  const phoneNumber = document.getElementById('phone').value;
+  const appVerifier = window.recaptchaVerifier;
+
+  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then(function(confirmationResult) {
+      window.confirmationResult = confirmationResult;
+      alert('OTP sent successfully to ' + phoneNumber);
+    })
+    .catch(function(error) {
+      console.error('Error:', error);
+      alert(error.message);
+    });
+}
+
+// OTP verify karne ka function
+function verifyOTP() {
+  const code = document.getElementById('otp').value;
+  window.confirmationResult.confirm(code)
+    .then(function(result) {
+      const user = result.user;
+      alert('✅ Phone number verified successfully!');
+      console.log('User:', user);
+    })
+    .catch(function(error) {
+      alert('❌ Invalid OTP!');
+      console.error(error);
+    });
+}
