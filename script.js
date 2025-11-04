@@ -462,26 +462,19 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 function sendOTP() {
-    const phoneNumber = document.getElementById('phone-number').value;
+    const phoneNumber = "+91" + "9889904191"; // Country code alag se
     
-    if (!phoneNumber) {
-        alert('Please enter phone number');
-        return;
-    }
-
-    // Firebase OTP send
     const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
         'size': 'normal'
     });
     
     firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
         .then(confirmationResult => {
+            alert('OTP SENT! Check: ' + phoneNumber);
             window.confirmationResult = confirmationResult;
             document.getElementById('otp-section').style.display = 'block';
-            alert('OTP sent successfully! Check your phone.');
         })
         .catch(error => {
-            console.error('OTP Error:', error);
-            alert('Error: ' + error.message);
+            alert('ERROR: ' + error.message + ' - Code: ' + error.code);
         });
 }
