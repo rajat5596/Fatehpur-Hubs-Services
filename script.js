@@ -461,47 +461,50 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// Wait until window loads (important for reCAPTCHA)
-window.onload = function () {
-  // reCAPTCHA widget create
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'normal',
-    callback: function(response) {
-      console.log('reCAPTCHA verified');
-    },
-    'expired-callback': function() {
-      alert('reCAPTCHA expired. Please try again.');
-    }
-  });
-};
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
 
-// OTP bhejne ka function
-function sendOTP() {
-  const phoneNumber = document.getElementById('phone').value;
-  const appVerifier = window.recaptchaVerifier;
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "fatehpur-hubs-a3a9f",
+    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+    messagingSenderId: "294360741451",
+    appId: "1:294360741451:web:3bc85078805750b9fabfce",
+    measurementId: "G-R8N7DVEHML"
+  };
 
-  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then(function(confirmationResult) {
-      window.confirmationResult = confirmationResult;
-      alert('OTP sent successfully to ' + phoneNumber);
-    })
-    .catch(function(error) {
-      console.error('Error:', error);
-      alert(error.message);
-    });
-}
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-// OTP verify karne ka function
-function verifyOTP() {
-  const code = document.getElementById('otp').value;
-  window.confirmationResult.confirm(code)
-    .then(function(result) {
-      const user = result.user;
-      alert('✅ Phone number verified successfully!');
-      console.log('User:', user);
-    })
-    .catch(function(error) {
-      alert('❌ Invalid OTP!');
-      console.error(error);
-    });
-}
+  // OTP bhejna
+  function sendOTP() {
+    const phone = document.getElementById("phone").value;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+    const appVerifier = window.recaptchaVerifier;
+    auth.signInWithPhoneNumber(phone, appVerifier)
+      .then(confirmationResult => {
+        window.confirmationResult = confirmationResult;
+        alert("OTP sent!");
+      })
+      .catch(error => {
+        alert(error.message);
+      });
+  }
+
+  // OTP verify karna
+  function verifyOTP() {
+    const otp = document.getElementById("otp").value;
+    confirmationResult.confirm(otp)
+      .then(result => {
+        alert("Login successful!");
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+      })
+      .catch(error => {
+        alert("Invalid OTP, try again!");
+      });
+  }
+</script>
