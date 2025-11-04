@@ -461,46 +461,24 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// OTP Functions
 function sendOTP() {
-    const phoneNumber = document.getElementById('phone-number').value;
+    alert('Send OTP function called!');
     
+    const phoneNumber = document.getElementById('phone-number').value;
     if (!phoneNumber) {
         alert('Please enter phone number');
         return;
     }
 
-    // Recaptcha setup
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'normal'
-    });
+    alert('Proceeding with OTP...');
     
-    // Send OTP
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then(confirmationResult => {
-            window.confirmationResult = confirmationResult;
-            document.getElementById('otp-section').style.display = 'block';
-            alert('OTP sent successfully!');
-        })
-        .catch(error => {
-            console.error('OTP Error:', error);
-            alert('Error: ' + error.message);
+    // Recaptcha try karo
+    try {
+        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'normal'
         });
-}
-
-function verifyOTP() {
-    const otp = document.getElementById('otp-input').value;
-    
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
+        alert('Recaptcha loaded');
+    } catch (error) {
+        alert('Recaptcha error: ' + error.message);
     }
-
-    confirmationResult.confirm(otp).then(result => {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        alert('Login successful!');
-    }).catch(error => {
-        alert('Invalid OTP!');
-    });
 }
