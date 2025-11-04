@@ -461,25 +461,33 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// Simple click handler - yeh code add karo
-setTimeout(function() {
-    var sendBtn = document.getElementById('send-otp-btn');
-    var verifyBtn = document.getElementById('verify-otp-btn');
+// Simple OTP Functions
+function sendOTP() {
+    alert('Send OTP button clicked!');
     
-    console.log('Send Button:', sendBtn);
-    console.log('Verify Button:', verifyBtn);
-    
-    if (sendBtn) {
-        sendBtn.onclick = function() {
-            alert('Button working!');
-            sendOTP();
-        };
+    const phoneNumber = document.getElementById('phone-number').value;
+    if (!phoneNumber) {
+        alert('Please enter phone number');
+        return;
     }
     
-    if (verifyBtn) {
-        verifyBtn.onclick = function() {
-            alert('Verify button working!');
-            verifyOTP();
-        };
+    alert('Phone number entered: ' + phoneNumber);
+    document.getElementById('otp-section').style.display = 'block';
+}
+
+function verifyOTP() {
+    alert('Verify OTP button clicked!');
+    
+    const otp = document.getElementById('otp-input').value;
+    if (!otp) {
+        alert('Please enter OTP');
+        return;
     }
-}, 1000);
+    
+    alert('OTP entered: ' + otp);
+    
+    // Temporary login success
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    alert('Login successful!');
+}
