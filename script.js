@@ -461,57 +461,25 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// OTP Functions
-// Simple test - yeh code try karo
-document.getElementById('send-otp-btn').addEventListener('click', function() {
-    alert('Button clicked!');
-    sendOTP();
-});
-function sendOTP() {
-    const phoneNumber = document.getElementById('phone-number').value;
+// Simple click handler - yeh code add karo
+setTimeout(function() {
+    var sendBtn = document.getElementById('send-otp-btn');
+    var verifyBtn = document.getElementById('verify-otp-btn');
     
-    if (!phoneNumber) {
-        alert('Please enter phone number');
-        return;
-    }
-
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'normal'
-    });
+    console.log('Send Button:', sendBtn);
+    console.log('Verify Button:', verifyBtn);
     
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then(confirmationResult => {
-            window.confirmationResult = confirmationResult;
-            document.getElementById('otp-section').style.display = 'block';
-            alert('OTP sent successfully!');
-        })
-        .catch(error => {
-            console.error('OTP Error:', error);
-            alert('Error: ' + error.message);
-        });
-}
-
-function verifyOTP() {
-    const otp = document.getElementById('otp-input').value;
+    if (sendBtn) {
+        sendBtn.onclick = function() {
+            alert('Button working!');
+            sendOTP();
+        };
+    }
     
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
+    if (verifyBtn) {
+        verifyBtn.onclick = function() {
+            alert('Verify button working!');
+            verifyOTP();
+        };
     }
-
-    confirmationResult.confirm(otp).then(result => {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        alert('Login successful!');
-    }).catch(error => {
-        alert('Invalid OTP!');
-    });
-}
-
-// Auto login check
-firebase.auth().onAuthStateChanged(user => {
-    if (user) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-    }
-});
+}, 1000);
