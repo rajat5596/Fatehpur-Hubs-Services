@@ -474,3 +474,31 @@ h2, h3 {
     text-decoration: none;
     display: inline-block;
     }
+<style>
+body {
+  font-family: Arial, sans-serif;
+}
+.otp-box {
+  border: 1px solid #ccc;
+  width: 300px;
+  padding: 20px;
+  margin: 100px auto;
+  border-radius: 10px;
+  text-align: center;
+  background: #f9f9f9;
+}
+.otp-box input {
+  width: 90%;
+  padding: 8px;
+  margin: 6px 0;
+}
+.otp-box button {
+  padding: 8px 15px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+}
+</style>
