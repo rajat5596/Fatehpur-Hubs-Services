@@ -462,23 +462,28 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 function sendOTP() {
-    alert('Send OTP function called!');
-    
     const phoneNumber = document.getElementById('phone-number').value;
+    
     if (!phoneNumber) {
         alert('Please enter phone number');
         return;
     }
-
-    alert('Proceeding with OTP...');
     
-    // Recaptcha try karo
-    try {
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'normal'
-        });
-        alert('Recaptcha loaded');
-    } catch (error) {
-        alert('Recaptcha error: ' + error.message);
+    // Temporary success - OTP sent message
+    alert('OTP would be sent to: ' + phoneNumber);
+    document.getElementById('otp-section').style.display = 'block';
+}
+
+function verifyOTP() {
+    const otp = document.getElementById('otp-input').value;
+    
+    if (!otp) {
+        alert('Please enter OTP');
+        return;
     }
+    
+    // Temporary login success
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    alert('Login successful with OTP: ' + otp);
 }
