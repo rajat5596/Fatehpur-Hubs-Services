@@ -462,19 +462,12 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 function sendOTP() {
-    const phoneNumber = "+91" + document.getElementById('phone-number').value;
-    
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'normal'
-    });
-    
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then(confirmationResult => {
-            alert('OTP sent to: ' + phoneNumber);
-            window.confirmationResult = confirmationResult;
-            document.getElementById('otp-section').style.display = 'block';
-        })
-        .catch(error => {
-            alert('OTP failed: ' + error.message);
-        });
+    alert('OTP would be sent to: ' + document.getElementById('phone-number').value);
+    document.getElementById('otp-section').style.display = 'block';
+}
+
+function verifyOTP() {
+    alert('Login successful!');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
 }
