@@ -30,6 +30,43 @@
     </style>
 </head>
 <body>
+    <div class="otp-box">
+  <h3>Phone Verification</h3>
+
+  <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
+  <div id="recaptcha-container"></div>
+  <button onclick="sendOTP()">Send OTP</button>
+
+  <br><br>
+  <input type="text" id="otp" placeholder="Enter OTP" />
+  <button onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<style>
+.otp-box {
+  border: 1px solid #ccc;
+  width: 300px;
+  padding: 15px;
+  margin: 40px auto;
+  border-radius: 10px;
+  text-align: center;
+  background: #f9f9f9;
+}
+.otp-box input {
+  width: 90%;
+  padding: 8px;
+  margin: 6px 0;
+}
+.otp-box button {
+  padding: 8px 15px;
+  margin-top: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+}
+</style>
     <!-- Firebase SDKs (Firebase v10 ke CDN links) -->
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
