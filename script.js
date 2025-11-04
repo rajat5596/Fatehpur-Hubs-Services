@@ -462,19 +462,8 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 function sendOTP() {
-    const phoneNumber = "+91" + "9889904191"; // Country code alag se
-    
-    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'normal'
-    });
-    
-    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then(confirmationResult => {
-            alert('OTP SENT! Check: ' + phoneNumber);
-            window.confirmationResult = confirmationResult;
-            document.getElementById('otp-section').style.display = 'block';
-        })
-        .catch(error => {
-            alert('ERROR: ' + error.message + ' - Code: ' + error.code);
-        });
+    alert('Send OTP clicked!');
+    const phoneNumber = document.getElementById('phone-number').value;
+    alert('Phone: ' + phoneNumber);
+    document.getElementById('otp-section').style.display = 'block';
 }
