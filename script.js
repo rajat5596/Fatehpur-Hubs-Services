@@ -462,8 +462,19 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 function sendOTP() {
-    alert('Send OTP clicked!');
-    const phoneNumber = document.getElementById('phone-number').value;
-    alert('Phone: ' + phoneNumber);
-    document.getElementById('otp-section').style.display = 'block';
+    const phoneNumber = "+91" + document.getElementById('phone-number').value;
+    
+    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal'
+    });
+    
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(confirmationResult => {
+            alert('OTP sent to: ' + phoneNumber);
+            window.confirmationResult = confirmationResult;
+            document.getElementById('otp-section').style.display = 'block';
+        })
+        .catch(error => {
+            alert('OTP failed: ' + error.message);
+        });
 }
