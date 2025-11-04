@@ -30,6 +30,29 @@
     </style>
 </head>
 <body>
+    <!-- OTP LOGIN SCREEN - YAHAN PASTE KARO -->
+    <div id="login-screen" style="padding: 20px; text-align: center; background: white;">
+        <h3>📱 Login with Phone</h3>
+        <input type="tel" id="phone-number" placeholder="+91 9876543210" 
+            style="padding: 10px; margin: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
+        <br>
+        <div id="recaptcha-container"></div>
+        <button onclick="sendOTP()" 
+            style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            Send OTP
+        </button>
+        
+        <div id="otp-section" style="display:none; margin-top: 20px;">
+            <input type="text" id="otp-input" placeholder="Enter OTP" 
+                style="padding: 10px; margin: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
+            <br>
+            <button onclick="verifyOTP()" 
+                style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                Verify OTP
+            </button>
+        </div>
+    </div>
+
     <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
@@ -38,6 +61,10 @@
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
+
+    <!-- AAPKA PURANA CONTENT - YAHAN SAB KUCH RAHEGA -->
+    <div id="main-app" style="display: none;">
+        <!-- Aapka existing content yahan rahega -->
 
     <div class="container">
         <header>
