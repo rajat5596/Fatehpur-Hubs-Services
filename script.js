@@ -468,22 +468,20 @@ function sendOTP() {
         alert('Please enter phone number');
         return;
     }
-    
-    // Temporary success - OTP sent message
-    alert('OTP would be sent to: ' + phoneNumber);
-    document.getElementById('otp-section').style.display = 'block';
-}
 
-function verifyOTP() {
-    const otp = document.getElementById('otp-input').value;
+    // Firebase OTP send
+    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'normal'
+    });
     
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
-    }
-    
-    // Temporary login success
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-    alert('Login successful with OTP: ' + otp);
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(confirmationResult => {
+            window.confirmationResult = confirmationResult;
+            document.getElementById('otp-section').style.display = 'block';
+            alert('OTP sent successfully! Check your phone.');
+        })
+        .catch(error => {
+            console.error('OTP Error:', error);
+            alert('Error: ' + error.message);
+        });
 }
