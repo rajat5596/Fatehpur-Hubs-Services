@@ -29,35 +29,79 @@
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
-
-
     <body>
 
-  <!-- ✅ OTP Login Screen -->
-  <div id="loginSection" class="otp-box">
-    <h3>Phone Verification</h3>
+  <!-- 🔐 OTP LOGIN SECTION -->
+  <div id="loginPage" class="otp-box">
+    <h3>Sign in with Phone</h3>
     <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
     <div id="recaptcha-container"></div>
     <button onclick="sendOTP()">Send OTP</button>
+
     <br><br>
     <input type="text" id="otp" placeholder="Enter OTP" />
     <button onclick="verifyOTP()">Verify OTP</button>
   </div>
 
-  <!-- ✅ Actual App Content (ye tab dikhega jab OTP verify ho jaye) -->
+  <!-- 🚀 MAIN APP (Hidden by default) -->
   <div id="mainApp" style="display:none;">
-      <!-- Yahan tumhara poora app ka content rahega -->
-      <div class="ad-container">
-          <div class="ad-label">Advertisement</div>
-          <script type="text/javascript">
-              atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-          </script>
-          <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-      </div>
+    <!-- 👇 Yahan tumhara pura old app code daal do -->
+    <div class="ad-container">
+      <div class="ad-label">Advertisement</div>
+      <script type="text/javascript">
+        atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+      </script>
+      <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+    </div>
 
-      <!-- Tumhara existing index.html ka main code (cards, service list, etc.) -->
+    <!-- 👇 Yahan se niche tak tumhara existing services wala code -->
+    <h2>🚀 Popular Services</h2>
+    <!-- plumber, electrician, etc. -->
   </div>
-            
+        <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
+
+<script>
+  // ✅ Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "fatehpur-hubs-a3a9f",
+    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+    messagingSenderId: "294360741451",
+    appId: "1:294360741451:web:3bc85078805750b9fabfce",
+    measurementId: "G-R8N7DVEHML"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // 📲 OTP bhejna
+  function sendOTP() {
+    const phone = document.getElementById('phone').value;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+    const appVerifier = window.recaptchaVerifier;
+
+    auth.signInWithPhoneNumber(phone, appVerifier)
+      .then(confirmationResult => {
+        window.confirmationResult = confirmationResult;
+        alert("OTP sent to your phone!");
+      })
+      .catch(error => alert(error.message));
+  }
+
+  // 🔑 OTP verify karna
+  function verifyOTP() {
+    const otp = document.getElementById('otp').value;
+    confirmationResult.confirm(otp)
+      .then(result => {
+        alert("Login successful!");
+        document.getElementById('loginPage').style.display = "none";
+        document.getElementById('mainApp').style.display = "block";
+      })
+      .catch(error => alert("Invalid OTP!"));
+  }
+</script>
             <h3>🚀 Popular Services</h3>
             <div id="mistri-categories" class="categories-list">
                 <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
