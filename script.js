@@ -461,3 +461,46 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// OTP Functions - Yeh code aapke existing JS ke END mein add karo
+function sendOTP() {
+    const phoneNumber = document.getElementById('phone-number').value;
+    
+    // Recaptcha setup
+    const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible'
+    });
+    
+    // Send OTP
+    firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then(confirmationResult => {
+            window.confirmationResult = confirmationResult;
+            document.getElementById('otp-section').style.display = 'block';
+            alert('OTP sent successfully!');
+        })
+        .catch(error => {
+            console.error('OTP Error:', error);
+            alert('OTP send failed: ' + error.message);
+        });
+}
+
+function verifyOTP() {
+    const otp = document.getElementById('otp-input').value;
+    
+    confirmationResult.confirm(otp).then(result => {
+        // Login successful
+        const user = result.user;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        alert('Login successful!');
+    }).catch(error => {
+        alert('Invalid OTP! Please try again.');
+    });
+}
+
+// Check if user already logged in
+firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+    }
+});
