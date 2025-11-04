@@ -30,28 +30,32 @@
     </style>
 </head>
 <body>
-    <!-- OTP LOGIN SCREEN - YAHAN PASTE KARO -->
-    <div id="login-screen" style="padding: 20px; text-align: center; background: white;">
-        <h3>📱 Login with Phone</h3>
-        <input type="tel" id="phone-number" placeholder="+91 9876543210" 
+    <!-- OTP LOGIN SCREEN -->
+<div id="login-screen" style="padding: 20px; text-align: center; background: white;">
+    <h3>📱 Login with Phone</h3>
+    <input type="tel" id="phone-number" placeholder="+91 9876543210" 
+        style="padding: 10px; margin: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
+    <br>
+    
+    <!-- VISIBLE RECAPTCHA -->
+    <div id="recaptcha-container"></div>
+    <br>
+    
+    <button id="send-otp-btn" 
+        style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        Send OTP
+    </button>
+    
+    <div id="otp-section" style="display:none; margin-top: 20px;">
+        <input type="text" id="otp-input" placeholder="Enter OTP" 
             style="padding: 10px; margin: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
         <br>
-        <div id="recaptcha-container"></div>
-        <button onclick="sendOTP()" 
-            style="background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-            Send OTP
+        <button id="verify-otp-btn" 
+            style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+            Verify OTP
         </button>
-        
-        <div id="otp-section" style="display:none; margin-top: 20px;">
-            <input type="text" id="otp-input" placeholder="Enter OTP" 
-                style="padding: 10px; margin: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
-            <br>
-            <button onclick="verifyOTP()" 
-                style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                Verify OTP
-            </button>
-        </div>
     </div>
+</div>
 
     <!-- Top Ad -->
     <div class="ad-container">
