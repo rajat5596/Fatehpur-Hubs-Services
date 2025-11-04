@@ -462,9 +462,11 @@ firebase.auth().signInAnonymously()
         console.log("Auth error:", error);
     });
 // OTP Functions
-document.getElementById('send-otp-btn').addEventListener('click', sendOTP);
-document.getElementById('verify-otp-btn').addEventListener('click', verifyOTP);
-
+// Simple test - yeh code try karo
+document.getElementById('send-otp-btn').addEventListener('click', function() {
+    alert('Button clicked!');
+    sendOTP();
+});
 function sendOTP() {
     const phoneNumber = document.getElementById('phone-number').value;
     
