@@ -461,3 +461,60 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+let providersLimit = 10; // Pehle 10 providers dikhao
+let allProviders = []; // Saare providers ka data
+
+// Firebase se data laake display karo
+function loadProviders() {
+    const providersRef = firebase.database().ref('service_providers');
+    
+    providersRef.limitToFirst(providersLimit).on('value', (snapshot) => {
+        const providersContainer = document.getElementById('providers-list');
+        providersContainer.innerHTML = '';
+        
+        snapshot.forEach((childSnapshot) => {
+            const provider = childSnapshot.val();
+            const providerId = childSnapshot.key;
+            
+            // Provider card banayein
+            const providerCard = `
+                <div class="provider-card">
+                    <h4>${provider.name}</h4>
+                    <p>📞 ${provider.phone}</p>
+                    <p>🔧 ${provider.category}</p>
+                    <p>📍 ${provider.area}</p>
+                    <p>⭐ ${provider.experience} years experience</p>
+                </div>
+            `;
+            providersContainer.innerHTML += providerCard;
+        });
+        
+        // Check karein aur providers hain ya nahi
+        checkMoreProviders();
+    });
+}
+
+// Load More Function
+function loadMoreProviders() {
+    providersLimit += 10; // 10 aur providers add karo
+    loadProviders();
+}
+
+// Check if more providers available
+function checkMoreProviders() {
+    const providersRef = firebase.database().ref('service_providers');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    
+    providersRef.once('value', (snapshot) => {
+        const totalProviders = snapshot.numChildren();
+        
+        if (providersLimit >= totalProviders) {
+            loadMoreBtn.style.display = 'none'; // Sab dikh gaya toh button hide
+        } else {
+            loadMoreBtn.style.display = 'block'; // Aur providers hain toh button show
+        }
+    });
+}
+
+// Page load pe call karo
+document.addEventListener('DOMContentLoaded', loadProviders);
