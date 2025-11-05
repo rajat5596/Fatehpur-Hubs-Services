@@ -494,27 +494,74 @@ function loadProviders() {
     });
 }
 
-// Load More Function
+let currentLimit = 5; // Start with 5 providers
+const increment = 5; // Har baar 5 aur dikhao
+
+function loadProviders() {
+    const providersRef = firebase.database().ref('service_providers');
+    
+    providersRef.limitToFirst(currentLimit).once('value', (snapshot) => {
+        const providersContainer = document.getElementById('providers-list');
+        providersContainer.innerHTML = '';
+        
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const provider = childSnapshot.val();
+                const providerCard = `
+                    <div class="provider-card">
+                        <h4>${provider.name}</h4>
+                        <p>📞 ${provider.phone}</p>
+                        <p>🔧 ${provider.category}</p>
+                        <p>📍 ${provider.area}</p>
+                        <p>⭐ ${provider.experience} years experience</p>
+                    </div>
+                    <hr>
+                `;
+                providersContainer.innerHTML += providerCard;
+            });
+        } else {
+            providersContainer.innerHTML = '<p>No service providers found.</p>';
+        }
+        
+        // Check if more providers available
+        checkMoreProviders();
+    });
+}
+
 function loadMoreProviders() {
-    providersLimit += 10; // 10 aur providers add karo
+    currentLimit += increment;
     loadProviders();
 }
 
-// Check if more providers available
+function showLessProviders() {
+    if (currentLimit > increment) {
+        currentLimit = increment; // Wapas 5 par le jao
+    } else {
+        currentLimit = 5; // Minimum 5
+    }
+    loadProviders();
+}
+
 function checkMoreProviders() {
     const providersRef = firebase.database().ref('service_providers');
     const loadMoreBtn = document.getElementById('load-more-btn');
+    const showLessBtn = document.getElementById('show-less-btn');
     
     providersRef.once('value', (snapshot) => {
         const totalProviders = snapshot.numChildren();
         
-        if (providersLimit >= totalProviders) {
-            loadMoreBtn.style.display = 'none'; // Sab dikh gaya toh button hide
+        if (currentLimit >= totalProviders) {
+            loadMoreBtn.style.display = 'none';
+            showLessBtn.style.display = 'block';
         } else {
-            loadMoreBtn.style.display = 'block'; // Aur providers hain toh button show
+            loadMoreBtn.style.display = 'block';
+            showLessBtn.style.display = 'block';
+        }
+        
+        // Agar 5 se kam hain toh buttons hide
+        if (totalProviders <= 5) {
+            loadMoreBtn.style.display = 'none';
+            showLessBtn.style.display = 'none';
         }
     });
 }
-
-// Page load pe call karo
-document.addEventListener('DOMContentLoaded', loadProviders);
