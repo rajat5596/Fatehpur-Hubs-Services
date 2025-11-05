@@ -24,22 +24,15 @@ const ALL_CATEGORIES = [
 // providersRef aur jobsRef ko index.html se pass kiya jayega
 function startFirebaseListener(providersRef, jobsRef) { 
     console.log("Starting Firebase Listeners...");
-    
-    // 1. Service Providers Listener
-    providersRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        serviceProviders = []; // Array ko har baar khali karein
-        if (data) {
-            for (let key in data) {
-                let provider = data[key];
-                provider.id = key; 
-                serviceProviders.push(provider);
-            }
-        }
-        // Data load hone ke baad hi list ko update karein
-        loadServiceProviders('mistri-list');
-        console.log(`Providers Loaded: ${serviceProviders.length}`);
-    });
+    // ***************** LOAD MORE VARIABLES *******************
+const SERVICES_PER_BATCH = 10;
+let lastKey = null; // पिछले बैच के अंतिम रिकॉर्ड की Key
+
+// *NOTE: LoadMoreBtn और ServiceListElement को HTML ID से जोड़ें*
+const serviceListElement = document.getElementById('mistri-list'); 
+const loadMoreBtn = document.getElementById('loadMoreButton'); 
+
+// *********************************************************
 
     // 2. Jobs Listener (New)
     jobsRef.on('value', (snapshot) => {
@@ -461,3 +454,56 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// **CORE LOAD MORE LOGIC (यह फ़ंक्शन हर बार "Load More" क्लिक पर चलेगा)**
+function loadNextBatch() {
+    let query = serviceProvidersRef.orderByKey().limitToFirst(SERVICES_PER_BATCH);
+    
+    // अगर पिछली बार कुछ लोड हुआ था, तो अगले रिकॉर्ड से शुरू करें (+1 ताकि डुप्लीकेट न आए)
+    if (lastKey) {
+        query = serviceProvidersRef.orderByKey().startAt(lastKey).limitToFirst(SERVICES_PER_BATCH + 1);
+        loadMoreBtn.innerHTML = 'Loading...';
+        loadMoreBtn.disabled = true;
+    } else {
+         // पहली बार लोड करने पर, बटन छुपा दें
+         if(loadMoreBtn) {
+             loadMoreBtn.style.display = 'none'; 
+         }
+    }
+
+    query.once('value', (snapshot) => {
+        let providersToDisplay = [];
+        let tempLastKey = null;
+        let count = 0;
+
+        snapshot.forEach((childSnapshot) => {
+            const providerId = childSnapshot.key;
+            
+            // पिछली बार के आखिरी रिकॉर्ड को छोड़ दें (अगर lastKey सेट है)
+            if (lastKey && providerId === lastKey) {
+                return;
+            }
+            
+            providersToDisplay.push({
+                id: providerId,
+                ...childSnapshot.val()
+            });
+            tempLastKey = providerId;
+            count++;
+        });
+
+        // UI को अपडेट करें (यह फ़ंक्शन आपको एडजस्ट करना होगा)
+        loadServiceProviders(providersToDisplay); 
+
+        // Pagination और बटन मैनेज करें
+        if (count < SERVICES_PER_BATCH) {
+            loadMoreBtn.style.display = 'none'; // और डेटा नहीं है
+        } else {
+            loadMoreBtn.style.display = 'block';
+            loadMoreBtn.innerHTML = 'और सेवाएं लोड करें (Load More Services)';
+            loadMoreBtn.disabled = false;
+        }
+
+        lastKey = tempLastKey; // अगले बैच के लिए अंतिम Key सेट करें
+        console.log(`Loaded ${count} providers. Total so far: ${serviceProviders.length}`);
+    });
+}
