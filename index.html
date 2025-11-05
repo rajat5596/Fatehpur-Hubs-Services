@@ -210,17 +210,6 @@
 <script src="ads.js"></script>
     
     <script>
-        // ✅ FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9fabfce"
-        };
-
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = app.database();
@@ -656,16 +645,19 @@ function openWhatsApp(phone) {
         });
     </script>
 
+<!-- ... बाकी HTML ... -->
+
+<!-- ⚠️ WebView और Browser दोनों के लिए यह अंतिम स्क्रिप्ट ब्लॉक है ⚠️ -->
 <script type="module">
     // Firebase के नए मॉड्यूलर SDKs को लोड करें
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     
     // =========================================================
-    // 1. Firebase कॉन्फ़िग (पूरी कॉन्फ़िग)
+    // 1. Firebase कॉन्फ़िग (यह फ़ाइल में अकेली होनी चाहिए)
     // =========================================================
-    // सुनिश्चित करें कि Firebase कंसोल से कॉपी किया गया पूरा 7-लाइन का कॉन्फ़िग ऑब्जेक्ट यहाँ है।
     const firebaseConfig = {
+      // यह API Key अब काम करनी चाहिए (क्योंकि प्रतिबंध None है)
       apiKey: "AIzaSyA3LjSiUIG-kyyZ5SVdplTP3WKHgRH2IWY", 
       authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
       databaseURL: "https://fatehpur-hubs-a3e9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -684,35 +676,73 @@ function openWhatsApp(phone) {
     const loginScreen = document.getElementById('login-screen');
     const mainAppContent = document.getElementById('main-app-content');
     const googleLoginButton = document.getElementById('google-login-button');
+    // अगर आपके पास लॉगआउट बटन है तो उसे भी हैंडल करें
+    const logoutButton = document.getElementById('logout-button'); 
 
-    // 4. AUTHENTICATION GATE
-    onAuthStateChanged(auth, (user) => { 
+    /**
+     * फ़ंक्शन: AUTHENTICATION GATE
+     */
+    const handleAuthState = (user) => { 
         if (user) {
             // यूज़र लॉग इन है: मुख्य ऐप दिखाओ
             if (loginScreen) loginScreen.style.display = 'none';
             if (mainAppContent) mainAppContent.style.display = 'block';
             console.log("User is authenticated:", user.email);
+            if (googleLoginButton) googleLoginButton.disabled = false;
         } else {
             // यूज़र लॉग इन नहीं है: लॉगिन स्क्रीन दिखाओ
             if (mainAppContent) mainAppContent.style.display = 'none';
             if (loginScreen) loginScreen.style.display = 'flex';
         }
-    });
+    };
+    
+    // Auth State Listener शुरू करें
+    onAuthStateChanged(auth, handleAuthState);
 
-    // 5. GOOGLE LOGIN बटन लॉजिक
+
+    // ===============================================================
+    // 4. REDIRECT FLOW RESULT CHECK (Login Return Handler)
+    // ===============================================================
+    getRedirectResult(auth)
+        .then((result) => {
+            if (result) {
+                console.log("Redirect Login Successful!", result.user.email);
+            }
+        })
+        .catch((error) => {
+            alert("Login Failed. Error Code: " + error.code + ". (Check Console)");
+            console.error("Redirect Login Error:", error);
+            if (googleLoginButton) googleLoginButton.disabled = false;
+        });
+
+
+    // =========================================================
+    // 5. GOOGLE LOGIN बटन लॉजिक (REDIRECT)
+    // =========================================================
     if (googleLoginButton) {
         googleLoginButton.addEventListener('click', (event) => {
-            event.preventDefault(); // पेज रीलोड होने से रोकेगा
+            event.preventDefault(); 
+            googleLoginButton.disabled = true;
 
-            signInWithPopup(auth, googleProvider) 
-                .then(() => {
-                    console.log("Login successful!");
-                })
+            signInWithRedirect(auth, googleProvider) 
                 .catch((error) => {
-                    // अगर API Key का प्रतिबंध 'None' पर सेट है, तो यह एरर नहीं आना चाहिए।
-                    alert("Login Failed. Error Code: " + error.code + ". (Google Cloud/Domain Check)"); 
-                    console.error("Login Error:", error);
+                    // अगर Redirect शुरू नहीं हो पाता है, तो यहाँ एरर आएगा।
+                    alert("Starting Redirect Failed. Error Code: " + error.code);
+                    console.error("Redirect Start Error:", error);
+                    googleLoginButton.disabled = false;
                 });
+        });
+    }
+
+    // 6. LOGOUT बटन लॉजिक (अगर आपके HTML में है)
+    if (logoutButton) {
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log("User signed out.");
+            }).catch((error) => {
+                console.error("Sign Out Error:", error);
+            });
         });
     }
 </script>
