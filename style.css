@@ -474,3 +474,31 @@ h2, h3 {
     text-decoration: none;
     display: inline-block;
     }
+.providers-container {
+    display: grid;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.provider-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-left: 4px solid #007bff;
+}
+
+.load-more-btn {
+    width: 100%;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.load-more-btn:hover {
+    background: #e9ecef;
+}
