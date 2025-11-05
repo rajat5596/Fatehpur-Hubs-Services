@@ -29,19 +29,7 @@
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
-    <body>
-        <!-- ****** START OF AUTHENTICATION GATE ****** -->
-
-<!-- 1. यह हिस्सा हमेशा दिखेगा अगर यूज़र लॉग इन नहीं है -->
-<div id="login-screen" style="text-align: center; padding: 50px; background-color: #f7f7f7; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-    <h1 style="color: #333;">Fatehpur Hubs Services</h1>
-    <p style="color: #666; margin-bottom: 30px;">आगे बढ़ने और सेवाओं का उपयोग करने के लिए Google से लॉगिन करें।</p>
-    
-    <button id="google-login-button" style="padding: 12px 25px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; background-color: #4285F4; color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-        Google से लॉगिन करें
-    </button>
-</div>
-        
+    <body>  
     <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
@@ -188,7 +176,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="ads.js"></script>
-    
+        <script>
+        // ✅ FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
     <script>
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
@@ -624,107 +622,5 @@ function openWhatsApp(phone) {
             setupCategoryFilters();
         });
     </script>
-
-<!-- ... बाकी HTML ... -->
-
-<!-- ⚠️ WebView और Browser दोनों के लिए यह अंतिम स्क्रिप्ट ब्लॉक है ⚠️ -->
-<script type="module">
-    // Firebase के नए मॉड्यूलर SDKs को लोड करें
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    
-    // =========================================================
-    // 1. Firebase कॉन्फ़िग (यह फ़ाइल में अकेली होनी चाहिए)
-    // =========================================================
-    const firebaseConfig = {
-      // यह API Key अब काम करनी चाहिए (क्योंकि प्रतिबंध None है)
-      apiKey: "AIzaSyA3LjSiUIG-kyyZ5SVdplTP3WKHgRH2IWY", 
-      authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
-      databaseURL: "https://fatehpur-hubs-a3e9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "fatehpur-hubs-a3e9f",
-      storageBucket: "fatehpur-hubs-a3e9f.appspot.com",
-      messagingSenderId: "294360741451",
-      appId: "1:294360741451:web:3bc80575087e9fabfce"
-    };
-
-    // 2. Initialization और Services
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    // 3. HTML IDs
-    const loginScreen = document.getElementById('login-screen');
-    const mainAppContent = document.getElementById('main-app-content');
-    const googleLoginButton = document.getElementById('google-login-button');
-    // अगर आपके पास लॉगआउट बटन है तो उसे भी हैंडल करें
-    const logoutButton = document.getElementById('logout-button'); 
-
-    /**
-     * फ़ंक्शन: AUTHENTICATION GATE
-     */
-    const handleAuthState = (user) => { 
-        if (user) {
-            // यूज़र लॉग इन है: मुख्य ऐप दिखाओ
-            if (loginScreen) loginScreen.style.display = 'none';
-            if (mainAppContent) mainAppContent.style.display = 'block';
-            console.log("User is authenticated:", user.email);
-            if (googleLoginButton) googleLoginButton.disabled = false;
-        } else {
-            // यूज़र लॉग इन नहीं है: लॉगिन स्क्रीन दिखाओ
-            if (mainAppContent) mainAppContent.style.display = 'none';
-            if (loginScreen) loginScreen.style.display = 'flex';
-        }
-    };
-    
-    // Auth State Listener शुरू करें
-    onAuthStateChanged(auth, handleAuthState);
-
-
-    // ===============================================================
-    // 4. REDIRECT FLOW RESULT CHECK (Login Return Handler)
-    // ===============================================================
-    getRedirectResult(auth)
-        .then((result) => {
-            if (result) {
-                console.log("Redirect Login Successful!", result.user.email);
-            }
-        })
-        .catch((error) => {
-            alert("Login Failed. Error Code: " + error.code + ". (Check Console)");
-            console.error("Redirect Login Error:", error);
-            if (googleLoginButton) googleLoginButton.disabled = false;
-        });
-
-
-    // =========================================================
-    // 5. GOOGLE LOGIN बटन लॉजिक (REDIRECT)
-    // =========================================================
-    if (googleLoginButton) {
-        googleLoginButton.addEventListener('click', (event) => {
-            event.preventDefault(); 
-            googleLoginButton.disabled = true;
-
-            signInWithRedirect(auth, googleProvider) 
-                .catch((error) => {
-                    // अगर Redirect शुरू नहीं हो पाता है, तो यहाँ एरर आएगा।
-                    alert("Starting Redirect Failed. Error Code: " + error.code);
-                    console.error("Redirect Start Error:", error);
-                    googleLoginButton.disabled = false;
-                });
-        });
-    }
-
-    // 6. LOGOUT बटन लॉजिक (अगर आपके HTML में है)
-    if (logoutButton) {
-        logoutButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            signOut(auth).then(() => {
-                console.log("User signed out.");
-            }).catch((error) => {
-                console.error("Sign Out Error:", error);
-            });
-        });
-    }
-</script>
 </body>
 </html>
