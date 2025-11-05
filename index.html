@@ -30,78 +30,32 @@
     </style>
 </head>
     <body>
-
-  <!-- 🔐 OTP LOGIN SECTION -->
-  <div id="loginPage" class="otp-box">
-    <h3>Sign in with Phone</h3>
-    <input type="text" id="phone" placeholder="+91XXXXXXXXXX" />
-    <div id="recaptcha-container"></div>
-    <button onclick="sendOTP()">Send OTP</button>
-
-    <br><br>
-    <input type="text" id="otp" placeholder="Enter OTP" />
-    <button onclick="verifyOTP()">Verify OTP</button>
-  </div>
-
-  <!-- 🚀 MAIN APP (Hidden by default) -->
-  <div id="mainApp" style="display:none;">
-    <!-- 👇 Yahan tumhara pura old app code daal do -->
+    <!-- Top Ad -->
     <div class="ad-container">
-      <div class="ad-label">Advertisement</div>
-      <script type="text/javascript">
-        atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+        <div class="ad-label">Advertisement</div>
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
 
-    <!-- 👇 Yahan se niche tak tumhara existing services wala code -->
-    <h2>🚀 Popular Services</h2>
-    <!-- plumber, electrician, etc. -->
-  </div>
-        <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
-
-<script>
-  // ✅ Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-    messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce",
-    measurementId: "G-R8N7DVEHML"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  // 📲 OTP bhejna
-  function sendOTP() {
-    const phone = document.getElementById('phone').value;
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
-    const appVerifier = window.recaptchaVerifier;
-
-    auth.signInWithPhoneNumber(phone, appVerifier)
-      .then(confirmationResult => {
-        window.confirmationResult = confirmationResult;
-        alert("OTP sent to your phone!");
-      })
-      .catch(error => alert(error.message));
-  }
-
-  // 🔑 OTP verify karna
-  function verifyOTP() {
-    const otp = document.getElementById('otp').value;
-    confirmationResult.confirm(otp)
-      .then(result => {
-        alert("Login successful!");
-        document.getElementById('loginPage').style.display = "none";
-        document.getElementById('mainApp').style.display = "block";
-      })
-      .catch(error => alert("Invalid OTP!"));
-  }
-</script>
+    <div class="container">
+        <header>
+            <h1><img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;"> <span>Fatehpur Hubs</span></h1>
+            <div id="auth-info">Fatehpur ke Professional Services</div>
+        </header>
+        
+        <div id="home-screen" class="screen active">
+            <input type="text" id="main-search-bar" placeholder="🔍 Search Plumber, Electrician...">
+            
+            <!-- Middle Ad -->
+            <div class="ad-container">
+                <div class="ad-label">Sponsored</div>
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
+            </div>
             <h3>🚀 Popular Services</h3>
             <div id="mistri-categories" class="categories-list">
                 <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
