@@ -655,14 +655,63 @@ function openWhatsApp(phone) {
             setupCategoryFilters();
         });
     </script>
-        <!-- ... आपके ऐप का सारा कंटेंट यहाँ ख़त्म होता है ... -->
+        <!-- पुराने 8.10.0 वर्जन को इन नए मॉड्यूल्स से बदलें -->
+<script type="module">
+    // Firebase के नए मॉड्यूलर SDKs को लोड करें
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     
-</div> 
-<!-- ****** यह main-app-content का अंत है (लाइन 626 से ठीक पहले) ****** -->
+    // =========================================================
+    // आपके your_main_script.js का सारा कंटेंट यहाँ पेस्ट करें
+    // =========================================================
 
-<!-- इसके बाद आपकी स्क्रिप्ट्स शुरू होती हैं (लाइन 626) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="your_main_script.js"></script>
+    // 1. Firebase Config (अपनी असली API Key डालें!)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE", 
+      authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
+      projectId: "fatehpur-hubs-a3e9f",
+      // ... बाकी कॉन्फ़िग डिटेल्स ...
+    };
+
+    // 2. Initialization और Services
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app); // यहाँ getAuth का इस्तेमाल हुआ
+    const googleProvider = new GoogleAuthProvider();
+
+    // 3. HTML IDs
+    const loginScreen = document.getElementById('login-screen');
+    const mainAppContent = document.getElementById('main-app-content');
+    const googleLoginButton = document.getElementById('google-login-button');
+
+    // 4. AUTHENTICATION GATE
+    onAuthStateChanged(auth, (user) => { // यहाँ onAuthStateChanged का इस्तेमाल हुआ
+        if (user) {
+            // यूज़र लॉग इन है: मुख्य ऐप दिखाओ
+            if (loginScreen) loginScreen.style.display = 'none';
+            if (mainAppContent) mainAppContent.style.display = 'block';
+            console.log("User is authenticated:", user.email);
+        } else {
+            // यूज़र लॉग इन नहीं है: लॉगिन स्क्रीन दिखाओ
+            if (mainAppContent) mainAppContent.style.display = 'none';
+            if (loginScreen) loginScreen.style.display = 'flex';
+        }
+    });
+
+    // 5. GOOGLE LOGIN बटन लॉजिक
+    if (googleLoginButton) {
+        googleLoginButton.addEventListener('click', () => {
+            // signInWithPopup को `auth` ऑब्जेक्ट के साथ इस्तेमाल करें
+            signInWithPopup(auth, googleProvider) 
+                .then(() => {
+                    // onAuthStateChanged अपने आप स्क्रीन बदल देगा।
+                    console.log("Login successful!");
+                })
+                .catch((error) => {
+                    alert("Login Failed. Error check console: " + error.code); 
+                    console.error("Login Error:", error);
+                });
+        });
+    }
+</script>
 </body>
 </html>
