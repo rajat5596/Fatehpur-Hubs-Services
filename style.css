@@ -487,21 +487,3 @@ h2, h3 {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-left: 4px solid #007bff;
 }
-.load-buttons {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.load-btn {
-    padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 5px;
-}
-
-.load-btn:hover {
-    background: #0056b3;
-}
