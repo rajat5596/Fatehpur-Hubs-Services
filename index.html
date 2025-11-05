@@ -30,6 +30,38 @@
     </style>
 </head>
     <body>
+        <!-- ****** START OF AUTHENTICATION GATE ****** -->
+
+<!-- 1. यह हिस्सा हमेशा दिखेगा अगर यूज़र लॉग इन नहीं है -->
+<div id="login-screen" style="text-align: center; padding: 50px; background-color: #f7f7f7; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+    <h1 style="color: #333;">Fatehpur Hubs Services</h1>
+    <p style="color: #666; margin-bottom: 30px;">आगे बढ़ने और सेवाओं का उपयोग करने के लिए Google से लॉगिन करें।</p>
+    
+    <button id="google-login-button" style="padding: 12px 25px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; background-color: #4285F4; color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        Google से लॉगिन करें
+    </button>
+</div>
+
+<!-- 2. यह div आपके पूरे ऐप कंटेंट को रैप करेगा और शुरू में छिपा रहेगा (JS इसे बाद में दिखाता है) -->
+<div id="main-app-content" style="display:none;">
+
+    <!-- यहां लाइन 34 के बाद से आपका सारा पुराना HTML कंटेंट शुरू होगा: Top Ad, Search bar, Services, etc. -->
+
+<!-- ****** END OF AUTHENTICATION GATE START ****** -->
+
+    
+
+    <!-- ****** यह LOGIN SCREEN है ****** -->
+    <div id="login-screen" style="text-align: center; padding: 50px;">
+        <h1>Fatehpur Hubs Services</h1>
+        <p>आगे बढ़ने और सेवाओं का उपयोग करने के लिए लॉगिन करें।</p>
+        
+        <button id="google-login-button" style="padding: 10px 20px; font-size: 18px; cursor: pointer;">
+            Google से लॉगिन करें
+        </button>
+    </div>
+    <!-- ********************************** -->
+        
     <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
@@ -623,7 +655,13 @@ function openWhatsApp(phone) {
             setupCategoryFilters();
         });
     </script>
-        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <!-- ... आपके ऐप का सारा कंटेंट यहाँ ख़त्म होता है ... -->
+    
+</div> 
+<!-- ****** यह main-app-content का अंत है (लाइन 626 से ठीक पहले) ****** -->
+
+<!-- इसके बाद आपकी स्क्रिप्ट्स शुरू होती हैं (लाइन 626) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="your_main_script.js"></script>
 </body>
