@@ -541,46 +541,73 @@ function showLessProviders() {
     }
     loadProviders();
 }
-// 1. Firebase Initialize करें (अगर पहले से नहीं किया है)
+// 1. Firebase Initialize करें (यह आपकी असली कॉन्फ़िग होनी चाहिए)
 var firebaseConfig = {
-  // आपकी Firebase कॉन्फ़िग डिटेल्स
+  apiKey: "YOUR_API_KEY", // इसे अपनी API Key से बदलें
+  authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
+  projectId: "fatehpur-hubs-a3e9f",
+  // ... बाकी कॉन्फ़िग
 };
-// firebase.initializeApp(firebaseConfig); // अगर यह पहले से है तो इसे दुबारा कॉल न करें
+firebase.initializeApp(firebaseConfig);
 
-// 2. Google Provider ऑब्जेक्ट बनाएँ
+const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-// 3. Login Button Click पर क्या होगा
-document.getElementById('google-login-button').addEventListener('click', () => {
-    
-    // signInWithPopup फंक्शन कॉल करें
-    firebase.auth().signInWithPopup(googleProvider)
-        .then((result) => {
-            // SUCCESS! - लॉगिन सफल
-            const user = result.user;
-            alert("Google Login Successful! Welcome " + user.displayName);
-            
-            // यूज़र को मुख्य डैशबोर्ड पर भेजें
-            window.location.href = "/dashboard.html"; 
-        })
-        .catch((error) => {
-            // ERROR! - अगर कुछ गलत हुआ
-            const errorMessage = error.message;
-            console.error("Google Login Failed:", errorMessage);
-            
-            alert("Login failed. Check console for error details: " + errorMessage);
-        });
+// DOM एलिमेंट्स
+const loginScreen = document.getElementById('login-screen');
+const mainAppContent = document.getElementById('main-app-content');
+const googleLoginButton = document.getElementById('google-login-button');
+const currentUserInfo = document.getElementById('current-user-info');
+
+
+// =======================================================
+// A. AUTHENTICATION GATE (सबसे ज़रूरी हिस्सा)
+// =======================================================
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        // यूज़र लॉग इन है (User is signed in)
+        
+        // 1. लॉगिन स्क्रीन को छुपाएँ
+        loginScreen.style.display = 'none';
+        
+        // 2. मुख्य ऐप कंटेंट दिखाएँ
+        mainAppContent.style.display = 'block';
+        
+        // 3. (Optional) यूज़र का नाम या ईमेल दिखाएँ
+        currentUserInfo.innerHTML = `Welcome, ${user.displayName || user.email}`;
+
+        console.log("User is authenticated:", user.email);
+
+    } else {
+        // यूज़र लॉग इन नहीं है (No user is signed in)
+        
+        // 1. मुख्य ऐप कंटेंट को छुपाएँ
+        mainAppContent.style.display = 'none';
+        
+        // 2. लॉगिन स्क्रीन दिखाएँ
+        loginScreen.style.display = 'block';
+
+        console.log("No user signed in. Showing login screen.");
+    }
 });
 
-// 4. (Optional) Login Status चेक करें
-// यह चेक करने के लिए कि यूज़र पहले से logged in है या नहीं
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // User is signed in.
-    console.log("User is already logged in:", user.email);
-    // window.location.href = "/dashboard.html"; 
-  } else {
-    // No user is signed in.
-    console.log("No user signed in.");
-  }
-});
+
+// =======================================================
+// B. GOOGLE LOGIN बटन लॉजिक
+// =======================================================
+if (googleLoginButton) {
+    googleLoginButton.addEventListener('click', () => {
+        
+        auth.signInWithPopup(googleProvider)
+            .then((result) => {
+                // onAuthStateChanged फंक्शन अपने आप चला जाएगा और ऐप दिखा देगा।
+                console.log("Google Login Successful!");
+                // alert यहाँ ज़रूरी नहीं है क्योंकि onAuthStateChanged हैंडल करेगा।
+            })
+            .catch((error) => {
+                const errorMessage = error.message;
+                console.error("Google Login Failed:", error);
+                alert("Login Failed: " + errorMessage);
+            });
+    });
+}
