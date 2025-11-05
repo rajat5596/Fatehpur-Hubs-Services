@@ -541,27 +541,3 @@ function showLessProviders() {
     }
     loadProviders();
 }
-
-function checkMoreProviders() {
-    const providersRef = firebase.database().ref('service_providers');
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    const showLessBtn = document.getElementById('show-less-btn');
-    
-    providersRef.once('value', (snapshot) => {
-        const totalProviders = snapshot.numChildren();
-        
-        if (currentLimit >= totalProviders) {
-            loadMoreBtn.style.display = 'none';
-            showLessBtn.style.display = 'block';
-        } else {
-            loadMoreBtn.style.display = 'block';
-            showLessBtn.style.display = 'block';
-        }
-        
-        // Agar 5 se kam hain toh buttons hide
-        if (totalProviders <= 5) {
-            loadMoreBtn.style.display = 'none';
-            showLessBtn.style.display = 'none';
-        }
-    });
-}
