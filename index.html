@@ -655,27 +655,29 @@ function openWhatsApp(phone) {
             setupCategoryFilters();
         });
     </script>
-        <!-- पुराने 8.10.0 वर्जन को इन नए मॉड्यूल्स से बदलें -->
+
 <script type="module">
     // Firebase के नए मॉड्यूलर SDKs को लोड करें
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     
     // =========================================================
-    // आपके your_main_script.js का सारा कंटेंट यहाँ पेस्ट करें
+    // 1. Firebase कॉन्फ़िग (पूरी कॉन्फ़िग)
     // =========================================================
-
-    // 1. Firebase Config (अपनी असली API Key डालें!)
+    // सुनिश्चित करें कि Firebase कंसोल से कॉपी किया गया पूरा 7-लाइन का कॉन्फ़िग ऑब्जेक्ट यहाँ है।
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY_HERE", 
+      apiKey: "AIzaSyA3LjSiUIG-kyyZ5SVdplTP3WKHgRH2IWY", 
       authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
+      databaseURL: "https://fatehpur-hubs-a3e9f-default-rtdb.asia-southeast1.firebasedatabase.app",
       projectId: "fatehpur-hubs-a3e9f",
-      // ... बाकी कॉन्फ़िग डिटेल्स ...
+      storageBucket: "fatehpur-hubs-a3e9f.appspot.com",
+      messagingSenderId: "294360741451",
+      appId: "1:294360741451:web:3bc80575087e9fabfce"
     };
 
     // 2. Initialization और Services
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app); // यहाँ getAuth का इस्तेमाल हुआ
+    const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
 
     // 3. HTML IDs
@@ -684,7 +686,7 @@ function openWhatsApp(phone) {
     const googleLoginButton = document.getElementById('google-login-button');
 
     // 4. AUTHENTICATION GATE
-    onAuthStateChanged(auth, (user) => { // यहाँ onAuthStateChanged का इस्तेमाल हुआ
+    onAuthStateChanged(auth, (user) => { 
         if (user) {
             // यूज़र लॉग इन है: मुख्य ऐप दिखाओ
             if (loginScreen) loginScreen.style.display = 'none';
@@ -699,15 +701,16 @@ function openWhatsApp(phone) {
 
     // 5. GOOGLE LOGIN बटन लॉजिक
     if (googleLoginButton) {
-        googleLoginButton.addEventListener('click', () => {
-            // signInWithPopup को `auth` ऑब्जेक्ट के साथ इस्तेमाल करें
+        googleLoginButton.addEventListener('click', (event) => {
+            event.preventDefault(); // पेज रीलोड होने से रोकेगा
+
             signInWithPopup(auth, googleProvider) 
                 .then(() => {
-                    // onAuthStateChanged अपने आप स्क्रीन बदल देगा।
                     console.log("Login successful!");
                 })
                 .catch((error) => {
-                    alert("Login Failed. Error check console: " + error.code); 
+                    // अगर API Key का प्रतिबंध 'None' पर सेट है, तो यह एरर नहीं आना चाहिए।
+                    alert("Login Failed. Error Code: " + error.code + ". (Google Cloud/Domain Check)"); 
                     console.error("Login Error:", error);
                 });
         });
