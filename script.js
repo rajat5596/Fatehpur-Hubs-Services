@@ -81,11 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to load the main list of service providers
-function loadServiceProviders(listId) {
+function loadServiceProviders(newProvidersToDisplay) { 
+    
     const mistriListDiv = document.getElementById(listId);
     if (!mistriListDiv) return;
-    
-    mistriListDiv.innerHTML = '<h3>Available Services</h3>';
     
     if (serviceProviders.length === 0) {
          mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 15px;">No services available.</p>';
