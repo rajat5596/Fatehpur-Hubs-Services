@@ -543,7 +543,7 @@ function showLessProviders() {
 }
 // 1. Firebase Initialize करें (यह आपकी असली कॉन्फ़िग होनी चाहिए)
 var firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // इसे अपनी API Key से बदलें
+  apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", // इसे अपनी API Key से बदलें
   authDomain: "fatehpur-hubs-a3e9f.firebaseapp.com",
   projectId: "fatehpur-hubs-a3e9f",
   // ... बाकी कॉन्फ़िग
