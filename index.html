@@ -113,14 +113,18 @@
             <div id="mistri-list-full"></div>
         </div>
         <div id="providers-list" class="providers-container">
-    <!-- Yahan providers dynamically load honge -->
+    <!-- Providers yahan load honge -->
 </div>
 
-<!-- Load More Button -->
-<button id="load-more-btn" class="load-more-btn" onclick="loadMoreProviders()">
-    🔽 Load More Providers
-</button>
-
+<div class="load-buttons">
+    <button id="load-more-btn" class="load-btn" onclick="loadMoreProviders()" style="display:none;">
+        🔽 Load More Providers
+    </button>
+    
+    <button id="show-less-btn" class="load-btn" onclick="showLessProviders()" style="display:none;">
+        🔼 Show Less Providers
+    </button>
+</div>
         <!-- JOBS SCREEN -->
         <div id="jobs-screen" class="screen">
             <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
