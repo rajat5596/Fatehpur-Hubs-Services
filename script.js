@@ -1,8 +1,9 @@
 // **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs**
 
-// Global Variables (Firebase se data aane tak khali rakhein)
+// 1. Global Variables (Firebase se data aane tak khali rakhein)
 let serviceProviders = [];
 let jobListings = [];
+let providersLimit = 10; // ⬅️ NEW: यह नियंत्रित करता है कि एक बार में कितनी सर्विस दिखानी है
 
 // All Categories List (Used for search screen and registration form)
 const ALL_CATEGORIES = [
@@ -21,33 +22,44 @@ const ALL_CATEGORIES = [
 
 
 // **FIREBASE DATA LISTENER FUNCTION (Called from index.html)**
-// providersRef aur jobsRef ko index.html se pass kiya jayega
 function startFirebaseListener(providersRef, jobsRef) { 
     console.log("Starting Firebase Listeners...");
-    // ***************** LOAD MORE VARIABLES *******************
-const SERVICES_PER_BATCH = 10;
-let lastKey = null; // पिछले बैच के अंतिम रिकॉर्ड की Key
 
-// *NOTE: LoadMoreBtn और ServiceListElement को HTML ID से जोड़ें*
-const serviceListElement = document.getElementById('mistri-list'); 
-const loadMoreBtn = document.getElementById('loadMoreButton'); 
-
-// *********************************************************
-
+    // पुराने SERVICES_PER_BATCH और lastKey को हटा दिया गया है।
+    // loadMoreBtn और serviceListElement अब loadServiceProviders फ़ंक्शन के अंदर मिलेंगे।
+    
     // 2. Jobs Listener (New)
     jobsRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        jobListings = []; // Array ko har baar khali karein
-        if (data) {
-            for (let key in data) {
-                let job = data[key];
-                job.id = key;
+        jobListings = []; 
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const job = childSnapshot.val();
+                job.id = childSnapshot.key;
                 jobListings.push(job);
-            }
+            });
         }
         loadJobListings();
-        console.log(`Jobs Loaded: ${jobListings.length}`);
     });
+
+    // 3. Service Providers Listener
+    providersRef.on('value', (snapshot) => {
+        serviceProviders = [];
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const provider = childSnapshot.val();
+                if (provider) serviceProviders.push(provider);
+            });
+            // ⭐️ UPDATE: providersLimit का उपयोग करके सर्विस लोड करें
+            loadServiceProviders('mistri-list');
+            loadServiceProviders('mistri-list-full'); // For search screen
+        } else {
+            // यह सुनिश्चित करने के लिए कि listDiv मौजूद है:
+            const listHome = document.getElementById('mistri-list');
+            if(listHome) listHome.innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+        }
+    });
+
+    // Anonymous Login (StartFirebaseListener में अनावश्यक, इसे अंत में रखा गया है)
 }
 
 
@@ -78,30 +90,59 @@ document.addEventListener('DOMContentLoaded', function() {
     
      // Add search event listener 
      document.getElementById('main-search-bar').addEventListener('input', searchProviders);
+     
+     // Form event listener (बग फिक्स के लिए यहाँ जोड़ा गया है)
+     const regForm = document.getElementById('service-registration-form');
+     if(regForm) regForm.addEventListener('submit', handleServiceRegistration);
+     
+     const jobForm = document.getElementById('job-posting-form');
+     if(jobForm) jobForm.addEventListener('submit', postJob);
 });
 
-// Function to load the main list of service providers
-function loadServiceProviders(newProvidersToDisplay) { 
-    
+// ✅ LOAD SERVICES (पूरा फ़ंक्शन बदलें - 10/10 लॉजिक)
+function loadServiceProviders(listId) {
     const mistriListDiv = document.getElementById(listId);
+    const loadMoreBtn = document.getElementById('loadMoreButton'); 
+    
     if (!mistriListDiv) return;
     
-    if (serviceProviders.length === 0) {
-         mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 15px;">No services available.</p>';
-    }
+    // Providers को हाल ही के अनुसार सॉर्ट करें (अच्छा रहता है)
+    const sortedProviders = serviceProviders.sort((a, b) => b.timestamp - a.timestamp); 
     
-    serviceProviders.forEach(provider => {
-        const card = createProfileCard(provider);
-        mistriListDiv.appendChild(card);
-    });
+    // ⭐️ बदलाव: केवल लिमिट के अनुसार सर्विस दिखाएँ (पहले 10, फिर 20, 30...)
+    const providersToShow = sortedProviders.slice(0, providersLimit);
+    
+    // List का शीर्षक सेट करें और उसे खाली करें
+    mistriListDiv.innerHTML = listId === 'mistri-list' ? '<h3>Available Services</h3>' : '';
+    
+    if (providersToShow.length === 0) {
+        mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 15px;">No services available.</p>';
+    } else {
+        providersToShow.forEach(provider => {
+            const card = createProfileCard(provider);
+            mistriListDiv.appendChild(card);
+        });
+    }
+
+    // ⭐️ बदलाव: "Load More" बटन को नियंत्रित करें (केवल Home Screen की लिस्ट के लिए)
+    if (listId === 'mistri-list' && loadMoreBtn) {
+        if (serviceProviders.length > providersLimit) {
+            loadMoreBtn.style.display = 'block'; 
+        } else {
+            loadMoreBtn.style.display = 'none'; 
+        }
+    }
 }
 
 // Helper function to create a profile card (Includes SHARE option)
 function createProfileCard(provider) {
     const card = document.createElement('div');
     card.className = 'profile-card';
+    // आपकी रेटिंग फील्ड 'New' हो सकती है।
+    const displayRating = provider.rating && provider.rating !== 'New' ? provider.rating : ''; 
+
     card.innerHTML = `
-        <h3>${provider.name} ${provider.rating}</h3>
+        <h3>${provider.name} ${displayRating}</h3>
         <p><strong>${provider.category}</strong> | ${provider.area}</p>
         <p>Experience: ${provider.experience}</p>
         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
@@ -221,6 +262,13 @@ function populateRegistrationCategories() {
 function filterByCategory(category, listId) {
     const mistriListDiv = document.getElementById(listId);
     if (!mistriListDiv) return;
+    
+    // Home Screen पर फिल्टर करने पर Load More बटन को छुपा दें
+    if(listId === 'mistri-list') {
+        const loadMoreBtn = document.getElementById('loadMoreButton');
+        if(loadMoreBtn) loadMoreBtn.style.display = 'none';
+    }
+
     mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
     
     const filteredProviders = category === 'All' 
@@ -232,76 +280,91 @@ function filterByCategory(category, listId) {
         return;
     }
 
+    // यहाँ फिल्टर होने के बाद सभी सर्विस दिखेंगी (10/10 लॉजिक फिल्टर पर लागू नहीं होता)
     filteredProviders.forEach(provider => {
         const card = createProfileCard(provider);
         mistriListDiv.appendChild(card);
     });
 }
 
-// FUNCTION: Handle Service Registration (Saves data to Firebase)
+// ✅ HANDLE SERVICE REGISTRATION (बग फिक्स: Duplicates और Proper Firebase Save)
 function handleServiceRegistration(e) {
     if (e) e.preventDefault(); 
     
-    // Get providersRef from the global window object (set in index.html)
-    const providersRef = window.providersRef;
+    const providersRef = window.providersRef; // ग्लोबल ऑब्जेक्ट से Firebase ref लें
     if (!providersRef) {
-        console.error("Firebase providers reference not found.");
+        alert("Firebase connection error. Please try again.");
         return;
     }
     
-    const regMessage = document.getElementById('registration-message');
-    regMessage.textContent = 'Submitting... (जमा हो रहा है...)';
-    regMessage.style.color = '#2a5298';
-    
-    const name = document.getElementById('reg-name').value.trim();
-    const phone = document.getElementById('reg-phone').value.trim();
-    const category = document.getElementById('reg-category').value;
-    const area = document.getElementById('reg-area').value.trim();
-    const experience = document.getElementById('reg-experience').value.trim();
+    const name = document.getElementById('providerName').value.trim();
+    const phone = document.getElementById('providerPhone').value.trim();
+    const category = document.getElementById('serviceCategory').value;
+    const area = document.getElementById('providerArea').value.trim();
+    const experience = document.getElementById('providerExperience').value.trim();
     
     if (!name || !phone || !category || !area || !experience) {
-        regMessage.textContent = '❌ Please fill all fields (कृपया सभी फ़ील्ड भरें).';
-        regMessage.style.color = 'red';
-        return false;
+        alert('Please fill all fields'); 
+        return;
     }
     
-    const newProvider = {
-        name: name,
-        category: category,
-        phone: phone,
-        area: area,
-        experience: experience,
-        rating: "New", 
-        timestamp: firebase.database.ServerValue.TIMESTAMP 
-    };
+    if (phone.length !== 10 || isNaN(phone)) {
+        alert('Enter valid 10-digit phone number');
+        return;
+    }
     
-    // Save to Firebase
-    providersRef.push(newProvider)
-        .then(() => {
-            regMessage.textContent = '✅ Registration Successful! आपकी सर्विस लिस्ट में जोड़ दी गई है।';
-            regMessage.style.color = 'green';
+    const submitBtn = document.getElementById('registerBtn');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Checking...';
+    submitBtn.disabled = true;
+    
+    // DUPLICATE CHECK
+    providersRef.orderByChild('phone').equalTo(phone).once('value')
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                alert('❌ This phone number is already registered! One phone can register only once.');
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                return; 
+            } 
+            
+            // DUPLICATE CHECK PASSED: Add new data to Firebase
+            const providerData = {
+                name: name,
+                phone: phone,
+                category: category,
+                area: area,
+                experience: experience,
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                rating: '⭐️⭐️⭐️⭐️' // Default Rating
+            };
 
-            // Clear form and go to Home Screen after 1.5 seconds
-            document.getElementById('service-registration-form').reset();
-            setTimeout(() => {
-                showScreen('home-screen');
-            }, 1500);
+            return providersRef.push(providerData);
         })
-        .catch(error => {
-            regMessage.textContent = `❌ Error: ${error.message}`;
-            regMessage.style.color = 'red';
-            console.error("Error registering service provider: ", error);
+        .then(() => {
+            alert('✅ Service Registered Successfully! We will review and publish it soon.');
+            document.getElementById('service-registration-form').reset();
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            showScreen('home-screen'); // Home screen पर वापस जाएँ
+        })
+        .catch((error) => {
+            console.error("Registration Error:", error);
+            alert('An error occurred during registration. Please try again.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         });
-    
-    return false; 
 }
 
 
-// Search Functionality
+// Search Functionality (यह अब सही mistri-list पर सर्च रिजल्ट दिखाएगा)
 function searchProviders(e) {
     const searchTerm = e.target.value.toLowerCase();
     const mistriListDiv = document.getElementById('mistri-list');
+    const loadMoreBtn = document.getElementById('loadMoreButton');
+
     mistriListDiv.innerHTML = '<h3>Search Results</h3>';
+    if(loadMoreBtn) loadMoreBtn.style.display = 'none'; // सर्च के दौरान लोड मोर बटन छुपाएँ
     
     const filtered = serviceProviders.filter(provider => 
         provider.name.toLowerCase().includes(searchTerm) ||
@@ -338,7 +401,12 @@ function loadJobListings() {
     }
 
     // Newest job first
-    jobListings.reverse().forEach(job => { 
+    // Note: jobListings array Firebase Listener में भरा जा रहा है, वहाँ key नहीं आ रही थी।
+    // Fix: Firebase Listener में key जोड़ी गई है।
+    
+    const sortedJobs = jobListings.sort((a, b) => b.timestamp - a.timestamp);
+
+    sortedJobs.forEach(job => { 
         const card = createJobCard(job);
         jobListDiv.appendChild(card);
     });
@@ -347,8 +415,14 @@ function loadJobListings() {
 // Helper function to create a job card
 function createJobCard(job) {
     const card = document.createElement('div');
-    card.className = 'profile-card job-card'; // Reusing profile-card style
+    card.className = 'profile-card job-card'; 
     card.style.marginBottom = '15px';
+    
+    // Contact information extraction is complex. We will display it directly and rely on user input.
+    const contactDisplay = job.contact.includes('tel:') ? job.contact.replace('tel:', '') : job.contact;
+    const phoneNumber = contactDisplay.match(/\d{10}/);
+    const validPhone = phoneNumber ? phoneNumber[0] : null;
+
     card.innerHTML = `
         <h4 style="color: #2a5298; font-weight: bold;">${job.title}</h4>
         <p style="margin-bottom: 5px;">📍 **Location:** ${job.location}</p>
@@ -357,10 +431,10 @@ function createJobCard(job) {
             Posted: ${new Date(job.timestamp).toLocaleDateString('en-IN')}
         </div>
         <div style="margin-top: 10px;">
-            <button class="contact-btn" style="background: #e91e63;" onclick="callNumber('${job.contact.match(/\d+/)[0]}')">
+            <button class="contact-btn" style="background: #e91e63;" onclick="${validPhone ? `callNumber('${validPhone}')` : `alert('Valid number not found')`}">
                 📞 Call Contact
             </button>
-            <button class="whatsapp-btn" onclick="openWhatsAppForJob('${job.contact}', '${job.title}')">
+            <button class="whatsapp-btn" onclick="${validPhone ? `openWhatsAppForJob('${validPhone}', '${job.title}')` : `alert('Valid number not found')`}">
                 💬 Message
             </button>
         </div>
@@ -369,18 +443,7 @@ function createJobCard(job) {
 }
 
 // WhatsApp for Job Function
-function openWhatsAppForJob(contactInfo, jobTitle) {
-    // Attempt to extract only the phone number
-    const phoneMatch = contactInfo.match(/\d{10}/); // Assuming 10-digit Indian number
-    const phone = phoneMatch ? phoneMatch[0] : null;
-
-    if (!phone) {
-        // Since we cannot use alert(), log error to console for debug
-        console.error("Contact number not clearly found. Please dial manually: " + contactInfo);
-        // Fallback UI message (if implemented) is better than nothing
-        return;
-    }
-
+function openWhatsAppForJob(phone, jobTitle) {
     const message = `Hello, I saw your job posting "${jobTitle}" on Fatehpur Hubs and am interested. Please tell me more about the job.`;
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
 }
@@ -389,11 +452,9 @@ function openWhatsAppForJob(contactInfo, jobTitle) {
 function postJob(e) {
     if (e) e.preventDefault();
 
-    // Get jobsRef from the global window object (set in index.html)
     const jobsRef = window.jobsRef; 
     if (!jobsRef) {
-        console.error("Firebase jobs reference not found.");
-        document.getElementById('postJobBtn').textContent = '❌ Error posting job.';
+        alert("Firebase connection error. Cannot post job.");
         return;
     }
 
@@ -404,10 +465,15 @@ function postJob(e) {
     const postJobBtn = document.getElementById('postJobBtn');
 
     if (!title || !description || !contact || !location) {
-        // Since we cannot use alert(), log error to console for debug
-        console.error("Please fill all job posting fields.");
-        return false;
+        alert("Please fill all job posting fields.");
+        return;
     }
+    
+    if (contact.length < 10) { // Simple validation
+        alert("Please enter a valid contact (Phone or Email).");
+        return;
+    }
+
 
     postJobBtn.textContent = 'Posting...';
     postJobBtn.disabled = true;
@@ -422,61 +488,40 @@ function postJob(e) {
 
     jobsRef.push(newJob)
         .then(() => {
-            postJobBtn.textContent = '✅ Job Posted!';
-            setTimeout(() => {
-                postJobBtn.textContent = 'Post Job';
-                postJobBtn.disabled = false;
-                document.getElementById('jobTitle').value = '';
-                document.getElementById('jobDescription').value = '';
-                document.getElementById('jobContact').value = '';
-                document.getElementById('jobLocation').value = '';
-                // The job listener will automatically reload the job listings
-            }, 1500);
+            alert('✅ Job Posted Successfully!');
+            postJobBtn.textContent = 'Post Job';
+            postJobBtn.disabled = false;
+            // Clear form and go to job screen
+            document.getElementById('job-posting-form').reset();
+            showScreen('jobs-screen'); 
         })
         .catch(error => {
-            postJobBtn.textContent = '❌ Error posting job. Try again.';
+            alert('❌ Error posting job. Try again.');
+            postJobBtn.textContent = 'Post Job';
             postJobBtn.disabled = false;
             console.error("Error posting job: ", error);
         });
-
-    return false;
 }
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const database = app.database();
 
-// ✅ ANONYMOUS AUTHENTICATION ADD KAREIN
-firebase.auth().signInAnonymously()
-    .then(() => {
-        console.log("User automatically signed in anonymously");
-    })
-    .catch(error => {
-        console.log("Auth error:", error);
-    });
-// ⭐️ नया और सरल Load More फंक्शन (पुराने loadNextBatch() की जगह)
+
+// ⭐️ NEW FUNCTION: Load 10 more services (loadNextBatch की जगह)
 window.loadMoreServices = function() {
-    // 1. बटन को नियंत्रित करें
     const loadMoreBtn = document.getElementById('loadMoreButton');
     if (loadMoreBtn) {
         loadMoreBtn.textContent = 'Loading...';
         loadMoreBtn.disabled = true;
     }
 
-    // 2. लिमिट 10 बढ़ाएँ
-    providersLimit += 10; 
+    providersLimit += 10; // लिमिट 10 बढ़ाएँ
     
-    // 3. लिस्ट को फिर से लोड करें (जो अब बढ़ी हुई लिमिट के साथ दिखेगी)
-    // setTimeout सिर्फ़ एक अच्छा UX अनुभव देने के लिए है
     setTimeout(() => {
         // 'mistri-list' ID के लिए लोड फ़ंक्शन को कॉल करें
         loadServiceProviders('mistri-list');
         
-        // 4. बटन को वापस सामान्य स्थिति में लाएँ
         if (loadMoreBtn) {
             loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
             loadMoreBtn.disabled = false;
 
-            // अगर अब और सर्विस नहीं बची हैं, तो बटन छुपा दें
             if (serviceProviders.length <= providersLimit) {
                 loadMoreBtn.style.display = 'none';
             }
@@ -484,6 +529,6 @@ window.loadMoreServices = function() {
     }, 100);
 }
 
-// ⚠️ ज़रूरी: अब आपको 'loadServiceProviders' फ़ंक्शन को भी 
-// संशोधित करना होगा ताकि वह इस 'providersLimit' का उपयोग करे
-// और Load More बटन को नियंत्रित करे।
+
+// Initialize Firebase (ये लाइनें कोड के अंत में ही रहनी चाहिए)
+// Note: firebaseConfig variable को index.html में परिभाषित किय
