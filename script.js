@@ -453,56 +453,37 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// **CORE LOAD MORE LOGIC (यह फ़ंक्शन हर बार "Load More" क्लिक पर चलेगा)**
-function loadNextBatch() {
-    let query = serviceProvidersRef.orderByKey().limitToFirst(SERVICES_PER_BATCH);
-    
-    // अगर पिछली बार कुछ लोड हुआ था, तो अगले रिकॉर्ड से शुरू करें (+1 ताकि डुप्लीकेट न आए)
-    if (lastKey) {
-        query = serviceProvidersRef.orderByKey().startAt(lastKey).limitToFirst(SERVICES_PER_BATCH + 1);
-        loadMoreBtn.innerHTML = 'Loading...';
+// ⭐️ नया और सरल Load More फंक्शन (पुराने loadNextBatch() की जगह)
+window.loadMoreServices = function() {
+    // 1. बटन को नियंत्रित करें
+    const loadMoreBtn = document.getElementById('loadMoreButton');
+    if (loadMoreBtn) {
+        loadMoreBtn.textContent = 'Loading...';
         loadMoreBtn.disabled = true;
-    } else {
-         // पहली बार लोड करने पर, बटन छुपा दें
-         if(loadMoreBtn) {
-             loadMoreBtn.style.display = 'none'; 
-         }
     }
 
-    query.once('value', (snapshot) => {
-        let providersToDisplay = [];
-        let tempLastKey = null;
-        let count = 0;
-
-        snapshot.forEach((childSnapshot) => {
-            const providerId = childSnapshot.key;
-            
-            // पिछली बार के आखिरी रिकॉर्ड को छोड़ दें (अगर lastKey सेट है)
-            if (lastKey && providerId === lastKey) {
-                return;
-            }
-            
-            providersToDisplay.push({
-                id: providerId,
-                ...childSnapshot.val()
-            });
-            tempLastKey = providerId;
-            count++;
-        });
-
-        // UI को अपडेट करें (यह फ़ंक्शन आपको एडजस्ट करना होगा)
-        loadServiceProviders(providersToDisplay); 
-
-        // Pagination और बटन मैनेज करें
-        if (count < SERVICES_PER_BATCH) {
-            loadMoreBtn.style.display = 'none'; // और डेटा नहीं है
-        } else {
-            loadMoreBtn.style.display = 'block';
-            loadMoreBtn.innerHTML = 'और सेवाएं लोड करें (Load More Services)';
+    // 2. लिमिट 10 बढ़ाएँ
+    providersLimit += 10; 
+    
+    // 3. लिस्ट को फिर से लोड करें (जो अब बढ़ी हुई लिमिट के साथ दिखेगी)
+    // setTimeout सिर्फ़ एक अच्छा UX अनुभव देने के लिए है
+    setTimeout(() => {
+        // 'mistri-list' ID के लिए लोड फ़ंक्शन को कॉल करें
+        loadServiceProviders('mistri-list');
+        
+        // 4. बटन को वापस सामान्य स्थिति में लाएँ
+        if (loadMoreBtn) {
+            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
             loadMoreBtn.disabled = false;
-        }
 
-        lastKey = tempLastKey; // अगले बैच के लिए अंतिम Key सेट करें
-        console.log(`Loaded ${count} providers. Total so far: ${serviceProviders.length}`);
-    });
+            // अगर अब और सर्विस नहीं बची हैं, तो बटन छुपा दें
+            if (serviceProviders.length <= providersLimit) {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+    }, 100);
 }
+
+// ⚠️ ज़रूरी: अब आपको 'loadServiceProviders' फ़ंक्शन को भी 
+// संशोधित करना होगा ताकि वह इस 'providersLimit' का उपयोग करे
+// और Load More बटन को नियंत्रित करे।
