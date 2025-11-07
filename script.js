@@ -1,11 +1,10 @@
-// **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs (Working 10/10 Load More)**
+// **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs**
 
-// 1. Global Variables
+// Global Variables (Firebase se data aane tak khali rakhein)
 let serviceProviders = [];
 let jobListings = [];
-let providersLimit = 10; // ✅ WORKING: यह नियंत्रित करता है कि एक बार में कितनी सर्विस दिखानी है
 
-// All Categories List
+// All Categories List (Used for search screen and registration form)
 const ALL_CATEGORIES = [
     { cat: 'Plumber', icon: '💧' },
     { cat: 'Electrician', icon: '⚡' },
@@ -22,38 +21,39 @@ const ALL_CATEGORIES = [
 
 
 // **FIREBASE DATA LISTENER FUNCTION (Called from index.html)**
-// Note: providersRef और jobsRef index.html में Firebase initialization के बाद पास होने चाहिए।
+// providersRef aur jobsRef ko index.html se pass kiya jayega
 function startFirebaseListener(providersRef, jobsRef) { 
     console.log("Starting Firebase Listeners...");
     
-    // 2. Jobs Listener
-    jobsRef.on('value', (snapshot) => {
-        jobListings = []; 
-        if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-                const job = childSnapshot.val();
-                job.id = childSnapshot.key;
-                jobListings.push(job);
-            });
+    // 1. Service Providers Listener
+    providersRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        serviceProviders = []; // Array ko har baar khali karein
+        if (data) {
+            for (let key in data) {
+                let provider = data[key];
+                provider.id = key; 
+                serviceProviders.push(provider);
+            }
         }
-        loadJobListings();
+        // Data load hone ke baad hi list ko update karein
+        loadServiceProviders('mistri-list');
+        console.log(`Providers Loaded: ${serviceProviders.length}`);
     });
 
-    // 3. Service Providers Listener
-    providersRef.on('value', (snapshot) => {
-        serviceProviders = [];
-        if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-                const provider = childSnapshot.val();
-                if (provider) serviceProviders.push(provider);
-            });
-            // ✅ Working Logic Call: providersLimit का उपयोग करके सर्विस लोड करें
-            loadServiceProviders('mistri-list');
-            loadServiceProviders('mistri-list-full'); // For search screen
-        } else {
-            const listHome = document.getElementById('mistri-list');
-            if(listHome) listHome.innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+    // 2. Jobs Listener (New)
+    jobsRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        jobListings = []; // Array ko har baar khali karein
+        if (data) {
+            for (let key in data) {
+                let job = data[key];
+                job.id = key;
+                jobListings.push(job);
+            }
         }
+        loadJobListings();
+        console.log(`Jobs Loaded: ${jobListings.length}`);
     });
 }
 
@@ -68,10 +68,15 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
         if(button.id !== 'more-cat-btn') {
             button.addEventListener('click', (e) => {
+                // Remove selected class from all buttons
                 document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
+                
+                // Add selected class to clicked button
                 e.target.classList.add('selected');
+                
+                // Filter services by category
                 const category = e.target.dataset.cat;
                 filterByCategory(category, 'mistri-list');
             });
@@ -80,81 +85,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
      // Add search event listener 
      document.getElementById('main-search-bar').addEventListener('input', searchProviders);
-     
-     // Form event listener (Registration & Job Posting)
-     const regForm = document.getElementById('service-registration-form');
-     if(regForm) regForm.addEventListener('submit', handleServiceRegistration);
-     
-     const jobForm = document.getElementById('job-posting-form');
-     if(jobForm) jobForm.addEventListener('submit', postJob);
 });
 
-// ✅ LOAD SERVICES (The main display function using providersLimit)
+// Function to load the main list of service providers
 function loadServiceProviders(listId) {
     const mistriListDiv = document.getElementById(listId);
-    const loadMoreBtn = document.getElementById('loadMoreButton'); 
-    
     if (!mistriListDiv) return;
     
-    const sortedProviders = serviceProviders.sort((a, b) => b.timestamp - a.timestamp); 
+    mistriListDiv.innerHTML = '<h3>Available Services</h3>';
     
-    // ⭐️ Key Logic: केवल लिमिट के अनुसार सर्विस दिखाएँ
-    const providersToShow = sortedProviders.slice(0, providersLimit);
-    
-    mistriListDiv.innerHTML = listId === 'mistri-list' ? '<h3>Available Services</h3>' : '';
-    
-    if (providersToShow.length === 0) {
-        mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 15px;">No services available.</p>';
-    } else {
-        providersToShow.forEach(provider => {
-            const card = createProfileCard(provider);
-            mistriListDiv.appendChild(card);
-        });
+    if (serviceProviders.length === 0) {
+         mistriListDiv.innerHTML += '<p style="text-align: center; color: #666; padding: 15px;">No services available.</p>';
     }
-
-    // ⭐️ Load More Button Control
-    if (listId === 'mistri-list' && loadMoreBtn) {
-        if (serviceProviders.length > providersLimit) {
-            loadMoreBtn.style.display = 'block'; 
-        } else {
-            loadMoreBtn.style.display = 'none'; 
-        }
-    }
+    
+    serviceProviders.forEach(provider => {
+        const card = createProfileCard(provider);
+        mistriListDiv.appendChild(card);
+    });
 }
-
-// ⭐️ WORKING LOAD MORE FUNCTION (Calls the display function again)
-window.loadMoreServices = function() {
-    const loadMoreBtn = document.getElementById('loadMoreButton');
-    if (loadMoreBtn) {
-        loadMoreBtn.textContent = 'Loading...';
-        loadMoreBtn.disabled = true;
-    }
-
-    providersLimit += 10; // लिमिट 10 बढ़ाएँ
-    
-    setTimeout(() => {
-        loadServiceProviders('mistri-list'); // लिस्ट को नए लिमिट के साथ फिर से लोड करें
-        
-        if (loadMoreBtn) {
-            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
-            loadMoreBtn.disabled = false;
-
-            if (serviceProviders.length <= providersLimit) {
-                loadMoreBtn.style.display = 'none';
-            }
-        }
-    }, 100);
-}
-
 
 // Helper function to create a profile card (Includes SHARE option)
 function createProfileCard(provider) {
     const card = document.createElement('div');
     card.className = 'profile-card';
-    const displayRating = provider.rating && provider.rating !== 'New' ? provider.rating : ''; 
-
     card.innerHTML = `
-        <h3>${provider.name} ${displayRating}</h3>
+        <h3>${provider.name} ${provider.rating}</h3>
         <p><strong>${provider.category}</strong> | ${provider.area}</p>
         <p>Experience: ${provider.experience}</p>
         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
@@ -180,6 +135,7 @@ function callNumber(phone) {
 // WhatsApp Function
 function openWhatsApp(phone) {
     const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
+    // Note: wa.me requires the country code (91)
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 
@@ -196,6 +152,7 @@ function shareApp() {
         .then(() => console.log('Successful share'))
         .catch((error) => console.log('Error sharing', error));
     } else {
+        // Fallback for desktop (opens WhatsApp with the message)
         const shareText = `Fatehpur Hubs - Local Services App\nFatehpur ki sabhi local services ek hi jagah! Abhi download karein:\n${appLink}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
     }
@@ -213,6 +170,7 @@ function shareProvider(name, category, phone) {
             url: window.location.href 
         });
     } else {
+        // Fallback for desktop/old browsers (opens WhatsApp with the message)
         window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 }
@@ -241,10 +199,12 @@ function loadAllCategories() {
         button.dataset.cat = item.cat;
         button.innerHTML = `${item.icon} ${item.cat}`;
         button.addEventListener('click', (e) => {
+            // Remove selected class from all buttons
             document.querySelectorAll('#all-categories-list .cat-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
             e.target.classList.add('selected');
+            
             filterByCategory(e.target.dataset.cat, 'mistri-list-full');
         });
         allCatList.appendChild(button);
@@ -269,12 +229,6 @@ function populateRegistrationCategories() {
 function filterByCategory(category, listId) {
     const mistriListDiv = document.getElementById(listId);
     if (!mistriListDiv) return;
-    
-    if(listId === 'mistri-list') {
-        const loadMoreBtn = document.getElementById('loadMoreButton');
-        if(loadMoreBtn) loadMoreBtn.style.display = 'none';
-    }
-
     mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
     
     const filteredProviders = category === 'All' 
@@ -292,84 +246,70 @@ function filterByCategory(category, listId) {
     });
 }
 
-// ✅ HANDLE SERVICE REGISTRATION (Bug Fixed: Duplicates and Proper Firebase Save)
+// FUNCTION: Handle Service Registration (Saves data to Firebase)
 function handleServiceRegistration(e) {
     if (e) e.preventDefault(); 
     
-    const providersRef = window.providersRef; 
+    // Get providersRef from the global window object (set in index.html)
+    const providersRef = window.providersRef;
     if (!providersRef) {
-        alert("Firebase connection error. Please try again.");
+        console.error("Firebase providers reference not found.");
         return;
     }
     
-    const name = document.getElementById('providerName').value.trim();
-    const phone = document.getElementById('providerPhone').value.trim();
-    const category = document.getElementById('serviceCategory').value;
-    const area = document.getElementById('providerArea').value.trim();
-    const experience = document.getElementById('providerExperience').value.trim();
+    const regMessage = document.getElementById('registration-message');
+    regMessage.textContent = 'Submitting... (जमा हो रहा है...)';
+    regMessage.style.color = '#2a5298';
+    
+    const name = document.getElementById('reg-name').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const category = document.getElementById('reg-category').value;
+    const area = document.getElementById('reg-area').value.trim();
+    const experience = document.getElementById('reg-experience').value.trim();
     
     if (!name || !phone || !category || !area || !experience) {
-        alert('Please fill all fields'); 
-        return;
+        regMessage.textContent = '❌ Please fill all fields (कृपया सभी फ़ील्ड भरें).';
+        regMessage.style.color = 'red';
+        return false;
     }
     
-    if (phone.length !== 10 || isNaN(phone)) {
-        alert('Enter valid 10-digit phone number');
-        return;
-    }
+    const newProvider = {
+        name: name,
+        category: category,
+        phone: phone,
+        area: area,
+        experience: experience,
+        rating: "New", 
+        timestamp: firebase.database.ServerValue.TIMESTAMP 
+    };
     
-    const submitBtn = document.getElementById('registerBtn');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Checking...';
-    submitBtn.disabled = true;
-    
-    // DUPLICATE CHECK
-    providersRef.orderByChild('phone').equalTo(phone).once('value')
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                alert('❌ This phone number is already registered! One phone can register only once.');
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                return; 
-            } 
-            
-            // DUPLICATE CHECK PASSED: Add new data to Firebase
-            const providerData = {
-                name: name,
-                phone: phone,
-                category: category,
-                area: area,
-                experience: experience,
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                rating: '⭐️⭐️⭐️⭐️' 
-            };
-
-            return providersRef.push(providerData);
-        })
+    // Save to Firebase
+    providersRef.push(newProvider)
         .then(() => {
-            alert('✅ Service Registered Successfully! We will review and publish it soon.');
+            regMessage.textContent = '✅ Registration Successful! आपकी सर्विस लिस्ट में जोड़ दी गई है।';
+            regMessage.style.color = 'green';
+
+            // Clear form and go to Home Screen after 1.5 seconds
             document.getElementById('service-registration-form').reset();
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            showScreen('home-screen'); 
+            setTimeout(() => {
+                showScreen('home-screen');
+            }, 1500);
         })
-        .catch((error) => {
-            console.error("Registration Error:", error);
-            alert('An error occurred during registration. Please try again.');
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
+        .catch(error => {
+            regMessage.textContent = `❌ Error: ${error.message}`;
+            regMessage.style.color = 'red';
+            console.error("Error registering service provider: ", error);
         });
+    
+    return false; 
 }
 
 
-// Search Functionality 
+// Search Functionality
 function searchProviders(e) {
     const searchTerm = e.target.value.toLowerCase();
     const mistriListDiv = document.getElementById('mistri-list');
-    const loadMoreBtn = document.getElementById('loadMoreButton');
-
     mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-    if(loadMoreBtn) loadMoreBtn.style.display = 'none'; 
     
     const filtered = serviceProviders.filter(provider => 
         provider.name.toLowerCase().includes(searchTerm) ||
@@ -405,9 +345,8 @@ function loadJobListings() {
         return;
     }
 
-    const sortedJobs = jobListings.sort((a, b) => b.timestamp - a.timestamp);
-
-    sortedJobs.forEach(job => { 
+    // Newest job first
+    jobListings.reverse().forEach(job => { 
         const card = createJobCard(job);
         jobListDiv.appendChild(card);
     });
@@ -416,13 +355,8 @@ function loadJobListings() {
 // Helper function to create a job card
 function createJobCard(job) {
     const card = document.createElement('div');
-    card.className = 'profile-card job-card'; 
+    card.className = 'profile-card job-card'; // Reusing profile-card style
     card.style.marginBottom = '15px';
-    
-    const contactDisplay = job.contact.includes('tel:') ? job.contact.replace('tel:', '') : job.contact;
-    const phoneNumber = contactDisplay.match(/\d{10}/);
-    const validPhone = phoneNumber ? phoneNumber[0] : null;
-
     card.innerHTML = `
         <h4 style="color: #2a5298; font-weight: bold;">${job.title}</h4>
         <p style="margin-bottom: 5px;">📍 **Location:** ${job.location}</p>
@@ -431,10 +365,10 @@ function createJobCard(job) {
             Posted: ${new Date(job.timestamp).toLocaleDateString('en-IN')}
         </div>
         <div style="margin-top: 10px;">
-            <button class="contact-btn" style="background: #e91e63;" onclick="${validPhone ? `callNumber('${validPhone}')` : `alert('Valid number not found')`}">
+            <button class="contact-btn" style="background: #e91e63;" onclick="callNumber('${job.contact.match(/\d+/)[0]}')">
                 📞 Call Contact
             </button>
-            <button class="whatsapp-btn" onclick="${validPhone ? `openWhatsAppForJob('${validPhone}', '${job.title}')` : `alert('Valid number not found')`}">
+            <button class="whatsapp-btn" onclick="openWhatsAppForJob('${job.contact}', '${job.title}')">
                 💬 Message
             </button>
         </div>
@@ -443,7 +377,18 @@ function createJobCard(job) {
 }
 
 // WhatsApp for Job Function
-function openWhatsAppForJob(phone, jobTitle) {
+function openWhatsAppForJob(contactInfo, jobTitle) {
+    // Attempt to extract only the phone number
+    const phoneMatch = contactInfo.match(/\d{10}/); // Assuming 10-digit Indian number
+    const phone = phoneMatch ? phoneMatch[0] : null;
+
+    if (!phone) {
+        // Since we cannot use alert(), log error to console for debug
+        console.error("Contact number not clearly found. Please dial manually: " + contactInfo);
+        // Fallback UI message (if implemented) is better than nothing
+        return;
+    }
+
     const message = `Hello, I saw your job posting "${jobTitle}" on Fatehpur Hubs and am interested. Please tell me more about the job.`;
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
 }
@@ -452,9 +397,11 @@ function openWhatsAppForJob(phone, jobTitle) {
 function postJob(e) {
     if (e) e.preventDefault();
 
+    // Get jobsRef from the global window object (set in index.html)
     const jobsRef = window.jobsRef; 
     if (!jobsRef) {
-        alert("Firebase connection error. Cannot post job.");
+        console.error("Firebase jobs reference not found.");
+        document.getElementById('postJobBtn').textContent = '❌ Error posting job.';
         return;
     }
 
@@ -465,15 +412,10 @@ function postJob(e) {
     const postJobBtn = document.getElementById('postJobBtn');
 
     if (!title || !description || !contact || !location) {
-        alert("Please fill all job posting fields.");
-        return;
+        // Since we cannot use alert(), log error to console for debug
+        console.error("Please fill all job posting fields.");
+        return false;
     }
-    
-    if (contact.length < 10) { 
-        alert("Please enter a valid contact (Phone or Email).");
-        return;
-    }
-
 
     postJobBtn.textContent = 'Posting...';
     postJobBtn.disabled = true;
@@ -488,23 +430,28 @@ function postJob(e) {
 
     jobsRef.push(newJob)
         .then(() => {
-            alert('✅ Job Posted Successfully!');
-            postJobBtn.textContent = 'Post Job';
-            postJobBtn.disabled = false;
-            document.getElementById('job-posting-form').reset();
-            showScreen('jobs-screen'); 
+            postJobBtn.textContent = '✅ Job Posted!';
+            setTimeout(() => {
+                postJobBtn.textContent = 'Post Job';
+                postJobBtn.disabled = false;
+                document.getElementById('jobTitle').value = '';
+                document.getElementById('jobDescription').value = '';
+                document.getElementById('jobContact').value = '';
+                document.getElementById('jobLocation').value = '';
+                // The job listener will automatically reload the job listings
+            }, 1500);
         })
         .catch(error => {
-            alert('❌ Error posting job. Try again.');
-            postJobBtn.textContent = 'Post Job';
+            postJobBtn.textContent = '❌ Error posting job. Try again.';
             postJobBtn.disabled = false;
             console.error("Error posting job: ", error);
         });
+
+    return false;
 }
-
-
-// Initialize Firebase (ये लाइनें कोड के अंत में ही रहनी चाहिए)
-// Note: firebaseConfig variable को index.html में परिभाषित किया जाना चाहिए।
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = app.database();
 
 // ✅ ANONYMOUS AUTHENTICATION ADD KAREIN
 firebase.auth().signInAnonymously()
@@ -514,4 +461,3 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-            
