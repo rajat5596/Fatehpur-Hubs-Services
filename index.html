@@ -618,5 +618,30 @@ function openWhatsApp(phone) {
             setupCategoryFilters();
         });
             </script>
-</body>
+<script>
+    // 1. Firebase Initialization 
+    const app = firebase.initializeApp(firebaseConfig); 
+    const database = app.database();
+    
+    // 2. Global References सेट करें
+    window.providersRef = database.ref('service_providers');
+    window.jobsRef = database.ref('job_listings');
+    
+    // 3. Authentication को सबसे पहले करें (यह Auth समस्या को हल करता है)
+    firebase.auth().signInAnonymously()
+        .then(() => {
+            // 4. Auth सफल होने के बाद, Listener को कॉल करें (यह Load More समस्या को हल करता है)
+            startFirebaseListener(window.providersRef, window.jobsRef); 
+        })
+        .catch(error => {
+            console.error("Auth error:", error);
+        });
+        
+    // 5. DOMContentLoaded की परवाह न करते हुए इसे लोड करें
+    loadAllCategories();
+    
+</script>
+
+<script src="script.js?v=FinalDone"></script> 
+</body> 
 </html>
