@@ -597,3 +597,48 @@ let currentCategory = 'ALL';            // 'ALL' or category name
 
 // list of categories (aapke ALL_CATEGORIES ke saath match kare)
 const ALL_CATEGORIES = ['Plumber','Electrician','Carpenter','Mason','Painter','AC Mechanic','TV Mechanic','Tiler','Welder','Computer Repair'];
+// ✅ Firebase Phone Authentication (OTP Login)
+let confirmationResult;
+
+// ✅ Send OTP
+function sendOTP() {
+  const phoneNumber = document.getElementById('phoneNumber').value;
+  if (!phoneNumber.startsWith('+91')) {
+    alert('Please enter valid number with +91');
+    return;
+  }
+
+  // reCAPTCHA
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'normal',
+    callback: function(response) {
+      console.log("reCAPTCHA verified");
+    }
+  });
+
+  firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+    .then((result) => {
+      confirmationResult = result;
+      alert('OTP sent successfully!');
+      document.getElementById('otp-section').style.display = 'block';
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Error sending OTP: ' + error.message);
+    });
+}
+
+// ✅ Verify OTP
+function verifyOTP() {
+  const code = document.getElementById('otpInput').value;
+  confirmationResult.confirm(code)
+    .then((result) => {
+      alert('Phone verified successfully!');
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('app-section').style.display = 'block';
+    })
+    .catch((error) => {
+      alert('Invalid OTP. Please try again.');
+      console.error(error);
+    });
+}
