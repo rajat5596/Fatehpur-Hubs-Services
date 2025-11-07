@@ -644,5 +644,24 @@ function openWhatsApp(phone) {
 </script>
 
 <script src="script.js?v=V9Final"></script> 
+        <!-- 🔐 Phone OTP Login Screen -->
+<div id="login-section" style="text-align:center; margin-top:40px;">
+  <h2>Sign In with Phone</h2>
+  
+  <input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX" style="padding:10px; width:80%; max-width:300px;"><br><br>
+  <div id="recaptcha-container"></div><br>
+  
+  <button onclick="sendOTP()" style="padding:10px 20px;">Send OTP</button><br><br>
+  
+  <div id="otp-section" style="display:none;">
+    <input type="text" id="otpInput" placeholder="Enter OTP" style="padding:10px; width:80%; max-width:300px;"><br><br>
+    <button onclick="verifyOTP()" style="padding:10px 20px;">Verify OTP</button>
+  </div>
+</div>
+
+<!-- 🔓 Main App Section -->
+<div id="app-section" style="display:none;">
+  <!-- Yahan tera main app ka content aayega -->
+</div>
 </body> 
 </html>
