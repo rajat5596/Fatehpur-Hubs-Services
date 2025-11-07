@@ -626,29 +626,31 @@ function openWhatsApp(phone) {
             // ✅ YE LINE ADD HO GAYI
             setupCategoryFilters();
         });
-    | **इस पूरे सेक्शन को इससे बदलें (नया, सही क्रम):** | ```html
-// ⭐️ KEY FIX: Initialization Code 
-<script>
-    // 1. Firebase Initialization (यह सुनिश्चित करता है कि providersRef और jobsRef मौजूद हों)
-    const app = firebase.initializeApp(firebaseConfig); // आपका config पहले ही डिफाइन होगा
+    <script>
+    // 1. Firebase Initialization
+    // NOTE: firebaseConfig variable ऊपर वाले <script> ब्लॉक से आ रहा है।
+    const app = firebase.initializeApp(firebaseConfig); 
     const database = app.database();
+    
+    // Global References सेट करें
     window.providersRef = database.ref('service_providers');
     window.jobsRef = database.ref('job_listings');
     
     // Anonymous Auth और Listener को शुरू करें
     firebase.auth().signInAnonymously()
         .then(() => {
-            // 2. Listener को Auth के सफल होने के बाद, सही Refs के साथ कॉल करें
+            // Listener को Auth के सफल होने के बाद, सही Refs के साथ कॉल करें
             startFirebaseListener(window.providersRef, window.jobsRef); 
         })
         .catch(error => {
             console.error("Auth error:", error);
         });
-    
-    // 3. अन्य फंक्शन जो DOMContentLoaded पर नहीं चलते, उन्हें यहाँ कॉल करें
+        
+    // 3. फंक्शन जो DOMContentLoaded पर नहीं चलते, उन्हें यहीं कॉल करें।
     loadAllCategories();
+    
 </script>
 
-<script src="script.js?v=7"></script> 
+<script src="script.js?v=8"></script> 
 </body>
 </html>
