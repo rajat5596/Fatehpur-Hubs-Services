@@ -461,54 +461,97 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
-// ... (आपके सभी ग्लोबल वैरिएबल्स, DOMContentLoaded लिसनर्स, और helper functions) ...
+// ✅ Global Variables
+let serviceProviders = [];
+let visibleCount = 10; // Initial 10 visible
 
-// ✅ LOAD SERVICES (The main display function using providersLimit)
+// ✅ Load Services with "Load More"
 function loadServiceProviders(listId) {
     const mistriListDiv = document.getElementById(listId);
-    const loadMoreBtn = document.getElementById('loadMoreButton'); 
-    
     if (!mistriListDiv) return;
-    
-    const sortedProviders = serviceProviders.sort((a, b) => b.timestamp - a.timestamp); 
-    
-    // ⭐️ Key Logic: केवल लिमिट के अनुसार सर्विस दिखाएँ
-    const providersToShow = sortedProviders.slice(0, providersLimit);
-    
-    // ... (rest of the display logic) ...
 
-    // ⭐️ Load More Button Control
-    if (listId === 'mistri-list' && loadMoreBtn) {
-        if (serviceProviders.length > providersLimit) {
-            loadMoreBtn.style.display = 'block'; 
+    mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+
+    if (serviceProviders.length === 0) {
+        mistriListDiv.innerHTML += '<p style="text-align:center;color:#666;">No services available.</p>';
+        return;
+    }
+
+    // ✅ Show only up to visibleCount items
+    const visibleProviders = serviceProviders.slice(0, visibleCount);
+
+    visibleProviders.forEach(provider => {
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.innerHTML = createProfessionalCard(provider);
+        mistriListDiv.appendChild(card);
+    });
+
+    // ✅ If there are more providers, show "Load More" button
+    if (visibleCount < serviceProviders.length) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.textContent = `🔽 Load More (${serviceProviders.length - visibleCount} left)`;
+        loadMoreBtn.style.cssText = `
+            display:block;
+            margin:15px auto;
+            padding:10px 20px;
+            background:#2a5298;
+            color:white;
+            border:none;
+            border-radius:20px;
+            cursor:pointer;
+        `;
+        loadMoreBtn.onclick = () => {
+            visibleCount += 10;
+            loadServiceProviders(listId); // reload with updated count
+        };
+        mistriListDiv.appendChild(loadMoreBtn);
+    }
+}
+
+// ✅ Firebase Listener
+function startFirebaseListener() {
+    providersRef.on('value', (snapshot) => {
+        serviceProviders = [];
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const provider = childSnapshot.val();
+                if (provider) serviceProviders.push(provider);
+            });
+
+            // ✅ Sort by latest first (optional)
+            serviceProviders.reverse();
+
+            // ✅ Reset visible count and load
+            visibleCount = 10;
+            loadServiceProviders('mistri-list');
         } else {
-            loadMoreBtn.style.display = 'none'; 
+            document.getElementById('mistri-list').innerHTML = '<p style="text-align:center;color:#666;">No services registered yet.</p>';
         }
-    }
+    });
 }
 
-// ⭐️ WORKING LOAD MORE FUNCTION 
-window.loadMoreServices = function() {
-    const loadMoreBtn = document.getElementById('loadMoreButton');
-    if (loadMoreBtn) {
-        loadMoreBtn.textContent = 'Loading...';
-        loadMoreBtn.disabled = true;
-    }
+// ✅ CREATE CARD (same as your code)
+function createProfessionalCard(provider) {
+    if (!provider) return '';
+    const name = provider.name || 'No Name';
+    const category = provider.category || 'Service';
+    const area = provider.area || 'Area';
+    const experience = provider.experience || 'Experience';
+    const rating = provider.rating || '⭐️⭐️⭐️⭐️';
+    const phone = provider.phone || '';
 
-    providersLimit += 10; // लिमिट 10 बढ़ाएँ
-    
-    setTimeout(() => {
-        loadServiceProviders('mistri-list'); // लिस्ट को नए लिमिट के साथ फिर से लोड करें
-        
-        if (loadMoreBtn) {
-            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
-            loadMoreBtn.disabled = false;
-
-            if (serviceProviders.length <= providersLimit) {
-                loadMoreBtn.style.display = 'none';
-            }
-        }
-    }, 100);
+    return `
+        <div style="margin-bottom: 10px;">
+            <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
+            <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
+            <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
+            <p style="margin: 2px 0; color: #666;">${rating}</p>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
+            <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+            <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
+        </div>
+    `;
 }
-
-// ... (Rest of startFirebaseListener and other functions) ...
