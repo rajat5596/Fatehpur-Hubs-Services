@@ -641,4 +641,82 @@ function verifyOTP() {
       alert('Invalid OTP. Please try again.');
       console.error(error);
     });
+}// ✅ Firebase Listener
+let serviceProviders = [];
+let visibleCount = 10;
+
+function startFirebaseListener() {
+  const providersRef = firebase.database().ref('service_providers');
+
+  providersRef.on('value', (snapshot) => {
+    serviceProviders = [];
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const provider = childSnapshot.val();
+        if (provider) serviceProviders.push(provider);
+      });
+
+      // ✅ Sort latest first
+      serviceProviders.reverse();
+
+      // ✅ Reset count and load first set
+      visibleCount = 10;
+      loadServiceProviders();
+    } else {
+      document.getElementById('app-section').innerHTML =
+        '<p style="text-align:center;color:#666;">No services found.</p>';
+    }
+  });
+}
+
+// ✅ Load visible cards
+function loadServiceProviders() {
+  const listDiv = document.getElementById('app-section');
+  listDiv.innerHTML = '';
+
+  const visible = serviceProviders.slice(0, visibleCount);
+  visible.forEach(provider => {
+    const card = document.createElement('div');
+    card.className = 'profile-card';
+    card.innerHTML = createProfessionalCard(provider);
+    listDiv.appendChild(card);
+  });
+
+  // ✅ Load More Button
+  if (visibleCount < serviceProviders.length) {
+    const btn = document.createElement('button');
+    btn.textContent = `🔽 Load More (${serviceProviders.length - visibleCount})`;
+    btn.style = "margin:15px auto; display:block; padding:10px 20px;";
+    btn.onclick = () => {
+      visibleCount += 10;
+      loadServiceProviders();
+    };
+    listDiv.appendChild(btn);
+  }
+}
+
+// ✅ Create Card UI
+function createProfessionalCard(provider) {
+  const name = provider.name || 'Unknown';
+  const category = provider.category || 'Service';
+  const area = provider.area || 'Area';
+  const phone = provider.phone || '';
+  return `
+    <div style="margin:10px; padding:15px; border:1px solid #ccc; border-radius:10px;">
+      <h3>${name}</h3>
+      <p>${category} - ${area}</p>
+      <button onclick="callNumber('${phone}')">📞 Call</button>
+      <button onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+    </div>
+  `;
+}
+
+// ✅ Helper Functions
+function callNumber(phone) {
+  if (!phone) return alert("Phone not available");
+  window.location.href = `tel:${phone}`;
+}
+function openWhatsApp(phone) {
+  if (!phone) return alert("Phone not available");
+  window.open(`https://wa.me/${phone}`, '_blank');
 }
