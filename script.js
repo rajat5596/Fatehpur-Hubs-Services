@@ -589,3 +589,11 @@ function shareProvider(name, category, phone) {
 window.onload = function() {
     startFirebaseListener();
 };
+// ---- STEP 1: Globals & state ----
+let serviceProviders = [];              // flat list from firebase
+let serviceProvidersByCategory = {};    // { "Plumber": [...], "Electrician": [...] }
+let visibleCount = 10;                  // how many to show initially (per view)
+let currentCategory = 'ALL';            // 'ALL' or category name
+
+// list of categories (aapke ALL_CATEGORIES ke saath match kare)
+const ALL_CATEGORIES = ['Plumber','Electrician','Carpenter','Mason','Painter','AC Mechanic','TV Mechanic','Tiler','Welder','Computer Repair'];
