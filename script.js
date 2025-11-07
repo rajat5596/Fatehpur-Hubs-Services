@@ -461,3 +461,54 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// ... (आपके सभी ग्लोबल वैरिएबल्स, DOMContentLoaded लिसनर्स, और helper functions) ...
+
+// ✅ LOAD SERVICES (The main display function using providersLimit)
+function loadServiceProviders(listId) {
+    const mistriListDiv = document.getElementById(listId);
+    const loadMoreBtn = document.getElementById('loadMoreButton'); 
+    
+    if (!mistriListDiv) return;
+    
+    const sortedProviders = serviceProviders.sort((a, b) => b.timestamp - a.timestamp); 
+    
+    // ⭐️ Key Logic: केवल लिमिट के अनुसार सर्विस दिखाएँ
+    const providersToShow = sortedProviders.slice(0, providersLimit);
+    
+    // ... (rest of the display logic) ...
+
+    // ⭐️ Load More Button Control
+    if (listId === 'mistri-list' && loadMoreBtn) {
+        if (serviceProviders.length > providersLimit) {
+            loadMoreBtn.style.display = 'block'; 
+        } else {
+            loadMoreBtn.style.display = 'none'; 
+        }
+    }
+}
+
+// ⭐️ WORKING LOAD MORE FUNCTION 
+window.loadMoreServices = function() {
+    const loadMoreBtn = document.getElementById('loadMoreButton');
+    if (loadMoreBtn) {
+        loadMoreBtn.textContent = 'Loading...';
+        loadMoreBtn.disabled = true;
+    }
+
+    providersLimit += 10; // लिमिट 10 बढ़ाएँ
+    
+    setTimeout(() => {
+        loadServiceProviders('mistri-list'); // लिस्ट को नए लिमिट के साथ फिर से लोड करें
+        
+        if (loadMoreBtn) {
+            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
+            loadMoreBtn.disabled = false;
+
+            if (serviceProviders.length <= providersLimit) {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+    }, 100);
+}
+
+// ... (Rest of startFirebaseListener and other functions) ...
