@@ -1,11 +1,11 @@
-// **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs**
+// **SCRIPT.JS - FINAL CORRECTED CODE with Firebase, Share & Jobs (Working 10/10 Load More)**
 
-// 1. Global Variables (Firebase se data aane tak khali rakhein)
+// 1. Global Variables
 let serviceProviders = [];
 let jobListings = [];
-let providersLimit = 10; // ⬅️ NEW: यह नियंत्रित करता है कि एक बार में कितनी सर्विस दिखानी है
+let providersLimit = 10; // ✅ WORKING: यह नियंत्रित करता है कि एक बार में कितनी सर्विस दिखानी है
 
-// All Categories List (Used for search screen and registration form)
+// All Categories List
 const ALL_CATEGORIES = [
     { cat: 'Plumber', icon: '💧' },
     { cat: 'Electrician', icon: '⚡' },
@@ -22,13 +22,11 @@ const ALL_CATEGORIES = [
 
 
 // **FIREBASE DATA LISTENER FUNCTION (Called from index.html)**
+// Note: providersRef और jobsRef index.html में Firebase initialization के बाद पास होने चाहिए।
 function startFirebaseListener(providersRef, jobsRef) { 
     console.log("Starting Firebase Listeners...");
-
-    // पुराने SERVICES_PER_BATCH और lastKey को हटा दिया गया है।
-    // loadMoreBtn और serviceListElement अब loadServiceProviders फ़ंक्शन के अंदर मिलेंगे।
     
-    // 2. Jobs Listener (New)
+    // 2. Jobs Listener
     jobsRef.on('value', (snapshot) => {
         jobListings = []; 
         if (snapshot.exists()) {
@@ -49,17 +47,14 @@ function startFirebaseListener(providersRef, jobsRef) {
                 const provider = childSnapshot.val();
                 if (provider) serviceProviders.push(provider);
             });
-            // ⭐️ UPDATE: providersLimit का उपयोग करके सर्विस लोड करें
+            // ✅ Working Logic Call: providersLimit का उपयोग करके सर्विस लोड करें
             loadServiceProviders('mistri-list');
             loadServiceProviders('mistri-list-full'); // For search screen
         } else {
-            // यह सुनिश्चित करने के लिए कि listDiv मौजूद है:
             const listHome = document.getElementById('mistri-list');
             if(listHome) listHome.innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
         }
     });
-
-    // Anonymous Login (StartFirebaseListener में अनावश्यक, इसे अंत में रखा गया है)
 }
 
 
@@ -73,15 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
         if(button.id !== 'more-cat-btn') {
             button.addEventListener('click', (e) => {
-                // Remove selected class from all buttons
                 document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
-                
-                // Add selected class to clicked button
                 e.target.classList.add('selected');
-                
-                // Filter services by category
                 const category = e.target.dataset.cat;
                 filterByCategory(category, 'mistri-list');
             });
@@ -91,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
      // Add search event listener 
      document.getElementById('main-search-bar').addEventListener('input', searchProviders);
      
-     // Form event listener (बग फिक्स के लिए यहाँ जोड़ा गया है)
+     // Form event listener (Registration & Job Posting)
      const regForm = document.getElementById('service-registration-form');
      if(regForm) regForm.addEventListener('submit', handleServiceRegistration);
      
@@ -99,20 +89,18 @@ document.addEventListener('DOMContentLoaded', function() {
      if(jobForm) jobForm.addEventListener('submit', postJob);
 });
 
-// ✅ LOAD SERVICES (पूरा फ़ंक्शन बदलें - 10/10 लॉजिक)
+// ✅ LOAD SERVICES (The main display function using providersLimit)
 function loadServiceProviders(listId) {
     const mistriListDiv = document.getElementById(listId);
     const loadMoreBtn = document.getElementById('loadMoreButton'); 
     
     if (!mistriListDiv) return;
     
-    // Providers को हाल ही के अनुसार सॉर्ट करें (अच्छा रहता है)
     const sortedProviders = serviceProviders.sort((a, b) => b.timestamp - a.timestamp); 
     
-    // ⭐️ बदलाव: केवल लिमिट के अनुसार सर्विस दिखाएँ (पहले 10, फिर 20, 30...)
+    // ⭐️ Key Logic: केवल लिमिट के अनुसार सर्विस दिखाएँ
     const providersToShow = sortedProviders.slice(0, providersLimit);
     
-    // List का शीर्षक सेट करें और उसे खाली करें
     mistriListDiv.innerHTML = listId === 'mistri-list' ? '<h3>Available Services</h3>' : '';
     
     if (providersToShow.length === 0) {
@@ -124,7 +112,7 @@ function loadServiceProviders(listId) {
         });
     }
 
-    // ⭐️ बदलाव: "Load More" बटन को नियंत्रित करें (केवल Home Screen की लिस्ट के लिए)
+    // ⭐️ Load More Button Control
     if (listId === 'mistri-list' && loadMoreBtn) {
         if (serviceProviders.length > providersLimit) {
             loadMoreBtn.style.display = 'block'; 
@@ -134,11 +122,35 @@ function loadServiceProviders(listId) {
     }
 }
 
+// ⭐️ WORKING LOAD MORE FUNCTION (Calls the display function again)
+window.loadMoreServices = function() {
+    const loadMoreBtn = document.getElementById('loadMoreButton');
+    if (loadMoreBtn) {
+        loadMoreBtn.textContent = 'Loading...';
+        loadMoreBtn.disabled = true;
+    }
+
+    providersLimit += 10; // लिमिट 10 बढ़ाएँ
+    
+    setTimeout(() => {
+        loadServiceProviders('mistri-list'); // लिस्ट को नए लिमिट के साथ फिर से लोड करें
+        
+        if (loadMoreBtn) {
+            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
+            loadMoreBtn.disabled = false;
+
+            if (serviceProviders.length <= providersLimit) {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+    }, 100);
+}
+
+
 // Helper function to create a profile card (Includes SHARE option)
 function createProfileCard(provider) {
     const card = document.createElement('div');
     card.className = 'profile-card';
-    // आपकी रेटिंग फील्ड 'New' हो सकती है।
     const displayRating = provider.rating && provider.rating !== 'New' ? provider.rating : ''; 
 
     card.innerHTML = `
@@ -168,7 +180,6 @@ function callNumber(phone) {
 // WhatsApp Function
 function openWhatsApp(phone) {
     const message = "Hello, I need your service from Fatehpur Hubs app. Please contact me.";
-    // Note: wa.me requires the country code (91)
     window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 
@@ -185,7 +196,6 @@ function shareApp() {
         .then(() => console.log('Successful share'))
         .catch((error) => console.log('Error sharing', error));
     } else {
-        // Fallback for desktop (opens WhatsApp with the message)
         const shareText = `Fatehpur Hubs - Local Services App\nFatehpur ki sabhi local services ek hi jagah! Abhi download karein:\n${appLink}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
     }
@@ -203,7 +213,6 @@ function shareProvider(name, category, phone) {
             url: window.location.href 
         });
     } else {
-        // Fallback for desktop/old browsers (opens WhatsApp with the message)
         window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
     }
 }
@@ -232,12 +241,10 @@ function loadAllCategories() {
         button.dataset.cat = item.cat;
         button.innerHTML = `${item.icon} ${item.cat}`;
         button.addEventListener('click', (e) => {
-            // Remove selected class from all buttons
             document.querySelectorAll('#all-categories-list .cat-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
             e.target.classList.add('selected');
-            
             filterByCategory(e.target.dataset.cat, 'mistri-list-full');
         });
         allCatList.appendChild(button);
@@ -263,7 +270,6 @@ function filterByCategory(category, listId) {
     const mistriListDiv = document.getElementById(listId);
     if (!mistriListDiv) return;
     
-    // Home Screen पर फिल्टर करने पर Load More बटन को छुपा दें
     if(listId === 'mistri-list') {
         const loadMoreBtn = document.getElementById('loadMoreButton');
         if(loadMoreBtn) loadMoreBtn.style.display = 'none';
@@ -280,18 +286,17 @@ function filterByCategory(category, listId) {
         return;
     }
 
-    // यहाँ फिल्टर होने के बाद सभी सर्विस दिखेंगी (10/10 लॉजिक फिल्टर पर लागू नहीं होता)
     filteredProviders.forEach(provider => {
         const card = createProfileCard(provider);
         mistriListDiv.appendChild(card);
     });
 }
 
-// ✅ HANDLE SERVICE REGISTRATION (बग फिक्स: Duplicates और Proper Firebase Save)
+// ✅ HANDLE SERVICE REGISTRATION (Bug Fixed: Duplicates and Proper Firebase Save)
 function handleServiceRegistration(e) {
     if (e) e.preventDefault(); 
     
-    const providersRef = window.providersRef; // ग्लोबल ऑब्जेक्ट से Firebase ref लें
+    const providersRef = window.providersRef; 
     if (!providersRef) {
         alert("Firebase connection error. Please try again.");
         return;
@@ -336,7 +341,7 @@ function handleServiceRegistration(e) {
                 area: area,
                 experience: experience,
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
-                rating: '⭐️⭐️⭐️⭐️' // Default Rating
+                rating: '⭐️⭐️⭐️⭐️' 
             };
 
             return providersRef.push(providerData);
@@ -346,7 +351,7 @@ function handleServiceRegistration(e) {
             document.getElementById('service-registration-form').reset();
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-            showScreen('home-screen'); // Home screen पर वापस जाएँ
+            showScreen('home-screen'); 
         })
         .catch((error) => {
             console.error("Registration Error:", error);
@@ -357,14 +362,14 @@ function handleServiceRegistration(e) {
 }
 
 
-// Search Functionality (यह अब सही mistri-list पर सर्च रिजल्ट दिखाएगा)
+// Search Functionality 
 function searchProviders(e) {
     const searchTerm = e.target.value.toLowerCase();
     const mistriListDiv = document.getElementById('mistri-list');
     const loadMoreBtn = document.getElementById('loadMoreButton');
 
     mistriListDiv.innerHTML = '<h3>Search Results</h3>';
-    if(loadMoreBtn) loadMoreBtn.style.display = 'none'; // सर्च के दौरान लोड मोर बटन छुपाएँ
+    if(loadMoreBtn) loadMoreBtn.style.display = 'none'; 
     
     const filtered = serviceProviders.filter(provider => 
         provider.name.toLowerCase().includes(searchTerm) ||
@@ -400,10 +405,6 @@ function loadJobListings() {
         return;
     }
 
-    // Newest job first
-    // Note: jobListings array Firebase Listener में भरा जा रहा है, वहाँ key नहीं आ रही थी।
-    // Fix: Firebase Listener में key जोड़ी गई है।
-    
     const sortedJobs = jobListings.sort((a, b) => b.timestamp - a.timestamp);
 
     sortedJobs.forEach(job => { 
@@ -418,7 +419,6 @@ function createJobCard(job) {
     card.className = 'profile-card job-card'; 
     card.style.marginBottom = '15px';
     
-    // Contact information extraction is complex. We will display it directly and rely on user input.
     const contactDisplay = job.contact.includes('tel:') ? job.contact.replace('tel:', '') : job.contact;
     const phoneNumber = contactDisplay.match(/\d{10}/);
     const validPhone = phoneNumber ? phoneNumber[0] : null;
@@ -469,7 +469,7 @@ function postJob(e) {
         return;
     }
     
-    if (contact.length < 10) { // Simple validation
+    if (contact.length < 10) { 
         alert("Please enter a valid contact (Phone or Email).");
         return;
     }
@@ -491,7 +491,6 @@ function postJob(e) {
             alert('✅ Job Posted Successfully!');
             postJobBtn.textContent = 'Post Job';
             postJobBtn.disabled = false;
-            // Clear form and go to job screen
             document.getElementById('job-posting-form').reset();
             showScreen('jobs-screen'); 
         })
@@ -504,31 +503,15 @@ function postJob(e) {
 }
 
 
-// ⭐️ NEW FUNCTION: Load 10 more services (loadNextBatch की जगह)
-window.loadMoreServices = function() {
-    const loadMoreBtn = document.getElementById('loadMoreButton');
-    if (loadMoreBtn) {
-        loadMoreBtn.textContent = 'Loading...';
-        loadMoreBtn.disabled = true;
-    }
-
-    providersLimit += 10; // लिमिट 10 बढ़ाएँ
-    
-    setTimeout(() => {
-        // 'mistri-list' ID के लिए लोड फ़ंक्शन को कॉल करें
-        loadServiceProviders('mistri-list');
-        
-        if (loadMoreBtn) {
-            loadMoreBtn.textContent = 'और सेवाएं लोड करें (Load More Services)';
-            loadMoreBtn.disabled = false;
-
-            if (serviceProviders.length <= providersLimit) {
-                loadMoreBtn.style.display = 'none';
-            }
-        }
-    }, 100);
-}
-
-
 // Initialize Firebase (ये लाइनें कोड के अंत में ही रहनी चाहिए)
-// Note: firebaseConfig variable को index.html में परिभाषित किय
+// Note: firebaseConfig variable को index.html में परिभाषित किया जाना चाहिए।
+
+// ✅ ANONYMOUS AUTHENTICATION ADD KAREIN
+firebase.auth().signInAnonymously()
+    .then(() => {
+        console.log("User automatically signed in anonymously");
+    })
+    .catch(error => {
+        console.log("Auth error:", error);
+    });
+            
