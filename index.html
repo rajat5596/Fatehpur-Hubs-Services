@@ -619,7 +619,8 @@ function openWhatsApp(phone) {
         });
             </script>
 <script>
-    // 1. Firebase Initialization 
+    // 1. Firebase Initialization (V9 Compat के साथ भी यह काम करता है)
+    // NOTE: firebaseConfig variable ऊपर वाले <script> ब्लॉक से आ रहा है।
     const app = firebase.initializeApp(firebaseConfig); 
     const database = app.database();
     
@@ -627,10 +628,10 @@ function openWhatsApp(phone) {
     window.providersRef = database.ref('service_providers');
     window.jobsRef = database.ref('job_listings');
     
-    // 3. Authentication को सबसे पहले करें (यह Auth समस्या को हल करता है)
+    // 3. Authentication को सबसे पहले करें
     firebase.auth().signInAnonymously()
         .then(() => {
-            // 4. Auth सफल होने के बाद, Listener को कॉल करें (यह Load More समस्या को हल करता है)
+            // 4. Auth सफल होने के बाद, Listener को कॉल करें
             startFirebaseListener(window.providersRef, window.jobsRef); 
         })
         .catch(error => {
@@ -641,7 +642,7 @@ function openWhatsApp(phone) {
     loadAllCategories();
     
 </script>
-<div id="mistri-list"></div>
-<script src="script.js?v=1.0"></script>
+
+<script src="script.js?v=V9Final"></script> 
 </body> 
 </html>
