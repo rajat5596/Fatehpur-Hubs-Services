@@ -16,7 +16,14 @@ const ALL_CATEGORIES = [
     { cat: 'Tiler', icon: '◻️' },
     { cat: 'Private Teacher', icon: '🎓' },
     { cat: 'Welder', icon: '🔥' },
-    { cat: 'Computer Repair', icon: '💻' }
+    { cat: 'Computer Repair', icon: '💻' },
+    
+    // --- यहाँ आपकी नई और बाकी बची हुई कैटेगरीज हैं ---
+    { cat: 'Beautician', icon: '💅' }, // आपने पहले ही डाल दी थी
+    { cat: 'Home Cleaning', icon: '🧹' },
+    { cat: 'Security Guard', icon: '🛡️' },
+    { cat: 'Laundry Service', icon: '🧺' },
+    { cat: 'Legal Consultant', icon: '⚖️' }
 ];
 
 
