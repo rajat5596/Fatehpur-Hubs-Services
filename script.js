@@ -17,6 +17,8 @@ const ALL_CATEGORIES = [
     { cat: 'Private Teacher', icon: '🎓' },
     { cat: 'Welder', icon: '🔥' },
     { cat: 'Computer Repair', icon: '💻' },
+    
+    // --- यहाँ नई, सही श्रेणियाँ हैं ---
     { cat: 'Beautician', icon: '💅' },
     { cat: 'Home Cleaning', icon: '🧹' },
     { cat: 'Security Guard', icon: '🛡️' },
