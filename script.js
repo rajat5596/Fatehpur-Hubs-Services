@@ -18,7 +18,7 @@ const ALL_CATEGORIES = [
     { cat: 'Welder', icon: '🔥' },
     { cat: 'Computer Repair', icon: '💻' },
     
-    // --- यहाँ नई, सही श्रेणियाँ हैं ---
+    // YEH 5 NAYI CATEGORIES ADD KAREIN
     { cat: 'Beautician', icon: '💅' },
     { cat: 'Home Cleaning', icon: '🧹' },
     { cat: 'Security Guard', icon: '🛡️' },
