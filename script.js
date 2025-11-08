@@ -17,8 +17,6 @@ const ALL_CATEGORIES = [
     { cat: 'Private Teacher', icon: '🎓' },
     { cat: 'Welder', icon: '🔥' },
     { cat: 'Computer Repair', icon: '💻' },
-    
-    // YEH 5 NAYI CATEGORIES ADD KAREIN
     { cat: 'Beautician', icon: '💅' },
     { cat: 'Home Cleaning', icon: '🧹' },
     { cat: 'Security Guard', icon: '🛡️' },
