@@ -163,107 +163,137 @@
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
-    <!-- SCRIPTS -->
+     <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="ads.js"></script>
-        <script>
-        // ✅ FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9fabfce"
-        };
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
-        const providersRef = database.ref('service_providers');
-        window.providersRef = providersRef;
+    
+    <!-- SCRIPTS -->
+<!-- Yahan par aapki Firebase SDK ki scripts hain: firebase-app, firebase-database, firebase-auth -->
+<!-- Neeche ka code in scripts ke load hone ke baad chalega -->
 
-        // ✅ GLOBAL VARIABLES
-        let serviceProviders = [];
-        const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+<script>
+    // ✅ FIREBASE CONFIG
+    // NOTE: Aapki Asli Firebase Keys yahan hain
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "fatehpur-hubs-a3a9f",
+        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+        messagingSenderId: "294360741451",
+        appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    };
 
-        // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
-        const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = app.database();
+    const providersRef = database.ref('service_providers');
+    window.providersRef = providersRef;
 
-        // ✅ FIREBASE LISTENER
-        function startFirebaseListener() {
-            providersRef.on('value', (snapshot) => {
-                serviceProviders = [];
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const provider = childSnapshot.val();
-                        if (provider) serviceProviders.push(provider);
-                    });
-                    loadServiceProviders('mistri-list');
-                } else {
-                    document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
-                }
-            });
-        }
+    // AUTHENTICATION OBJECTS - Yeh Auth logic ke liye zaroori hai
+    const auth = firebase.auth(); 
+    window.auth = auth; 
 
-        // ✅ LOAD SERVICES
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-            if (serviceProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
-                return;
+    /* 🛑 AUTH CHECK SCRIPT - LOGIN/LOGOUT STATUS MANAGE KARTA HAI
+    यह script सुनिश्चित करती है कि कोई भी user login.html से आए बिना सीधे index.html न खोल पाए।
+    */
+    
+    // Auth state change listener: Jaise hi login/logout status badalta hai, yeh chalta hai
+    auth.onAuthStateChanged(function(user) {
+        if (!user) {
+            // Agar user logged in nahi hai, to use login page par redirect kar do
+            // Ise sirf tab redirect karna hai jab woh pehle se login.html par na ho
+            if (window.location.pathname.indexOf('login.html') === -1) {
+                console.log("User not logged in. Redirecting to login.html");
+                window.location.href = 'login.html'; 
             }
-            serviceProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = createProfessionalCard(provider);
-                mistriListDiv.appendChild(card);
-            });
+        } else {
+            // User logged in hai. 
+            console.log("User logged in with UID:", user.uid);
+            // Jab user logged in ho, tab hi services load karo
+            startFirebaseListener(); 
         }
-         // ✅ LOAD SERVICES
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-            if (serviceProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
-                return;
-            }
-            serviceProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = createProfessionalCard(provider);
-                mistriListDiv.appendChild(card);
-            });
-        }
+    });
 
-        // ✅ CREATE CARD
-        function createProfessionalCard(provider) {
-            if (!provider) return '';
-            const name = provider.name || 'No Name';
-            const category = provider.category || 'Service';
-            const area = provider.area || 'Area';
-            const experience = provider.experience || 'Experience';
-            const rating = provider.rating || '⭐️⭐️⭐️⭐️';
-            const phone = provider.phone || '';
-            return `
-                <div style="margin-bottom: 10px;">
-                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
-                    <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
-                    <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
-                    <p style="margin: 2px 0; color: #666;">${rating}</p>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
-                    <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
-                </div>
-            `;
+    // Logout Function (Yeh function aap button click par call kar sakte hain)
+    window.logout = function() {
+        auth.signOut().then(() => {
+            console.log("User signed out.");
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Logout error:", error);
+        });
+    }
+
+    // ✅ GLOBAL VARIABLES (Yeh hissa aapke original code se hai)
+    let serviceProviders = [];
+    const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+
+    // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
+    const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
+
+    // ✅ FIREBASE LISTENER FUNCTION (Yeh function ab Auth check ke baad hi call hoga)
+    function startFirebaseListener() {
+        providersRef.on('value', (snapshot) => {
+            serviceProviders = [];
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const provider = childSnapshot.val();
+                    if (provider) serviceProviders.push(provider);
+                });
+                loadServiceProviders('mistri-list');
+            } else {
+                document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+            }
+        });
+    }
+
+    // ✅ LOAD SERVICES (Yeh function do bar likha hua tha, ab ek hi use karenge)
+    function loadServiceProviders(listId) {
+        const mistriListDiv = document.getElementById(listId);
+        if (!mistriListDiv) return;
+        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+        if (serviceProviders.length === 0) {
+            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
+            return;
         }
+        serviceProviders.forEach(provider => {
+            const card = document.createElement('div');
+            card.className = 'profile-card';
+            card.innerHTML = createProfessionalCard(provider);
+            mistriListDiv.appendChild(card);
+        });
+    }
+
+    // ✅ CREATE CARD (Yeh hissa aapke original code se hai)
+    function createProfessionalCard(provider) {
+        if (!provider) return '';
+        const name = provider.name || 'No Name';
+        const category = provider.category || 'Service';
+        const area = provider.area || 'Area';
+        const experience = provider.experience || 'Experience';
+        const rating = provider.rating || '⭐️⭐️⭐️⭐️';
+        const phone = provider.phone || '';
+        return `
+            <div style="margin-bottom: 10px;">
+                <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
+                <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
+                <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
+                <p style="margin: 2px 0; color: #666;">${rating}</p>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
+                <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+                <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
+            </div>
+        `;
+    } 
+
+    // NOTE: Call, WhatsApp, Share functions yahan missing hain. Agar aapko services list dikh jayegi, to main woh functions bhi add kar dunga.
+    // Jab tak woh functions nahi hain, button click par error aayega.
+</script>
 // ✅ REGISTER SERVICE WITH DUPLICATE CHECK
         function registerService() {
             const name = document.getElementById('providerName').value.trim();
