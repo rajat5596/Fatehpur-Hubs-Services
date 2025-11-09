@@ -4,10 +4,6 @@
 // PART 1: CONFIGURATION AND INITIALIZATION
 // -------------------------------------------------------------
 
-// Firebase SDK Compatibility Imports: (Yeh aapki login.html mein already hai)
-// import { initializeApp } from 'firebase/app';
-// import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
-
 // 🛑 अपनी ASLI FIREBASE CONFIGURATION यहाँ डालें
 const firebaseConfig = {
     apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", // YAHAN ASLI KEY DAALEIN
@@ -19,6 +15,7 @@ const firebaseConfig = {
 };
 
 // VAPID Key: Firebase Console -> Settings -> Cloud Messaging mein milegi.
+// **HTTPS DOMAIN par VAPID key MANDATORY hai**
 const VAPID_KEY = "BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ"; // 🛑 Yahan asli VAPID key zaroor daalein
 
 // Firebase Services Initialize karein
@@ -36,14 +33,14 @@ const step2 = document.getElementById('step-otp');
 const statusMessage = document.getElementById('status-message');
 
 // RecaptchaVerifier setup. Yeh phone verification ke liye mandatory hai.
-// Yeh widget login.html mein maujood div#recaptcha-container mein dikhega.
+// **IMPORTANT:** Vercel jaise live hosting par, hum invisible size use karte hain.
 function setupRecaptcha() {
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible', // User ko dikhega nahi, background mein chalega
+        'size': 'invisible', // Background mein chalega
         'callback': (response) => {
             // Recaptcha solve hone ke baad, phone sign-in process shuru karein
             console.log("Recaptcha solved automatically. Proceeding to send OTP.");
-            onSignInSubmit(true); // Call to send OTP
+            onSignInSubmit(true); 
         },
         'expired-callback': () => {
             updateStatus('Recaptcha expired. Please try again.', true);
@@ -59,11 +56,12 @@ window.onload = function() {
 // Form submit hone par kya karna hai (Common Handler)
 authForm.addEventListener('submit', function(e) {
     e.preventDefault();
+    console.log("Form Submitted. Executing Authentication Logic."); // Debugging ke liye
     if (step1.style.display !== 'none') {
-        // Agar phone number step par hain (Step 1)
-        onSignInSubmit(false); // Recaptcha ko solve karne ke liye trigger karein
+        // Step 1: OTP bhejna
+        onSignInSubmit(false); 
     } else {
-        // Agar OTP verification step par hain (Step 2)
+        // Step 2: OTP verify karna
         verifyOtp();
     }
 });
@@ -82,14 +80,24 @@ function onSignInSubmit(isRecaptchaSolved) {
     // Agar Recaptcha solve ho chuka hai, tab hi aage badhe
     if (!isRecaptchaSolved) {
         // Recaptcha ko force execute karne ke liye
-        updateStatus("सुरक्षा जाँच चल रही है...", false);
+        updateStatus("सुरक्षा जाँच चल रही है... (Recaptcha)", false);
+        
+        // Agar RecaptchaVerifier object initialized nahi hai, to error dega.
+        if (!window.recaptchaVerifier) {
+            updateStatus("Recaptcha Initialization Error. Please check Console.", true);
+            console.error("Recaptcha object not found on window. Please ensure setupRecaptcha ran.");
+            return;
+        }
+        
+        // Recaptcha verification ko trigger karein
         window.recaptchaVerifier.verify();
         return; 
     }
     
+    // Agar yahan tak pahunch gaye, to Recaptcha solve ho chuka hai
     const phoneNumber = phoneInput.value.trim();
 
-    if (!phoneNumber || phoneNumber.length < 10) {
+    if (!phoneNumber || phoneNumber.length !== 10) {
         updateStatus("कृपया 10 अंकों का वैध मोबाइल नंबर डालें।", true);
         return;
     }
@@ -97,9 +105,10 @@ function onSignInSubmit(isRecaptchaSolved) {
     updateStatus("OTP भेजा जा रहा है...", false);
     
     // International format zaroori hai (Assumption: +91 India)
-    const appVerifier = window.recaptchaVerifier;
+    const appVerifier = window.recaptchaVerifier; // RecaptchaVerifier ka instance
     const fullPhoneNumber = "+91" + phoneNumber; 
 
+    // Firebase Phone Sign-in
     auth.signInWithPhoneNumber(fullPhoneNumber, appVerifier)
         .then((confirmation) => {
             // OTP successfully bhej diya gaya hai.
@@ -107,12 +116,12 @@ function onSignInSubmit(isRecaptchaSolved) {
             updateStatus(`OTP ${phoneNumber} पर भेजा गया है।`);
             
             // UI ko OTP step par change karein
-            step1.style.display = 'none';
-            step2.style.display = 'block';
+            document.getElementById('step-phone').style.display = 'none';
+            document.getElementById('step-otp').style.display = 'block';
         })
         .catch((error) => {
             console.error("OTP Error:", error);
-            updateStatus("OTP भेजने में समस्या हुई। कृपया पुनः प्रयास करें। (Error: " + error.code + ")", true);
+            updateStatus("OTP भेजने में समस्या हुई। (Error: " + error.code + ")", true);
             
             // Recaptcha ko reset karein
             window.recaptchaVerifier.render().then(function(widgetId) {
