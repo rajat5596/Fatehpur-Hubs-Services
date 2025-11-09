@@ -466,3 +466,91 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// Firebase Authentication
+let confirmationResult = null;
+let otpTimer = null;
+let otpTimeLeft = 60;
+
+// OTP Functions
+function handlePhoneLogin() {
+    const phoneNumber = document.getElementById('phone-number').value;
+    
+    if (phoneNumber.length !== 10) {
+        alert('कृपया सही 10-digit मोबाइल नंबर दर्ज करें');
+        return;
+    }
+
+    const phone = '+91' + phoneNumber;
+
+    const appVerifier = new firebase.auth.RecaptchaVerifier('auth-button', {
+        'size': 'invisible'
+    });
+
+    firebase.auth().signInWithPhoneNumber(phone, appVerifier)
+        .then((confirmation) => {
+            confirmationResult = confirmation;
+            document.getElementById('auth-screen').classList.remove('active');
+            document.getElementById('otp-screen').classList.add('active');
+            document.getElementById('phone-number-display').textContent = phoneNumber;
+            startOTPTimer();
+        })
+        .catch((error) => {
+            console.error('SMS not sent', error);
+            alert('Error sending SMS: ' + error.message);
+        });
+}
+
+function verifyOTP() {
+    const otp = document.getElementById('otp-input').value;
+    
+    if (otp.length !== 6) {
+        alert('Please enter 6-digit OTP');
+        return;
+    }
+
+    confirmationResult.confirm(otp)
+        .then((result) => {
+            document.getElementById('otp-screen').classList.remove('active');
+            document.getElementById('app-screen').style.display = 'block';
+            localStorage.setItem('userLoggedIn', 'true');
+        })
+        .catch((error) => {
+            alert('Invalid OTP. Please try again.');
+        });
+}
+
+function startOTPTimer() {
+    otpTimeLeft = 60;
+    const timerElement = document.getElementById('otp-timer');
+    const resendBtn = document.getElementById('resend-otp-btn');
+    
+    resendBtn.disabled = true;
+    
+    otpTimer = setInterval(() => {
+        otpTimeLeft--;
+        timerElement.textContent = `OTP expires in ${otpTimeLeft} seconds`;
+        
+        if (otpTimeLeft <= 0) {
+            clearInterval(otpTimer);
+            resendBtn.disabled = false;
+            timerElement.textContent = 'OTP expired';
+        }
+    }, 1000);
+}
+
+function resendOTP() {
+    handlePhoneLogin();
+}
+
+// Event Listeners for OTP
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('auth-button').addEventListener('click', handlePhoneLogin);
+    document.getElementById('verify-otp-btn').addEventListener('click', verifyOTP);
+    document.getElementById('resend-otp-btn').addEventListener('click', resendOTP);
+    
+    // Check if already logged in
+    if (localStorage.getItem('userLoggedIn') === 'true') {
+        document.getElementById('auth-screen').classList.remove('active');
+        document.getElementById('app-screen').style.display = 'block';
+    }
+});
