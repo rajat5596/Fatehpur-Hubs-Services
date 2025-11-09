@@ -466,3 +466,200 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// --- 1. CONFIGURATION ---
+
+// APNI ASLI FIREBASE CONFIG YAHAN DAALEIN. 
+// Ye keys aapko Firebase Console se milengi.
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE", 
+    authDomain: "your-project-id.firebaseapp.com",
+    projectId: "your-project-id",
+    storageBucket: "your-project-id.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// --- 2. INITIALIZATION ---
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// Global variables for verification process
+let recaptchaVerifier;
+let confirmationResult;
+
+// --- 3. UI ELEMENT REFERENCES ---
+
+const mobilePhase = document.getElementById('mobile-phase');
+const otpPhase = document.getElementById('otp-phase');
+const successScreen = document.getElementById('success-screen');
+const mobileInput = document.getElementById('mobile-input');
+const otpInput = document.getElementById('otp-input');
+const sendButton = document.getElementById('send-otp-button');
+const verifyButton = document.getElementById('verify-otp-button');
+const messageArea = document.getElementById('message-area');
+const otpMessageArea = document.getElementById('otp-message-area');
+
+
+// --- 4. CORE FUNCTIONS ---
+
+/**
+ * RecaptchaVerifier set up karega. Yeh web par Phone Auth ke liye mandatory hai.
+ * Use tab call karna hai jab page load ho jaye.
+ */
+function setupRecaptcha() {
+    try {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'normal', // Can be 'invisible' or 'normal'
+            'callback': (response) => {
+                // reCAPTCHA solved, proceed with phone number submission
+                console.log("Recaptcha verified.");
+                sendOTP();
+            },
+            'expired-callback': () => {
+                // Recaptcha expired.
+                console.log("Recaptcha expired.");
+                messageArea.textContent = '❌ Verification expire ho gaya. Phir se koshish karein.';
+                sendButton.disabled = false;
+            }
+        }, auth);
+        window.recaptchaVerifier.render(); // Recaptcha ko render karein
+    } catch (e) {
+        console.error("Recaptcha Setup Error:", e);
+        messageArea.textContent = '❌ Recaptcha load nahi ho paya. Internet check karein.';
+        sendButton.disabled = true;
+    }
+}
+
+/**
+ * Mobile number check karega aur OTP bhejega.
+ */
+async function sendOTP() {
+    const mobileNumber = mobileInput.value.trim();
+    if (mobileNumber.length !== 10) {
+        messageArea.textContent = '❌ कृपया सही 10 अंकों का मोबाइल नंबर डालें।';
+        return;
+    }
+    
+    // International format mein convert karein
+    const phoneNumber = '+91' + mobileNumber;
+
+    sendButton.disabled = true;
+    sendButton.textContent = 'OTP भेजा जा रहा है...';
+    messageArea.textContent = '';
+    
+    try {
+        const verifier = window.recaptchaVerifier;
+        if (!verifier) {
+             messageArea.textContent = '❌ Recaptcha ready nahi hai. Phir se koshish karein.';
+             return;
+        }
+
+        confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, verifier);
+        
+        // Success: Transition to OTP input phase
+        mobilePhase.classList.add('hidden');
+        otpPhase.classList.remove('hidden');
+        otpMessageArea.textContent = `✅ OTP आपके नंबर ${mobileNumber} पर सफलतापूर्वक भेजा गया है।`;
+        
+    } catch (error) {
+        console.error("OTP Sending Error:", error);
+        
+        let displayError = 'OTP bhejte samay error aaya. Kripya doobara koshish karein.';
+        if (error.code === 'auth/missing-phone-number') {
+            displayError = 'Mobile Number galti se khali reh gaya.';
+        } else if (error.code === 'auth/invalid-phone-number') {
+            displayError = 'Mobile Number ka format galat hai.';
+        } else if (error.code === 'auth/too-many-requests') {
+            displayError = 'Bahut zyada requests ho gayi hain. Kripya thodi der baad koshish karein.';
+        }
+
+        messageArea.textContent = `❌ Error: ${displayError}`;
+    } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = 'OTP भेजें';
+    }
+}
+
+/**
+ * OTP check karega aur login complete karega.
+ */
+async function verifyOTP() {
+    const otp = otpInput.value.trim();
+    if (otp.length !== 6) {
+        otpMessageArea.textContent = '❌ कृपया 6 अंकों का OTP डालें।';
+        return;
+    }
+
+    verifyButton.disabled = true;
+    verifyButton.textContent = 'Verify हो रहा है...';
+    otpMessageArea.textContent = '';
+    
+    try {
+        // Confirmation Result ka use karke OTP verify karein
+        await confirmationResult.confirm(otp);
+        
+        // Success: User is now signed in
+        const user = auth.currentUser;
+        console.log("User successfully signed in. UID:", user.uid);
+
+        // Success screen dikhayein
+        otpPhase.classList.add('hidden');
+        successScreen.classList.remove('hidden');
+
+    } catch (error) {
+        console.error("OTP Verification Error:", error);
+        let displayError = 'OTP verification mein error. Kripya sahi OTP daalein.';
+
+        if (error.code === 'auth/invalid-verification-code') {
+             displayError = 'Galat OTP daala gaya hai.';
+        } else if (error.code === 'auth/code-expired') {
+             displayError = 'OTP expire ho gaya hai. Phir se bhejhein.';
+        }
+
+        otpMessageArea.textContent = `❌ Error: ${displayError}`;
+    } finally {
+        verifyButton.disabled = false;
+        verifyButton.textContent = 'OTP Verify करें';
+    }
+}
+
+/**
+ * Login process ko shuru se reset karega.
+ */
+window.resetLogin = () => {
+    mobilePhase.classList.remove('hidden');
+    otpPhase.classList.add('hidden');
+    messageArea.textContent = '';
+    otpMessageArea.textContent = '';
+    otpInput.value = '';
+    // Recaptcha ko reset karna zaroori hai
+    if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        setupRecaptcha(); // Recaptcha ko dobara render karein
+    }
+}
+
+// --- 5. EVENT LISTENERS (HTML se linked) ---
+
+// Page load hone par Recaptcha set up karein
+window.onload = setupRecaptcha;
+
+// Buttons ko functions se jod dein
+sendButton.addEventListener('click', sendOTP);
+verifyButton.addEventListener('click', verifyOTP);
+
+// Mobile input par Enter key dabane par OTP bhej dein
+mobileInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        sendOTP();
+    }
+});
+
+// OTP input par Enter key dabane par verify karein
+otpInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        verifyOTP();
+    }
+});
