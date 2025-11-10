@@ -514,7 +514,6 @@ function verifyOTP() {
         .then((result) => {
             alert('Phone verification successful!');
             document.getElementById('phoneAuthModal').style.display = 'none';
-            checkAuthAndLoadData();
         })
         .catch((error) => {
             alert('Invalid OTP. Please try again.');
@@ -526,70 +525,8 @@ function closeAuthModal() {
     document.getElementById('phoneAuthModal').style.display = 'none';
 }
 
-// Check Authentication Status
-function checkAuthAndLoadData() {
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            // User is logged in - enable all features
-            console.log('User logged in:', user.phoneNumber);
-            loadAllData(); // Aapka existing data load function
-        } else {
-            // User not logged in - show auth modal
-            console.log('User not logged in - showing auth modal');
-            document.getElementById('phoneAuthModal').style.display = 'block';
-            initializeRecaptcha();
-        }
-    });
-}
-
-// Protect your existing functions - Example for jobs
-function protectJobAccess() {
-    const user = auth.currentUser;
-    if (user) {
-        // User verified - show jobs screen
-        ShowScreen('jobs-screen');
-        loadJobs(); // Aapka existing jobs load function
-    } else {
-        // Show auth modal
-        document.getElementById('phoneAuthModal').style.display = 'block';
-    }
-}
-
-// Modify your existing job posting function
-function postJob() {
-    const user = auth.currentUser;
-    if (user) {
-        // Allow job posting
-        yourExistingPostJobFunction();
-    } else {
-        alert('Please verify your phone first');
-        document.getElementById('phoneAuthModal').style.display = 'block';
-    }
-    }
-
-// Auto-check auth when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for Firebase to initialize
-    setTimeout(() => {
-        checkAuthAndLoadData();
-    }, 1000);
-});
 // Auto show auth modal when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        if (!auth.currentUser) {
-            document.getElementById('phoneAuthModal').style.display = 'block';
-            initializeRecaptcha();
-        }
-    }, 2000);
-});
-
-// Auto show auth modal when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        if (!auth.currentUser) {
-            document.getElementById('phoneAuthModal').style.display = 'block';
-            initializeRecaptcha();
-        }
-    }, 2000);
-});
+setTimeout(() => {
+    document.getElementById('phoneAuthModal').style.display = 'block';
+    initializeRecaptcha();
+}, 2000);
