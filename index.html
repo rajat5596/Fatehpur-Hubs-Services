@@ -190,42 +190,7 @@
     const app = firebase.initializeApp(firebaseConfig);
     const database = app.database();
     const providersRef = database.ref('service_providers');
-    window.providersRef = providersRef;
-
-    // AUTHENTICATION OBJECTS - Yeh Auth logic ke liye zaroori hai
     const auth = firebase.auth(); 
-    window.auth = auth; 
-
-    /* 🛑 AUTH CHECK SCRIPT - LOGIN/LOGOUT STATUS MANAGE KARTA HAI
-    यह script सुनिश्चित करती है कि कोई भी user login.html से आए बिना सीधे index.html न खोल पाए।
-    */
-    
-    // Auth state change listener: Jaise hi login/logout status badalta hai, yeh chalta hai
-    auth.onAuthStateChanged(function(user) {
-        if (!user) {
-            // Agar user logged in nahi hai, to use login page par redirect kar do
-            // Ise sirf tab redirect karna hai jab woh pehle se login.html par na ho
-            if (window.location.pathname.indexOf('login.html') === -1) {
-                console.log("User not logged in. Redirecting to login.html");
-                window.location.href = 'login.html'; 
-            }
-        } else {
-            // User logged in hai. 
-            console.log("User logged in with UID:", user.uid);
-            // Jab user logged in ho, tab hi services load karo
-            startFirebaseListener(); 
-        }
-    });
-
-    // Logout Function (Yeh function aap button click par call kar sakte hain)
-    window.logout = function() {
-        auth.signOut().then(() => {
-            console.log("User signed out.");
-            window.location.href = 'login.html';
-        }).catch((error) => {
-            console.error("Logout error:", error);
-        });
-    }
 
     // ✅ GLOBAL VARIABLES (Yeh hissa aapke original code se hai)
     let serviceProviders = [];
