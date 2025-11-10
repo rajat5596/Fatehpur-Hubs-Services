@@ -29,7 +29,7 @@
         .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
-    <body>  
+<body>
     <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
@@ -56,6 +56,7 @@
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
             </div>
+            
             <h3>🚀 Popular Services</h3>
 <div id="mistri-categories" class="categories-list">
     <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
@@ -119,6 +120,7 @@
             <div id="all-categories-list" class="categories-list"></div> 
             <div id="mistri-list-full"></div>
         </div>
+
         <!-- JOBS SCREEN -->
         <div id="jobs-screen" class="screen">
             <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
@@ -162,110 +164,94 @@
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-        </div>
-     <!-- SCRIPTS -->
+    </div>
+    <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="ads.js"></script>
-    
-<script>
-    // ✅ FIREBASE CONFIG
-    const firebaseConfig = {
-        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "fatehpur-hubs-a3a9f",
-        storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-        messagingSenderId: "294360741451",
-        appId: "1:294360741451:web:3bc85078805750b9fabfce"
-    };
+    <script src="ads.js"></script>
+    <script>
+        // ✅ FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = app.database();
-    const providersRef = database.ref('service_providers');
-    const auth = firebase.auth(); 
-    // ✅ GLOBAL VARIABLES
-    let serviceProviders = [];
-    const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair', 'Beautician', 'Home Cleaning', 'Security Guard', 'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'];
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = app.database();
+        const providersRef = database.ref('service_providers');
+        window.providersRef = providersRef;
 
-    // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
-    const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
-    
-    // ✅ LOAD SERVICES 
-    function loadServiceProviders(listId) {
-        // ... (Aapka original function logic)
-        const mistriListDiv = document.getElementById(listId);
-        if (!mistriListDiv) return;
-        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-        // ...
-        
-        // Agar load hone ke baad bhi data nahi aata, to yeh message dikhao
-        if (serviceProviders.length === 0) {
-            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet. (Listener Working)</p>';
+        // ✅ GLOBAL VARIABLES
+        let serviceProviders = [];
+        const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+
+        // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
+        const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
+
+        // ✅ FIREBASE LISTENER
+        function startFirebaseListener() {
+            providersRef.on('value', (snapshot) => {
+                serviceProviders = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const provider = childSnapshot.val();
+                        if (provider) serviceProviders.push(provider);
+                    });
+                    loadServiceProviders('mistri-list');
+                } else {
+                    document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+                }
+            });
         }
-    }
-    
-    // ✅ FIREBASE LISTENER (Jisse services real-time mein load hon)
-    function startFirebaseListener() {
-        providersRef.on('value', (snapshot) => {
-            serviceProviders = [];
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const provider = childSnapshot.val();
-                    if (provider) serviceProviders.push(provider);
-                });
-                loadServiceProviders('mistri-list');
-            } else {
-                document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
+
+        // ✅ LOAD SERVICES
+        function loadServiceProviders(listId) {
+            const mistriListDiv = document.getElementById(listId);
+            if (!mistriListDiv) return;
+            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+            if (serviceProviders.length === 0) {
+                mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
+                return;
             }
-        });
-    }
-
-</script>
-    // ✅ LOAD SERVICES (Yeh function do bar likha hua tha, ab ek hi use karenge)
-    function loadServiceProviders(listId) {
-        const mistriListDiv = document.getElementById(listId);
-        if (!mistriListDiv) return;
-        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-        if (serviceProviders.length === 0) {
-            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
-            return;
+            serviceProviders.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.innerHTML = createProfessionalCard(provider);
+                mistriListDiv.appendChild(card);
+            });
         }
-        serviceProviders.forEach(provider => {
-            const card = document.createElement('div');
-            card.className = 'profile-card';
-            card.innerHTML = createProfessionalCard(provider);
-            mistriListDiv.appendChild(card);
-        });
-    }
 
-    // ✅ CREATE CARD (Yeh hissa aapke original code se hai)
-    function createProfessionalCard(provider) {
-        if (!provider) return '';
-        const name = provider.name || 'No Name';
-        const category = provider.category || 'Service';
-        const area = provider.area || 'Area';
-        const experience = provider.experience || 'Experience';
-        const rating = provider.rating || '⭐️⭐️⭐️⭐️';
-        const phone = provider.phone || '';
-        return `
-            <div style="margin-bottom: 10px;">
-                <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
-                <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
-                <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
-                <p style="margin: 2px 0; color: #666;">${rating}</p>
-            </div>
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
-                <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
-                <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
-            </div>
-        `;
-    } 
-</script>
-// ✅ REGISTER SERVICE WITH DUPLICATE CHECK
+        // ✅ CREATE CARD
+        function createProfessionalCard(provider) {
+            if (!provider) return '';
+            const name = provider.name || 'No Name';
+            const category = provider.category || 'Service';
+            const area = provider.area || 'Area';
+            const experience = provider.experience || 'Experience';
+            const rating = provider.rating || '⭐️⭐️⭐️⭐️';
+            const phone = provider.phone || '';
+            return `
+                <div style="margin-bottom: 10px;">
+                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
+                    <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
+                    <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
+                    <p style="margin: 2px 0; color: #666;">${rating}</p>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
+                    <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
+                </div>
+            `;
+        }
+
+        // ✅ REGISTER SERVICE
         function registerService() {
             const name = document.getElementById('providerName').value.trim();
             const phone = document.getElementById('providerPhone').value.trim();
@@ -274,61 +260,39 @@
             const experience = document.getElementById('providerExperience').value.trim();
             
             if (!name || !phone || !category || !area || !experience) {
-                alert('Please fill all fields'); 
-                return false;
+                alert('Please fill all fields'); return false;
             }
-            
             if (phone.length !== 10 || isNaN(phone)) {
-                alert('Enter valid 10-digit phone number');
-                return false;
+                alert('Enter valid 10-digit phone number'); return false;
             }
             
             const submitBtn = document.getElementById('registerBtn');
             const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Checking...';
+            submitBtn.textContent = 'Registering...';
             submitBtn.disabled = true;
             
-            // ✅ DUPLICATE CHECK - Same phone number already exists?
-            providersRef.orderByChild('phone').equalTo(phone).once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        alert('❌ This phone number is already registered! One phone can register only once.');
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                        return;
-                    }
-                    
-                    // ✅ If not duplicate, register service
-                    const newProvider = { 
-                        name: name, 
-                        category: category, 
-                        phone: phone, 
-                        area: area, 
-                        experience: experience, 
-                        rating: "⭐️⭐️⭐️⭐️", 
-                        timestamp: new Date().toISOString() 
-                    };
-                    
-                    return providersRef.push(newProvider);
-                })
-                .then((result) => {
-                    if (result) {
-                        alert('✅ Service Registered Successfully!');
-                        document.getElementById('providerName').value = '';
-                        document.getElementById('providerPhone').value = '';
-                        document.getElementById('serviceCategory').value = '';
-                        document.getElementById('providerArea').value = '';
-                        document.getElementById('providerExperience').value = '';
-                    }
-                })
-                .catch(error => {
-                    alert('❌ Error: ' + error.message);
-                })
-                .finally(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                });
-            
+            const newProvider = { 
+                name: name, 
+                category: category, 
+                phone: phone, 
+                area: area, 
+                experience: experience, 
+                rating: "⭐️⭐️⭐️⭐️", 
+                timestamp: new Date().toISOString() 
+            };
+            providersRef.push(newProvider).then(() => {
+                alert('✅ Service Registered Successfully!');
+                document.getElementById('providerName').value = '';
+                document.getElementById('providerPhone').value = '';
+                document.getElementById('serviceCategory').value = '';
+                document.getElementById('providerArea').value = '';
+                document.getElementById('providerExperience').value = '';
+            }).catch(error => {
+                alert('❌ Error: ' + error.message);
+            }).finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
             return false;
         }
 
@@ -359,25 +323,15 @@
 
         // ✅ CONTACT FUNCTIONS
         function callNumber(phone) { 
-    // ✅ CLEAN PHONE NUMBER - Remove +91, spaces, hyphens
-    const cleanPhone = phone.replace(/[\s\-+]/g, '').replace(/^91/, '');
-    if(cleanPhone.length === 10 && !isNaN(cleanPhone)) {
-        window.location.href = `tel:+91${cleanPhone}`;
-    } else {
-        alert('Invalid phone number: ' + phone);
-    }
-}
-
-function openWhatsApp(phone) { 
-    // ✅ CLEAN PHONE NUMBER - Remove +91, spaces, hyphens
-    const cleanPhone = phone.replace(/[\s\-+]/g, '').replace(/^91/, '');
-    if(cleanPhone.length === 10 && !isNaN(cleanPhone)) {
-        const message = "Hello, I need your service from Fatehpur Hubs app.";
-        window.open(`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
-    } else {
-        alert('Invalid phone number: ' + phone);
-    }
-}
+            if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
+        }
+        
+        function openWhatsApp(phone) { 
+            if(phone && phone.length === 10) {
+                const message = "Hello, I need your service from Fatehpur Hubs app.";
+                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+            }
+        }
         
         function contactForAds() {
             const message = "Hello, I'm interested in advertising my business on Fatehpur Hubs. Please share details about ad spaces, pricing, and duration.";
@@ -389,52 +343,10 @@ function openWhatsApp(phone) {
             document.getElementById(screenId).classList.add('active');
         }
         // ✅ JOBS FUNCTIONS
-                function openMoreApps() { 
+        function openMoreApps() { 
             showScreen('jobs-screen');
             loadLocalJobs();
         }
-
-        // ✅ CATEGORY BUTTONS FIX - YEH FUNCTION ADD KAREIN
-        function setupCategoryFilters() {
-            document.querySelectorAll('#mistri-categories .cat-btn').forEach(button => {
-                if(button.id !== 'more-cat-btn') {
-                    button.addEventListener('click', function() {
-                        // Remove selected class from all buttons
-                        document.querySelectorAll('#mistri-categories .cat-btn').forEach(btn => {
-                            btn.classList.remove('selected');
-                        });
-                        
-                        // Add selected class to clicked button
-                        this.classList.add('selected');
-                        
-                        // Get category
-                        const category = this.getAttribute('data-cat');
-                        const mistriListDiv = document.getElementById('mistri-list');
-                        
-                        if (!mistriListDiv) return;
-                        
-                        // Filter services
-                        mistriListDiv.innerHTML = `<h3>${category} Services</h3>`;
-                        const filtered = serviceProviders.filter(p => p && p.category === category);
-                        
-                        if (filtered.length === 0) {
-                            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services found in this category.</p>';
-                            return;
-                        }
-
-                        // Show filtered services
-                        filtered.forEach(provider => {
-                            const card = document.createElement('div');
-                            card.className = 'profile-card';
-                            card.innerHTML = createProfessionalCard(provider);
-                            mistriListDiv.appendChild(card);
-                        });
-                    });
-                }
-            });
-        }
-        // ✅ LOAD ALL CATEGORIES (For Search Screen)
-        function loadAllCategories() {}
 
         function postJob() {
             const jobTitle = document.getElementById('jobTitle').value.trim();
@@ -604,15 +516,12 @@ function openWhatsApp(phone) {
                 });
             }
             
-                        // Load categories for search screen
+            // Load categories for search screen
             loadAllCategories();
             
             // Start Firebase
             startFirebaseListener();
-            
-            // ✅ YE LINE ADD HO GAYI
-            setupCategoryFilters();
         });
-            </script>
-</body> 
+    </script>
+</body>
 </html>
