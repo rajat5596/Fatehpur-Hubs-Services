@@ -186,9 +186,6 @@
     const database = app.database();
     const providersRef = database.ref('service_providers');
     const auth = firebase.auth(); 
-    // 🛑 ProvidersRef aur Auth object ko global window object mein store karna zaroori nahi hai
-    // jab tak hum unhe seedha dusre functions mein istemal na karein.
-
     // ✅ GLOBAL VARIABLES
     let serviceProviders = [];
     const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair', 'Beautician', 'Home Cleaning', 'Security Guard', 'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'];
@@ -196,22 +193,7 @@
     // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
     const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
     
-    // Yahan se aapke saare Functions shuru hote hain (loadServiceProviders, createProfessionalCard, etc.)
-    // Note: Main sirf Firebase aur Initialization part de raha hoon. Baaki functions isi file mein hone chahiye.
-
-    // ----------------------------------------------------------------------
-    // NOTE: Aapke saare Custom Functions (loadServiceProviders, startFirebaseListener)
-    // is block ke theek neeche hone chahiye.
-    // ----------------------------------------------------------------------
-
-    // ✅ MAIN APP START: Firebase Listener ko turant chalu karein
-    // Yeh Line maanta hai ki startFirebaseListener function iske baad hi define kiya gaya hai.
-    // startFirebaseListener(); 
-    // Comment: Chunki aapka pura code nahi hai, is function call ko hum last mein rakhenge.
-
-    // --- Aapke Sare Custom Functions Yahan Aayenge (jaisa purane code mein tha) ---
-
-    // ✅ LOAD SERVICES (Mock functions, aapka original code yahan hona chahiye)
+    // ✅ LOAD SERVICES 
     function loadServiceProviders(listId) {
         // ... (Aapka original function logic)
         const mistriListDiv = document.getElementById(listId);
@@ -240,9 +222,6 @@
             }
         });
     }
-
-    // ✅ APP KA ANTIM CALL (Sabse ant mein ise chalaya jaata hai)
-    startFirebaseListener(); 
 
 </script>
     // ✅ LOAD SERVICES (Yeh function do bar likha hua tha, ab ek hi use karenge)
@@ -285,9 +264,6 @@
             </div>
         `;
     } 
-
-    // NOTE: Call, WhatsApp, Share functions yahan missing hain. Agar aapko services list dikh jayegi, to main woh functions bhi add kar dunga.
-    // Jab tak woh functions nahi hain, button click par error aayega.
 </script>
 // ✅ REGISTER SERVICE WITH DUPLICATE CHECK
         function registerService() {
