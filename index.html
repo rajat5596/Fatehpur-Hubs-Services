@@ -162,20 +162,15 @@
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
+        </div>
      <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="ads.js"></script>
     
-    <!-- SCRIPTS -->
-<!-- Yahan par aapki Firebase SDK ki scripts hain: firebase-app, firebase-database, firebase-auth -->
-<!-- Neeche ka code in scripts ke load hone ke baad chalega -->
-
 <script>
     // ✅ FIREBASE CONFIG
-    // NOTE: Aapki Asli Firebase Keys yahan hain
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -186,20 +181,51 @@
         appId: "1:294360741451:web:3bc85078805750b9fabfce"
     };
 
-    // Initialize Firebase
+    // Initialize Firebase Services
     const app = firebase.initializeApp(firebaseConfig);
     const database = app.database();
     const providersRef = database.ref('service_providers');
-    const auth = firebase.auth(); 
+    const auth = firebase.auth();
+    // 🛑 ProvidersRef aur Auth object ko global window object mein store karna zaroori nahi hai
+    // jab tak hum unhe seedha dusre functions mein istemal na karein.
 
-    // ✅ GLOBAL VARIABLES (Yeh hissa aapke original code se hai)
+    // ✅ GLOBAL VARIABLES
     let serviceProviders = [];
-    const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+    const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair', 'Beautician', 'Home Cleaning', 'Security Guard', 'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'];
 
     // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
     const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
+    
+    // Yahan se aapke saare Functions shuru hote hain (loadServiceProviders, createProfessionalCard, etc.)
+    // Note: Main sirf Firebase aur Initialization part de raha hoon. Baaki functions isi file mein hone chahiye.
 
-    // ✅ FIREBASE LISTENER FUNCTION (Yeh function ab Auth check ke baad hi call hoga)
+    // ----------------------------------------------------------------------
+    // NOTE: Aapke saare Custom Functions (loadServiceProviders, startFirebaseListener)
+    // is block ke theek neeche hone chahiye.
+    // ----------------------------------------------------------------------
+
+    // ✅ MAIN APP START: Firebase Listener ko turant chalu karein
+    // Yeh Line maanta hai ki startFirebaseListener function iske baad hi define kiya gaya hai.
+    // startFirebaseListener(); 
+    // Comment: Chunki aapka pura code nahi hai, is function call ko hum last mein rakhenge.
+
+    // --- Aapke Sare Custom Functions Yahan Aayenge (jaisa purane code mein tha) ---
+
+    // ✅ LOAD SERVICES (Mock functions, aapka original code yahan hona chahiye)
+    function loadServiceProviders(listId) {
+        // ... (Aapka original function logic)
+        const mistriListDiv = document.getElementById(listId);
+        if (!mistriListDiv) return;
+        mistriListDiv.innerHTML = '<h3>Available Services</h3>';
+        // ...
+        
+        // Agar load hone ke baad bhi data nahi aata, to yeh message dikhao
+        if (serviceProviders.length === 0) {
+            mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services registered yet. (Listener Working)</p>';
+        }
+    }
+    
+    // ✅ FIREBASE LISTENER (Jisse services real-time mein load hon)
     function startFirebaseListener() {
         providersRef.on('value', (snapshot) => {
             serviceProviders = [];
@@ -215,6 +241,10 @@
         });
     }
 
+    // ✅ APP KA ANTIM CALL (Sabse ant mein ise chalaya jaata hai)
+    startFirebaseListener(); 
+
+</script>
     // ✅ LOAD SERVICES (Yeh function do bar likha hua tha, ab ek hi use karenge)
     function loadServiceProviders(listId) {
         const mistriListDiv = document.getElementById(listId);
