@@ -466,3 +466,103 @@ firebase.auth().signInAnonymously()
     .catch(error => {
         console.log("Auth error:", error);
     });
+// ==================== PHONE AUTHENTICATION CODE ====================
+
+// Initialize Firebase Auth
+const auth = firebase.auth();
+let recaptchaVerifier;
+let confirmationResult;
+
+// Initialize reCAPTCHA
+function initializeRecaptcha() {
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible'
+    });
+}
+
+// Send OTP
+function sendOTP() {
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    
+    if (!phoneNumber) {
+        alert('Please enter phone number');
+        return;
+    }
+
+    auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+        .then((result) => {
+            confirmationResult = result;
+            document.getElementById('otpSection').style.display = 'block';
+            alert('OTP sent successfully!');
+        })
+        .catch((error) => {
+            alert('Error: ' + error.message);
+            console.error('OTP Error:', error);
+        });
+}
+
+// Verify OTP
+function verifyOTP() {
+    const otp = document.getElementById('otpInput').value;
+    
+    if (!otp) {
+        alert('Please enter OTP');
+        return;
+    }
+
+    confirmationResult.confirm(otp)
+        .then((result) => {
+            alert('Phone verification successful!');
+            document.getElementById('phoneAuthModal').style.display = 'none';
+            checkAuthAndLoadData();
+        })
+        .catch((error) => {
+            alert('Invalid OTP. Please try again.');
+        });
+}
+
+// Close Auth Modal
+function closeAuthModal() {
+    document.getElementById('phoneAuthModal').style.display = 'none';
+}
+
+// Check Authentication Status
+function checkAuthAndLoadData() {
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            // User is logged in - enable all features
+            console.log('User logged in:', user.phoneNumber);
+            loadAllData(); // Aapka existing data load function
+        } else {
+            // User not logged in - show auth modal
+            console.log('User not logged in - showing auth modal');
+            document.getElementById('phoneAuthModal').style.display = 'block';
+            initializeRecaptcha();
+        }
+    });
+}
+
+// Protect your existing functions - Example for jobs
+function protectJobAccess() {
+    const user = auth.currentUser;
+    if (user) {
+        // User verified - show jobs screen
+        ShowScreen('jobs-screen');
+        loadJobs(); // Aapka existing jobs load function
+    } else {
+        // Show auth modal
+        document.getElementById('phoneAuthModal').style.display = 'block';
+    }
+}
+
+// Modify your existing job posting function
+function postJob() {
+    const user = auth.currentUser;
+    if (user) {
+        // Allow job posting
+        yourExistingPostJobFunction();
+    } else {
+        alert('Please verify your phone first');
+        document.getElementById('phoneAuthModal').style.display = 'block';
+    }
+    
