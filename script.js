@@ -565,4 +565,22 @@ function postJob() {
         alert('Please verify your phone first');
         document.getElementById('phoneAuthModal').style.display = 'block';
     }
-    
+    }
+
+// Auto-check auth when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for Firebase to initialize
+    setTimeout(() => {
+        checkAuthAndLoadData();
+    }, 1000);
+});
+// Auto show auth modal when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        if (!auth.currentUser) {
+            document.getElementById('phoneAuthModal').style.display = 'block';
+            initializeRecaptcha();
+        }
+    }, 2000);
+});
+
