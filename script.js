@@ -584,3 +584,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
 });
 
+// Auto show auth modal when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        if (!auth.currentUser) {
+            document.getElementById('phoneAuthModal').style.display = 'block';
+            initializeRecaptcha();
+        }
+    }, 2000);
+});
