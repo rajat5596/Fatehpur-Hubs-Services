@@ -181,11 +181,11 @@
         appId: "1:294360741451:web:3bc85078805750b9fabfce"
     };
 
-    // Initialize Firebase Services
+    // Initialize Firebase
     const app = firebase.initializeApp(firebaseConfig);
     const database = app.database();
     const providersRef = database.ref('service_providers');
-    const auth = firebase.auth();
+    const auth = firebase.auth(); 
     // 🛑 ProvidersRef aur Auth object ko global window object mein store karna zaroori nahi hai
     // jab tak hum unhe seedha dusre functions mein istemal na karein.
 
