@@ -82,6 +82,7 @@ async function verifyOTP() {
         return;
     }
     
+    localStorage.setItem('phoneVerified', 'true');
     alert('✅ Verified! Opening app...');
     window.location.href = "index.html";
 }
