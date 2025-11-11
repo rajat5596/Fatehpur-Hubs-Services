@@ -17,13 +17,15 @@
         .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
         .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 14px; transition: all 0.3s; }
         .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
-        .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
-        .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
-        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
-        .share-btn-inline { background: #f8f9fa; color: #333; border: 1px solid #e0e0e0; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
-        .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
-        .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
+        .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .contact-btn, .whatsapp-btn, .share-btn-inline { padding: 8px 15px; border-radius: 20px; cursor: pointer; margin: 5px; }
+        .contact-btn { background: #2a5298; color: white; border: none; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; }
+        .share-btn-inline { background: #f8f9fa; color: #333; border: 1px solid #e0e0e0; }
+        .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; z-index: 100; }
+        .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .promotion-banner { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -36,7 +38,7 @@
         </script>
     </div>
 
-    <!-- OTP LOGIN - VISIBLE RECAPTCHA + DOMAIN FIX -->
+    <!-- OTP LOGIN - BILKUL WAHI JO OTP DE RAHA HAI -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
         <div style="background:white;padding:40px 30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
             <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
@@ -58,7 +60,15 @@
         <header><h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1></header>
 
         <div id="home-screen" class="screen active">
-            <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician...">
+            <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician..." onkeyup="searchServices()">
+
+            <!-- PROMOTION BANNER -->
+            <div class="promotion-banner">
+                <p>Apna Business Promote Karein! ₹500/month se shuru<br>
+                <button onclick="contactForAds()" style="background:white;color:#d35400;padding:8px 20px;border:none;border-radius:25px;margin-top:10px;font-weight:bold;">Ad Lagwayein</button></p>
+            </div>
+
+            <!-- MIDDLE AD -->
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
@@ -67,22 +77,8 @@
             </div>
 
             <h3>Popular Services</h3>
-            <div class="categories-list">
-                <button class="cat-btn" onclick="filterByCategory('Plumber')">Plumber</button>
-                <button class="cat-btn" onclick="filterByCategory('Electrician')">Electrician</button>
-                <button class="cat-btn" onclick="filterByCategory('Carpenter')">Carpenter</button>
-                <button class="cat-btn" onclick="filterByCategory('Mason')">Mason</button>
-                <button class="cat-btn" onclick="filterByCategory('Painter')">Painter</button>
-                <button class="cat-btn" onclick="filterByCategory('AC Mechanic')">AC Mech.</button>
-                <button class="cat-btn" onclick="filterByCategory('Tiler')">Tiler</button>
-                <button class="cat-btn" onclick="filterByCategory('Beautician')">Beautician</button>
-                <button class="cat-btn" onclick="filterByCategory('Home Cleaning')">Home Cleaning</button>
-                <button class="cat-btn" onclick="filterByCategory('Security Guard')">Security Guard</button>
-                <button class="cat-btn" onclick="filterByCategory('Laundry Service')">Laundry</button>
-                <button class="cat-btn" onclick="filterByCategory('Legal Consultant')">Legal Consultant</button>
-                <button class="cat-btn" onclick="filterByCategory('Private Teacher')">Private Teacher</button>
-                <button class="cat-btn" onclick="filterByCategory('Computer Repair')">Computer Repair</button>
-                <button class="cat-btn" onclick="filterByCategory('Welder')">Welder</button>
+            <div class="categories-list" id="mistri-categories">
+                <!-- Buttons yahan script se fill honge -->
             </div>
 
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
@@ -107,9 +103,15 @@
             <div style="height:80px;"></div>
         </div>
 
+        <div id="jobs-screen" class="screen">
+            <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Back</button>
+            <h2>Local Jobs</h2>
+            <div id="jobs-list"><p>Loading jobs...</p></div>
+        </div>
+
         <div class="footer">
-            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Premium</a>
-            <button class="share-btn-inline" onclick="shareApp()">Share</button>
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
+            <button class="share-btn-inline" onclick="shareApp()">Share App</button>
             <button class="share-btn-inline" onclick="showScreen('jobs-screen')">Jobs</button>
         </div>
     </div>
@@ -122,7 +124,7 @@
     <script src="script.js"></script>
 
     <script>
-        window.firebaseConfig = { /* tumhara config */ apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fatehpur-hubs-a3a9f", storageBucket: "fatehpur-hubs-a3a9f.appspot.com", messagingSenderId: "294360741451", appId: "1:294360741451:web:3bc85078805750b9fabfce" };
+        window.firebaseConfig = { apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fatehpur-hubs-a3a9f", storageBucket: "fatehpur-hubs-a3a9f.appspot.com", messagingSenderId: "294360741451", appId: "1:294360741451:web:3bc85078805750b9fabfce" };
 
         let recaptchaVerifier, confirmationResult;
 
@@ -132,11 +134,7 @@
             window.providersRef = database.ref('service_providers');
             window.jobsRef = database.ref('local_jobs');
 
-            // VISIBLE RECAPTCHA
-            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                size: 'normal',
-                callback: () => { document.getElementById('sendOtpBtn').click(); }
-            });
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'normal', callback: () => { document.getElementById('sendOtpBtn').click(); } });
             recaptchaVerifier.render();
 
             document.getElementById('sendOtpBtn').onclick = () => {
@@ -149,12 +147,16 @@
 
             document.getElementById('verifyOtpBtn').onclick = () => {
                 confirmationResult.confirm(document.getElementById('otpInput').value)
-                    .then(() => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); })
+                    .then(() => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); loadCategories(); loadAds(); })
                     .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
             };
 
-            window.skipLogin = () => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); };
+            window.skipLogin = () => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); loadCategories(); loadAds(); };
         };
+
+        function contactForAds() { window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank'); }
+        function shareApp() { if (navigator.share) { navigator.share({ title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in' }); } else { alert('Share link: https://www.fatehpurhubs.co.in'); } }
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id==='jobs-screen') loadJobs(); }
     </script>
 </body>
 </html>
