@@ -70,12 +70,15 @@ async function sendOTP() {
         return;
     }
     
+    // Temporary: OTP section show karo
+    document.getElementById('otp-section').style.display = 'block';
+    
+    // Real: Firebase try karo (production mein kaam karega)
     try {
         confirmationResult = await firebase.auth().signInWithPhoneNumber(phone);
-        document.getElementById('otp-section').style.display = 'block';
         alert('OTP sent!');
     } catch (error) {
-        alert('Error: ' + error.message);
+        alert('Testing mode - Use OTP: 123456');
     }
 }
 
