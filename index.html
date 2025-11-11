@@ -146,13 +146,26 @@
             };
 
             document.getElementById('verifyOtpBtn').onclick = () => {
-                confirmationResult.confirm(document.getElementById('otpInput').value)
-                    .then(() => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); loadCategories(); loadAds(); })
-                    .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
-            };
+    confirmationResult.confirm(document.getElementById('otpInput').value)
+        .then(() => { 
+            document.getElementById('loginScreen').style.display = 'none'; 
+            document.getElementById('mainApp').style.display = 'block'; 
+            startFirebaseListener(); 
+            loadCategories(); 
+            loadAds(); 
+            setTimeout(loadAds, 2000); 
+        })
+        .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+};
 
-            window.skipLogin = () => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); loadCategories(); loadAds(); };
-        };
+            window.skipLogin = () => { 
+    document.getElementById('loginScreen').style.display = 'none'; 
+    document.getElementById('mainApp').style.display = 'block'; 
+    startFirebaseListener(); 
+    loadCategories(); 
+    loadAds(); 
+    setTimeout(loadAds, 2000); 
+};
 
         function contactForAds() { window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank'); }
         function shareApp() { if (navigator.share) { navigator.share({ title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in' }); } else { alert('Share link: https://www.fatehpurhubs.co.in'); } }
