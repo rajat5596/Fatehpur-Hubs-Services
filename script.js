@@ -1,3 +1,10 @@
+// TOP PE YE LINE ADD KARO
+firebase.initializeApp(window.firebaseConfig);
+const database = firebase.database();
+const providersRef = database.ref('service_providers');
+const jobsRef = database.ref('local_jobs');
+window.providersRef = providersRef;
+window.jobsRef = jobsRef;
 // script.js - FINAL 100% WORKING VERSION
 // REAL OTP LOGIN + CATEGORY BUTTONS + SEARCH + REGISTER + JOBS
 
