@@ -62,23 +62,29 @@
 
 const app = firebase.initializeApp(firebaseConfig);
 let confirmationResult;
-
-async function sendOTP() {
-    const phone = document.getElementById('phone').value;
-    if (!phone) {
-        alert('Please enter phone number');
+async function verifyOTP() {
+    const otp = document.getElementById('otp').value;
+    if (!otp) {
+        alert('Please enter OTP');
         return;
     }
     
-    // Temporary: OTP section show karo
-    document.getElementById('otp-section').style.display = 'block';
+    // Testing mode - auto verify 123456
+    if (otp === "123456") {
+        localStorage.setItem('phoneVerified', 'true');
+        alert('✅ Verified! Opening app...');
+        window.location.href = "index.html";
+        return;
+    }
     
-    // Real: Firebase try karo (production mein kaam karega)
+    // Real Firebase verification
     try {
-        confirmationResult = await firebase.auth().signInWithPhoneNumber(phone);
-        alert('OTP sent!');
+        await confirmationResult.confirm(otp);
+        localStorage.setItem('phoneVerified', 'true');
+        alert('✅ Verified! Opening app...');
+        window.location.href = "index.html";
     } catch (error) {
-        alert('Testing mode - Use OTP: 123456');
+        alert('Invalid OTP');
     }
 }
 
