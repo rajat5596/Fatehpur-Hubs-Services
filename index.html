@@ -30,7 +30,6 @@
     </style>
 </head>
 <body>
-    <div id="app-content" style="display: none !important;">
     <!-- Top Ad -->
     <div class="ad-container">
         <div class="ad-label">Advertisement</div>
@@ -39,13 +38,11 @@
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
-<div class="container">
+
+    <div class="container">
         <header>
             <h1><img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;"> <span>Fatehpur Hubs</span></h1>
             <div id="auth-info">Fatehpur ke Professional Services</div>
-<button onclick="showPhoneAuth()" style="background: #ff6b00; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-left: 10px; cursor: pointer; font-size: 12px;">
-    📱 Verify Phone
-</button>
         </header>
         
         <div id="home-screen" class="screen active">
@@ -171,7 +168,6 @@
     <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="ads.js"></script>
     <script>
         // ✅ FIREBASE CONFIG
@@ -184,6 +180,7 @@
             messagingSenderId: "294360741451",
             appId: "1:294360741451:web:3bc85078805750b9fabfce"
         };
+
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = app.database();
@@ -212,7 +209,8 @@
                 }
             });
         }
-                  // ✅ LOAD SERVICES
+
+        // ✅ LOAD SERVICES
         function loadServiceProviders(listId) {
             const mistriListDiv = document.getElementById(listId);
             if (!mistriListDiv) return;
@@ -282,7 +280,6 @@
                 rating: "⭐️⭐️⭐️⭐️", 
                 timestamp: new Date().toISOString() 
             };
-            
             providersRef.push(newProvider).then(() => {
                 alert('✅ Service Registered Successfully!');
                 document.getElementById('providerName').value = '';
@@ -311,7 +308,6 @@
                 window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
             }
         }
-
         function shareApp() {
             const message = `Check out Fatehpur Hubs - Find all professional services in Fatehpur!\n\nDownload the app now: ${PLAY_STORE_LINK}`;
             if (navigator.share) {
@@ -324,7 +320,7 @@
             }
         }
 
-        // ✅ CONTACT FUNCTIONS
+      // ✅ CONTACT FUNCTIONS
         function callNumber(phone) { 
             if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
         }
@@ -496,62 +492,6 @@
                 allCatList.appendChild(button);
             });
         }
-// ✅ PHONE AUTHENTICATION FUNCTIONS
-let confirmationResult = null;
-
-function showPhoneAuth() {
-    document.getElementById('phone-auth-popup').style.display = 'block';
-}
-
-function hidePhoneAuth() {
-    document.getElementById('phone-auth-popup').style.display = 'none';
-    // App ko bhi hide karo
-    document.getElementById('app-content').style.display = 'none';
-}
-
-async function sendOTP() {
-    const phone = document.getElementById('phone-number').value;
-    
-    if (!phone) {
-        alert('Please enter phone number');
-        return;
-    }
-
-    try {
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'normal'
-        });
-
-        confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier);
-        document.getElementById('otp-section').style.display = 'block';
-        alert('OTP sent successfully!');
-    } catch (error) {
-        alert('Error: ' + error.message);
-        console.error('OTP Error:', error);
-    }
-}
-
-async function verifyOTP() {
-    const otp = document.getElementById('otp-code').value;
-    
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
-    }
-
-    try {
-        const result = await confirmationResult.confirm(otp);
-        alert('✅ Phone verified successfully!');
-        hidePhoneAuth();
-document.getElementById('app-content').style.display = 'block';
-        
-        // Yahan aap user data save kar sakte hain
-        console.log('User verified:', result.user);
-        
-    } catch (error) {
-        alert('❌ Invalid OTP: ' + error.message);
-    }
-}
 
         // ✅ INITIALIZE APP
         document.addEventListener('DOMContentLoaded', function() {
@@ -581,24 +521,6 @@ document.getElementById('app-content').style.display = 'block';
             // Start Firebase
             startFirebaseListener();
         });
-   </script>
-<!-- Phone Verification Section -->
-<div id="phone-auth-popup" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
-        <h3>📱 Phone Verification</h3>
-        <input type="tel" id="phone-number" placeholder="+91 9876543210" style="padding: 10px; margin: 10px 0; width: 90%; border: 1px solid #ccc; border-radius: 5px;">
-        <br>
-        <button onclick="sendOTP()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; margin: 5px;">Send OTP</button>
-        
-        <div id="otp-section" style="display: none;">
-            <input type="text" id="otp-code" placeholder="Enter OTP" style="padding: 10px; margin: 10px 0; width: 90%; border: 1px solid #ccc; border-radius: 5px;">
-            <br>
-            <button onclick="verifyOTP()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; margin: 5px;">Verify OTP</button>
-        </div>
-        
-        <div id="recaptcha-container" style="margin: 10px 0;"></div>
-        <button onclick="hidePhoneAuth()" style="padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 5px;">Close</button>
-    </div>
-</div>
+    </script>
 </body>
 </html>
