@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Verification - Fatehpur Hubs</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin: 0; 
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; 
+        }
+        input, button { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            font-size: 16px; 
+        }
+        input { border: 2px solid #ddd; }
+        button { 
+            background: #ff6b00; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📱 Phone Verification</h2>
+        <p>Enter your phone number to continue</p>
+        
+        <input type="tel" id="phone" placeholder="+91 9876543210" required>
+        <button onclick="sendOTP()">Send OTP</button>
+        
+        <div id="otp-section" style="display: none;">
+            <input type="text" id="otp" placeholder="Enter OTP" required>
+            <button onclick="verifyOTP()">Verify & Continue</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
+        projectId: "fatehpur-hubs-a3a9f",
+        appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    };
+    
+    const app = firebase.initializeApp(firebaseConfig);
+    let confirmationResult;
+
+    async function sendOTP() {
+    const phone = document.getElementById('phone').value;
+    if (!phone) {
+        alert('Please enter phone number');
+        return;
+    }
+    
+    // Temporary bypass for testing
+    document.getElementById('otp-section').style.display = 'block';
+    alert('OTP sent! (Testing mode)');
+}
+
+async function verifyOTP() {
+    const otp = document.getElementById('otp').value;
+    if (!otp) {
+        alert('Please enter OTP');
+        return;
+    }
+    
+    alert('✅ Verified! Opening app...');
+    window.location.href = "index.html";
+}
+    </script>
+</body>
+</html>
