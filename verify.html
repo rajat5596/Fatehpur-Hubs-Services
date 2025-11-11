@@ -54,25 +54,29 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
-        projectId: "fatehpur-hubs-a3a9f",
-        appId: "1:294360741451:web:3bc85078805750b9fabfce"
-    };
-    
-    const app = firebase.initializeApp(firebaseConfig);
-    let confirmationResult;
+    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
+    projectId: "fatehpur-hubs-a3a9f",
+    appId: "1:294360741451:web:3bc85078805750b9fabfce"
+};
 
-    async function sendOTP() {
+const app = firebase.initializeApp(firebaseConfig);
+let confirmationResult;
+
+async function sendOTP() {
     const phone = document.getElementById('phone').value;
     if (!phone) {
         alert('Please enter phone number');
         return;
     }
     
-    // Temporary bypass for testing
-    document.getElementById('otp-section').style.display = 'block';
-    alert('OTP sent! (Testing mode)');
+    try {
+        confirmationResult = await firebase.auth().signInWithPhoneNumber(phone);
+        document.getElementById('otp-section').style.display = 'block';
+        alert('OTP sent!');
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
 }
 
 async function verifyOTP() {
@@ -82,9 +86,14 @@ async function verifyOTP() {
         return;
     }
     
-    localStorage.setItem('phoneVerified', 'true');
-    alert('✅ Verified! Opening app...');
-    window.location.href = "index.html";
+    try {
+        await confirmationResult.confirm(otp);
+        localStorage.setItem('phoneVerified', 'true');
+        alert('✅ Verified! Opening app...');
+        window.location.href = "index.html";
+    } catch (error) {
+        alert('Invalid OTP');
+    }
 }
     </script>
 </body>
