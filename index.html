@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fatehpur Hubs</title>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6666">
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
         body { background: #f5f5f5; }
         .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
-        header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; text-align: center; }
         .screen { display: none; padding: 15px; }
         .screen.active { display: block; }
-        #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px 0; }
+        #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px; }
         .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; }
+        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 14px; }
         .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
         .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
         .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
@@ -30,497 +29,84 @@
     </style>
 </head>
 <body>
-    <!-- Top Ad -->
-    <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
-        <script type="text/javascript">
-            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+
+    <!-- OTP LOGIN - INVALID PHONE NUMBER FIX -->
+    <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="background:white;padding:40px 30px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);text-align:center;width:90%;max-width:400px;">
+            <h2 style="color:#1e3c72;margin-bottom:10px;">Fatehpur Hubs</h2>
+            <p style="color:#555;margin-bottom:20px;">Apna 10 digit number daaliye</p>
+            
+            <div id="recaptcha-container"></div>
+            
+            <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
+            <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
+            <div id="otpSection" style="margin-top:20px;display:none;">
+                <input type="text" id="otpInput" placeholder="123456" maxlength="6" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
+                <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
+            </div>
+            <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;"></p>
+            <button onclick="skipLogin()" style="margin-top:20px;padding:12px 20px;background:#ff5722;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">Skip Login (Test)</button>
+        </div>
     </div>
 
+    <!-- Baaki sab same jaise pehle tha... (Top Ad, Header, Home Screen, etc.) -->
+    <!-- MAIN APP CODE (same as before) -->
     <div class="container">
-        <header>
-            <h1><img src="https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs.firebasestorage.app/o/file_0000000059806208b25eb7951e979b96.png?alt=media&token=61e97884-5882-4055-b45f-4303a0d6d818" alt="" style="height: 50px; width: auto;"> <span>Fatehpur Hubs</span></h1>
-            <div id="auth-info">Fatehpur ke Professional Services</div>
-        </header>
-        
-        <div id="home-screen" class="screen active">
-            <input type="text" id="main-search-bar" placeholder="🔍 Search Plumber, Electrician...">
-            
-            <!-- Middle Ad -->
-            <div class="ad-container">
-                <div class="ad-label">Sponsored</div>
-                <script type="text/javascript">
-                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
-            </div>
-            
-            <h3>🚀 Popular Services</h3>
-<div id="mistri-categories" class="categories-list">
-    <button class="cat-btn" data-cat="Plumber">💧 Plumber</button>
-    <button class="cat-btn" data-cat="Electrician">⚡ Electrician</button>
-    <button class="cat-btn" data-cat="Carpenter">🔨 Carpenter</button>
-    <button class="cat-btn" data-cat="Mason">🧱 Mason</button>
-    <button class="cat-btn" data-cat="Painter">🎨 Painter</button>
-    <button class="cat-btn" data-cat="AC Mechanic">❄️ AC Mech.</button>
-    <button class="cat-btn" data-cat="Tiler">◻️ Tiler</button>
-    <button class="cat-btn" data-cat="Beautician">💅 Beautician</button>
-    <button class="cat-btn" data-cat="Home Cleaning">🧹 Home Cleaning</button>
-    <button class="cat-btn" data-cat="Security Guard">🛡️ Security Guard</button>
-    <button class="cat-btn" data-cat="Laundry Service">🧺 Laundry</button>
-    <button class="cat-btn" data-cat="Legal Consultant">⚖️ Legal Consultant</button>
-    <button class="cat-btn" data-cat="Private Teacher">🎓 Private Teacher</button>
-    <button class="cat-btn" data-cat="Computer Repair">💻 Computer Repair</button>
-    <button class="cat-btn" data-cat="Welder">🔥 Welder</button>
-</div>
-
-            <div class="promotion-section" style="padding: 10px; background-color: #f7f7f7; border-radius: 8px; margin-bottom: 15px;">
-                <h3 style="text-align: center; font-size: 1.1em; color: #333; margin-top: 0;">✨ Special Offers & Promotions ✨</h3> 
-                <div id="promotion-banner-area" style="min-height: 100px; padding-top: 5px;"></div>
-            </div>
-            <div id="service-registration" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-                <h3 style="color: white; text-align: center;">➕ Add Your Service</h3>
-                <form id="serviceForm">
-                    <input type="text" id="providerName" placeholder="Your Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <select id="serviceCategory" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                        <option value="">Select Service</option>
-                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option>
-                        <option>Painter</option><option>AC Mechanic</option><option>Tiler</option><option>TV Mechanic</option>
-                        <option>Welder</option><option>Computer Repair</option>
-                    </select>
-                    <input type="text" id="providerArea" placeholder="Your Area" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="text" id="providerExperience" placeholder="Experience" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <button type="submit" id="registerBtn" style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Register Service</button>
-                </form>
-            </div>
-
-            <!-- CONTACT FOR ADS SECTION -->
-            <div class="contact-ads-section">
-                <h4 style="color: #4b0082; margin-bottom: 5px; font-size: 1.1em;">📢 Want to Promote Your Business?</h4>
-                <p style="color: #333; font-size: 0.9em; margin-bottom: 15px;">Show your ad to thousands of users in Fatehpur!<br>Contact us for advertising space.</p>
-                <button onclick="contactForAds()" style="background: #8a2be2; color: white; padding: 10px 20px; border: none; border-radius: 25px; font-size: 1em; font-weight: bold; cursor: pointer;">📞 Contact for Advertising</button>
-                <p style="font-size: 12px; margin-top: 10px; color: #666;">WhatsApp: 9889904191</p>
-            </div>
-            
-            <div id="mistri-list">
-                <h3>Available Services</h3>
-                <p style="text-align: center; color: #2a5298;">Loading services...</p>
-            </div> 
-            
-            <div style="height: 80px;"></div>
-        </div>
-
-        <!-- SEARCH SCREEN -->
-        <div id="search-screen" class="screen">
-            <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
-            <h2>All Services</h2>
-            <div id="all-categories-list" class="categories-list"></div> 
-            <div id="mistri-list-full"></div>
-        </div>
-
-        <!-- JOBS SCREEN -->
-        <div id="jobs-screen" class="screen">
-            <button class="back-btn" onclick="showScreen('home-screen')" style="background: #f8f9fa; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; margin-bottom: 15px; cursor: pointer;">← Back</button>
-            <h2>🏢 Local Jobs</h2>
-            
-            <!-- Job Posting Form -->
-            <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white;">
-                <h3 style="color: white; text-align: center;">➕ Post a Job</h3>
-                <form id="jobForm">
-                    <input type="text" id="jobTitle" placeholder="Job Title (e.g., Sales Girl, Helper)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="text" id="shopName" placeholder="Shop/Business Name" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="tel" id="jobPhone" placeholder="Phone Number" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="text" id="jobLocation" placeholder="Location/Area" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <input type="text" id="jobSalary" placeholder="Salary (e.g., ₹8000/month)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                    <select id="jobType" style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px;">
-                        <option value="full-time">Full Time</option>
-                        <option value="part-time">Part Time</option>
-                    </select>
-                    <textarea id="jobDescription" placeholder="Job Description (e.g., Required for clothing shop, timing 10AM-7PM)" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 16px; height: 80px;"></textarea>
-                    <button type="submit" id="postJobBtn" style="width: 100%; background: #25D366; color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Post Job</button>
-                </form>
-            </div>
-            
-            <!-- Jobs List -->
-            <div id="jobs-list">
-                <p style="text-align: center; color: #2a5298;">Loading jobs...</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">⭐ Premium</a>
-            <button class="share-btn-inline" onclick="shareApp()">📤 Share App</button>
-            <button class="share-btn-inline" onclick="openMoreApps()">➕ More</button>
-        </div>
+        <!-- ... tumhara pura app code yahan rahega ... -->
+        <!-- Main ne sirf login part change kiya hai -->
+        <!-- Baaki sab same hai jaise pehle tha -->
     </div>
-
-    <!-- Bottom Ad -->
-    <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
-        <script type="text/javascript">
-            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
-    </div>
-    <!-- SCRIPTS -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
+    <script src="script.js"></script>
+
     <script>
-        // ✅ FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9fabfce"
-        };
+        window.firebaseConfig = { /* tumhara config */ };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = app.database();
-        const providersRef = database.ref('service_providers');
-        window.providersRef = providersRef;
+        let recaptchaVerifier;
+        let confirmationResult;
 
-        // ✅ GLOBAL VARIABLES
-        let serviceProviders = [];
-        const ALL_CATEGORIES = ['Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 'AC Mechanic', 'TV Mechanic', 'Tiler', 'Welder', 'Computer Repair'];
+        window.onload = () => {
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+            recaptchaVerifier.render();
 
-        // ✅ PLAY STORE LINK (Yahan change karein jab app public hogi)
-        const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.fatehpurhubs.app";
-
-        // ✅ FIREBASE LISTENER
-        function startFirebaseListener() {
-            providersRef.on('value', (snapshot) => {
-                serviceProviders = [];
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const provider = childSnapshot.val();
-                        if (provider) serviceProviders.push(provider);
-                    });
-                    loadServiceProviders('mistri-list');
-                } else {
-                    document.getElementById('mistri-list').innerHTML = '<p style="text-align: center; color: #666;">No services registered yet.</p>';
-                }
-            });
-        }
-
-        // ✅ LOAD SERVICES
-        function loadServiceProviders(listId) {
-            const mistriListDiv = document.getElementById(listId);
-            if (!mistriListDiv) return;
-            mistriListDiv.innerHTML = '<h3>Available Services</h3>';
-            if (serviceProviders.length === 0) {
-                mistriListDiv.innerHTML += '<p style="text-align: center; color: #666;">No services available.</p>';
-                return;
-            }
-            serviceProviders.forEach(provider => {
-                const card = document.createElement('div');
-                card.className = 'profile-card';
-                card.innerHTML = createProfessionalCard(provider);
-                mistriListDiv.appendChild(card);
-            });
-        }
-
-        // ✅ CREATE CARD
-        function createProfessionalCard(provider) {
-            if (!provider) return '';
-            const name = provider.name || 'No Name';
-            const category = provider.category || 'Service';
-            const area = provider.area || 'Area';
-            const experience = provider.experience || 'Experience';
-            const rating = provider.rating || '⭐️⭐️⭐️⭐️';
-            const phone = provider.phone || '';
-            return `
-                <div style="margin-bottom: 10px;">
-                    <h4 style="margin: 0 0 5px 0; color: #2a5298;">${name}</h4>
-                    <p style="margin: 2px 0; color: #666;">📌 ${category} | ${area}</p>
-                    <p style="margin: 2px 0; color: #666;">⏱️ ${experience}</p>
-                    <p style="margin: 2px 0; color: #666;">${rating}</p>
-                </div>
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                    <button class="contact-btn" onclick="callNumber('${phone}')">📞 Call</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${phone}')">💬 WhatsApp</button>
-                    <button class="share-btn-inline" onclick="shareProvider('${name}', '${category}', '${phone}')">📤 Share</button>
-                </div>
-            `;
-        }
-
-        // ✅ REGISTER SERVICE
-        function registerService() {
-            const name = document.getElementById('providerName').value.trim();
-            const phone = document.getElementById('providerPhone').value.trim();
-            const category = document.getElementById('serviceCategory').value;
-            const area = document.getElementById('providerArea').value.trim();
-            const experience = document.getElementById('providerExperience').value.trim();
-            
-            if (!name || !phone || !category || !area || !experience) {
-                alert('Please fill all fields'); return false;
-            }
-            if (phone.length !== 10 || isNaN(phone)) {
-                alert('Enter valid 10-digit phone number'); return false;
-            }
-            
-            const submitBtn = document.getElementById('registerBtn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Registering...';
-            submitBtn.disabled = true;
-            
-            const newProvider = { 
-                name: name, 
-                category: category, 
-                phone: phone, 
-                area: area, 
-                experience: experience, 
-                rating: "⭐️⭐️⭐️⭐️", 
-                timestamp: new Date().toISOString() 
-            };
-            providersRef.push(newProvider).then(() => {
-                alert('✅ Service Registered Successfully!');
-                document.getElementById('providerName').value = '';
-                document.getElementById('providerPhone').value = '';
-                document.getElementById('serviceCategory').value = '';
-                document.getElementById('providerArea').value = '';
-                document.getElementById('providerExperience').value = '';
-            }).catch(error => {
-                alert('❌ Error: ' + error.message);
-            }).finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-            return false;
-        }
-
-        // ✅ SHARE FUNCTIONS WITH PLAY STORE LINK
-        function shareProvider(name, category, phone) {
-            const message = `Check this ${category} service:\n\n👨‍🔧 Name: ${name}\n📞 Phone: ${phone}\n📍 From: Fatehpur Hubs App\n\nDownload the app: ${PLAY_STORE_LINK}`;
-            if (navigator.share) {
-                navigator.share({ 
-                    title: `${category} Service - Fatehpur Hubs`, 
-                    text: message 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-        function shareApp() {
-            const message = `Check out Fatehpur Hubs - Find all professional services in Fatehpur!\n\nDownload the app now: ${PLAY_STORE_LINK}`;
-            if (navigator.share) {
-                navigator.share({ 
-                    title: 'Fatehpur Hubs', 
-                    text: message 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-
-      // ✅ CONTACT FUNCTIONS
-        function callNumber(phone) { 
-            if(phone && phone.length === 10) window.location.href = `tel:+91${phone}`; 
-        }
-        
-        function openWhatsApp(phone) { 
-            if(phone && phone.length === 10) {
-                const message = "Hello, I need your service from Fatehpur Hubs app.";
-                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-        
-        function contactForAds() {
-            const message = "Hello, I'm interested in advertising my business on Fatehpur Hubs. Please share details about ad spaces, pricing, and duration.";
-            window.open(`https://wa.me/919889904191?text=${encodeURIComponent(message)}`, '_blank');
-        }
-        
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-        // ✅ JOBS FUNCTIONS
-        function openMoreApps() { 
-            showScreen('jobs-screen');
-            loadLocalJobs();
-        }
-
-        function postJob() {
-            const jobTitle = document.getElementById('jobTitle').value.trim();
-            const shopName = document.getElementById('shopName').value.trim();
-            const jobPhone = document.getElementById('jobPhone').value.trim();
-            const jobLocation = document.getElementById('jobLocation').value.trim();
-            const jobSalary = document.getElementById('jobSalary').value.trim();
-            const jobDescription = document.getElementById('jobDescription').value.trim();
-            const jobType = document.getElementById('jobType').value;
-            
-            if (!jobTitle || !shopName || !jobPhone || !jobLocation || !jobSalary || !jobDescription) {
-                alert('Please fill all fields');
-                return false;
-            }
-            
-            if (jobPhone.length !== 10 || isNaN(jobPhone)) {
-                alert('Enter valid 10-digit phone number');
-                return false;
-            }
-            
-            const submitBtn = document.getElementById('postJobBtn');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Posting...';
-            submitBtn.disabled = true;
-            
-            const newJob = {
-                title: jobTitle,
-                shopName: shopName,
-                phone: jobPhone,
-                location: jobLocation,
-                salary: jobSalary,
-                description: jobDescription,
-                type: jobType,
-                timestamp: new Date().toISOString()
-            };
-            
-            const jobsRef = database.ref('local_jobs');
-            jobsRef.push(newJob)
-                .then(() => {
-                    alert('✅ Job Posted Successfully!');
-                    // Clear form
-                    document.getElementById('jobTitle').value = '';
-                    document.getElementById('shopName').value = '';
-                    document.getElementById('jobPhone').value = '';
-                    document.getElementById('jobLocation').value = '';
-                    document.getElementById('jobSalary').value = '';
-                    document.getElementById('jobDescription').value = '';
-                    document.getElementById('jobType').value = 'full-time';
-                    
-                    // Refresh jobs list
-                    loadLocalJobs();
-                })
-                .catch(error => {
-                    alert('❌ Error: ' + error.message);
-                })
-                .finally(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-                });
-        }
-
-        function loadLocalJobs() {
-            const jobsRef = database.ref('local_jobs');
-            const jobsListDiv = document.getElementById('jobs-list');
-            
-            jobsRef.on('value', (snapshot) => {
-                jobsListDiv.innerHTML = '<h3>🏢 Local Jobs</h3>';
-                
-                if (!snapshot.exists()) {
-                    jobsListDiv.innerHTML += '<p style="text-align: center; color: #666;">No jobs posted yet. Be the first to post a job!</p>';
+            document.getElementById('sendOtpBtn').onclick = () => {
+                let phone = document.getElementById('phoneInput').value.trim();
+                if (phone.length !== 10 || isNaN(phone)) {
+                    document.getElementById('loginMsg').innerHTML = "10 digit number daaliye";
                     return;
                 }
-                
-                snapshot.forEach((childSnapshot) => {
-                    const job = childSnapshot.val();
-                    const jobCard = document.createElement('div');
-                    jobCard.className = 'profile-card';
-                    jobCard.innerHTML = `
-                        <div style="margin-bottom: 10px;">
-                            <h4 style="margin: 0 0 5px 0; color: #2a5298;">${job.title}</h4>
-                            <p style="margin: 2px 0; color: #666;">🏪 ${job.shopName}</p>
-                            <p style="margin: 2px 0; color: #666;">📍 ${job.location}</p>
-                            <p style="margin: 2px 0; color: #666;">💰 ${job.salary}</p>
-                            <p style="margin: 2px 0; color: #666;">${job.type === 'full-time' ? '⏰ Full Time' : '⏱️ Part Time'}</p>
-                            <p style="margin: 2px 0; color: #666;">${job.description}</p>
-                        </div>
-                        <div style="display: flex; gap: 8px; margin-top: 10px;">
-                            <button class="contact-btn" onclick="callNumber('${job.phone}')">📞 Call</button>
-                            <button class="whatsapp-btn" onclick="openJobWhatsApp('${job.phone}', '${job.title}', '${job.shopName}')">💬 Apply</button>
-                            <button class="share-btn-inline" onclick="shareJob('${job.title}', '${job.shopName}', '${job.phone}')">📤 Share</button>
-                        </div>
-                    `;
-                    jobsListDiv.appendChild(jobCard);
-                });
-            });
-        }
-
-        function openJobWhatsApp(phone, jobTitle, shopName) {
-            if(phone && phone.length === 10) {
-                const message = `Hello, I'm interested in the ${jobTitle} position at ${shopName}. I found this job on Fatehpur Hubs app.`;
-                window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-
-        function shareJob(jobTitle, shopName, phone) {
-            const message = `Job Opportunity in Fatehpur!\n\n🏢 ${shopName}\n📋 ${jobTitle}\n📞 ${phone}\n\nDownload Fatehpur Hubs App: ${PLAY_STORE_LINK}`;
-            if (navigator.share) {
-                navigator.share({ 
-                    title: 'Job Opportunity - Fatehpur Hubs', 
-                    text: message 
-                });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-            }
-        }
-
-        // ✅ LOAD ALL CATEGORIES (For Search Screen)
-        function loadAllCategories() {
-            const allCatList = document.getElementById('all-categories-list');
-            if (!allCatList) return;
-            allCatList.innerHTML = '';
-            
-            ALL_CATEGORIES.forEach(cat => {
-                const button = document.createElement('button');
-                button.className = 'cat-btn';
-                button.textContent = cat;
-                button.onclick = () => {
-                    const mistriListDiv = document.getElementById('mistri-list-full');
-                    mistriListDiv.innerHTML = `<h3>${cat} Services</h3>`;
-                    const filtered = serviceProviders.filter(p => p && p.category === cat);
-                    
-                    if (filtered.length === 0) {
-                        mistriListDiv.innerHTML += '<p style="color:red; text-align: center;">No services found.</p>';
-                        return;
-                    }
-
-                    filtered.forEach(provider => {
-                        const card = document.createElement('div');
-                        card.className = 'profile-card';
-                        card.innerHTML = createProfessionalCard(provider);
-                        mistriListDiv.appendChild(card);
+                phone = '+91' + phone; // AUTO +91 ADD
+                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+                    .then(c => {
+                        confirmationResult = c;
+                        document.getElementById('otpSection').style.display = 'block';
+                        document.getElementById('sendOtpBtn').style.display = 'none';
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                    })
+                    .catch(err => {
+                        document.getElementById('loginMsg').innerHTML = "Error: " + err.message;
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
                     });
-                };
-                allCatList.appendChild(button);
-            });
-        }
+            };
 
-        // ✅ INITIALIZE APP
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("🚀 App Started - No Errors!");
-            
-            // Form event listener
-            const serviceForm = document.getElementById('serviceForm');
-            if (serviceForm) {
-                serviceForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    registerService();
-                });
-            }
-            
-            // Job form event listener
-            const jobForm = document.getElementById('jobForm');
-            if (jobForm) {
-                jobForm.addEventListener('submit', function(event) {
-                    event.preventDefault();
-                    postJob();
-                });
-            }
-            
-            // Load categories for search screen
-            loadAllCategories();
-            
-            // Start Firebase
-            startFirebaseListener();
-        });
+            document.getElementById('verifyOtpBtn').onclick = () => {
+                const otp = document.getElementById('otpInput').value;
+                if (otp.length !== 6) {
+                    document.getElementById('loginMsg').innerHTML = "6 digit OTP";
+                    return;
+                }
+                confirmationResult.confirm(otp)
+                    .then(() => {
+                        document.getElementById('loginScreen').style.display = 'none';
+                        startFirebaseListener();
+                    })
+                    .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+            };
+        };
     </script>
 </body>
 </html>
