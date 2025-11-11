@@ -87,23 +87,6 @@ async function verifyOTP() {
         alert('Invalid OTP');
     }
 }
-
-async function verifyOTP() {
-    const otp = document.getElementById('otp').value;
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
-    }
-    
-    try {
-        await confirmationResult.confirm(otp);
-        localStorage.setItem('phoneVerified', 'true');
-        alert('✅ Verified! Opening app...');
-        window.location.href = "index.html";
-    } catch (error) {
-        alert('Invalid OTP');
-    }
-}
     </script>
 </body>
 </html>
