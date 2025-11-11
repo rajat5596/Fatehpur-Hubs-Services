@@ -63,26 +63,6 @@
 const app = firebase.initializeApp(firebaseConfig);
 let confirmationResult;
 
-// ✅ YEH FUNCTION ADD KARO
-async function sendOTP() {
-    const phone = document.getElementById('phone').value;
-    if (!phone) {
-        alert('Please enter phone number');
-        return;
-    }
-    
-    // Temporary: OTP section show karo
-    document.getElementById('otp-section').style.display = 'block';
-    
-    // Real: Firebase try karo
-    try {
-        confirmationResult = await firebase.auth().signInWithPhoneNumber(phone);
-        alert('OTP sent!');
-    } catch (error) {
-        alert('Testing mode - Use OTP: 123456');
-    }
-}
-
 async function verifyOTP() {
     const otp = document.getElementById('otp').value;
     if (!otp) {
@@ -94,7 +74,7 @@ async function verifyOTP() {
     if (otp === "123456") {
         localStorage.setItem('phoneVerified', 'true');
         alert('✅ Verified! Opening app...');
-        window.location.href = "index.html";
+        window.location.href = "https://www.fatehpurhubs.co.in/";
         return;
     }
     
@@ -103,7 +83,7 @@ async function verifyOTP() {
         await confirmationResult.confirm(otp);
         localStorage.setItem('phoneVerified', 'true');
         alert('✅ Verified! Opening app...');
-        window.location.href = "index.html";
+        window.location.href = "https://www.fatehpurhubs.co.in/";
     } catch (error) {
         alert('Invalid OTP');
     }
