@@ -15,7 +15,7 @@
         .screen.active { display: block; }
         #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px; }
         .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
-        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 14px; }
+        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 14px; transition: all 0.3s; }
         .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
         .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
         .contact-btn { background: #2a5298; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; }
@@ -24,57 +24,50 @@
         .footer { position: fixed; bottom: 0; width: 100%; max-width: 400px; background: white; padding: 10px 15px; display: flex; justify-content: space-between; border-top: 1px solid #e0e0e0; }
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
-        .promotion-section { margin: 20px 0; padding: 15px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 10px; text-align: center; }
-        .contact-ads-section { margin: 20px 0; padding: 15px; background: #e6e6fa; border-radius: 10px; text-align: center; border: 2px solid #8a2be2; }
     </style>
 </head>
 <body>
 
-    <!-- TOP AD WAPAS DAAL DIYA -->
+    <!-- TOP AD -->
     <div class="ad-container">
-        <div class="ad-label">Advertisement</div>
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
         </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
 
-    <!-- OTP LOGIN - CAPTCHA ERROR FIX + VISIBLE RECAPTCHA -->
+    <!-- OTP LOGIN - VISIBLE RECAPTCHA + DOMAIN FIX -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
-        <div style="background:white;padding:40px 30px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);text-align:center;width:90%;max-width:400px;">
+        <div style="background:white;padding:40px 30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
             <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
-            <p style="color:#555;">10 digit number daaliye</p>
-            <div id="recaptcha-container" style="margin:20px auto;"></div>
+            <p style="color:#555;margin:15px 0;">10 digit number daaliye</p>
+            <div id="recaptcha-container" style="margin:20px auto; width:304px;"></div>
             <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
             <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
             <div id="otpSection" style="margin-top:20px;display:none;">
                 <input type="text" id="otpInput" placeholder="123456" maxlength="6" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
                 <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
             </div>
-            <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;"></p>
-            <button onclick="skipLogin()" style="margin-top:20px;padding:12px 20px;background:#ff5722;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">Skip Login (Test)</button>
+            <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;min-height:20px;"></p>
+            <button onclick="skipLogin()" style="margin-top:10px;padding:10px 20px;background:#ff5722;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">Skip Login (Test)</button>
         </div>
     </div>
 
     <!-- MAIN APP -->
-    <div class="container">
-        <header>
-            <h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1>
-        </header>
+    <div class="container" id="mainApp" style="display:none;">
+        <header><h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1></header>
 
         <div id="home-screen" class="screen active">
             <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician...">
-
-            <!-- MIDDLE AD -->
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                    document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
                 </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
             </div>
 
             <h3>Popular Services</h3>
-            <div id="mistri-categories" class="categories-list">
+            <div class="categories-list">
                 <button class="cat-btn" onclick="filterByCategory('Plumber')">Plumber</button>
                 <button class="cat-btn" onclick="filterByCategory('Electrician')">Electrician</button>
                 <button class="cat-btn" onclick="filterByCategory('Carpenter')">Carpenter</button>
@@ -92,11 +85,6 @@
                 <button class="cat-btn" onclick="filterByCategory('Welder')">Welder</button>
             </div>
 
-            <div class="promotion-section">
-                <h3>Special Offers & Promotions</h3>
-                <div id="promotion-banner-area"></div>
-            </div>
-
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
                 <form id="serviceForm">
@@ -111,57 +99,19 @@
                     </select>
                     <input type="text" id="providerArea" placeholder="Your Area" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <input type="text" id="providerExperience" placeholder="Experience (years)" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <button type="submit" id="registerBtn" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;">Register Service</button>
+                    <button type="submit" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;">Register Service</button>
                 </form>
             </div>
 
-            <div class="contact-ads-section">
-                <h4 style="color:#4b0082;">Want to Promote Your Business?</h4>
-                <p style="color:#333;font-size:0.9em;">Show your ad to thousands!</p>
-                <button onclick="contactForAds()" style="background:#8a2be2;color:white;padding:10px 20px;border:none;border-radius:25px;">Contact for Advertising</button>
-                <p style="font-size:12px;color:#666;">WhatsApp: 9889904191</p>
-            </div>
-
-            <div id="mistri-list">
-                <h3>Available Services</h3>
-                <p style="text-align:center;color:#2a5298;">Loading services...</p>
-            </div>
+            <div id="mistri-list"><h3>Available Services</h3><p style="text-align:center;color:#2a5298;">Loading...</p></div>
             <div style="height:80px;"></div>
-        </div>
-
-        <div id="jobs-screen" class="screen">
-            <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Back</button>
-            <h2>Local Jobs</h2>
-            <div style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
-                <h3 style="text-align:center;">Post a Job</h3>
-                <form id="jobForm">
-                    <input type="text" id="jobTitle" placeholder="Job Title" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <input type="text" id="shopName" placeholder="Shop Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <input type="tel" id="jobPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <input type="text" id="jobLocation" placeholder="Location" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <input type="text" id="jobSalary" placeholder="Salary" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
-                    <textarea id="jobDescription" placeholder="Job Description" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;height:80px;"></textarea>
-                    <button type="submit" id="postJobBtn" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;">Post Job</button>
-                </form>
-            </div>
-            <div id="jobs-list">
-                <p style="text-align:center;color:#2a5298;">Loading jobs...</p>
-            </div>
         </div>
 
         <div class="footer">
             <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Premium</a>
-            <button class="share-btn-inline" onclick="shareApp()">Share App</button>
+            <button class="share-btn-inline" onclick="shareApp()">Share</button>
             <button class="share-btn-inline" onclick="showScreen('jobs-screen')">Jobs</button>
         </div>
-    </div>
-
-    <!-- BOTTOM AD -->
-    <div class="ad-container">
-        <script type="text/javascript">
-            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
     </div>
 
     <!-- SCRIPTS -->
@@ -172,65 +122,38 @@
     <script src="script.js"></script>
 
     <script>
-        window.firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9fabfce"
-        };
+        window.firebaseConfig = { /* tumhara config */ apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fatehpur-hubs-a3a9f", storageBucket: "fatehpur-hubs-a3a9f.appspot.com", messagingSenderId: "294360741451", appId: "1:294360741451:web:3bc85078805750b9fabfce" };
 
         let recaptchaVerifier, confirmationResult;
 
         window.onload = () => {
             firebase.initializeApp(window.firebaseConfig);
-            const database = firebase.database();
+            window.database = firebase.database();
             window.providersRef = database.ref('service_providers');
             window.jobsRef = database.ref('local_jobs');
 
-            // VISIBLE RECAPTCHA - ERROR FIX
+            // VISIBLE RECAPTCHA
             recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'normal',
-                'callback': () => console.log("reCAPTCHA solved")
+                size: 'normal',
+                callback: () => { document.getElementById('sendOtpBtn').click(); }
             });
             recaptchaVerifier.render();
 
             document.getElementById('sendOtpBtn').onclick = () => {
-                let phone = document.getElementById('phoneInput').value.trim();
-                if (phone.length !== 10 || isNaN(phone)) {
-                    document.getElementById('loginMsg').innerHTML = "10 digit number daaliye";
-                    return;
-                }
-                phone = '+91' + phone;
-                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+                let phone = '+91' + document.getElementById('phoneInput').value.trim();
+                if (phone.length !== 13) { document.getElementById('loginMsg').innerHTML = "10 digit daaliye"; return; }
                 firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                    .then(c => {
-                        confirmationResult = c;
-                        document.getElementById('otpSection').style.display = 'block';
-                        document.getElementById('sendOtpBtn').style.display = 'none';
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya! reCAPTCHA tick karo if asked.</span>";
-                    })
-                    .catch(err => {
-                        document.getElementById('loginMsg').innerHTML = err.message;
-                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                    });
+                    .then(c => { confirmationResult = c; document.getElementById('otpSection').style.display = 'block'; document.getElementById('loginMsg').innerHTML = "OTP bheja gaya!"; })
+                    .catch(err => document.getElementById('loginMsg').innerHTML = err.message);
             };
 
             document.getElementById('verifyOtpBtn').onclick = () => {
                 confirmationResult.confirm(document.getElementById('otpInput').value)
-                    .then(() => {
-                        document.getElementById('loginScreen').style.display = 'none';
-                        startFirebaseListener();
-                    })
+                    .then(() => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); })
                     .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
             };
 
-            window.skipLogin = () => {
-                document.getElementById('loginScreen').style.display = 'none';
-                startFirebaseListener();
-            };
+            window.skipLogin = () => { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; startFirebaseListener(); };
         };
     </script>
 </body>
