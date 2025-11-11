@@ -30,12 +30,21 @@
 </head>
 <body>
 
-    <!-- OTP LOGIN - ALL ERRORS FIXED -->
+    <!-- TOP AD WAPAS DAAL DIYA -->
+    <div class="ad-container">
+        <div class="ad-label">Advertisement</div>
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+    </div>
+
+    <!-- OTP LOGIN - CAPTCHA ERROR FIX + VISIBLE RECAPTCHA -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
         <div style="background:white;padding:40px 30px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);text-align:center;width:90%;max-width:400px;">
             <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
             <p style="color:#555;">10 digit number daaliye</p>
-            <div id="recaptcha-container"></div>
+            <div id="recaptcha-container" style="margin:20px auto;"></div>
             <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
             <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
             <div id="otpSection" style="margin-top:20px;display:none;">
@@ -56,7 +65,7 @@
         <div id="home-screen" class="screen active">
             <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician...">
 
-            <!-- Middle Ad -->
+            <!-- MIDDLE AD -->
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
@@ -95,21 +104,10 @@
                     <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                         <option value="">Select Service</option>
-                        <option>Plumber</option>
-                        <option>Electrician</option>
-                        <option>Carpenter</option>
-                        <option>Mason</option>
-                        <option>Painter</option>
-                        <option>AC Mechanic</option>
-                        <option>Tiler</option>
-                        <option>Beautician</option>
-                        <option>Home Cleaning</option>
-                        <option>Security Guard</option>
-                        <option>Laundry Service</option>
-                        <option>Legal Consultant</option>
-                        <option>Private Teacher</option>
-                        <option>Computer Repair</option>
-                        <option>Welder</option>
+                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option>
+                        <option>Painter</option><option>AC Mechanic</option><option>Tiler</option><option>Beautician</option>
+                        <option>Home Cleaning</option><option>Security Guard</option><option>Laundry Service</option>
+                        <option>Legal Consultant</option><option>Private Teacher</option><option>Computer Repair</option><option>Welder</option>
                     </select>
                     <input type="text" id="providerArea" placeholder="Your Area" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <input type="text" id="providerExperience" placeholder="Experience (years)" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
@@ -158,7 +156,7 @@
         </div>
     </div>
 
-    <!-- Bottom Ad -->
+    <!-- BOTTOM AD -->
     <div class="ad-container">
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -174,7 +172,6 @@
     <script src="script.js"></script>
 
     <script>
-        // CONFIG + OTP + SKIP + ALL FIX
         window.firebaseConfig = {
             apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
             authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -193,7 +190,11 @@
             window.providersRef = database.ref('service_providers');
             window.jobsRef = database.ref('local_jobs');
 
-            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
+            // VISIBLE RECAPTCHA - ERROR FIX
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'normal',
+                'callback': () => console.log("reCAPTCHA solved")
+            });
             recaptchaVerifier.render();
 
             document.getElementById('sendOtpBtn').onclick = () => {
@@ -209,7 +210,7 @@
                         confirmationResult = c;
                         document.getElementById('otpSection').style.display = 'block';
                         document.getElementById('sendOtpBtn').style.display = 'none';
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya! reCAPTCHA tick karo if asked.</span>";
                     })
                     .catch(err => {
                         document.getElementById('loginMsg').innerHTML = err.message;
@@ -230,10 +231,7 @@
                 document.getElementById('loginScreen').style.display = 'none';
                 startFirebaseListener();
             };
-
-            document.getElementById('serviceForm').onsubmit = e => { e.preventDefault(); registerService(); };
-            document.getElementById('jobForm').onsubmit = e => { e.preventDefault(); postJob(); };
         };
     </script>
 </body>
-                </html>
+</html>
