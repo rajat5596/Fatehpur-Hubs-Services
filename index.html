@@ -30,14 +30,12 @@
 </head>
 <body>
 
-    <!-- OTP LOGIN - INVALID PHONE NUMBER FIX -->
+    <!-- OTP LOGIN - ALL ERRORS FIXED -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
         <div style="background:white;padding:40px 30px;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,0.3);text-align:center;width:90%;max-width:400px;">
-            <h2 style="color:#1e3c72;margin-bottom:10px;">Fatehpur Hubs</h2>
-            <p style="color:#555;margin-bottom:20px;">Apna 10 digit number daaliye</p>
-            
+            <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
+            <p style="color:#555;">10 digit number daaliye</p>
             <div id="recaptcha-container"></div>
-            
             <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
             <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
             <div id="otpSection" style="margin-top:20px;display:none;">
@@ -49,26 +47,152 @@
         </div>
     </div>
 
-    <!-- Baaki sab same jaise pehle tha... (Top Ad, Header, Home Screen, etc.) -->
-    <!-- MAIN APP CODE (same as before) -->
+    <!-- MAIN APP -->
     <div class="container">
-        <!-- ... tumhara pura app code yahan rahega ... -->
-        <!-- Main ne sirf login part change kiya hai -->
-        <!-- Baaki sab same hai jaise pehle tha -->
+        <header>
+            <h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1>
+        </header>
+
+        <div id="home-screen" class="screen active">
+            <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician...">
+
+            <!-- Middle Ad -->
+            <div class="ad-container">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
+            </div>
+
+            <h3>Popular Services</h3>
+            <div id="mistri-categories" class="categories-list">
+                <button class="cat-btn" onclick="filterByCategory('Plumber')">Plumber</button>
+                <button class="cat-btn" onclick="filterByCategory('Electrician')">Electrician</button>
+                <button class="cat-btn" onclick="filterByCategory('Carpenter')">Carpenter</button>
+                <button class="cat-btn" onclick="filterByCategory('Mason')">Mason</button>
+                <button class="cat-btn" onclick="filterByCategory('Painter')">Painter</button>
+                <button class="cat-btn" onclick="filterByCategory('AC Mechanic')">AC Mech.</button>
+                <button class="cat-btn" onclick="filterByCategory('Tiler')">Tiler</button>
+                <button class="cat-btn" onclick="filterByCategory('Beautician')">Beautician</button>
+                <button class="cat-btn" onclick="filterByCategory('Home Cleaning')">Home Cleaning</button>
+                <button class="cat-btn" onclick="filterByCategory('Security Guard')">Security Guard</button>
+                <button class="cat-btn" onclick="filterByCategory('Laundry Service')">Laundry</button>
+                <button class="cat-btn" onclick="filterByCategory('Legal Consultant')">Legal Consultant</button>
+                <button class="cat-btn" onclick="filterByCategory('Private Teacher')">Private Teacher</button>
+                <button class="cat-btn" onclick="filterByCategory('Computer Repair')">Computer Repair</button>
+                <button class="cat-btn" onclick="filterByCategory('Welder')">Welder</button>
+            </div>
+
+            <div class="promotion-section">
+                <h3>Special Offers & Promotions</h3>
+                <div id="promotion-banner-area"></div>
+            </div>
+
+            <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
+                <h3 style="text-align:center;">Add Your Service</h3>
+                <form id="serviceForm">
+                    <input type="text" id="providerName" placeholder="Your Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                        <option value="">Select Service</option>
+                        <option>Plumber</option>
+                        <option>Electrician</option>
+                        <option>Carpenter</option>
+                        <option>Mason</option>
+                        <option>Painter</option>
+                        <option>AC Mechanic</option>
+                        <option>Tiler</option>
+                        <option>Beautician</option>
+                        <option>Home Cleaning</option>
+                        <option>Security Guard</option>
+                        <option>Laundry Service</option>
+                        <option>Legal Consultant</option>
+                        <option>Private Teacher</option>
+                        <option>Computer Repair</option>
+                        <option>Welder</option>
+                    </select>
+                    <input type="text" id="providerArea" placeholder="Your Area" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="text" id="providerExperience" placeholder="Experience (years)" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <button type="submit" id="registerBtn" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;">Register Service</button>
+                </form>
+            </div>
+
+            <div class="contact-ads-section">
+                <h4 style="color:#4b0082;">Want to Promote Your Business?</h4>
+                <p style="color:#333;font-size:0.9em;">Show your ad to thousands!</p>
+                <button onclick="contactForAds()" style="background:#8a2be2;color:white;padding:10px 20px;border:none;border-radius:25px;">Contact for Advertising</button>
+                <p style="font-size:12px;color:#666;">WhatsApp: 9889904191</p>
+            </div>
+
+            <div id="mistri-list">
+                <h3>Available Services</h3>
+                <p style="text-align:center;color:#2a5298;">Loading services...</p>
+            </div>
+            <div style="height:80px;"></div>
+        </div>
+
+        <div id="jobs-screen" class="screen">
+            <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Back</button>
+            <h2>Local Jobs</h2>
+            <div style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
+                <h3 style="text-align:center;">Post a Job</h3>
+                <form id="jobForm">
+                    <input type="text" id="jobTitle" placeholder="Job Title" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="text" id="shopName" placeholder="Shop Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="tel" id="jobPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="text" id="jobLocation" placeholder="Location" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="text" id="jobSalary" placeholder="Salary" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <textarea id="jobDescription" placeholder="Job Description" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;height:80px;"></textarea>
+                    <button type="submit" id="postJobBtn" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;">Post Job</button>
+                </form>
+            </div>
+            <div id="jobs-list">
+                <p style="text-align:center;color:#2a5298;">Loading jobs...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Premium</a>
+            <button class="share-btn-inline" onclick="shareApp()">Share App</button>
+            <button class="share-btn-inline" onclick="showScreen('jobs-screen')">Jobs</button>
+        </div>
     </div>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+
+    <!-- Bottom Ad -->
+    <div class="ad-container">
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
     <script src="script.js"></script>
 
     <script>
-        window.firebaseConfig = { /* tumhara config */ };
+        // CONFIG + OTP + SKIP + ALL FIX
+        window.firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fatehpur-hubs-a3a9f",
+            storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+            messagingSenderId: "294360741451",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
 
-        let recaptchaVerifier;
-        let confirmationResult;
+        let recaptchaVerifier, confirmationResult;
 
         window.onload = () => {
+            firebase.initializeApp(window.firebaseConfig);
+            const database = firebase.database();
+            window.providersRef = database.ref('service_providers');
+            window.jobsRef = database.ref('local_jobs');
+
             recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
             recaptchaVerifier.render();
 
@@ -78,7 +202,7 @@
                     document.getElementById('loginMsg').innerHTML = "10 digit number daaliye";
                     return;
                 }
-                phone = '+91' + phone; // AUTO +91 ADD
+                phone = '+91' + phone;
                 document.getElementById('sendOtpBtn').innerHTML = "Sending...";
                 firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
                     .then(c => {
@@ -88,25 +212,28 @@
                         document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
                     })
                     .catch(err => {
-                        document.getElementById('loginMsg').innerHTML = "Error: " + err.message;
+                        document.getElementById('loginMsg').innerHTML = err.message;
                         document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
                     });
             };
 
             document.getElementById('verifyOtpBtn').onclick = () => {
-                const otp = document.getElementById('otpInput').value;
-                if (otp.length !== 6) {
-                    document.getElementById('loginMsg').innerHTML = "6 digit OTP";
-                    return;
-                }
-                confirmationResult.confirm(otp)
+                confirmationResult.confirm(document.getElementById('otpInput').value)
                     .then(() => {
                         document.getElementById('loginScreen').style.display = 'none';
                         startFirebaseListener();
                     })
                     .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
             };
+
+            window.skipLogin = () => {
+                document.getElementById('loginScreen').style.display = 'none';
+                startFirebaseListener();
+            };
+
+            document.getElementById('serviceForm').onsubmit = e => { e.preventDefault(); registerService(); };
+            document.getElementById('jobForm').onsubmit = e => { e.preventDefault(); postJob(); };
         };
     </script>
 </body>
-</html>
+                </html>
