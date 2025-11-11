@@ -45,49 +45,64 @@
         <button onclick="sendOTP()">Send OTP</button>
         
         <div id="otp-section" style="display: none;">
-            <input type="text" id="otp" placeholder="Enter OTP" required>
+            <input type="text" id="otp" placeholder="Enter OTP (Use: 123456)" required>
             <button onclick="verifyOTP()">Verify & Continue</button>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script>
-    const firebaseConfig = {
-    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
-    projectId: "fatehpur-hubs-a3a9f",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce"
-};
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
+            projectId: "fatehpur-hubs-a3a9f",
+            appId: "1:294360741451:web:3bc85078805750b9fabfce"
+        };
 
-const app = firebase.initializeApp(firebaseConfig);
-let confirmationResult;
+        const app = firebase.initializeApp(firebaseConfig);
+        let confirmationResult;
 
-async function verifyOTP() {
-    const otp = document.getElementById('otp').value;
-    if (!otp) {
-        alert('Please enter OTP');
-        return;
-    }
-    
-    // Testing mode - auto verify 123456
-    if (otp === "123456") {
-        localStorage.setItem('phoneVerified', 'true');
-        alert('✅ Verified! Opening app...');
-        window.location.href = "https://www.fatehpurhubs.co.in/";
-        return;
-    }
-    
-    // Real Firebase verification
-    try {
-        await confirmationResult.confirm(otp);
-        localStorage.setItem('phoneVerified', 'true');
-        alert('✅ Verified! Opening app...');
-        window.location.href = "https://www.fatehpurhubs.co.in/";
-    } catch (error) {
-        alert('Invalid OTP');
-    }
-}
+        async function sendOTP() {
+            const phone = document.getElementById('phone').value;
+            if (!phone) {
+                alert('Please enter phone number');
+                return;
+            }
+            
+            document.getElementById('otp-section').style.display = 'block';
+            
+            try {
+                confirmationResult = await firebase.auth().signInWithPhoneNumber(phone);
+                alert('OTP sent!');
+            } catch (error) {
+                alert('Testing mode - Use OTP: 123456');
+            }
+        }
+
+        async function verifyOTP() {
+            const otp = document.getElementById('otp').value;
+            if (!otp) {
+                alert('Please enter OTP');
+                return;
+            }
+            
+            if (otp === "123456") {
+                localStorage.setItem('phoneVerified', 'true');
+                alert('✅ Verified! Opening app...');
+                window.location.href = "https://www.fatehpurhubs.co.in/";
+                return;
+            }
+            
+            try {
+                await confirmationResult.confirm(otp);
+                localStorage.setItem('phoneVerified', 'true');
+                alert('✅ Verified! Opening app...');
+                window.location.href = "https://www.fatehpurhubs.co.in/";
+            } catch (error) {
+                alert('Invalid OTP');
+            }
+        }
     </script>
 </body>
 </html>
