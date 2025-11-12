@@ -222,7 +222,6 @@
         };
     };
     <script>
-  // PWA SERVICE WORKER REGISTER - 100% SAFE
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
@@ -230,6 +229,6 @@
         .catch(err => console.log('SW Error:', err));
     });
   }
-    </script>
+</script>
 </body>
 </html>
