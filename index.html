@@ -153,38 +153,53 @@
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA
-recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible'
-});
-recaptchaVerifier.render();
+        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA (NO PHOTO, NO TICK)
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible'
+        });
+        recaptchaVerifier.render();
 
+        // SEND OTP — YE PURA SAHI HAI
         document.getElementById('sendOtpBtn').onclick = () => {
-    let phone = '+91' + document.getElementById('phoneInput').value.trim();
-    if (phone.length !== 13) {
-        document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
-        return;
-    }
+            let phone = '+91' + document.getElementById('phoneInput').value.trim();
+            if (phone.length !== 13) {
+                document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+                return;
+            }
 
-    document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
 
-    recaptchaVerifier.verify().then(() => {
-        firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-            .then((confirmationResult) => {
-                window.confirmationResult = confirmationResult;
-                document.getElementById('otpSection').style.display = 'block';
-                document.getElementById('sendOtpBtn').style.display = 'none';
-                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
-            })
-            .catch((error) => {
-                document.getElementById('loginMsg').innerHTML = error.message;
+            recaptchaVerifier.verify().then(() => {
+                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+                    .then((result) => {
+                        confirmationResult = result;
+                        document.getElementById('otpSection').style.display = 'block';
+                        document.getElementById('sendOtpBtn').style.display = 'none';
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                    })
+                    .catch((error) => {
+                        document.getElementById('loginMsg').innerHTML = error.message;
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                    });
+            }).catch(() => {
+                document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
                 document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
             });
-    }).catch(() => {
-        document.getElementById('loginMsg').innerHTML = "reCAPTCHA failed, try again";
-        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-    });
-};
+        };
+
+        // VERIFY OTP
+        document.getElementById('verifyOtpBtn').onclick = () => {
+            confirmationResult.confirm(document.getElementById('otpInput').value)
+                .then(() => { 
+                    document.getElementById('loginScreen').style.display = 'none'; 
+                    document.getElementById('mainApp').style.display = 'block'; 
+                    startFirebaseListener(); 
+                    loadCategories(); 
+                    loadPromotionAds(); 
+                    setTimeout(loadPromotionAds, 2000);
+                })
+                .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+        };
 
         // Extra functions
         window.contactForAds = () => { 
@@ -197,10 +212,10 @@ recaptchaVerifier.render();
                 alert('Share link: https://www.fatehpurhubs.co.in'); 
             } 
         };
-        windowshowScreen = (id) => { 
+        window.showScreen = (id) => { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             document.getElementById(id).classList.add('active'); 
-            if(id==='jobs-screen') loadJobs(); 
+            if(id === 'jobs-screen') loadJobs(); 
         };
     };
     </script>
