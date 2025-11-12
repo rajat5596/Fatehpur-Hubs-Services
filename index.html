@@ -43,7 +43,6 @@
         <div style="background:white;padding:40px 30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
             <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
             <p style="color:#555;margin:15px 0;">10 digit number daaliye</p>
-            <div id="recaptcha-container" style="margin:20px auto; width:304px;"></div>
             <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
             <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
             <div id="otpSection" style="margin-top:20px;display:none;">
@@ -154,59 +153,40 @@
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-        // Visible reCAPTCHA
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 
-            size: 'normal', 
-            callback: () => { document.getElementById('sendOtpBtn').click(); } 
-        });
-        recaptchaVerifier.render();
-
-        // Send OTP
-        document.getElementById('sendOtpBtn').onclick = () => {
-            let phone = '+91' + document.getElementById('phoneInput').value.trim();
-            if (phone.length !== 13) { 
-                document.getElementById('loginMsg').innerHTML = "10 digit daaliye"; 
-                return; 
-            }
-            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-            firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                .then(c => { 
-                    confirmationResult = c; 
-                    document.getElementById('otpSection').style.display = 'block'; 
-                    document.getElementById('sendOtpBtn').style.display = 'none';
-                    document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>"; 
-                })
-                .catch(err => {
-                    document.getElementById('loginMsg').innerHTML = err.message;
-                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                });
-        };
+        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA (NO PHOTO, NO TICK)
+recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    'size': 'invisible'
+});
+recaptchaVerifier.render();
 
         // Verify OTP — YE PURA SAHI HAI AB
-        document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult.confirm(document.getElementById('otpInput').value)
-                .then(() => { 
-                    document.getElementById('loginScreen').style.display = 'none'; 
-                    document.getElementById('mainApp').style.display = 'block'; 
-                    startFirebaseListener(); 
-                    loadCategories(); 
-                    loadAds(); 
-                    setTimeout(loadAds, 2000);
-                })
-                .catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "Galat OTP";
-                });
-        };
+        document.getElementById('sendOtpBtn').onclick = () => {
+    let phone = '+91' + document.getElementById('phoneInput').value.trim();
+    if (phone.length !== 13) {
+        document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+        return;
+    }
 
-        // Skip Login — YE BHI PURA SAHI
-        window.skipLogin = () => { 
-            document.getElementById('loginScreen').style.display = 'none'; 
-            document.getElementById('mainApp').style.display = 'block'; 
-            startFirebaseListener(); 
-            loadCategories(); 
-            loadAds(); 
-            setTimeout(loadAds, 2000);
-        };
+    document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+
+    // Invisible reCAPTCHA trigger
+    recaptchaVerifier.verify().then(() => {
+        firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+            .then(c => {
+                confirmationResult = c;
+                document.getElementById('otpSection').style.display = 'block';
+                document.getElementById('sendOtpBtn').style.display = 'none';
+                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+            })
+            .catch(err => {
+                document.getElementById('loginMsg').innerHTML = err.message;
+                document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+            });
+    }).catch(() => {
+        document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
+        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+    });
+};
 
         // Extra functions
         window.contactForAds = () => { 
