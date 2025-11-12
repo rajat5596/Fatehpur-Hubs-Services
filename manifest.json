@@ -7,22 +7,16 @@
   "theme_color": "#ff6666",
   "orientation": "portrait",
   "id": "/fatehpurhubs",
-  "description": "Fatehpur ka sabse best local services app - Plumber, Electrician, Jobs, Business ads sab ek jagah!",
+  "description": "Fatehpur ka No.1 local services app",
   "icons": [
     {
-      "src": "https://i.ibb.co/HLdQDHf3/20251112-170018.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://i.ibb.co/4pJ0nZk/fatehpurhubs-512.png",
+      "src": "https://i.ibb.co/MymrKyD4/20251112-170043.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/9bKXvPq/fatehpurhubs-1024.png",
+      "src": "https://i.ibb.co/395dV9gY/icon1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
@@ -31,35 +25,30 @@
   "screenshots": [
     {
       "src": "https://i.ibb.co/KjDTmLth/s1.png",
-      "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Login Screen"
     },
     {
       "src": "https://i.ibb.co/gbxfp4bd/s2.png",
-      "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Home Page"
     },
     {
       "src": "https://i.ibb.co/jPZbBrNX/s3.png",
-      "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Service List"
     },
     {
       "src": "https://i.ibb.co/R4Vk38kY/s4.png",
-      "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Add Service"
     },
     {
       "src": "https://i.ibb.co/pBVQv0M7/s5.png",
-      "sizes": "1080x2400",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Jobs Page"
