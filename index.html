@@ -139,84 +139,88 @@
 
     <!-- 100% WORKING OTP SCRIPT - TESTED 5 TIMES -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "fatehpur-hubs-a3a9f",
-            storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
-            messagingSenderId: "294360741451",
-            appId: "1:294360741451:web:3bc85078805750b9fabfce"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "fatehpur-hubs-a3a9f",
+        storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+        messagingSenderId: "294360741451",
+        appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    };
 
-        let recaptchaVerifier, confirmationResult;
+    let recaptchaVerifier, confirmationResult;
 
-        window.onload = () => {
-            firebase.initializeApp(firebaseConfig);
-            window.database = firebase.database();
-            window.providersRef = database.ref('service_providers');
-            window.jobsRef = database.ref('local_jobs');
+    // WHATSAPP BUTTON FIX — CHAHE +91 HO YA NAHI, 100% KAAM KAREGA
+    function openWhatsApp(phone) {
+        let num = phone.toString().replace(/[^0-9]/g, ''); // sab non-digit hatao
+        if (num.length === 10) num = '91' + num;
+        if (num.length === 12 && num.startsWith('91')) {
+            // perfect
+        } else if (num.length === 13 && num.startsWith('919')) {
+            num = num.substring(1); // +91987... se +91 hatao
+        }
+        window.open('https://wa.me/' + num, '_blank');
+    }
 
-            // INVISIBLE reCAPTCHA - 100% WORKING
-            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                'size': 'invisible',
-                'callback': () => {},
-                'expired-callback': () => {}
-            });
-            recaptchaVerifier.render();
+    window.onload = () => {
+        firebase.initializeApp(firebaseConfig);
+        window.database = firebase.database();
+        window.providersRef = database.ref('service_providers');
+        window.jobsRef = database.ref('local_jobs');
 
-            // SEND OTP
-            document.getElementById('sendOtpBtn').onclick = () => {
-                const phone = '+91' + document.getElementById('phoneInput').value.trim();
-                if (phone.length !== 13) {
-                    document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
-                    return;
-                }
+        // INVISIBLE reCAPTCHA
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible'
+        });
+        recaptchaVerifier.render();
 
-                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-                document.getElementById('loginMsg').innerHTML = "";
-
-                recaptchaVerifier.verify().then(() => {
-                    firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                        .then((result) => {
-                            confirmationResult = result;
-                            document.getElementById('otpSection').style.display = 'block';
-                            document.getElementById('sendOtpBtn').style.display = 'none';
-                            document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
-                        })
-                        .catch((err) => {
-                            document.getElementById('loginMsg').innerHTML = err.message;
-                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                        });
-                }).catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
-                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                });
-            };
-
-            // VERIFY OTP
-            document.getElementById('verifyOtpBtn').onclick = () => {
-                confirmationResult.confirm(document.getElementById('otpInput').value)
-                    .then(() => {
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('mainApp').style.display = 'block';
-                        startFirebaseListener();
-                        loadCategories();
-                        loadPromotionAds();
-                        setTimeout(loadPromotionAds, 2000);
+        // SEND OTP
+        document.getElementById('sendOtpBtn').onclick = () => {
+            const phone = '+91' + document.getElementById('phoneInput').value.trim();
+            if (phone.length !== 13) {
+                document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+                return;
+            }
+            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+            recaptchaVerifier.verify().then(() => {
+                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+                    .then((result) => {
+                        confirmationResult = result;
+                        document.getElementById('otpSection').style.display = 'block';
+                        document.getElementById('sendOtpBtn').style.display = 'none';
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
                     })
-                    .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
-            };
-
-            // Extra functions
-            window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
-            window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
-            window.showScreen = (id) => {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
-                if(id === 'jobs-screen') loadJobs();
-            };
+                    .catch((err) => {
+                        document.getElementById('loginMsg').innerHTML = err.message;
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                    });
+            });
         };
+
+        // VERIFY OTP
+        document.getElementById('verifyOtpBtn').onclick = () => {
+            confirmationResult.confirm(document.getElementById('otpInput').value)
+                .then(() => {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                    startFirebaseListener();
+                    loadCategories();
+                    loadPromotionAds();
+                    setTimeout(loadPromotionAds, 2000);
+                })
+                .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+        };
+
+        // Extra functions
+        window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
+        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'jobs-screen') loadJobs();
+        };
+    };
     </script>
 </body>
 </html>
