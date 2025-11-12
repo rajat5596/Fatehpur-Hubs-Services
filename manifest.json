@@ -16,8 +16,14 @@
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/MymrKyD4/20251112-170043.png",
+      "src": "https://i.ibb.co/4pJ0nZk/fatehpurhubs-512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.ibb.co/9bKXvPq/fatehpurhubs-1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
     }
