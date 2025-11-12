@@ -155,38 +155,43 @@
             window.providersRef = database.ref('service_providers');
             window.jobsRef = database.ref('local_jobs');
 
-            // INVISIBLE reCAPTCHA
-            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible'
+            // INVISIBLE reCAPTCHA — BILKUL SAHI
+recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    'size': 'invisible',
+    'callback': function(response) {
+        // reCAPTCHA solved - will proceed with sending OTP
+    },
+    'expired-callback': function() {
+        document.getElementById('loginMsg').innerHTML = "reCAPTCHA expired, try again";
+    }
 });
-recaptchaVerifier.render().catch(err => console.log(err));
+recaptchaVerifier.render().then(function(widgetId) {
+    window.recaptchaWidgetId = widgetId;
+});
 
             // SEND OTP
             document.getElementById('sendOtpBtn').onclick = () => {
-                let phone = '+91' + document.getElementById('phoneInput').value.trim();
-                if (phone.length !== 13) {
-                    document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
-                    return;
-                }
-                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+    let phone = '+91' + document.getElementById('phoneInput').value.trim();
+    if (phone.length !== 13) {
+        document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+        return;
+    }
+    
+    document.getElementById('sendOtpBtn').innerHTML = "Sending...";
 
-                recaptchaVerifier.verify().then(() => {
-                    firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                        .then((result) => {
-                            confirmationResult = result;
-                            document.getElementById('otpSection').style.display = 'block';
-                            document.getElementById('sendOtpBtn').style.display = 'none';
-                            document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
-                        })
-                        .catch((error) => {
-                            document.getElementById('loginMsg').innerHTML = error.message;
-                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                        });
-                }).catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
-                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                });
-            };
+    grecaptcha.execute(window.recaptchaWidgetId, {action: 'submit'}).then(() => {
+        return firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier);
+    }).then((result) => {
+        confirmationResult = result;
+        document.getElementById('otpSection').style.display = 'block';
+        document.getElementById('sendOtpBtn').style.display = 'none';
+        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+    }).catch((error) => {
+        document.getElementById('loginMsg').innerHTML = error.message;
+        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+        grecaptcha.reset(window.recaptchaWidgetId);
+    });
+};
 
             // VERIFY OTP
             document.getElementById('verifyOtpBtn').onclick = () => {
