@@ -50,6 +50,7 @@
                 <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
             </div>
             <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;min-height:20px;"></p>
+            <div id="recaptcha-container"></div>
         </div>
     </div>
 
@@ -156,9 +157,9 @@
 
             // INVISIBLE reCAPTCHA
             recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-                size: 'invisible'
-            });
-            recaptchaVerifier.render();
+    'size': 'invisible'
+});
+recaptchaVerifier.render().catch(err => console.log(err));
 
             // SEND OTP
             document.getElementById('sendOtpBtn').onclick = () => {
