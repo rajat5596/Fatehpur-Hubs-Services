@@ -51,7 +51,7 @@ function displayServices() {
             <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience} years experience</p>
             <div style="display:flex;justify-content:space-between;margin-top:10px;">
                 <button class="contact-btn" onclick="window.open('tel:${p.phone}')">Call</button>
-                <button class="whatsapp-btn" onclick="window.open('https://wa.me/91${p.phone}')">WhatsApp</button>
+                str += `<button class="whatsapp-btn" onclick="openWhatsApp('${item.phone}')">WhatsApp</button>`;
                 <button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'https://www.fatehpurhubs.co.in'})">Share</button>
             </div>
         </div>
