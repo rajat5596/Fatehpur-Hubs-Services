@@ -153,13 +153,12 @@
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA (NO PHOTO, NO TICK)
+        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA
 recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible'
+    size: 'invisible'
 });
 recaptchaVerifier.render();
 
-        // Verify OTP — YE PURA SAHI HAI AB
         document.getElementById('sendOtpBtn').onclick = () => {
     let phone = '+91' + document.getElementById('phoneInput').value.trim();
     if (phone.length !== 13) {
@@ -169,21 +168,20 @@ recaptchaVerifier.render();
 
     document.getElementById('sendOtpBtn').innerHTML = "Sending...";
 
-    // Invisible reCAPTCHA trigger
     recaptchaVerifier.verify().then(() => {
         firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-            .then(c => {
-                confirmationResult = c;
+            .then((confirmationResult) => {
+                window.confirmationResult = confirmationResult;
                 document.getElementById('otpSection').style.display = 'block';
                 document.getElementById('sendOtpBtn').style.display = 'none';
                 document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
             })
-            .catch(err => {
-                document.getElementById('loginMsg').innerHTML = err.message;
+            .catch((error) => {
+                document.getElementById('loginMsg').innerHTML = error.message;
                 document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
             });
     }).catch(() => {
-        document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
+        document.getElementById('loginMsg').innerHTML = "reCAPTCHA failed, try again";
         document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
     });
 };
@@ -199,7 +197,7 @@ recaptchaVerifier.render();
                 alert('Share link: https://www.fatehpurhubs.co.in'); 
             } 
         };
-        window.showScreen = (id) => { 
+        windowshowScreen = (id) => { 
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
             document.getElementById(id).classList.add('active'); 
             if(id==='jobs-screen') loadJobs(); 
