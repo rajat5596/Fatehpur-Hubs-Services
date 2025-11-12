@@ -38,7 +38,7 @@
         </script>
     </div>
 
-    <!-- OTP LOGIN - BILKUL WAHI JO OTP DE RAHA HAI -->
+    <!-- OTP LOGIN -->
     <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
         <div style="background:white;padding:40px 30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
             <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
@@ -73,24 +73,24 @@
                     document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
                 </script>
             </div>
-<!-- PROFESSIONAL PROMOTION SECTION - YE PURA PASTE KAR DO -->
-<div class="promotion-section" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;">
-    <h3 style="text-align:center;color:white;font-size:18px;margin:0 0 15px;font-weight:bold;">
-        Special Offers & Promotions
-    </h3>
-    <div id="promotion-banner-area" style="position:relative;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.3);">
-        <p style="text-align:center;color:#fff;padding:20px;font-size:14px;">Loading amazing offers...</p>
-    </div>
-    <div style="text-align:center;margin-top:15px;">
-        <button onclick="contactForAds()" style="background:#fff;color:#764ba2;padding:10px 25px;border:none;border-radius:30px;font-weight:bold;box-shadow:0 5px 15px rgba(0,0,0,0.2);">
-            Apna Ad Lagwayein (₹500/month)
-        </button>
-    </div>
-</div>
-            <h3>Popular Services</h3>
-            <div class="categories-list" id="mistri-categories">
-                <!-- Buttons yahan script se fill honge -->
+
+            <!-- PROFESSIONAL PROMOTION SECTION -->
+            <div class="promotion-section" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;">
+                <h3 style="text-align:center;color:white;font-size:18px;margin:0 0 15px;font-weight:bold;">
+                    Special Offers & Promotions
+                </h3>
+                <div id="promotion-banner-area" style="position:relative;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+                    <p style="text-align:center;color:#fff;padding:20px;font-size:14px;">Loading amazing offers...</p>
+                </div>
+                <div style="text-align:center;margin-top:15px;">
+                    <button onclick="contactForAds()" style="background:#fff;color:#764ba2;padding:10px 25px;border:none;border-radius:30px;font-weight:bold;box-shadow:0 5px 15px rgba(0,0,0,0.2);">
+                        Apna Ad Lagwayein (₹500/month)
+                    </button>
+                </div>
             </div>
+
+            <h3>Popular Services</h3>
+            <div class="categories-list" id="mistri-categories"></div>
 
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
@@ -134,90 +134,82 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
 
+    <!-- FINAL WORKING SCRIPT - OTP + NO CAPTCHA -->
     <script>
-    window.firebaseConfig = { 
-        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", 
-        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
-        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", 
-        projectId: "fatehpur-hubs-a3a9f", 
-        storageBucket: "fatehpur-hubs-a3a9f.appspot.com", 
-        messagingSenderId: "294360741451", 
-        appId: "1:294360741451:web:3bc85078805750b9fabfce" 
-    };
+        window.firebaseConfig = { 
+            apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY", 
+            authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com", 
+            databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app", 
+            projectId: "fatehpur-hubs-a3a9f", 
+            storageBucket: "fatehpur-hubs-a3a9f.appspot.com", 
+            messagingSenderId: "294360741451", 
+            appId: "1:294360741451:web:3bc85078805750b9fabfce" 
+        };
 
-    let recaptchaVerifier, confirmationResult;
+        let recaptchaVerifier, confirmationResult;
 
-    window.onload = () => {
-        firebase.initializeApp(window.firebaseConfig);
-        window.database = firebase.database();
-        window.providersRef = database.ref('service_providers');
-        window.jobsRef = database.ref('local_jobs');
+        window.onload = () => {
+            firebase.initializeApp(window.firebaseConfig);
+            window.database = firebase.database();
+            window.providersRef = database.ref('service_providers');
+            window.jobsRef = database.ref('local_jobs');
 
-        // INVISIBLE reCAPTCHA — KUCH BHI NAHI DIKHEGA (NO PHOTO, NO TICK)
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible'
-        });
-        recaptchaVerifier.render();
-
-        // SEND OTP — YE PURA SAHI HAI
-        document.getElementById('sendOtpBtn').onclick = () => {
-            let phone = '+91' + document.getElementById('phoneInput').value.trim();
-            if (phone.length !== 13) {
-                document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
-                return;
-            }
-
-            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-
-            recaptchaVerifier.verify().then(() => {
-                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                    .then((result) => {
-                        confirmationResult = result;
-                        document.getElementById('otpSection').style.display = 'block';
-                        document.getElementById('sendOtpBtn').style.display = 'none';
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
-                    })
-                    .catch((error) => {
-                        document.getElementById('loginMsg').innerHTML = error.message;
-                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                    });
-            }).catch(() => {
-                document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
-                document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+            // INVISIBLE reCAPTCHA
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                size: 'invisible'
             });
-        };
+            recaptchaVerifier.render();
 
-        // VERIFY OTP
-        document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult.confirm(document.getElementById('otpInput').value)
-                .then(() => { 
-                    document.getElementById('loginScreen').style.display = 'none'; 
-                    document.getElementById('mainApp').style.display = 'block'; 
-                    startFirebaseListener(); 
-                    loadCategories(); 
-                    loadPromotionAds(); 
-                    setTimeout(loadPromotionAds, 2000);
-                })
-                .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
-        };
+            // SEND OTP
+            document.getElementById('sendOtpBtn').onclick = () => {
+                let phone = '+91' + document.getElementById('phoneInput').value.trim();
+                if (phone.length !== 13) {
+                    document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+                    return;
+                }
+                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
 
-        // Extra functions
-        window.contactForAds = () => { 
-            window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank'); 
+                recaptchaVerifier.verify().then(() => {
+                    firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+                        .then((result) => {
+                            confirmationResult = result;
+                            document.getElementById('otpSection').style.display = 'block';
+                            document.getElementById('sendOtpBtn').style.display = 'none';
+                            document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                        })
+                        .catch((error) => {
+                            document.getElementById('loginMsg').innerHTML = error.message;
+                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                        });
+                }).catch(() => {
+                    document.getElementById('loginMsg').innerHTML = "reCAPTCHA error, try again";
+                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                });
+            };
+
+            // VERIFY OTP
+            document.getElementById('verifyOtpBtn').onclick = () => {
+                confirmationResult.confirm(document.getElementById('otpInput').value)
+                    .then(() => { 
+                        document.getElementById('loginScreen').style.display = 'none'; 
+                        document.getElementById('mainApp').style.display = 'block'; 
+                        startFirebaseListener(); 
+                        loadCategories(); 
+                        loadPromotionAds(); 
+                        setTimeout(loadPromotionAds, 2000);
+                    })
+                    .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+            };
+
+            // Extra functions
+            window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
+            window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+            window.showScreen = (id) => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                if(id === 'jobs-screen') loadJobs();
+            };
         };
-        window.shareApp = () => { 
-            if (navigator.share) { 
-                navigator.share({ title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in' }); 
-            } else { 
-                alert('Share link: https://www.fatehpurhubs.co.in'); 
-            } 
-        };
-        window.showScreen = (id) => { 
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
-            document.getElementById(id).classList.add('active'); 
-            if(id === 'jobs-screen') loadJobs(); 
-        };
-    };
     </script>
-    </body>
-    </html>
+</body>
+</html>
