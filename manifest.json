@@ -10,13 +10,13 @@
   "description": "Fatehpur ka No.1 local services app",
   "icons": [
     {
-      "src": "https://i.ibb.co/MymrKyD4/20251112-170043.png",
+      "src": "https://i.ibb.co/YOUR-512-LINK/icon512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/dsTcKs7B/icon1024.png",
+      "src": "https://i.ibb.co/YOUR-1024-LINK/icon1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any maskable"
@@ -27,19 +27,19 @@
       "src": "https://i.ibb.co/KjDTmLth/s1.png",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Login Screen"
+      "label": "Login"
     },
     {
       "src": "https://i.ibb.co/gbxfp4bd/s2.png",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Home Page"
+      "label": "Home"
     },
     {
       "src": "https://i.ibb.co/jPZbBrNX/s3.png",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Service List"
+      "label": "Services"
     },
     {
       "src": "https://i.ibb.co/R4Vk38kY/s4.png",
@@ -51,7 +51,9 @@
       "src": "https://i.ibb.co/pBVQv0M7/s5.png",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Jobs Page"
+      "label": "Jobs"
     }
-  ]
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "prefer_related_applications": false
 }
