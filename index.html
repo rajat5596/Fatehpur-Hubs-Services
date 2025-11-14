@@ -97,7 +97,7 @@
 
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
-                <form id="serviceForm" onsubmit="return registerService(event)">
+                <form id="serviceForm" onsubmit="event.preventDefault(); return registerService();">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
@@ -136,14 +136,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
     <script src="script.js"></script>
-    function registerService(event) {
-    event.preventDefault(); // Page refresh rokega
-
+    function registerService() {
     const service = {
-        name: document.getElementById('serviceCategory').value,
-        user: document.getElementById('providerName').value,
-        experience: document.getElementById('providerExperience').value,
+        category: document.getElementById('serviceCategory').value,
+        name: document.getElementById('providerName').value,
         mobile: document.getElementById('providerPhone').value,
+        experience: document.getElementById('providerExperience').value,
         time: new Date().toLocaleString('en-IN')
     };
 
@@ -151,12 +149,10 @@
     services.push(service);
     localStorage.setItem('fatehpur_services', JSON.stringify(services));
 
-    alert('✅ Service Registered Successfully!');
+    alert('Service Registered!');
 
     document.getElementById('serviceForm').reset();
-    return false;
 }
-
     <!-- 100% WORKING OTP SCRIPT - TESTED 5 TIMES -->
     <script>
     const firebaseConfig = {
@@ -249,5 +245,12 @@
     });
   }
 </script>
+    <!-- BOTTOM AD (Same as Top) -->
+<div style="position:fixed; bottom:0; left:0; width:100%; text-align:center; z-index:9999; background:white; padding:5px 0; border-top:1px solid #ddd;">
+    <script type="text/javascript">
+        atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
+    </script>
+</div>
 </body>
 </html>
