@@ -73,7 +73,7 @@
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                    document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
+                document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
                 </script>
             </div>
 
@@ -123,7 +123,7 @@
             <div id="jobs-list"><p>Loading jobs...</p></div>
         </div>
 
-        <!-- FOOTER (WAPAS LAGA DIYA) -->
+        <!-- FOOTER -->
         <div class="footer">
             <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
             <button class="share-btn-inline" onclick="shareApp()">Share App</button>
@@ -149,7 +149,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
 
-    <!-- SERVICE REGISTER + REALTIME SHOW + NO LOGOUT ON REFRESH -->
+    <!-- MAIN SCRIPT -->
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
@@ -164,7 +164,6 @@
     let recaptchaVerifier, confirmationResult;
     let userPhone = localStorage.getItem('userPhone');
 
-    // AUTO LOGIN ON REFRESH
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
@@ -174,15 +173,17 @@
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
         recaptchaVerifier.render();
 
-        // IF USER ALREADY LOGGED IN
-        if (userPhone && firebase.auth().currentUser) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            startFirebaseListener();
-            loadCategories();
-            loadPromotionAds();
-            setTimeout(loadPromotionAds, 2000);
-        }
+        // AUTO LOGIN ON REFRESH
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user && userPhone) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                startFirebaseListener();
+                loadCategories();
+                loadPromotionAds();
+                setTimeout(loadPromotionAds, 2000);
+            }
+        });
 
         // SEND OTP
         document.getElementById('sendOtpBtn').onclick = () => {
@@ -207,9 +208,9 @@
             });
         };
 
-        // VERIFY OTP
+        // VERIFY OTP - YE LINE THIK KI HAI!
         document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult-confirm(document.getElementById('otpInput').value)
+            confirmationResult.confirm(document.getElementById('otpInput').value)
                 .then(() => {
                     localStorage.setItem('userPhone', document.getElementById('phoneInput').value);
                     document.getElementById('loginScreen').style.display = 'none';
@@ -231,7 +232,6 @@
         };
     };
 
-    // REGISTER SERVICE + SAVE TO FIREBASE
     function registerService() {
         const service = {
             category: document.getElementById('serviceCategory').value,
@@ -242,21 +242,16 @@
             time: new Date().toLocaleString('en-IN')
         };
 
-        // SAVE TO FIREBASE
         providersRef.push(service);
-
-        // ALSO SAVE TO LOCAL (FOR FAST SHOW)
         let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
         services.push(service);
         localStorage.setItem('fatehpur_services', JSON.stringify(services));
 
         alert('Service Registered!');
-
         document.getElementById('serviceForm').reset();
-        loadLocalServices(); // REALTIME SHOW
+        loadLocalServices();
     }
 
-    // LOAD LOCAL SERVICES (REALTIME)
     function loadLocalServices() {
         const services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
         const list = document.getElementById('mistri-list');
@@ -278,7 +273,6 @@
         }
     }
 
-    // CALL ON LOGIN
     function startFirebaseListener() {
         loadLocalServices();
     }
@@ -293,4 +287,4 @@
     </script>
 
 </body>
-    </html>
+</html>
