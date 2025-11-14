@@ -73,7 +73,7 @@
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
+                    document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
                 </script>
             </div>
 
@@ -162,7 +162,6 @@
     };
 
     let recaptchaVerifier, confirmationResult;
-    let userPhone = localStorage.getItem('userPhone');
 
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
@@ -175,10 +174,11 @@
 
         // AUTO LOGIN ON REFRESH
         firebase.auth().onAuthStateChanged((user) => {
-            if (user && userPhone) {
+            if (user) {
+                localStorage.setItem('userPhone', user.phoneNumber.replace('+91', ''));
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                startFirebaseListener();
+                loadAllServicesFromFirebase();
                 loadCategories();
                 loadPromotionAds();
                 setTimeout(loadPromotionAds, 2000);
@@ -208,14 +208,13 @@
             });
         };
 
-        // VERIFY OTP - YE LINE THIK KI HAI!
+        // VERIFY OTP
         document.getElementById('verifyOtpBtn').onclick = () => {
             confirmationResult.confirm(document.getElementById('otpInput').value)
                 .then(() => {
-                    localStorage.setItem('userPhone', document.getElementById('phoneInput').value);
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
-                    startFirebaseListener();
+                    loadAllServicesFromFirebase();
                     loadCategories();
                     loadPromotionAds();
                     setTimeout(loadPromotionAds, 2000);
@@ -232,6 +231,7 @@
         };
     };
 
+    // REGISTER SERVICE
     function registerService() {
         const service = {
             category: document.getElementById('serviceCategory').value,
@@ -242,18 +242,24 @@
             time: new Date().toLocaleString('en-IN')
         };
 
-        providersRef.push(service);
-        let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
-        services.push(service);
-        localStorage.setItem('fatehpur_services', JSON.stringify(services));
-
-        alert('Service Registered!');
-        document.getElementById('serviceForm').reset();
-        loadLocalServices();
+        providersRef.push(service).then(() => {
+            alert('Service Registered!');
+            document.getElementById('serviceForm').reset();
+            loadAllServicesFromFirebase();
+        });
     }
 
-    function loadLocalServices() {
-        const services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
+    // LOAD ALL SERVICES FROM FIREBASE
+    function loadAllServicesFromFirebase() {
+        providersRef.on('value', (snapshot) => {
+            const services = [];
+            snapshot.forEach(child => services.push(child.val()));
+            displayServices(services);
+        });
+    }
+
+    // DISPLAY SERVICES
+    function displayServices(services) {
         const list = document.getElementById('mistri-list');
         list.innerHTML = '<h3>Available Services</h3>';
         if (services.length === 0) {
@@ -273,9 +279,17 @@
         }
     }
 
-    function startFirebaseListener() {
-        loadLocalServices();
+    function openWhatsApp(phone) {
+        let num = phone.toString().replace(/[^0-9]/g, '');
+        if (num.length === 10) num = '91' + num;
+        window.open('https://wa.me/' + num, '_blank');
     }
+
+    // YE SAB FUNCTION BHI CHAHIE — AGAR `script.js` MEIN HAIN TO THEEK, WARNA YAHAN DAAL
+    function searchServices() { /* Tera search code */ }
+    function loadCategories() { /* Tera categories code */ }
+    function loadJobs() { /* Tera jobs code */ }
+    function loadPromotionAds() { /* Tera ads code */ }
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -287,4 +301,4 @@
     </script>
 
 </body>
-</html>
+    </html>
