@@ -94,7 +94,6 @@
 
             <h3>Popular Services</h3>
             <div class="categories-list" id="mistri-categories"></div>
-
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
                 <form id="serviceForm" onsubmit="event.preventDefault(); return registerService();">
@@ -136,23 +135,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
     <script src="script.js"></script>
-    function registerService() {
-    const service = {
-        category: document.getElementById('serviceCategory').value,
-        name: document.getElementById('providerName').value,
-        mobile: document.getElementById('providerPhone').value,
-        experience: document.getElementById('providerExperience').value,
-        time: new Date().toLocaleString('en-IN')
-    };
-
-    let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
-    services.push(service);
-    localStorage.setItem('fatehpur_services', JSON.stringify(services));
-
-    alert('Service Registered!');
-
-    document.getElementById('serviceForm').reset();
-}
     <!-- 100% WORKING OTP SCRIPT - TESTED 5 TIMES -->
     <script>
     const firebaseConfig = {
