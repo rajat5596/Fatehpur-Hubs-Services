@@ -6,12 +6,12 @@
     <title>Fatehpur Hubs</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6666">
-    <!-- Google reCAPTCHA Script - YE ZAROORI HAI -->
+    <!-- Google reCAPTCHA Script -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
         body { background: #f5f5f5; }
-        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
+        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 70px; }
         header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; text-align: center; }
         .screen { display: none; padding: 15px; }
         .screen.active { display: block; }
@@ -28,11 +28,13 @@
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
         .promotion-banner { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: bold; }
+        /* Bottom Ad Fixed */
+        #bottom-ad { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9998; background: white; padding: 5px 0; border-top: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
-    <!-- TOP AD -->
+    <!-- TOP AD (320x50) -->
     <div class="ad-container">
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -69,7 +71,7 @@
                 <button onclick="contactForAds()" style="background:white;color:#d35400;padding:8px 20px;border:none;border-radius:25px;margin-top:10px;font-weight:bold;">Ad Lagwayein</button></p>
             </div>
 
-            <!-- MIDDLE AD -->
+            <!-- MIDDLE AD (300x250) -->
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
@@ -97,7 +99,7 @@
 
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
-                <form id="serviceForm" onsubmit="event.preventDefault(); return registerService();">
+                <form id="serviceForm" onsubmit="event.preventDefault(); registerService();">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
@@ -130,30 +132,47 @@
         </div>
     </div>
 
+    <!-- BOTTOM AD (320x50) - Fixed -->
+    <div id="bottom-ad">
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
+        </script>
+    </div>
+
+    <!-- POPUNDER AD (Background Tab) -->
+    <script type='text/javascript' src='//pl28050994.effectivegatecpm.com/09/81/bd/0981bd95e47c0b359cb5dd03dff72087.js'></script>
+
     <!-- SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
     <script src="script.js"></script>
+
+    <!-- SERVICE REGISTER FUNCTION (100% WORKING) -->
+    <script>
     function registerService() {
-    const service = {
-        category: document.getElementById('serviceCategory').value,
-        name: document.getElementById('providerName').value,
-        mobile: document.getElementById('providerPhone').value,
-        experience: document.getElementById('providerExperience').value,
-        time: new Date().toLocaleString('en-IN')
-    };
+        const service = {
+            category: document.getElementById('serviceCategory').value,
+            name: document.getElementById('providerName').value,
+            mobile: document.getElementById('providerPhone').value,
+            area: document.getElementById('providerArea').value,
+            experience: document.getElementById('providerExperience').value,
+            time: new Date().toLocaleString('en-IN')
+        };
 
-    let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
-    services.push(service);
-    localStorage.setItem('fatehpur_services', JSON.stringify(services));
+        let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
+        services.push(service);
+        localStorage.setItem('fatehpur_services', JSON.stringify(services));
 
-    alert('Service Registered!');
+        alert('Service Registered Successfully!');
 
-    document.getElementById('serviceForm').reset();
-}
-    <!-- 100% WORKING OTP SCRIPT - TESTED 5 TIMES -->
+        document.getElementById('serviceForm').reset();
+    }
+    </script>
+
+    <!-- 100% WORKING OTP SCRIPT -->
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
@@ -167,15 +186,11 @@
 
     let recaptchaVerifier, confirmationResult;
 
-    // WHATSAPP BUTTON FIX — CHAHE +91 HO YA NAHI, 100% KAAM KAREGA
     function openWhatsApp(phone) {
-        let num = phone.toString().replace(/[^0-9]/g, ''); // sab non-digit hatao
+        let num = phone.toString().replace(/[^0-9]/g, '');
         if (num.length === 10) num = '91' + num;
-        if (num.length === 12 && num.startsWith('91')) {
-            // perfect
-        } else if (num.length === 13 && num.startsWith('919')) {
-            num = num.substring(1); // +91987... se +91 hatao
-        }
+        if (num.length === 12 && num.startsWith('91')) {}
+        else if (num.length === 13 && num.startsWith('919')) { num = num.substring(1); }
         window.open('https://wa.me/' + num, '_blank');
     }
 
@@ -185,13 +200,9 @@
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-        // INVISIBLE reCAPTCHA
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'invisible'
-        });
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
         recaptchaVerifier.render();
 
-        // SEND OTP
         document.getElementById('sendOtpBtn').onclick = () => {
             const phone = '+91' + document.getElementById('phoneInput').value.trim();
             if (phone.length !== 13) {
@@ -214,7 +225,6 @@
             });
         };
 
-        // VERIFY OTP
         document.getElementById('verifyOtpBtn').onclick = () => {
             confirmationResult.confirm(document.getElementById('otpInput').value)
                 .then(() => {
@@ -228,7 +238,6 @@
                 .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
         };
 
-        // Extra functions
         window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
         window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
         window.showScreen = (id) => {
@@ -237,19 +246,15 @@
             if(id === 'jobs-screen') loadJobs();
         };
     };
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker Registered'))
-        .catch(err => console.log('SW Error:', err));
-    });
-  }
-        <!-- BOTTOM AD (Same as Top) -->
-<div style="position:fixed; bottom:0; left:0; width:100%; text-align:center; z-index:9999; background:white; padding:5px 0; border-top:1px solid #ddd;">
-    <script type="text/javascript">
-        atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
-</script>
-    
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker Registered'))
+                .catch(err => console.log('SW Error:', err));
+        });
+    }
+    </script>
+
 </body>
 </html>
