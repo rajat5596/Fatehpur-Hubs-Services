@@ -60,10 +60,11 @@
     <div class="container" id="mainApp" style="display:none;">
         <header><h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1></header>
 
+        <!-- HOME SCREEN -->
         <div id="home-screen" class="screen active">
             <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician..." onkeyup="searchServices()">
 
-            <!-- PROMOTION BANNER -->
+            <!-- ₹500 PROMOTION BANNER -->
             <div class="promotion-banner">
                 <p>Apna Business Promote Karein! ₹500/month se shuru<br>
                 <button onclick="contactForAds()" style="background:white;color:#d35400;padding:8px 20px;border:none;border-radius:25px;margin-top:10px;font-weight:bold;">Ad Lagwayein</button></p>
@@ -77,24 +78,16 @@
                 </script>
             </div>
 
-            <!-- PROFESSIONAL PROMOTION SECTION -->
-            <div class="promotion-section" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;">
-                <h3 style="text-align:center;color:white;font-size:18px;margin:0 0 15px;font-weight:bold;">
-                    Special Offers & Promotions
-                </h3>
-                <div id="promotion-banner-area" style="position:relative;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.3);">
-                    <p style="text-align:center;color:#fff;padding:20px;font-size:14px;">Loading amazing offers...</p>
-                </div>
-                <div style="text-align:center;margin-top:15px;">
-                    <button onclick="contactForAds()" style="background:#fff;color:#764ba2;padding:10px 25px;border:none;border-radius:30px;font-weight:bold;box-shadow:0 5px 15px rgba(0,0,0,0.2);">
-                        Apna Ad Lagwayein (₹500/month)
-                    </button>
-                </div>
+            <!-- 4 PROMOTION ADS (ads.js) -->
+            <div id="promotion-banner-area"></div>
+
+            <!-- 15 CATEGORY BUTTONS -->
+            <h3>Popular Services</h3>
+            <div class="categories-list" id="mistri-categories">
+                <!-- script.js se load hoga -->
             </div>
 
-            <h3>Popular Services</h3>
-            <div class="categories-list" id="mistri-categories"></div>
-
+            <!-- ADD SERVICE FORM -->
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
                 <form id="serviceForm" onsubmit="event.preventDefault(); registerService();">
@@ -113,14 +106,27 @@
                 </form>
             </div>
 
+            <!-- AVAILABLE SERVICES (22 TOTAL) -->
             <div id="mistri-list"><h3>Available Services</h3><p style="text-align:center;color:#2a5298;">Loading...</p></div>
             <div style="height:80px;"></div>
         </div>
 
+        <!-- JOBS SCREEN -->
         <div id="jobs-screen" class="screen">
             <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Back</button>
             <h2>Local Jobs</h2>
             <div id="jobs-list"><p>Loading jobs...</p></div>
+
+            <!-- JOB REGISTRATION FORM -->
+            <div style="margin:20px 0;padding:20px;background:#f0f0f0;border-radius:10px;">
+                <h3>Add Job</h3>
+                <form id="jobForm" onsubmit="event.preventDefault(); registerJob();">
+                    <input type="text" id="jobTitle" placeholder="Job Title" required style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;">
+                    <input type="text" id="jobCompany" placeholder="Company Name" required style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;">
+                    <input type="text" id="jobSalary" placeholder="Salary" required style="width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px;">
+                    <button type="submit" style="width:100%;background:#ff9800;color:white;padding:12px;border:none;border-radius:8px;">Post Job</button>
+                </form>
+            </div>
         </div>
 
         <!-- FOOTER -->
@@ -142,7 +148,7 @@
     <!-- POPUNDER AD -->
     <script type='text/javascript' src='//pl28050994.effectivegatecpm.com/09/81/bd/0981bd95e47c0b359cb5dd03dff72087.js'></script>
 
-    <!-- SCRIPTS -->
+    <!-- FIREBASE + SCRIPTS -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -178,7 +184,8 @@
                 localStorage.setItem('userPhone', user.phoneNumber.replace('+91', ''));
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                loadAllServicesFromFirebase();
+                loadAllServices();
+                loadJobs();
                 loadCategories();
                 loadPromotionAds();
                 setTimeout(loadPromotionAds, 2000);
@@ -214,7 +221,8 @@
                 .then(() => {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
-                    loadAllServicesFromFirebase();
+                    loadAllServices();
+                    loadJobs();
                     loadCategories();
                     loadPromotionAds();
                     setTimeout(loadPromotionAds, 2000);
@@ -241,16 +249,30 @@
             experience: document.getElementById('providerExperience').value,
             time: new Date().toLocaleString('en-IN')
         };
-
         providersRef.push(service).then(() => {
             alert('Service Registered!');
             document.getElementById('serviceForm').reset();
-            loadAllServicesFromFirebase();
+            loadAllServices();
         });
     }
 
-    // LOAD ALL SERVICES FROM FIREBASE
-    function loadAllServicesFromFirebase() {
+    // REGISTER JOB
+    function registerJob() {
+        const job = {
+            title: document.getElementById('jobTitle').value,
+            company: document.getElementById('jobCompany').value,
+            salary: document.getElementById('jobSalary').value,
+            time: new Date().toLocaleString('en-IN')
+        };
+        jobsRef.push(job).then(() => {
+            alert('Job Posted!');
+            document.getElementById('jobForm').reset();
+            loadJobs();
+        });
+    }
+
+    // LOAD ALL SERVICES
+    function loadAllServices() {
         providersRef.on('value', (snapshot) => {
             const services = [];
             snapshot.forEach(child => services.push(child.val()));
@@ -279,17 +301,33 @@
         }
     }
 
+    // LOAD JOBS
+    function loadJobs() {
+        jobsRef.on('value', (snapshot) => {
+            const jobs = [];
+            snapshot.forEach(child => jobs.push(child.val()));
+            const list = document.getElementById('jobs-list');
+            list.innerHTML = '<h3>Available Jobs</h3>';
+            if (jobs.length === 0) {
+                list.innerHTML += '<p>No jobs yet.</p>';
+            } else {
+                jobs.forEach(j => {
+                    list.innerHTML += `
+                        <div class="profile-card">
+                            <b>${j.title}</b><br>
+                            ${j.company} | ₹${j.salary}<br>
+                            <small>${j.time}</small>
+                        </div>`;
+                });
+            }
+        });
+    }
+
     function openWhatsApp(phone) {
         let num = phone.toString().replace(/[^0-9]/g, '');
         if (num.length === 10) num = '91' + num;
         window.open('https://wa.me/' + num, '_blank');
     }
-
-    // YE SAB FUNCTION BHI CHAHIE — AGAR `script.js` MEIN HAIN TO THEEK, WARNA YAHAN DAAL
-    function searchServices() { /* Tera search code */ }
-    function loadCategories() { /* Tera categories code */ }
-    function loadJobs() { /* Tera jobs code */ }
-    function loadPromotionAds() { /* Tera ads code */ }
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -301,4 +339,4 @@
     </script>
 
 </body>
-    </html>
+</html>
