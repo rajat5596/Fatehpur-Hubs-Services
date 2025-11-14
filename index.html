@@ -97,7 +97,7 @@
 
             <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
                 <h3 style="text-align:center;">Add Your Service</h3>
-                <form id="serviceForm">
+                <form id="serviceForm" onsubmit="return registerService(event)">
                     <input type="text" id="providerName" placeholder="Your Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
                     <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
@@ -136,6 +136,26 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="ads.js"></script>
     <script src="script.js"></script>
+    function registerService(event) {
+    event.preventDefault(); // Page refresh rokega
+
+    const service = {
+        name: document.getElementById('serviceCategory').value,
+        user: document.getElementById('providerName').value,
+        experience: document.getElementById('providerExperience').value,
+        mobile: document.getElementById('providerPhone').value,
+        time: new Date().toLocaleString('en-IN')
+    };
+
+    let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
+    services.push(service);
+    localStorage.setItem('fatehpur_services', JSON.stringify(services));
+
+    alert('✅ Service Registered Successfully!');
+
+    document.getElementById('serviceForm').reset();
+    return false;
+}
 
     <!-- 100% WORKING OTP SCRIPT - TESTED 5 TIMES -->
     <script>
