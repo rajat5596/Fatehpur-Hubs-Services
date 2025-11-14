@@ -6,12 +6,11 @@
     <title>Fatehpur Hubs</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6666">
-    <!-- Google reCAPTCHA Script -->
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
         body { background: #f5f5f5; }
-        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 70px; }
+        .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 80px; }
         header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; text-align: center; }
         .screen { display: none; padding: 15px; }
         .screen.active { display: block; }
@@ -28,13 +27,12 @@
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
         .promotion-banner { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: bold; }
-        /* Bottom Ad Fixed */
-        #bottom-ad { position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9998; background: white; padding: 5px 0; border-top: 1px solid #ddd; }
+        #bottom-ad { position: fixed; bottom: 60px; left: 0; width: 100%; text-align: center; z-index: 999; background: white; padding: 5px 0; border-top: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
-    <!-- TOP AD (320x50) -->
+    <!-- TOP AD -->
     <div class="ad-container">
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -71,7 +69,7 @@
                 <button onclick="contactForAds()" style="background:white;color:#d35400;padding:8px 20px;border:none;border-radius:25px;margin-top:10px;font-weight:bold;">Ad Lagwayein</button></p>
             </div>
 
-            <!-- MIDDLE AD (300x250) -->
+            <!-- MIDDLE AD -->
             <div class="ad-container">
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
@@ -125,6 +123,7 @@
             <div id="jobs-list"><p>Loading jobs...</p></div>
         </div>
 
+        <!-- FOOTER (WAPAS LAGA DIYA) -->
         <div class="footer">
             <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
             <button class="share-btn-inline" onclick="shareApp()">Share App</button>
@@ -132,7 +131,7 @@
         </div>
     </div>
 
-    <!-- BOTTOM AD (320x50) - Fixed -->
+    <!-- BOTTOM AD -->
     <div id="bottom-ad">
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
@@ -140,7 +139,7 @@
         </script>
     </div>
 
-    <!-- POPUNDER AD (Background Tab) -->
+    <!-- POPUNDER AD -->
     <script type='text/javascript' src='//pl28050994.effectivegatecpm.com/09/81/bd/0981bd95e47c0b359cb5dd03dff72087.js'></script>
 
     <!-- SCRIPTS -->
@@ -150,29 +149,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
 
-    <!-- SERVICE REGISTER FUNCTION (100% WORKING) -->
-    <script>
-    function registerService() {
-        const service = {
-            category: document.getElementById('serviceCategory').value,
-            name: document.getElementById('providerName').value,
-            mobile: document.getElementById('providerPhone').value,
-            area: document.getElementById('providerArea').value,
-            experience: document.getElementById('providerExperience').value,
-            time: new Date().toLocaleString('en-IN')
-        };
-
-        let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
-        services.push(service);
-        localStorage.setItem('fatehpur_services', JSON.stringify(services));
-
-        alert('Service Registered Successfully!');
-
-        document.getElementById('serviceForm').reset();
-    }
-    </script>
-
-    <!-- 100% WORKING OTP SCRIPT -->
+    <!-- SERVICE REGISTER + REALTIME SHOW + NO LOGOUT ON REFRESH -->
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
@@ -185,15 +162,9 @@
     };
 
     let recaptchaVerifier, confirmationResult;
+    let userPhone = localStorage.getItem('userPhone');
 
-    function openWhatsApp(phone) {
-        let num = phone.toString().replace(/[^0-9]/g, '');
-        if (num.length === 10) num = '91' + num;
-        if (num.length === 12 && num.startsWith('91')) {}
-        else if (num.length === 13 && num.startsWith('919')) { num = num.substring(1); }
-        window.open('https://wa.me/' + num, '_blank');
-    }
-
+    // AUTO LOGIN ON REFRESH
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
@@ -203,6 +174,17 @@
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
         recaptchaVerifier.render();
 
+        // IF USER ALREADY LOGGED IN
+        if (userPhone && firebase.auth().currentUser) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            startFirebaseListener();
+            loadCategories();
+            loadPromotionAds();
+            setTimeout(loadPromotionAds, 2000);
+        }
+
+        // SEND OTP
         document.getElementById('sendOtpBtn').onclick = () => {
             const phone = '+91' + document.getElementById('phoneInput').value.trim();
             if (phone.length !== 13) {
@@ -225,9 +207,11 @@
             });
         };
 
+        // VERIFY OTP
         document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult.confirm(document.getElementById('otpInput').value)
+            confirmationResult-confirm(document.getElementById('otpInput').value)
                 .then(() => {
+                    localStorage.setItem('userPhone', document.getElementById('phoneInput').value);
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
                     startFirebaseListener();
@@ -247,14 +231,66 @@
         };
     };
 
+    // REGISTER SERVICE + SAVE TO FIREBASE
+    function registerService() {
+        const service = {
+            category: document.getElementById('serviceCategory').value,
+            name: document.getElementById('providerName').value,
+            mobile: document.getElementById('providerPhone').value,
+            area: document.getElementById('providerArea').value,
+            experience: document.getElementById('providerExperience').value,
+            time: new Date().toLocaleString('en-IN')
+        };
+
+        // SAVE TO FIREBASE
+        providersRef.push(service);
+
+        // ALSO SAVE TO LOCAL (FOR FAST SHOW)
+        let services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
+        services.push(service);
+        localStorage.setItem('fatehpur_services', JSON.stringify(services));
+
+        alert('Service Registered!');
+
+        document.getElementById('serviceForm').reset();
+        loadLocalServices(); // REALTIME SHOW
+    }
+
+    // LOAD LOCAL SERVICES (REALTIME)
+    function loadLocalServices() {
+        const services = JSON.parse(localStorage.getItem('fatehpur_services') || '[]');
+        const list = document.getElementById('mistri-list');
+        list.innerHTML = '<h3>Available Services</h3>';
+        if (services.length === 0) {
+            list.innerHTML += '<p style="text-align:center;color:#2a5298;">No services yet.</p>';
+        } else {
+            services.forEach(s => {
+                list.innerHTML += `
+                    <div class="profile-card">
+                        <b>${s.category}</b><br>
+                        ${s.name} - ${s.mobile}<br>
+                        Area: ${s.area} | ${s.experience} years exp<br>
+                        <small>${s.time}</small><br>
+                        <button class="contact-btn" onclick="window.location.href='tel:${s.mobile}'">Call</button>
+                        <button class="whatsapp-btn" onclick="openWhatsApp('${s.mobile}')">WhatsApp</button>
+                    </div>`;
+            });
+        }
+    }
+
+    // CALL ON LOGIN
+    function startFirebaseListener() {
+        loadLocalServices();
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker Registered'))
+                .then(reg => console.log('SW Registered'))
                 .catch(err => console.log('SW Error:', err));
         });
     }
     </script>
 
 </body>
-</html>
+    </html>
