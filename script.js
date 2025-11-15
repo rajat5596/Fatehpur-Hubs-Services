@@ -107,3 +107,62 @@ function loadJobs() {
         console.error("Jobs reference not initialized.");
     }
 }
+// Function 1: HTML Card banane ke liye
+function displayJobs(jobs) {
+    const container = document.getElementById('jobs-list');
+    container.innerHTML = ''; // Pehle se मौजूद 'Loading jobs...' ya purana data hatao
+
+    if (!jobs || jobs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#555;">अभी कोई जॉब पोस्ट नहीं हुई है।</p>';
+        return;
+    }
+
+    // Har job ke liye ek card banao
+    jobs.forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'profile-card job-card';
+        card.innerHTML = `
+            <h3 style="color:#2a5298; margin-bottom:5px;">${job.title}</h3>
+            <p><strong>दुकान/कंपनी:</strong> ${job.shopName}</p>
+            <p><strong>लोकेशन:</strong> ${job.location}</p>
+            <p><strong>सैलरी:</strong> ₹${job.salary} / महीना</p>
+            <p style="margin-top:10px;">${job.description}</p>
+            <div style="margin-top:15px; text-align:right;">
+                <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone}')">
+                    WhatsApp/Call (${job.phone})
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+
+// Function 2: Firebase se data fetch karne ke liye
+function loadJobs() {
+    // Check if jobsRef is initialized (from index.html window.onload)
+    if (!window.jobsRef) {
+        console.error("jobsRef is not initialized. Firebase might not be fully loaded.");
+        // If not loaded, wait a moment and try again (Handles script timing)
+        setTimeout(loadJobs, 500); 
+        return;
+    }
+
+    // Data ko Realtime Database se fetch karo
+    window.jobsRef.on('value', (snapshot) => {
+        const jobs = [];
+        snapshot.forEach((childSnapshot) => {
+            const job = childSnapshot.val();
+            // Job data ko array mein add karo
+            jobs.push(job);
+        });
+
+        // Nayi jobs ko display karo
+        displayJobs(jobs.reverse()); // Jobs ko latest se pehle dikhane ke liye reverse()
+        
+        console.log(`Loaded ${jobs.length} jobs.`);
+    }, (error) => {
+        console.error("Firebase Jobs Load Error:", error);
+        document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
+    });
+}
