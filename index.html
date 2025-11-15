@@ -159,6 +159,51 @@
         window.open('https://wa.me/' + num, '_blank');
     }
 
+    // ⭐ SERVICE REGISTRATION FUNCTION ADDED HERE ⭐
+    function registerService() {
+        const name = document.getElementById('providerName').value;
+        const phone = document.getElementById('providerPhone').value;
+        const category = document.getElementById('serviceCategory').value;
+        const area = document.getElementById('providerArea').value;
+        const experience = document.getElementById('providerExperience').value;
+        const form = document.getElementById('serviceForm');
+
+        if (!name || !phone || !category || !area || !experience) {
+            alert("कृपया सभी फ़ील्ड भरें।");
+            return false;
+        }
+        
+        // एक साधारण वैलिडेशन (10 अंक का फ़ोन नंबर)
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            return false;
+        }
+
+        const providerData = {
+            name: name,
+            phone: phone,
+            category: category,
+            area: area,
+            experience: experience + ' years',
+            timestamp: firebase.database.ServerValue.TIMESTAMP 
+        };
+
+        // डेटाबेस में डेटा भेजें
+        window.providersRef.push(providerData)
+            .then(() => {
+                alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                form.reset(); 
+            })
+            .catch((error) => {
+                alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                console.error("Firebase Error:", error);
+            });
+
+        return true; 
+    }
+    // ⭐ END OF SERVICE REGISTRATION FUNCTION ⭐
+
+
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
@@ -200,10 +245,18 @@
                 .then(() => {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
-                    startFirebaseListener();
-                    loadCategories();
-                    loadPromotionAds();
-                    setTimeout(loadPromotionAds, 2000);
+                    
+                    // Note: Missing functions (startFirebaseListener, loadCategories, loadPromotionAds) 
+                    // को script.js में होना चाहिए।
+                    if (typeof startFirebaseListener === 'function') startFirebaseListener();
+                    if (typeof loadCategories === 'function') loadCategories();
+                    if (typeof loadPromotionAds === 'function') {
+                        loadPromotionAds();
+                        setTimeout(loadPromotionAds, 2000);
+                    } else {
+                        // Fallback for missing functions
+                        console.warn("One or more required functions (startFirebaseListener, loadCategories, loadPromotionAds) are missing. Check script.js");
+                    }
                 })
                 .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
         };
@@ -214,16 +267,18 @@
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'jobs-screen') loadJobs();
+            if(id === 'jobs-screen' && typeof loadJobs === 'function') loadJobs();
         };
+        // PWA setup
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('SW Error:', err));
+            });
+        }
     };
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker Registered'))
-        .catch(err => console.log('SW Error:', err));
-    });
-  }
-</script>
+    </script>
 </body>
-</html>
+    </html>
+    
