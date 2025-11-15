@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#ff6666">
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
+        /* Basic Styling (Unchanged) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
         body { background: #f5f5f5; }
         .container { max-width: 400px; margin: 0 auto; background: white; min-height: 100vh; }
@@ -27,31 +28,46 @@
         .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
         .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
         .promotion-banner { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: bold; }
+        /* Registration Specific Styles */
+        .reg-input { width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #ddd; font-size:16px; }
     </style>
 </head>
 <body>
 
     <div class="ad-container">
+        <!-- Ad Script 1 -->
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
             document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
         </script>
     </div>
 
-    <div id="loginScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
-        <div style="background:white;padding:40px 30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
-            <h2 style="color:#1e3c72;">Fatehpur Hubs</h2>
-            <p style="color:#555;margin:15px 0;">10 digit number daaliye</p>
-            <input type="tel" id="phoneInput" placeholder="9876543210" maxlength="10" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
-            <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Send OTP</button>
-            <div id="otpSection" style="margin-top:20px;display:none;">
-                <input type="text" id="otpInput" placeholder="123456" maxlength="6" style="width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px;">
-                <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
+    <!-- ⭐ UPDATED REGISTRATION/LOGIN SCREEN ⭐ -->
+    <div id="registrationScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="background:white;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+            <h2 style="color:#1e3c72; margin-bottom: 20px;">Fatehpur Hubs</h2>
+            
+            <div id="profileInputSection">
+                <p style="color:#555;margin:15px 0;">Sign Up/Login करें</p>
+                <input type="text" id="userName" placeholder="आपका पूरा नाम" class="reg-input">
+                <input type="text" id="userArea" placeholder="आपकी लोकैलिटी/Area" class="reg-input">
+                <input type="tel" id="phoneInput" placeholder="10 अंक का Mobile Number" maxlength="10" class="reg-input">
+                <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;margin-top:15px;">Send OTP & Sign Up</button>
             </div>
+
+            <div id="otpSection" style="margin-top:20px;display:none;">
+                <p style="color:#555;margin:15px 0;">OTP Verify करें</p>
+                <input type="text" id="otpInput" placeholder="6 अंक का OTP" maxlength="6" class="reg-input">
+                <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
+                <button onclick="document.getElementById('otpSection').style.display='none'; document.getElementById('profileInputSection').style.display='block'; document.getElementById('sendOtpBtn').innerHTML='Send OTP & Sign Up';" style="background:none; border:none; color:#1e3c72; margin-top:10px; cursor:pointer;">&#8592; Edit Number</button>
+            </div>
+            
             <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;min-height:20px;"></p>
             <div id="recaptcha-container"></div>
         </div>
     </div>
+    <!-- ⭐ END OF REGISTRATION/LOGIN SCREEN ⭐ -->
+
 
     <div class="container" id="mainApp" style="display:none;">
         <header><h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1></header>
@@ -65,6 +81,7 @@
             </div>
 
             <div class="ad-container">
+                <!-- Ad Script 2 -->
                 <script type="text/javascript">
                     atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
                     document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
@@ -108,9 +125,12 @@
             <div id="mistri-list"><h3>Available Services</h3><p style="text-align:center;color:#2a5298;">Loading...</p></div>
             <div style="height:80px;"></div>
         </div>
-                    <div id="jobs-screen" class="screen">
+        
+        <!-- Job Screen (Structure corrected as requested previously) -->
+        <div id="jobs-screen" class="screen">
             <h2 class="screen-title">💼 Job Listings</h2>
 
+            <!-- JOB REGISTRATION FORM -->
             <div class="registration-section" style="padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
                 <h3>✅ Job Post करें (Hiring)</h3>
                 <form id="jobForm" onsubmit="jobRegister(); return false;">
@@ -124,10 +144,12 @@
                     <button type="submit" class="contact-btn" style="width: 100%; background-color: #2a5298;">जॉब पोस्ट करें</button>
                 </form>
             </div>
+            <!-- END OF JOB REGISTRATION FORM -->
+            
             <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Home Screen</button>
             <h2>Local Jobs</h2>
             <div id="jobs-list"><p>Loading jobs...</p></div>
-                    </div>
+        </div>
 
         <div class="footer">
             <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
@@ -137,6 +159,7 @@
     </div>
 
     <div id="bottom-ad">
+        <!-- Ad Script 3 -->
         <script type="text/javascript">
             atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
             document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
@@ -160,20 +183,20 @@
     };
 
     let recaptchaVerifier, confirmationResult;
+    let tempUserData = {}; // ⭐ New: Temporary storage for Name, Area, Locality
 
     // WHATSAPP BUTTON FIX — CHAHE +91 HO YA NAHI, 100% KAAM KAREGA
     function openWhatsApp(phone) {
-        let num = phone.toString().replace(/[^0-9]/g, ''); // sab non-digit hatao
+        let num = phone.toString().replace(/[^0-9]/g, '');
         if (num.length === 10) num = '91' + num;
         if (num.length === 12 && num.startsWith('91')) {
-            // perfect
         } else if (num.length === 13 && num.startsWith('919')) {
-            num = num.substring(1); // +91987... se +91 hatao
+            num = num.substring(1);
         }
         window.open('https://wa.me/' + num, '_blank');
     }
 
-    // ⭐ SERVICE REGISTRATION FUNCTION ADDED HERE ⭐
+    // ⭐ SERVICE REGISTRATION FUNCTION (Unchanged) ⭐
     function registerService() {
         const name = document.getElementById('providerName').value;
         const phone = document.getElementById('providerPhone').value;
@@ -187,22 +210,17 @@
             return false;
         }
         
-        // एक साधारण वैलिडेशन (10 अंक का फ़ोन नंबर)
         if (phone.length !== 10 || isNaN(phone)) {
             alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
 
         const providerData = {
-            name: name,
-            phone: phone,
-            category: category,
-            area: area,
+            name: name, phone: phone, category: category, area: area,
             experience: experience + ' years',
             timestamp: firebase.database.ServerValue.TIMESTAMP 
         };
 
-        // डेटाबेस में डेटा भेजें
         window.providersRef.push(providerData)
             .then(() => {
                 alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
@@ -212,54 +230,48 @@
                 alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
                 console.error("Firebase Error:", error);
             });
-
         return true; 
     }
     // ⭐ END OF SERVICE REGISTRATION FUNCTION ⭐
 
-// Function to register a new job post
-function jobRegister() {
-    const title = document.getElementById('jobTitle').value;
-    const shopName = document.getElementById('jobShopName').value;
-    const location = document.getElementById('jobLocation').value;
-    const salary = document.getElementById('jobSalary').value;
-    const description = document.getElementById('jobDescription').value;
-    const phone = document.getElementById('jobPhone').value;
-    const form = document.getElementById('jobForm'); // Assuming your job form has this ID
+    // Function to register a new job post (Unchanged)
+    function jobRegister() {
+        const title = document.getElementById('jobTitle').value;
+        const shopName = document.getElementById('jobShopName').value;
+        const location = document.getElementById('jobLocation').value;
+        const salary = document.getElementById('jobSalary').value;
+        const description = document.getElementById('jobDescription').value;
+        const phone = document.getElementById('jobPhone').value;
+        const form = document.getElementById('jobForm');
 
-    if (!title || !shopName || !location || !salary || !description || !phone) {
-        alert("कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+        if (!title || !shopName || !location || !salary || !description || !phone) {
+            alert("कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+            return false;
+        }
+
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            return false;
+        }
+
+        const jobData = {
+            title: title, shopName: shopName, location: location, salary: salary,
+            description: description, phone: phone, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP 
+        };
+
+        window.jobsRef.push(jobData) 
+            .then(() => {
+                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                form.reset(); 
+            })
+            .catch((error) => {
+                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
+                console.error("Firebase Job Error:", error);
+            });
+
         return false;
     }
-
-    if (phone.length !== 10 || isNaN(phone)) {
-        alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
-        return false;
-    }
-
-    const jobData = {
-        title: title,
-        shopName: shopName,
-        location: location,
-        salary: salary,
-        description: description,
-        phone: phone, 
-        timestamp: firebase.database.ServerValue.TIMESTAMP 
-    };
-
-    // Use the jobsRef initialized in window.onload
-    window.jobsRef.push(jobData) 
-        .then(() => {
-            alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-            form.reset(); 
-        })
-        .catch((error) => {
-            alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
-            console.error("Firebase Job Error:", error);
-        });
-
-    return false; // Prevent default form submission
-}
         
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
@@ -267,56 +279,101 @@ function jobRegister() {
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-
-        // INVISIBLE reCAPTCHA
+        // 1. INVISIBLE reCAPTCHA SETUP
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
             'size': 'invisible'
         });
         recaptchaVerifier.render();
 
-        // SEND OTP
+        // 2. PERSISTENCE CHECK: User Authentication State Listener
+        // यह चेक करता है कि यूज़र पहले से लॉगिन है या नहीं (आपका "हमेशा लॉगिन" फ़ीचर)।
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // If user is found, load the main app directly
+                document.getElementById('registrationScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                console.log("Auto-Login Successful:", user.phoneNumber);
+
+                // ⭐ CRITICAL: Load all necessary data for returning users ⭐
+                // अगर ये फंक्शन्स script.js में मौजूद हैं, तो उन्हें कॉल करें
+                if (typeof startFirebaseListener === 'function') startFirebaseListener();
+                if (typeof loadCategories === 'function') loadCategories();
+                if (typeof loadJobs === 'function') loadJobs(); 
+                
+                if (typeof loadPromotionAds === 'function') {
+                    loadPromotionAds();
+                    setTimeout(loadPromotionAds, 2000);
+                }
+            } else {
+                // अगर कोई यूजर लॉग इन नहीं है, तो रजिस्ट्रेशन स्क्रीन दिखाएँ।
+                document.getElementById('registrationScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+        });
+
+
+        // 3. SEND OTP (Registration/Login Step 1)
         document.getElementById('sendOtpBtn').onclick = () => {
-            const phone = '+91' + document.getElementById('phoneInput').value.trim();
-            if (phone.length !== 13) {
-                document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
+            const name = document.getElementById('userName').value.trim();
+            const area = document.getElementById('userArea').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            
+            if (!name || !area || phone.length !== 10 || isNaN(phone)) {
+                document.getElementById('loginMsg').innerHTML = "कृपया सभी फ़ील्ड (नाम, एरिया) भरें और 10 अंक का नंबर डालें।";
                 return;
             }
+
+            // ⭐ Temporary Profile Data Save ⭐
+            tempUserData = {
+                name: name,
+                area: area,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
             document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+            const fullPhone = '+91' + phone;
+
             recaptchaVerifier.verify().then(() => {
-                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+                firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
                     .then((result) => {
                         confirmationResult = result;
-                        document.getElementById('otpSection').style.display = 'block';
-                        document.getElementById('sendOtpBtn').style.display = 'none';
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                        document.getElementById('profileInputSection').style.display = 'none'; // Profile fields hide
+                        document.getElementById('otpSection').style.display = 'block'; // OTP field shows
+                        document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
                     })
                     .catch((err) => {
                         document.getElementById('loginMsg').innerHTML = err.message;
-                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                        document.getElementById('profileInputSection').style.display = 'block';
+                        document.getElementById('otpSection').style.display = 'none';
                     });
             });
         };
 
-        // VERIFY OTP
+        // 4. VERIFY OTP (Registration/Login Step 2)
         document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult.confirm(document.getElementById('otpInput').value)
-                .then(() => {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    
-                    // Note: Missing functions (startFirebaseListener, loadCategories, loadPromotionAds) 
-                    // को script.js में होना चाहिए।
-                    if (typeof startFirebaseListener === 'function') startFirebaseListener();
-                    if (typeof loadCategories === 'function') loadCategories();
-                    if (typeof loadPromotionAds === 'function') {
-                        loadPromotionAds();
-                        setTimeout(loadPromotionAds, 2000);
-                    } else {
-                        // Fallback for missing functions
-                        console.warn("One or more required functions (startFirebaseListener, loadCategories, loadPromotionAds) are missing. Check script.js");
+            const otp = document.getElementById('otpInput').value;
+            if (otp.length !== 6) {
+                document.getElementById('loginMsg').innerHTML = "कृपया 6 अंक का OTP डालें।";
+                return;
+            }
+
+            confirmationResult.confirm(otp)
+                .then((result) => {
+                    const user = result.user;
+                    // ⭐ CRITICAL: Save Profile data after successful sign-in ⭐
+                    if (user && user.uid) {
+                        window.database.ref('users/' + user.uid).set(tempUserData)
+                            .then(() => console.log("User profile saved/updated."))
+                            .catch(error => console.error("Profile save error:", error));
                     }
+                    
+                    // onAuthStateChanged अब स्क्रीन स्विचिंग को संभालेगा और डेटा लोड करेगा।
+                    document.getElementById('loginMsg').innerHTML = "<span style='color:green'>Login Successful! Redirecting...</span>";
                 })
-                .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+                .catch(() => {
+                    document.getElementById('loginMsg').innerHTML = "Galat OTP";
+                });
         };
 
         // Extra functions
@@ -338,5 +395,5 @@ function jobRegister() {
     };
     </script>
 </body>
-    </html>
-    
+</html>
+
