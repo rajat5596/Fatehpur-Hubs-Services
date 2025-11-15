@@ -148,8 +148,8 @@
     let recaptchaVerifier, confirmationResult;
     let isAppInitialized = false; 
 
-    // Function to load the main app components
     function loadMainApp() {
+        // App is considered fully initialized and ready to show content
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
 
@@ -165,25 +165,20 @@
         }
     }
 
-    // ⭐ NEW: This function handles both login check and app load ⭐
+    // This function handles the logic after successful Firebase Auth login/re-login
     function handleSuccessfulLogin(user) {
         // We use the phone number from the Firebase Auth object
         const phone = user.phoneNumber; 
         
-        // 1. Check if the user is registered in the Realtime Database
+        // 1. Check if the user is registered in the Realtime Database (Billing/Sign-up check)
         checkIfUserExists(phone)
             .then(userFound => {
-                if(userFound) {
-                    loadMainApp();
-                } else {
-                    // Scenario: User is logged into Firebase Auth but not in your DB
-                    // (Should not happen in your flow, but good to handle)
-                    console.warn("User logged in but not found in DB. Should proceed to registration if required.");
-                    loadMainApp(); 
-                }
+                // Since the user is logged into Auth, we load the app regardless.
+                // If userFound is false, they might be prompted to register via serviceForm.
+                loadMainApp(); 
             })
             .catch(err => {
-                console.error("Database check failed, loading main app anyway:", err);
+                console.error("Database check failed, loading main app:", err);
                 loadMainApp();
             });
     }
@@ -234,12 +229,13 @@
         return true; 
     }
     
+    // Billing Optimization: Checks if user exists in Realtime DB 
     function checkIfUserExists(phoneNumber) {
         // Accepts full number (+91XXXXXXXXXX) or 10-digit number
         const phoneNumForSearch = phoneNumber.startsWith('+91') ? phoneNumber.substring(3) : phoneNumber; 
         
         return new Promise((resolve, reject) => {
-            if (!window.providersRef) return reject(new Error("Database not ready."));
+            if (!window.providersRef) return resolve(false); // Failsafe
             
             window.providersRef.orderByChild('phone').equalTo(phoneNumForSearch).limitToFirst(1).once('value')
                 .then((snapshot) => {
@@ -256,12 +252,13 @@
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
         
-        // 1. **CRITICAL FIX FOR PERSISTENCE:** Auto-Login Check runs FIRST
+        // 1. CRITICAL FIX: Auto-Login Check runs FIRST before any UI logic
         firebase.auth().onAuthStateChanged(user => {
             if (user && !isAppInitialized) {
-                // If a user is found AND the app hasn't been initialized yet
+                // User is found, proceed to load main app
                 handleSuccessfulLogin(user);
             }
+            // If user is null (logged out) OR if app is already initialized, do nothing here.
         });
 
         // INVISIBLE reCAPTCHA
@@ -288,17 +285,17 @@
             checkIfUserExists(rawPhone) // Pass 10-digit number for DB check
                 .then((userFound) => {
                     if (userFound) {
-                        // If user is found in DB, skip OTP and try to sign in silently
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>User found. Signing in...</span>";
-
-                        // This ensures that even if persistence failed, we try to log them in again
+                        // If user is found in DB, try silent sign-in to renew session
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>Purana User. Session shuru ho raha hai...</span>";
+                        
+                        // We attempt to sign in again without sending a new OTP
+                        // This often succeeds instantly if the user has a recent token.
                         firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
                             .then(result => {
-                                // If the session is still active, this might complete quickly
                                 if (result && result.user) {
                                      handleSuccessfulLogin(result.user);
                                 } else {
-                                    // Need OTP
+                                    // If signInWithPhoneNumber returns confirmationResult (needs OTP)
                                     confirmationResult = result;
                                     document.getElementById('otpSection').style.display = 'block';
                                     document.getElementById('sendOtpBtn').style.display = 'none';
@@ -306,25 +303,27 @@
                                 }
                             })
                             .catch((err) => {
-                                // If silent sign-in fails, proceed to normal OTP flow
+                                // If silent sign-in fails (Token expired), proceed to normal OTP flow
                                 document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-                                firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
-                                    .then((result) => {
-                                        confirmationResult = result;
-                                        document.getElementById('otpSection').style.display = 'block';
-                                        document.getElementById('sendOtpBtn').style.display = 'none';
-                                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
-                                    })
-                                    .catch((err) => {
-                                        document.getElementById('loginMsg').innerHTML = err.message;
-                                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
-                                        document.getElementById('sendOtpBtn').disabled = false;
-                                    });
+                                return firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier);
+                            })
+                            .then(result => {
+                                if (result) {
+                                    confirmationResult = result;
+                                    document.getElementById('otpSection').style.display = 'block';
+                                    document.getElementById('sendOtpBtn').style.display = 'none';
+                                    document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                                }
+                            })
+                            .catch((err) => {
+                                document.getElementById('loginMsg').innerHTML = err.message;
+                                document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                                document.getElementById('sendOtpBtn').disabled = false;
                             });
                         return;
                     }
 
-                    // If new user, proceed with OTP
+                    // If new user (userFound is false), proceed with normal OTP flow
                     document.getElementById('sendOtpBtn').innerHTML = "Sending...";
                     
                     recaptchaVerifier.verify().then(() => {
@@ -365,6 +364,7 @@
                     return confirmationResult.confirm(otp);
                 })
                 .then(result => {
+                    // Result contains the logged-in user object
                     handleSuccessfulLogin(result.user);
                 })
                 .catch((error) => {
@@ -390,6 +390,7 @@
             });
         }
     };
-    </script>
+                   </script>
+    
     </body>
     </html>
