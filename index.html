@@ -240,7 +240,7 @@
     let recaptchaVerifier, confirmationResult;
     let tempUserData = {}; 
     
-    // ⭐ NEW GLOBAL STATE FOR PAGINATION ⭐
+    // ⭐ GLOBAL STATE FOR PAGINATION - FIXED AND SIMPLIFIED ⭐
     let providersLastKey = null;
     const providersLimit = 10;
     let currentCategory = null; 
@@ -282,71 +282,216 @@
         ).join('');
     }
 
-    // ⭐ OPTIMIZED PAGINATION FUNCTION: Load Services (Providers) ⭐
-    // `loadMore` true hone par agla page load hoga, false ya undefined hone par pehla page.
+    // ⭐ FIXED PAGINATION FUNCTION: Load Services (Providers) ⭐
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
         
         let queryRef;
-        loadMoreBtn.style.display = 'none'; // Pehle button hide karein
+        loadMoreBtn.style.display = 'none';
 
-        if (!loadMore) {
-            // Agar pehla page load kar rahe hain, toh state reset karein
+        if (!loadMore || currentCategory !== null) {
+            // New Query OR Filter is active: Do not reset pagination state here if filter is active.
+            // If filter is active, call filterByCategory instead.
+            if(currentCategory !== null) return;
+            
+            // New Unfiltered Query: Reset State & UI
             providersLastKey = null;
-            currentCategory = null;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
             listElement.innerHTML = '<h3>Available Services (Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading latest 10 providers...</p>';
-            queryRef = window.providersRef.limitToFirst(providersLimit + 1); // +1 agla key nikalne ke liye
+            queryRef = window.providersRef.orderByKey().limitToFirst(providersLimit + 1);
         } else {
-            // Agla page load kar rahe hain (Next 10)
+            // Load More: Use last key for unfiltered list
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
-            // startAt(value, key): value null hoga kyunki hum order-by key use kar rahe hain
-            queryRef = window.providersRef.startAt(null, providersLastKey).limitToFirst(providersLimit + 1);
+            queryRef = window.providersRef.orderByKey().startAt(providersLastKey).limitToFirst(providersLimit + 1);
         }
 
-        queryRef.once('value', (snapshot) => { // once use karein taaki har baar poori list download na ho
-            document.getElementById('loading-more')?.remove(); // Loading message hata dein
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-more')?.remove();
 
-            if (!snapshot.exists()) {
-                if (!loadMore) listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">No services available yet!</p>';
-                loadMoreBtn.style.display = 'none';
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">No services available yet!</p>';
                 return;
             }
 
-            let items = [];
-            let newLastKey = null;
-            let count = 0;
-
+            let allItems = [];
             snapshot.forEach(childSnapshot => {
-                const key = childSnapshot.key;
-                // Pehle item ko skip karein agar loadMore hai
-                if (loadMore && key === providersLastKey && count === 0) { 
-                    count++;
-                    return; 
-                }
-                
-                // Item ko array mein jodein
-                if (count < providersLimit) {
-                    items.push(renderProviderCard(childSnapshot.val()));
-                    newLastKey = key;
-                    count++;
-                }
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
             });
 
-            providersLastKey = newLastKey;
+            // If loading more, the first item in allItems is a duplicate (the last key from the previous batch)
+            if (loadMore && allItems.length > 0) {
+                allItems.shift(); 
+            }
+            
+            // Collect the actual 10 items to render
+            let itemsToRender = allItems.slice(0, providersLimit);
+            
+            // Set the next starting key
+            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
 
             if (!loadMore) {
-                listElement.innerHTML = `<h3>Available Services (${category} - ${count} loaded)</h3>` + items.join('');
+                listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
             } else {
-                listElement.insertAdjacentHTML('beforeend', items.join(''));
+                listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
 
-            if (count < providersLimit || snapshot.numChildren() <= providersLimit) {
+            // If we got exactly 11 (or less than 10 after shift), it means more data is available
+            if (allItems.length > providersLimit) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => loadCategories(true);
+            } else {
                 loadMoreBtn.style.display = 'none';
                 listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
+            }
+
+        }, (error) => {
+            console.error("Error loading services:", error);
+            document.getElementById('loading-more')?.remove();
+            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">Error loading data.</p>';
+        });
+    }
+
+
+    // ⭐ FIXED PAGINATION FUNCTION: Load Jobs ⭐
+    window.loadJobs = (loadMore = false) => {
+        const listElement = document.getElementById('jobs-list');
+        const loadMoreBtn = document.getElementById('load-more-jobs');
+        
+        let queryRef;
+        loadMoreBtn.style.display = 'none';
+
+        if (!loadMore) {
+            jobsLastKey = null;
+            listElement.innerHTML = '<h3>Local Jobs (Top 10)</h3><p>Loading latest 10 jobs...</p>';
+            queryRef = window.jobsRef.orderByKey().limitToLast(jobsLimit + 1); // Use limitToLast for jobs (to get latest first)
+        } else {
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-jobs" style="text-align:center;color:#ff9800;">Loading more jobs...</p>');
+            // Use endBefore and jobsLastKey (key of the oldest loaded item) to go backwards
+            queryRef = window.jobsRef.orderByKey().endBefore(jobsLastKey).limitToLast(jobsLimit + 1); 
+        }
+
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-jobs')?.remove();
+
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:#ff6666;">No jobs posted yet!</p>';
+                return;
+            }
+
+            let allItems = [];
+            snapshot.forEach(childSnapshot => {
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+            });
+
+            // If loading more, the items are sorted descending by key due to limitToLast, 
+            // so we reverse to process from newest to oldest.
+            allItems.reverse();
+
+            // If loading more, the first item is the duplicate (the one right before jobsLastKey)
+            if (loadMore && allItems.length > 0) {
+                allItems.shift(); 
+            }
+            
+            let itemsToRender = allItems.slice(0, jobsLimit);
+            
+            // The last key is the key of the oldest item we rendered (which will be the start point for endBefore next time)
+            jobsLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderJobCard(item.data)).join('');
+
+            if (!loadMore) {
+                listElement.innerHTML = `<h3>Local Jobs (${itemsToRender.length} loaded)</h3>` + htmlContent;
             } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent); // Newest on top, oldest at bottom
+            }
+
+            if (allItems.length > jobsLimit) {
                 loadMoreBtn.style.display = 'block';
-                loadMoreBtn.onclick = () => filterByCategory(currentCategory, true); // Agli loadMore call
+                loadMoreBtn.onclick = () => loadJobs(true);
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of Job List.</p>');
+            }
+        }, (error) => {
+            console.error("Error loading jobs:", error);
+            document.getElementById('loading-jobs')?.remove();
+            listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:red;">Error loading jobs.</p>';
+        });
+    }
+
+    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category ⭐
+    window.filterByCategory = (category, loadMore = false) => {
+        const listElement = document.getElementById('mistri-list');
+        const loadMoreBtn = document.getElementById('load-more-providers');
+        loadMoreBtn.style.display = 'none';
+        
+        // Buttons ko selected state dein
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.remove('selected');
+            if(btn.innerText === category) {
+                btn.classList.add('selected');
+            }
+        });
+
+        let queryRef;
+        const baseRef = window.providersRef.orderByChild('category'); // Base reference: order by category
+
+        if (!loadMore) {
+            // Nayi Category Filter, state reset
+            providersLastKey = null;
+            currentCategory = category;
+            listElement.innerHTML = `<h3>Available Services (${category} - Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
+            
+            // First page query: only category match, limit to 11
+            queryRef = baseRef.startAt(category).endAt(category).limitToFirst(providersLimit + 1);
+        } else {
+            // Agla page load kar rahe hain
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
+
+            // Next page query: start after the last key, but within the current category range
+            // We use startAt(value, key) to continue the pagination from the last item's key.
+            queryRef = baseRef.startAt(currentCategory, providersLastKey).endAt(currentCategory).limitToFirst(providersLimit + 1);
+        }
+        
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-more')?.remove();
+
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">No ${category} services available yet!</p>`;
+                return;
+            }
+
+            let allItems = [];
+            snapshot.forEach(childSnapshot => {
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+            });
+            
+            // Remove the duplicate first item if loading more
+            if (loadMore && allItems.length > 0) {
+                allItems.shift();
+            }
+
+            let itemsToRender = allItems.slice(0, providersLimit);
+            
+            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
+
+            if (!loadMore) {
+                listElement.innerHTML = `<h3>Available Services (${category} - ${itemsToRender.length} loaded)</h3>` + htmlContent;
+            } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent);
+            }
+
+            if (allItems.length > providersLimit) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => filterByCategory(currentCategory, true); 
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
             }
 
         }, (error) => {
@@ -374,6 +519,7 @@
             const providers = snapshot.val();
             let results = [];
             if (providers) {
+                // Object.values() function se Firebase key-value pairs ko array of objects mein convert karte hain
                 results = Object.values(providers).filter(p => 
                     (p.name && p.name.toLowerCase().includes(searchTerm)) || 
                     (p.category && p.category.toLowerCase().includes(searchTerm)) ||
@@ -437,6 +583,8 @@
             .then(() => {
                 alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                 form.reset(); 
+                // Data register hone ke baad list ko refresh karein
+                loadCategories(); 
             })
             .catch((error) => {
                 alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
@@ -457,7 +605,7 @@
         const form = document.getElementById('jobForm');
 
         if (!title || !shopName || !location || !salary || !description || !phone) {
-            alert("कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
             return false;
         }
 
@@ -476,6 +624,8 @@
             .then(() => {
                 alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                 form.reset(); 
+                // Data register hone ke baad list ko refresh karein
+                if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
             })
             .catch((error) => {
                 alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
@@ -488,8 +638,9 @@
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
-        window.providersRef = database.ref('service_providers').orderByKey(); // OrderByKey is CRITICAL for pagination
-        window.jobsRef = database.ref('local_jobs').orderByKey(); // OrderByKey is CRITICAL for pagination
+        // Base reference: Order by key (for general listing) and order by child (for filtering)
+        window.providersRef = database.ref('service_providers'); 
+        window.jobsRef = database.ref('local_jobs'); 
 
         // 1. INVISIBLE reCAPTCHA SETUP
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -607,3 +758,4 @@
     </script>
 </body>
 </html>
+        
