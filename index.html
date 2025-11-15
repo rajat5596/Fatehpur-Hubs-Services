@@ -267,18 +267,6 @@ function jobRegister() {
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
 
-        // ⭐ CRITICAL PERSISTENCE FIX: Auto-Login Check runs FIRST ⭐
-        firebase.auth().onAuthStateChanged(user => {
-            if (user) {
-                // If user is found, load the main app directly
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
-                // You may want to call initial loading functions here too
-                // Example: if (typeof loadCategories === 'function') loadCategories();
-                console.log("Auto-Login Successful:", user.phoneNumber);
-            }
-        });
 
         // INVISIBLE reCAPTCHA
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
