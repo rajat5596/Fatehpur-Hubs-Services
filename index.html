@@ -146,49 +146,81 @@
     };
 
     let recaptchaVerifier, confirmationResult;
+    let isAppInitialized = false; 
 
-    // WHATSAPP BUTTON FIX — CHAHE +91 HO YA NAHI, 100% KAAM KAREGA
+    // Function to load the main app components
+    function loadMainApp() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+
+        if (!isAppInitialized) {
+            // All required functions from script.js are called only ONCE here
+            if (typeof startFirebaseListener === 'function') startFirebaseListener();
+            if (typeof loadCategories === 'function') loadCategories();
+            if (typeof loadPromotionAds === 'function') {
+                loadPromotionAds();
+                setTimeout(loadPromotionAds, 2000);
+            }
+            isAppInitialized = true;
+        }
+    }
+
+    // ⭐ NEW: This function handles both login check and app load ⭐
+    function handleSuccessfulLogin(user) {
+        // We use the phone number from the Firebase Auth object
+        const phone = user.phoneNumber; 
+        
+        // 1. Check if the user is registered in the Realtime Database
+        checkIfUserExists(phone)
+            .then(userFound => {
+                if(userFound) {
+                    loadMainApp();
+                } else {
+                    // Scenario: User is logged into Firebase Auth but not in your DB
+                    // (Should not happen in your flow, but good to handle)
+                    console.warn("User logged in but not found in DB. Should proceed to registration if required.");
+                    loadMainApp(); 
+                }
+            })
+            .catch(err => {
+                console.error("Database check failed, loading main app anyway:", err);
+                loadMainApp();
+            });
+    }
+
     function openWhatsApp(phone) {
-        let num = phone.toString().replace(/[^0-9]/g, ''); // sab non-digit hatao
+        let num = phone.toString().replace(/[^0-9]/g, '');
         if (num.length === 10) num = '91' + num;
         if (num.length === 12 && num.startsWith('91')) {
             // perfect
         } else if (num.length === 13 && num.startsWith('919')) {
-            num = num.substring(1); // +91987... se +91 hatao
+            num = num.substring(1);
         }
         window.open('https://wa.me/' + num, '_blank');
     }
 
-    // ⭐ SERVICE REGISTRATION FUNCTION ADDED HERE ⭐
     function registerService() {
         const name = document.getElementById('providerName').value;
-        const phone = document.getElementById('providerPhone').value;
+        const phone = document.getElementById('providerPhone').value; // 10 digit number
         const category = document.getElementById('serviceCategory').value;
         const area = document.getElementById('providerArea').value;
         const experience = document.getElementById('providerExperience').value;
         const form = document.getElementById('serviceForm');
 
-        if (!name || !phone || !category || !area || !experience) {
-            alert("कृपया सभी फ़ील्ड भरें।");
-            return false;
-        }
-        
-        // एक साधारण वैलिडेशन (10 अंक का फ़ोन नंबर)
-        if (phone.length !== 10 || isNaN(phone)) {
-            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+        if (!name || !phone || !category || !area || !experience || phone.length !== 10 || isNaN(phone)) {
+            alert("कृपया सभी फ़ील्ड भरें और 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
 
         const providerData = {
             name: name,
-            phone: phone,
+            phone: phone, 
             category: category,
             area: area,
             experience: experience + ' years',
             timestamp: firebase.database.ServerValue.TIMESTAMP 
         };
 
-        // डेटाबेस में डेटा भेजें
         window.providersRef.push(providerData)
             .then(() => {
                 alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
@@ -201,14 +233,36 @@
 
         return true; 
     }
-    // ⭐ END OF SERVICE REGISTRATION FUNCTION ⭐
-
+    
+    function checkIfUserExists(phoneNumber) {
+        // Accepts full number (+91XXXXXXXXXX) or 10-digit number
+        const phoneNumForSearch = phoneNumber.startsWith('+91') ? phoneNumber.substring(3) : phoneNumber; 
+        
+        return new Promise((resolve, reject) => {
+            if (!window.providersRef) return reject(new Error("Database not ready."));
+            
+            window.providersRef.orderByChild('phone').equalTo(phoneNumForSearch).limitToFirst(1).once('value')
+                .then((snapshot) => {
+                    resolve(snapshot.exists()); 
+                })
+                .catch(reject);
+        });
+    }
 
     window.onload = () => {
+        // 0. INITIALIZE FIREBASE
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
         window.providersRef = database.ref('service_providers');
         window.jobsRef = database.ref('local_jobs');
+        
+        // 1. **CRITICAL FIX FOR PERSISTENCE:** Auto-Login Check runs FIRST
+        firebase.auth().onAuthStateChanged(user => {
+            if (user && !isAppInitialized) {
+                // If a user is found AND the app hasn't been initialized yet
+                handleSuccessfulLogin(user);
+            }
+        });
 
         // INVISIBLE reCAPTCHA
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -216,49 +270,107 @@
         });
         recaptchaVerifier.render();
 
-        // SEND OTP
+        // 2. SEND OTP (Billing Optimized)
         document.getElementById('sendOtpBtn').onclick = () => {
-            const phone = '+91' + document.getElementById('phoneInput').value.trim();
-            if (phone.length !== 13) {
+            const rawPhone = document.getElementById('phoneInput').value.trim();
+            const fullPhone = '+91' + rawPhone;
+            
+            if (rawPhone.length !== 10) {
                 document.getElementById('loginMsg').innerHTML = "10 digit daaliye";
                 return;
             }
-            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-            recaptchaVerifier.verify().then(() => {
-                firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-                    .then((result) => {
-                        confirmationResult = result;
-                        document.getElementById('otpSection').style.display = 'block';
-                        document.getElementById('sendOtpBtn').style.display = 'none';
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+            
+            document.getElementById('sendOtpBtn').innerHTML = "Checking...";
+            document.getElementById('sendOtpBtn').disabled = true; 
+            document.getElementById('loginMsg').innerHTML = ""; 
+            
+            // Check if user exists before sending OTP (Billing optimization)
+            checkIfUserExists(rawPhone) // Pass 10-digit number for DB check
+                .then((userFound) => {
+                    if (userFound) {
+                        // If user is found in DB, skip OTP and try to sign in silently
+                        document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>User found. Signing in...</span>";
+
+                        // This ensures that even if persistence failed, we try to log them in again
+                        firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                            .then(result => {
+                                // If the session is still active, this might complete quickly
+                                if (result && result.user) {
+                                     handleSuccessfulLogin(result.user);
+                                } else {
+                                    // Need OTP
+                                    confirmationResult = result;
+                                    document.getElementById('otpSection').style.display = 'block';
+                                    document.getElementById('sendOtpBtn').style.display = 'none';
+                                    document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                                }
+                            })
+                            .catch((err) => {
+                                // If silent sign-in fails, proceed to normal OTP flow
+                                document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+                                firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                                    .then((result) => {
+                                        confirmationResult = result;
+                                        document.getElementById('otpSection').style.display = 'block';
+                                        document.getElementById('sendOtpBtn').style.display = 'none';
+                                        document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                                    })
+                                    .catch((err) => {
+                                        document.getElementById('loginMsg').innerHTML = err.message;
+                                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                                        document.getElementById('sendOtpBtn').disabled = false;
+                                    });
+                            });
+                        return;
+                    }
+
+                    // If new user, proceed with OTP
+                    document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+                    
+                    recaptchaVerifier.verify().then(() => {
+                        firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                            .then((result) => {
+                                confirmationResult = result;
+                                document.getElementById('otpSection').style.display = 'block';
+                                document.getElementById('sendOtpBtn').style.display = 'none';
+                                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP bheja gaya!</span>";
+                            })
+                            .catch((err) => {
+                                document.getElementById('loginMsg').innerHTML = err.message;
+                                document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                                document.getElementById('sendOtpBtn').disabled = false;
+                            });
                     })
                     .catch((err) => {
-                        document.getElementById('loginMsg').innerHTML = err.message;
-                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                         document.getElementById('loginMsg').innerHTML = "Recaptcha Error: " + err.message;
+                         document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                         document.getElementById('sendOtpBtn').disabled = false;
                     });
-            });
+
+                })
+                .catch((error) => {
+                    document.getElementById('loginMsg').innerHTML = "Error checking user: " + error.message;
+                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP";
+                    document.getElementById('sendOtpBtn').disabled = false;
+                });
         };
 
-        // VERIFY OTP
+        // 3. VERIFY OTP (Persistence Added)
         document.getElementById('verifyOtpBtn').onclick = () => {
-            confirmationResult.confirm(document.getElementById('otpInput').value)
+            const otp = document.getElementById('otpInput').value;
+            
+            // Set persistence to LOCAL before confirming OTP (Ensures long-term session)
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 .then(() => {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('mainApp').style.display = 'block';
-                    
-                    // Note: Missing functions (startFirebaseListener, loadCategories, loadPromotionAds) 
-                    // को script.js में होना चाहिए।
-                    if (typeof startFirebaseListener === 'function') startFirebaseListener();
-                    if (typeof loadCategories === 'function') loadCategories();
-                    if (typeof loadPromotionAds === 'function') {
-                        loadPromotionAds();
-                        setTimeout(loadPromotionAds, 2000);
-                    } else {
-                        // Fallback for missing functions
-                        console.warn("One or more required functions (startFirebaseListener, loadCategories, loadPromotionAds) are missing. Check script.js");
-                    }
+                    return confirmationResult.confirm(otp);
                 })
-                .catch(() => document.getElementById('loginMsg').innerHTML = "Galat OTP");
+                .then(result => {
+                    handleSuccessfulLogin(result.user);
+                })
+                .catch((error) => {
+                    document.getElementById('loginMsg').innerHTML = "Galat OTP या एरर: " + error.message;
+                    console.error(error);
+                });
         };
 
         // Extra functions
@@ -279,6 +391,5 @@
         }
     };
     </script>
-</body>
+    </body>
     </html>
-    
