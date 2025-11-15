@@ -1,8 +1,16 @@
 let serviceProviders = [];
 let currentFilter = '';
 
+// providersRef, jobsRef, और database variables index.html से window scope में सेट हैं।
+
 function startFirebaseListener() {
-    providersRef.on('value', snapshot => {
+    // Ensure providersRef is available (it should be set in index.html's window.onload)
+    if (!window.providersRef || !window.jobsRef) {
+        console.error("Firebase references (providersRef/jobsRef) are not initialized.");
+        return;
+    }
+
+    window.providersRef.on('value', snapshot => {
         serviceProviders = [];
         snapshot.forEach(child => {
             serviceProviders.push({ id: child.key, ...child.val() });
@@ -10,7 +18,7 @@ function startFirebaseListener() {
         displayServices();
     });
 
-    jobsRef.on('value', snapshot => {
+    window.jobsRef.on('value', snapshot => {
         const jobs = [];
         snapshot.forEach(child => jobs.push({ id: child.key, ...child.val() }));
         displayJobs(jobs);
@@ -25,8 +33,12 @@ function loadCategories() {
 
 function filterByCategory(cat) {
     currentFilter = cat;
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
-    event.target.classList.add('selected');
+    // event.target is used, so ensure this function is called via an HTML onclick
+    // Safely check if event is available before using event.target
+    if (typeof event !== 'undefined' && event.target) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
     displayServices();
 }
 
@@ -34,19 +46,19 @@ function searchServices() {
     displayServices();
 }
 
-// YE FUNCTION ADD KIYA — SABSE ZAROORI
-function openWhatsApp(phone) {
-    let num = phone.toString().replace(/[^0-9]/g, '');
-    if (num.length === 10) num = '91' + num;
-    if (num.length === 13 && num.startsWith('919')) num = num.substring(1);
-    window.open('https://wa.me/' + num, '_blank');
-}
-
 function displayServices() {
     let filtered = serviceProviders;
     const search = document.getElementById('main-search-bar').value.toLowerCase();
+    
+    // Filter logic
     if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
-    if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.category.toLowerCase().includes(search) || p.area.toLowerCase().includes(search));
+    if (search) {
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(search) || 
+            p.category.toLowerCase().includes(search) || 
+            p.area.toLowerCase().includes(search)
+        );
+    }
 
     const list = document.getElementById('mistri-list');
     if (filtered.length === 0) {
@@ -54,11 +66,10 @@ function displayServices() {
         return;
     }
 
-    // YE PURA BLOCK SAHI KIYA — str += galat tha
     list.innerHTML = '<h3>Available Services</h3>' + filtered.map(p => `
         <div class="profile-card">
             <h4 style="margin:0 0 5px;color:#2a5298;">${p.name} <span style="font-size:12px;color:#666;">(${p.category})</span></h4>
-            <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience} years experience</p>
+            <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience}</p>
             <div style="display:flex;justify-content:space-between;margin-top:10px;">
                 <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
                 <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
@@ -68,8 +79,9 @@ function displayServices() {
     `).join('');
 }
 
-function loadAds() { 
-    if (typeof showAds === 'function') showAds(); 
+function loadPromotionAds() { 
+    // This is often where special ad/promotion banners are loaded from DB.
+    console.log("Loading promotion ads...");
 }
 
 function displayJobs(jobs) {
@@ -86,4 +98,12 @@ function displayJobs(jobs) {
             <button class="whatsapp-btn" onclick="openWhatsApp('${j.phone}')">Contact</button>
         </div>
     `).join('');
+} 
+
+function loadJobs() {
+    // This function can be called to explicitly reload jobs, though the listener is running.
+    console.log("Loading job list screen...");
+    if (!window.jobsRef) {
+        console.error("Jobs reference not initialized.");
+    }
 }
