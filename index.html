@@ -227,7 +227,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
     <script> 
-            const firebaseConfig = {
+                const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -262,16 +262,7 @@
                 text: shareText
             }).catch(error => console.error('Sharing failed', error));
         } else {
-            // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `
-                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-                    <h5 class="text-lg font-bold mb-3 text-gray-800">कॉन्टैक्ट डीटेल्स</h5>
-                    <p class="text-sm whitespace-pre-line text-gray-600">${shareText}</p>
-                    <button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button>
-                </div>`;
-            document.body.appendChild(msg);
+            alert(`Contact Details:\n${shareText}`);
         }
     }
 
@@ -407,7 +398,6 @@
         if (itemsToRender.length > 0) {
             const htmlContent = itemsToRender.map(item => renderProviderCard(item)).join('');
             if (!isLoadMore) {
-                // यहां टोटल काउंट दिख रहा है, जो लिस्ट एंड होने तक ठीक से काम करेगा
                 listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
             } else {
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
@@ -448,10 +438,9 @@
             // इनिशियल फ़िल्टर लोड या नई कैटेगरी का चयन
             currentCategory = category;
             filteredPageIndex = 0;
-            // यह सुनिश्चित करने के लिए कि सभी आइटम फ़ेच हो रहे हैं
             listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है... (पूरी लिस्ट फेच की जा रही है)</p>`;
 
-            // इस कैटेगरी के लिए सभी आइटम फ़ेच करें 
+            // इस कैटेगरी के लिए सभी आइटम फ़ेच करें (क्रॉस-कैटेगरी बग को रोकने के लिए आवश्यक)
             window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
                 if (!snapshot.exists()) {
                     listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">इस कैटेगरी में कोई सर्विस नहीं है।</p>`;
@@ -529,16 +518,7 @@
             location.reload(); // लॉगआउट के बाद पेज रीलोड करें
         }).catch((error) => {
             console.error("Sign Out Error:", error);
-             // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `
-                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-                    <h5 class="text-lg font-bold mb-3 text-red-500">साइन आउट एरर</h5>
-                    <p class="text-sm text-gray-600">Sign Out में एरर आई। कृपया दोबारा कोशिश करें।</p>
-                    <button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button>
-                </div>`;
-            document.body.appendChild(msg);
+            alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
         });
     }
 
@@ -569,31 +549,19 @@
         const form = document.getElementById('serviceForm');
 
         if (!name || !phone || !category || !area || !experience) {
-            // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">रजिस्ट्रेशन एरर</h5><p class="text-sm text-gray-600">कृपया सभी फ़ील्ड भरें।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-            document.body.appendChild(msg);
+            alert("कृपया सभी फ़ील्ड भरें।");
             return false;
         }
         
         if (phone.length !== 10 || isNaN(phone)) {
-            // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">फ़ोन नंबर एरर</h5><p class="text-sm text-gray-600">कृपया 10 अंक का सही फ़ोन नंबर डालें।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-            document.body.appendChild(msg);
+            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
         
         // डुप्लीकेट फ़ोन नंबर के लिए जाँच करें
         window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
             if (snapshot.exists()) {
-                // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                const msg = document.createElement('div');
-                msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">डुप्लीकेट एंट्री</h5><p class="text-sm text-gray-600">यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                document.body.appendChild(msg);
+                alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
                 return;
             }
 
@@ -606,57 +574,12 @@
 
             window.providersRef.push(providerData)
                 .then(() => {
-                    // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                    const msg = document.createElement('div');
-                    msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                    msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-green-500">सफलता</h5><p class="text-sm text-gray-600">सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                    document.body.appendChild(msg);
+                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                     form.reset(); 
                     loadCategories(); 
                 })
                 .catch((error) => {
-                    // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">फ़ोन नंबर एरर</h5><p class="text-sm text-gray-600">कृपया 10 अंक का सही फ़ोन नंबर डालें।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-            document.body.appendChild(msg);
-            return false;
-        }
-        
-        // डुप्लीकेट फ़ोन नंबर के लिए जाँच करें
-        window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
-            if (snapshot.exists()) {
-                // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                const msg = document.createElement('div');
-                msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">डुप्लीकेट एंट्री</h5><p class="text-sm text-gray-600">यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                document.body.appendChild(msg);
-                return;
-            }
-
-            // यदि फ़ोन नंबर यूनीक है, तो डेटा पुश करें
-            const providerData = {
-                name: name, phone: phone, category: category, area: area,
-                experience: experience + ' years',
-                timestamp: firebase.database.ServerValue.TIMESTAMP 
-            };
-
-            window.providersRef.push(providerData)
-                .then(() => {
-                    // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                    const msg = document.createElement('div');
-                    msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                    msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-green-500">सफलता</h5><p class="text-sm text-gray-600">सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                    document.body.appendChild(msg);
-                    form.reset(); 
-                    loadCategories(); 
-                })
-                .catch((error) => {
-                    // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                    const msg = document.createElement('div');
-                    msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                    msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">रजिस्ट्रेशन एरर</h5><p class="text-sm text-gray-600">रजिस्ट्रेशन में एरर आई: ${error.message}</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                    document.body.appendChild(msg);
+                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
                     console.error("Firebase Error:", error);
                 });
         });
@@ -676,20 +599,12 @@
         const form = document.getElementById('jobForm');
 
         if (!title || !shopName || !location || !salary || !description || !phone) {
-            // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">रजिस्ट्रेशन एरर</h5><p class="text-sm text-gray-600">कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-            document.body.appendChild(msg);
+            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
             return false;
         }
 
         if (phone.length !== 10 || isNaN(phone)) {
-            // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-            const msg = document.createElement('div');
-            msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">फ़ोन नंबर एरर</h5><p class="text-sm text-gray-600">कृपया 10 अंक का सही फ़ोन नंबर डालें।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-            document.body.appendChild(msg);
+            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
 
@@ -701,20 +616,12 @@
 
         window.jobsRef.push(jobData) 
             .then(() => {
-                // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                const msg = document.createElement('div');
-                msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-green-500">सफलता</h5><p class="text-sm text-gray-600">जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                document.body.appendChild(msg);
+                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                 form.reset(); 
                 if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
             })
             .catch((error) => {
-                 // alert की जगह कस्टम मैसेज बॉक्स यूज़ करें
-                const msg = document.createElement('div');
-                msg.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-                msg.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full"><h5 class="text-lg font-bold mb-3 text-red-500">जॉब रजिस्ट्रेशन एरर</h5><p class="text-sm text-gray-600">जॉब रजिस्ट्रेशन में एरर आई: ${error.message}</p><button onclick="this.parentNode.parentNode.remove()" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">बंद करें</button></div>`;
-                document.body.appendChild(msg);
+                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
                 console.error("Firebase Job Error:", error);
             });
 
@@ -772,6 +679,7 @@
 
             document.getElementById('sendOtpBtn').innerHTML = "Sending...";
             const fullPhone = '+91' + phone;
+            document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>OTP भेजने की प्रक्रिया शुरू हो रही है...</span>";
 
             // नया OTP भेजने का प्रयास करने से पहले किसी भी मौजूदा यूज़र को लॉगआउट करें (सुरक्षा फ़िक्स)
             firebase.auth().signOut()
@@ -779,23 +687,32 @@
                 .catch(() => initiateOtpFlow(fullPhone)); 
 
             function initiateOtpFlow(fullPhone) {
+                console.log("Attempting reCAPTCHA verification for:", fullPhone);
                 recaptchaVerifier.verify().then(() => {
+                    console.log("reCAPTCHA Verified. Sending SMS now...");
+                    document.getElementById('loginMsg').innerHTML = `<span style='color:#2a5298'>सुरक्षा जाँच पूरी हुई। ${fullPhone} पर OTP भेजा जा रहा है...</span>`;
+
                     firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
                         .then((result) => {
                             confirmationResult = result;
                             document.getElementById('profileInputSection').style.display = 'none'; 
                             document.getElementById('otpSection').style.display = 'block'; 
-                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up"; // रीसेट करें
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
+                            document.getElementById('loginMsg').innerHTML = `<span style='color:green'>✅ OTP ${fullPhone} पर भेजा गया!</span>`;
                         })
                         .catch((err) => {
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>OTP एरर: ${err.message}</span>`;
+                            // ⭐ OTP Failures often land here
+                            console.error("Firebase SMS Send Error:", err.code, err.message);
+                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ OTP भेजने में एरर आई: ${err.message} (कोड: ${err.code}). कृपया दोबारा कोशिश करें या कुछ देर इंतज़ार करें।</span>`;
                             document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
                             document.getElementById('profileInputSection').style.display = 'block';
                             document.getElementById('otpSection').style.display = 'none';
+                            // reCAPTCHA को रीसेट करें ताकि यह फिर से काम करे
+                            recaptchaVerifier.clear();
                         });
                 }).catch((err) => {
-                    document.getElementById('loginMsg').innerHTML = `<span style='color:red'>Recaptcha एरर: ${err.message}</span>`;
+                    // ⭐ reCAPTCHA failures land here
+                    console.error("reCAPTCHA Verification Error:", err.message);
+                    document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ reCAPTCHA जाँच में एरर: ${err.message}. कृपया पेज रीलोड करके फिर से कोशिश करें।</span>`;
                     document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
                 });
             }
@@ -809,7 +726,9 @@
                 document.getElementById('loginMsg').innerHTML = "<span style='color:red'>कृपया 6 अंक का OTP डालें।</span>";
                 return;
             }
-            document.getElementById('verifyOtpBtn').innerHTML = "Verifying...";
+            
+            document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>सत्यापन किया जा रहा है...</span>";
+
 
             confirmationResult.confirm(otp)
                 .then((result) => {
@@ -817,23 +736,20 @@
                     if (user && user.uid) {
                         window.database.ref('users/' + user.uid).set(tempUserData)
                             .then(() => {
-                                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>Login Successful! Redirecting...</span>";
+                                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>✅ Login Successful! Redirecting...</span>";
                                 // ⭐ CRITICAL FIX: सफल सत्यापन के बाद रिलोड करें
                                 location.reload(); 
                             })
                             .catch(error => {
                                 console.error("Profile save error:", error);
                                 document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Login Successful, but profile save failed. Please contact support.</span>";
-                                document.getElementById('verifyOtpBtn').innerHTML = "Verify OTP";
                             });
                     } else {
                         document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Verification Failed: User not returned.</span>";
-                        document.getElementById('verifyOtpBtn').innerHTML = "Verify OTP";
                     }
                 })
                 .catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "<span style='color:red'>ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
-                    document.getElementById('verifyOtpBtn').innerHTML = "Verify OTP";
+                    document.getElementById('loginMsg').innerHTML = "<span style='color:red'>❌ ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
                 });
         };
 
