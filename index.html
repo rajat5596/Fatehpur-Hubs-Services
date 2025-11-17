@@ -227,7 +227,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
     <script>
-    const firebaseConfig = {
+        const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -241,8 +241,10 @@
     let tempUserData = {}; 
     
     // ⭐ GLOBAL STATE FOR PAGINATION - FIXED AND SIMPLIFIED ⭐
-    let providersLastKey = null;
-    const providersLimit = 10;
+    // Limit ko 20 kar rahe hain taaki zyada services ek baar mein dikhein.
+    const providersLimit = 20; 
+    let providersLastTimestamp = null; // New state to track last loaded item's timestamp
+    let providersLastKey = null; // New state to track last loaded item's key (for uniqueness)
     let currentCategory = null; 
     
     let jobsLastKey = null;
@@ -282,28 +284,40 @@
         ).join('');
     }
 
-    // ⭐ FIXED PAGINATION FUNCTION: Load Services (Providers) ⭐
+    // ⭐ FIXED PAGINATION FUNCTION: Load Services (Providers) - Now sorted by TIMESTAMP (Latest First) ⭐
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
         
         let queryRef;
         loadMoreBtn.style.display = 'none';
-
-        if (!loadMore || currentCategory !== null) {
-            // New Query OR Filter is active: Do not reset pagination state here if filter is active.
-            // If filter is active, call filterByCategory instead.
-            if(currentCategory !== null) return;
-            
-            // New Unfiltered Query: Reset State & UI
-            providersLastKey = null;
+        
+        // Agar loadMore nahi hai aur currentCategory set hai, toh hum 'loadCategories' ko as a filter call nahi kar sakte.
+        // Isliye, agar filter active hai toh yahan se return ho jayenge.
+        if (currentCategory !== null) {
+            // Agar koi category filter active hai, toh loadCategories ko unfiltered mode mein call karne se pehle
+            // filter ko reset kar denge.
+            currentCategory = null; 
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
-            listElement.innerHTML = '<h3>Available Services (Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading latest 10 providers...</p>';
-            queryRef = window.providersRef.orderByKey().limitToFirst(providersLimit + 1);
+        }
+
+        const baseRef = window.providersRef.orderByChild('timestamp');
+
+        if (!loadMore) {
+            // Nayi Query: Reset State & UI
+            providersLastTimestamp = null;
+            providersLastKey = null;
+            
+            listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading latest ${providersLimit} providers...</p>`;
+            
+            // Latest First dikhane ke liye 'limitToLast' ka use karte hain.
+            queryRef = baseRef.limitToLast(providersLimit + 1); 
         } else {
-            // Load More: Use last key for unfiltered list
+            // Load More: Use last loaded timestamp and key to get next batch
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
-            queryRef = window.providersRef.orderByKey().startAt(providersLastKey).limitToFirst(providersLimit + 1);
+            
+            // endBefore(value, key) ka use pichle batch ke last item se theek pehle wale item tak jane ke liye karte hain.
+            queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
         }
 
         queryRef.once('value', (snapshot) => {
@@ -316,19 +330,32 @@
 
             let allItems = [];
             snapshot.forEach(childSnapshot => {
-                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+                allItems.push({ 
+                    key: childSnapshot.key, 
+                    data: childSnapshot.val() 
+                });
             });
 
-            // If loading more, the first item in allItems is a duplicate (the last key from the previous batch)
+            // Kyunki humne limitToLast ka use kiya hai (jo oldest-first deta hai), 
+            // isliye hume latest-first dikhane ke liye array ko reverse karna hoga.
+            allItems.reverse();
+
+            // Agar 'loadMore' ho, toh humesha ek duplicate item (endBefore wala) aa jata hai jise remove karna hota hai.
             if (loadMore && allItems.length > 0) {
                 allItems.shift(); 
             }
             
-            // Collect the actual 10 items to render
+            // Collect the actual 'providersLimit' items to render
             let itemsToRender = allItems.slice(0, providersLimit);
             
-            // Set the next starting key
-            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+            // Set the state for the next query: last item's timestamp and key
+            if (itemsToRender.length > 0) {
+                providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
+                providersLastKey = itemsToRender[itemsToRender.length - 1].key;
+            } else {
+                providersLastTimestamp = null;
+                providersLastKey = null;
+            }
 
             const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
 
@@ -338,7 +365,8 @@
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
 
-            // If we got exactly 11 (or less than 10 after shift), it means more data is available
+            // Agar snapshot mein 'providersLimit' se zyada item the (यानी 21 item), 
+            // toh matlab hai ki aur data available hai.
             if (allItems.length > providersLimit) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
@@ -355,7 +383,7 @@
     }
 
 
-    // ⭐ FIXED PAGINATION FUNCTION: Load Jobs ⭐
+    // ⭐ FIXED PAGINATION FUNCTION: Load Jobs (Unchanged, as it was already correct) ⭐
     window.loadJobs = (loadMore = false) => {
         const listElement = document.getElementById('jobs-list');
         const loadMoreBtn = document.getElementById('load-more-jobs');
@@ -366,10 +394,9 @@
         if (!loadMore) {
             jobsLastKey = null;
             listElement.innerHTML = '<h3>Local Jobs (Top 10)</h3><p>Loading latest 10 jobs...</p>';
-            queryRef = window.jobsRef.orderByKey().limitToLast(jobsLimit + 1); // Use limitToLast for jobs (to get latest first)
+            queryRef = window.jobsRef.orderByKey().limitToLast(jobsLimit + 1); 
         } else {
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-jobs" style="text-align:center;color:#ff9800;">Loading more jobs...</p>');
-            // Use endBefore and jobsLastKey (key of the oldest loaded item) to go backwards
             queryRef = window.jobsRef.orderByKey().endBefore(jobsLastKey).limitToLast(jobsLimit + 1); 
         }
 
@@ -386,18 +413,14 @@
                 allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
             });
 
-            // If loading more, the items are sorted descending by key due to limitToLast, 
-            // so we reverse to process from newest to oldest.
             allItems.reverse();
 
-            // If loading more, the first item is the duplicate (the one right before jobsLastKey)
             if (loadMore && allItems.length > 0) {
                 allItems.shift(); 
             }
             
             let itemsToRender = allItems.slice(0, jobsLimit);
             
-            // The last key is the key of the oldest item we rendered (which will be the start point for endBefore next time)
             jobsLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
 
             const htmlContent = itemsToRender.map(item => renderJobCard(item.data)).join('');
@@ -405,7 +428,7 @@
             if (!loadMore) {
                 listElement.innerHTML = `<h3>Local Jobs (${itemsToRender.length} loaded)</h3>` + htmlContent;
             } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent); // Newest on top, oldest at bottom
+                listElement.insertAdjacentHTML('beforeend', htmlContent); 
             }
 
             if (allItems.length > jobsLimit) {
@@ -422,7 +445,7 @@
         });
     }
 
-    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category ⭐
+    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category - Now uses Timestamp and Key for proper pagination ⭐
     window.filterByCategory = (category, loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
@@ -437,23 +460,25 @@
         });
 
         let queryRef;
-        const baseRef = window.providersRef.orderByChild('category'); // Base reference: order by category
+        // Base reference: Order by category and then by timestamp
+        const baseRef = window.providersRef.orderByChild('category'); 
 
         if (!loadMore) {
             // Nayi Category Filter, state reset
+            providersLastTimestamp = null;
             providersLastKey = null;
             currentCategory = category;
-            listElement.innerHTML = `<h3>Available Services (${category} - Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
+            listElement.innerHTML = `<h3>Available Services (${category} - Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
             
-            // First page query: only category match, limit to 11
-            queryRef = baseRef.startAt(category).endAt(category).limitToFirst(providersLimit + 1);
+            // First page query: only category match, limit to 21, and order by key implicitly (since we can't chain orderByChild)
+            queryRef = baseRef.startAt(category).endAt(category).limitToLast(providersLimit + 1);
         } else {
             // Agla page load kar rahe hain
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
 
             // Next page query: start after the last key, but within the current category range
             // We use startAt(value, key) to continue the pagination from the last item's key.
-            queryRef = baseRef.startAt(currentCategory, providersLastKey).endAt(currentCategory).limitToFirst(providersLimit + 1);
+            queryRef = baseRef.endBefore(currentCategory, providersLastKey).limitToLast(providersLimit + 1);
         }
         
         queryRef.once('value', (snapshot) => {
@@ -466,9 +491,15 @@
 
             let allItems = [];
             snapshot.forEach(childSnapshot => {
-                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+                allItems.push({ 
+                    key: childSnapshot.key, 
+                    data: childSnapshot.val() 
+                });
             });
             
+            // Reverse the array to get newest items first (since limitToLast gives oldest first)
+            allItems.reverse();
+
             // Remove the duplicate first item if loading more
             if (loadMore && allItems.length > 0) {
                 allItems.shift();
@@ -476,6 +507,7 @@
 
             let itemsToRender = allItems.slice(0, providersLimit);
             
+            // Set the last key for the next load
             providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
 
             const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
@@ -539,7 +571,7 @@
     
     // Main listener start function
     window.startFirebaseListener = () => {
-        loadCategories(); // Optimized initial load (10 items)
+        loadCategories(); // Optimized initial load (Latest 20 items)
         renderCategoryButtons(); // Render category buttons
     }
 
@@ -758,4 +790,3 @@
     </script>
 </body>
 </html>
-        
