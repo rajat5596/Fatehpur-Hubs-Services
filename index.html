@@ -227,7 +227,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
     <script>
-        const firebaseConfig = {
+            const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -240,24 +240,37 @@
     let recaptchaVerifier, confirmationResult;
     let tempUserData = {}; 
     
-    // ⭐ GLOBAL STATE FOR PAGINATION - FIXED AND SIMPLIFIED ⭐
-    // Limit ko 20 kar rahe hain taaki zyada services ek baar mein dikhein.
+    // ⭐ GLOBAL STATE FOR PAGINATION ⭐
     const providersLimit = 20; 
-    let providersLastTimestamp = null; // New state to track last loaded item's timestamp
-    let providersLastKey = null; // New state to track last loaded item's key (for uniqueness)
+    let providersLastTimestamp = null; 
+    let providersLastKey = null; 
     let currentCategory = null; 
     
     let jobsLastKey = null;
     const jobsLimit = 10;
 
-    // Helper functions for rendering (Unchanged)
+    // ⭐ NEW: Share Details Function (Add this back) ⭐
+    window.shareProviderDetails = (name, phone, category) => {
+        const shareText = `Name: ${name} (${category})\nPhone: ${phone}\n\nFatehpur Hubs App ke zariye service provider ki jaankari mili.`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Service Provider Contact',
+                text: shareText
+            }).catch(error => console.error('Sharing failed', error));
+        } else {
+            alert(`Contact Details:\n${shareText}`);
+        }
+    }
+
+    // ⭐ FIXED: Render Provider Card (Added Share Button Back) ⭐
     function renderProviderCard(p) {
         return `<div class="profile-card">
             <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
             <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
-            <div style="margin-top:10px;">
-                <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
             </div>
         </div>`;
     }
@@ -292,31 +305,27 @@
         let queryRef;
         loadMoreBtn.style.display = 'none';
         
-        // Agar loadMore nahi hai aur currentCategory set hai, toh hum 'loadCategories' ko as a filter call nahi kar sakte.
-        // Isliye, agar filter active hai toh yahan se return ho jayenge.
-        if (currentCategory !== null) {
-            // Agar koi category filter active hai, toh loadCategories ko unfiltered mode mein call karne se pehle
-            // filter ko reset kar denge.
+        // Agar filter active hai, toh unfiltered list load karne se pehle filter ko reset kar dein
+        if (currentCategory !== null && !loadMore) {
             currentCategory = null; 
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
         }
 
+        // We use orderByChild('timestamp') to sort by the newest items
         const baseRef = window.providersRef.orderByChild('timestamp');
 
         if (!loadMore) {
-            // Nayi Query: Reset State & UI
             providersLastTimestamp = null;
             providersLastKey = null;
             
             listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading latest ${providersLimit} providers...</p>`;
             
-            // Latest First dikhane ke liye 'limitToLast' ka use karte hain.
+            // limitToLast gets the newest items (in reverse order)
             queryRef = baseRef.limitToLast(providersLimit + 1); 
         } else {
-            // Load More: Use last loaded timestamp and key to get next batch
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
             
-            // endBefore(value, key) ka use pichle batch ke last item se theek pehle wale item tak jane ke liye karte hain.
+            // endBefore(value, key) uses the last item's timestamp and key to fetch the next older batch
             queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
         }
 
@@ -336,19 +345,15 @@
                 });
             });
 
-            // Kyunki humne limitToLast ka use kiya hai (jo oldest-first deta hai), 
-            // isliye hume latest-first dikhane ke liye array ko reverse karna hoga.
+            // Reverse the array to display the newest item first
             allItems.reverse();
 
-            // Agar 'loadMore' ho, toh humesha ek duplicate item (endBefore wala) aa jata hai jise remove karna hota hai.
             if (loadMore && allItems.length > 0) {
-                allItems.shift(); 
+                allItems.shift(); // Remove the duplicate item from the start
             }
             
-            // Collect the actual 'providersLimit' items to render
             let itemsToRender = allItems.slice(0, providersLimit);
             
-            // Set the state for the next query: last item's timestamp and key
             if (itemsToRender.length > 0) {
                 providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
                 providersLastKey = itemsToRender[itemsToRender.length - 1].key;
@@ -365,8 +370,6 @@
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
 
-            // Agar snapshot mein 'providersLimit' se zyada item the (यानी 21 item), 
-            // toh matlab hai ki aur data available hai.
             if (allItems.length > providersLimit) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
@@ -383,7 +386,7 @@
     }
 
 
-    // ⭐ FIXED PAGINATION FUNCTION: Load Jobs (Unchanged, as it was already correct) ⭐
+    // Load Jobs (Unchanged)
     window.loadJobs = (loadMore = false) => {
         const listElement = document.getElementById('jobs-list');
         const loadMoreBtn = document.getElementById('load-more-jobs');
@@ -445,13 +448,12 @@
         });
     }
 
-    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category - Now uses Timestamp and Key for proper pagination ⭐
+    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category (Uses Key and Category for Pagination) ⭐
     window.filterByCategory = (category, loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
         loadMoreBtn.style.display = 'none';
         
-        // Buttons ko selected state dein
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.classList.remove('selected');
             if(btn.innerText === category) {
@@ -460,24 +462,22 @@
         });
 
         let queryRef;
-        // Base reference: Order by category and then by timestamp
         const baseRef = window.providersRef.orderByChild('category'); 
 
         if (!loadMore) {
-            // Nayi Category Filter, state reset
+            // New Category Filter, state reset
             providersLastTimestamp = null;
             providersLastKey = null;
             currentCategory = category;
             listElement.innerHTML = `<h3>Available Services (${category} - Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
             
-            // First page query: only category match, limit to 21, and order by key implicitly (since we can't chain orderByChild)
+            // Query: filter by category, limit to 21
             queryRef = baseRef.startAt(category).endAt(category).limitToLast(providersLimit + 1);
         } else {
-            // Agla page load kar rahe hain
+            // Next page query: start after the last key, but within the current category range
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
 
-            // Next page query: start after the last key, but within the current category range
-            // We use startAt(value, key) to continue the pagination from the last item's key.
+            // This complex query helps continue from the last loaded key within the category
             queryRef = baseRef.endBefore(currentCategory, providersLastKey).limitToLast(providersLimit + 1);
         }
         
@@ -500,7 +500,6 @@
             // Reverse the array to get newest items first (since limitToLast gives oldest first)
             allItems.reverse();
 
-            // Remove the duplicate first item if loading more
             if (loadMore && allItems.length > 0) {
                 allItems.shift();
             }
@@ -533,25 +532,23 @@
         });
     };
 
-    // Simple search for quick use (Unchanged)
+    // Simple search (Unchanged)
     window.searchServices = () => {
         const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
         const listElement = document.getElementById('mistri-list');
         
         if (searchTerm.length < 3) {
-            loadCategories(); // Search chhota hai, toh wapas optimized Top 10 list dikha dein
+            loadCategories(); 
             return;
         }
 
         listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">Searching...</p>`;
-        document.getElementById('load-more-providers').style.display = 'none'; // Search ke time pagination button chhupa dein
+        document.getElementById('load-more-providers').style.display = 'none'; 
         
-        // Note: Searching requires loading all data, which is less optimized, but necessary for a full search feature.
-        window.providersRef.once('value', (snapshot) => { // Use .once for search to avoid continuous listener
+        window.providersRef.once('value', (snapshot) => { 
             const providers = snapshot.val();
             let results = [];
             if (providers) {
-                // Object.values() function se Firebase key-value pairs ko array of objects mein convert karte hain
                 results = Object.values(providers).filter(p => 
                     (p.name && p.name.toLowerCase().includes(searchTerm)) || 
                     (p.category && p.category.toLowerCase().includes(searchTerm)) ||
@@ -569,13 +566,25 @@
         });
     };
     
-    // Main listener start function
-    window.startFirebaseListener = () => {
-        loadCategories(); // Optimized initial load (Latest 20 items)
-        renderCategoryButtons(); // Render category buttons
+    // ⭐ NEW: Log Out Function ⭐
+    window.logOut = () => {
+        firebase.auth().signOut().then(() => {
+            // Sign out successful. onAuthStateChanged listener handles screen switch.
+            console.log("User signed out successfully.");
+        }).catch((error) => {
+            // An error happened.
+            console.error("Sign Out Error:", error);
+            alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
+        });
     }
 
-    // WHATSAPP BUTTON FIX — CHAHE +91 HO YA nahi, 100% KAAM KAREGA (Unchanged)
+    // Main listener start function (Unchanged)
+    window.startFirebaseListener = () => {
+        loadCategories(); 
+        renderCategoryButtons(); 
+    }
+
+    // WHATSAPP BUTTON FIX (Unchanged)
     function openWhatsApp(phone) {
         let num = phone.toString().replace(/[^0-9]/g, '');
         if (num.length === 10) num = '91' + num;
@@ -615,7 +624,6 @@
             .then(() => {
                 alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                 form.reset(); 
-                // Data register hone ke baad list ko refresh karein
                 loadCategories(); 
             })
             .catch((error) => {
@@ -656,7 +664,6 @@
             .then(() => {
                 alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
                 form.reset(); 
-                // Data register hone ke baad list ko refresh karein
                 if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
             })
             .catch((error) => {
@@ -670,7 +677,6 @@
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
-        // Base reference: Order by key (for general listing) and order by child (for filtering)
         window.providersRef = database.ref('service_providers'); 
         window.jobsRef = database.ref('local_jobs'); 
 
@@ -688,10 +694,8 @@
                 document.getElementById('mainApp').style.display = 'block';
                 console.log("Auto-Login Successful:", user.phoneNumber);
 
-                // ⭐ CRITICAL: Call the newly defined optimized data loading function ⭐
                 startFirebaseListener();
                 
-                // Assuming loadPromotionAds is defined somewhere else (like ads.js)
                 if (typeof loadPromotionAds === 'function') {
                     loadPromotionAds();
                     setTimeout(loadPromotionAds, 2000);
@@ -715,7 +719,6 @@
                 return;
             }
 
-            // ⭐ Temporary Profile Data Save ⭐
             tempUserData = {
                 name: name,
                 area: area,
@@ -753,14 +756,12 @@
             confirmationResult.confirm(otp)
                 .then((result) => {
                     const user = result.user;
-                    // ⭐ CRITICAL: Save Profile data after successful sign-in ⭐
                     if (user && user.uid) {
                         window.database.ref('users/' + user.uid).set(tempUserData)
                             .then(() => console.log("User profile saved/updated."))
                             .catch(error => console.error("Profile save error:", error));
                     }
                     
-                    // onAuthStateChanged अब स्क्रीन स्विचिंग को संभालेगा और डेटा लोड करेगा।
                     document.getElementById('loginMsg').innerHTML = "<span style='color:green'>Login Successful! Redirecting...</span>";
                 })
                 .catch(() => {
@@ -774,9 +775,8 @@
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // Job screen par jaane par, optimized loadJobs ko call karein
             if(id === 'jobs-screen') loadJobs();
-            if(id === 'home-screen') loadCategories(); // Home screen par wapas aane par bhi optimize load ho
+            if(id === 'home-screen') loadCategories(); 
         };
         // PWA setup
         if ('serviceWorker' in navigator) {
