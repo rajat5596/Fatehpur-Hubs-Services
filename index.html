@@ -227,7 +227,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
     <script>
-            const firebaseConfig = {
+                const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -240,18 +240,22 @@
     let recaptchaVerifier, confirmationResult;
     let tempUserData = {}; 
     
-    // ⭐ GLOBAL STATE FOR PAGINATION ⭐
+    // ⭐ GLOBAL STATE FOR PAGINATION & FILTERING ⭐
     const providersLimit = 20; 
-    let providersLastTimestamp = null; 
-    let providersLastKey = null; 
+    let providersLastTimestamp = null; // General pagination timestamp
+    let providersLastKey = null; // General pagination key
     let currentCategory = null; 
+    
+    // NEW: Local state for category filtering
+    let filteredProviders = [];
+    let filteredPageIndex = 0;
     
     let jobsLastKey = null;
     const jobsLimit = 10;
 
-    // ⭐ NEW: Share Details Function (Add this back) ⭐
+    // Share Details Function
     window.shareProviderDetails = (name, phone, category) => {
-        const shareText = `Name: ${name} (${category})\nPhone: ${phone}\n\nFatehpur Hubs App ke zariye service provider ki jaankari mili.`;
+        const shareText = `नाम: ${name} (${category})\nफ़ोन: ${phone}\n\nFatehpur Hubs App के ज़रिए सर्विस प्रोवाइडर की जानकारी मिली।`;
         if (navigator.share) {
             navigator.share({
                 title: 'Service Provider Contact',
@@ -262,7 +266,7 @@
         }
     }
 
-    // ⭐ FIXED: Render Provider Card (Added Share Button Back) ⭐
+    // Render Provider Card (With all 3 buttons)
     function renderProviderCard(p) {
         return `<div class="profile-card">
             <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
@@ -297,7 +301,7 @@
         ).join('');
     }
 
-    // ⭐ FIXED PAGINATION FUNCTION: Load Services (Providers) - Now sorted by TIMESTAMP (Latest First) ⭐
+    // Load Services (Providers) - Sorted by TIMESTAMP (Latest First)
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
@@ -305,27 +309,26 @@
         let queryRef;
         loadMoreBtn.style.display = 'none';
         
-        // Agar filter active hai, toh unfiltered list load karne se pehle filter ko reset kar dein
-        if (currentCategory !== null && !loadMore) {
+        // Reset category filter state when loading main categories
+        if (currentCategory !== null) {
             currentCategory = null; 
+            filteredProviders = [];
+            filteredPageIndex = 0;
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
         }
 
-        // We use orderByChild('timestamp') to sort by the newest items
         const baseRef = window.providersRef.orderByChild('timestamp');
 
         if (!loadMore) {
             providersLastTimestamp = null;
             providersLastKey = null;
             
-            listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading latest ${providersLimit} providers...</p>`;
+            listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
             
-            // limitToLast gets the newest items (in reverse order)
             queryRef = baseRef.limitToLast(providersLimit + 1); 
         } else {
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
             
-            // endBefore(value, key) uses the last item's timestamp and key to fetch the next older batch
             queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
         }
 
@@ -333,7 +336,7 @@
             document.getElementById('loading-more')?.remove();
 
             if (!loadMore && !snapshot.exists()) {
-                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">No services available yet!</p>';
+                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>';
                 return;
             }
 
@@ -349,18 +352,19 @@
             allItems.reverse();
 
             if (loadMore && allItems.length > 0) {
-                allItems.shift(); // Remove the duplicate item from the start
+                // If it's a "Load More", the first item is a duplicate and must be removed.
+                // This is a common pattern for Realtime Database pagination.
+                allItems.shift(); 
             }
             
             let itemsToRender = allItems.slice(0, providersLimit);
             
             if (itemsToRender.length > 0) {
+                // Set the last item's timestamp and key for the next load
                 providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
                 providersLastKey = itemsToRender[itemsToRender.length - 1].key;
-            } else {
-                providersLastTimestamp = null;
-                providersLastKey = null;
-            }
+            } 
+            // If itemsToRender.length is 0, we've hit the end of the list, variables remain null.
 
             const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
 
@@ -370,18 +374,19 @@
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
 
+            // The button should be shown if the fetched batch was larger than the limit (meaning more items exist)
             if (allItems.length > providersLimit) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
             } else {
                 loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
             }
 
         }, (error) => {
             console.error("Error loading services:", error);
             document.getElementById('loading-more')?.remove();
-            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">Error loading data.</p>';
+            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
         });
     }
 
@@ -396,10 +401,10 @@
 
         if (!loadMore) {
             jobsLastKey = null;
-            listElement.innerHTML = '<h3>Local Jobs (Top 10)</h3><p>Loading latest 10 jobs...</p>';
+            listElement.innerHTML = '<h3>Local Jobs (Top 10)</h3><p>नवीनतम 10 जॉब्स लोड हो रही हैं...</p>';
             queryRef = window.jobsRef.orderByKey().limitToLast(jobsLimit + 1); 
         } else {
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-jobs" style="text-align:center;color:#ff9800;">Loading more jobs...</p>');
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-jobs" style="text-align:center;color:#ff9800;">और जॉब्स लोड हो रही हैं...</p>');
             queryRef = window.jobsRef.orderByKey().endBefore(jobsLastKey).limitToLast(jobsLimit + 1); 
         }
 
@@ -407,7 +412,7 @@
             document.getElementById('loading-jobs')?.remove();
 
             if (!loadMore && !snapshot.exists()) {
-                listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:#ff6666;">No jobs posted yet!</p>';
+                listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:#ff6666;">अभी कोई जॉब पोस्ट नहीं की गई है!</p>';
                 return;
             }
 
@@ -439,20 +444,52 @@
                 loadMoreBtn.onclick = () => loadJobs(true);
             } else {
                 loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of Job List.</p>');
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">जॉब लिस्ट समाप्त।</p>');
             }
         }, (error) => {
             console.error("Error loading jobs:", error);
             document.getElementById('loading-jobs')?.remove();
-            listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:red;">Error loading jobs.</p>';
+            listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:red;">जॉब्स लोड करने में एरर आई।</p>';
         });
     }
 
-    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category (Uses Key and Category for Pagination) ⭐
+    // NEW FUNCTIONALITY: Renders filtered page from local array
+    function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
+        const start = filteredPageIndex * providersLimit;
+        const end = start + providersLimit;
+        const itemsToRender = filteredProviders.slice(start, end);
+
+        if (itemsToRender.length > 0) {
+            const htmlContent = itemsToRender.map(item => renderProviderCard(item)).join('');
+            if (!isLoadMore) {
+                listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${itemsToRender.length} loaded)</h3>` + htmlContent;
+            } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent);
+            }
+            filteredPageIndex++; 
+        } else if (!isLoadMore) {
+             listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
+        }
+        
+        // Check if there are more items left to render locally
+        if (filteredProviders.length > filteredPageIndex * providersLimit) {
+            loadMoreBtn.style.display = 'block';
+            loadMoreBtn.onclick = () => filterByCategory(currentCategory, true);
+        } else {
+            loadMoreBtn.style.display = 'none';
+            listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
+        }
+    }
+
+    // FIXED: Filter by Category (Fetches all, sorts locally, paginates locally)
     window.filterByCategory = (category, loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
         loadMoreBtn.style.display = 'none';
+        
+        // Reset main pagination state
+        providersLastTimestamp = null;
+        providersLastKey = null;
         
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.classList.remove('selected');
@@ -461,76 +498,47 @@
             }
         });
 
-        let queryRef;
-        const baseRef = window.providersRef.orderByChild('category'); 
-
         if (!loadMore) {
-            // New Category Filter, state reset
-            providersLastTimestamp = null;
-            providersLastKey = null;
+            // Initial filter load or new category selected
             currentCategory = category;
-            listElement.innerHTML = `<h3>Available Services (${category} - Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
-            
-            // Query: filter by category, limit to 21
-            queryRef = baseRef.startAt(category).endAt(category).limitToLast(providersLimit + 1);
-        } else {
-            // Next page query: start after the last key, but within the current category range
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
+            filteredPageIndex = 0;
+            listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है...</p>`;
 
-            // This complex query helps continue from the last loaded key within the category
-            queryRef = baseRef.endBefore(currentCategory, providersLastKey).limitToLast(providersLimit + 1);
-        }
-        
-        queryRef.once('value', (snapshot) => {
-            document.getElementById('loading-more')?.remove();
+            // Fetch ALL items for this category
+            window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">इस कैटेगरी में कोई सर्विस नहीं है।</p>`;
+                    return;
+                }
 
-            if (!loadMore && !snapshot.exists()) {
-                listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">No ${category} services available yet!</p>`;
-                return;
-            }
-
-            let allItems = [];
-            snapshot.forEach(childSnapshot => {
-                allItems.push({ 
-                    key: childSnapshot.key, 
-                    data: childSnapshot.val() 
+                // Convert to array
+                filteredProviders = [];
+                snapshot.forEach(childSnapshot => {
+                    filteredProviders.push(childSnapshot.val());
                 });
+
+                // Sort by timestamp descending (Latest First)
+                filteredProviders.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Render the first page
+                renderFilteredPage(listElement, loadMoreBtn);
+            }, (error) => {
+                console.error("Error loading filtered services:", error);
+                listElement.innerHTML = '<p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
             });
+
+        } else {
+            // Load More (just render the next page from the stored array)
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
             
-            // Reverse the array to get newest items first (since limitToLast gives oldest first)
-            allItems.reverse();
-
-            if (loadMore && allItems.length > 0) {
-                allItems.shift();
-            }
-
-            let itemsToRender = allItems.slice(0, providersLimit);
-            
-            // Set the last key for the next load
-            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
-
-            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
-
-            if (!loadMore) {
-                listElement.innerHTML = `<h3>Available Services (${category} - ${itemsToRender.length} loaded)</h3>` + htmlContent;
-            } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent);
-            }
-
-            if (allItems.length > providersLimit) {
-                loadMoreBtn.style.display = 'block';
-                loadMoreBtn.onclick = () => filterByCategory(currentCategory, true); 
-            } else {
-                loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
-            }
-
-        }, (error) => {
-            console.error("Error loading filtered services:", error);
-            document.getElementById('loading-more')?.remove();
-            listElement.innerHTML = '<p style="text-align:center;color:red;">Error loading data.</p>';
-        });
+            // Short delay to simulate network latency for better UX
+            setTimeout(() => { 
+                document.getElementById('loading-more')?.remove();
+                renderFilteredPage(listElement, loadMoreBtn, true);
+            }, 100);
+        }
     };
+
 
     // Simple search (Unchanged)
     window.searchServices = () => {
@@ -542,7 +550,7 @@
             return;
         }
 
-        listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">Searching...</p>`;
+        listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">खोज हो रही है...</p>`;
         document.getElementById('load-more-providers').style.display = 'none'; 
         
         window.providersRef.once('value', (snapshot) => { 
@@ -554,25 +562,25 @@
                     (p.category && p.category.toLowerCase().includes(searchTerm)) ||
                     (p.area && p.area.toLowerCase().includes(searchTerm))
                 );
+                // Sort search results by timestamp (latest first)
+                results.sort((a, b) => b.timestamp - a.timestamp);
             }
             
             let html = `<h3>Search Results for "${searchTerm}" (${results.length} found)</h3>`;
             if (results.length > 0) {
                 html += results.map(p => renderProviderCard(p)).join('');
             } else {
-                html += '<p style="text-align:center;color:#ff6666;">No services found matching your search.</p>';
+                html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
             }
             listElement.innerHTML = html;
         });
     };
     
-    // ⭐ NEW: Log Out Function ⭐
+    // Log Out Function (Unchanged)
     window.logOut = () => {
         firebase.auth().signOut().then(() => {
-            // Sign out successful. onAuthStateChanged listener handles screen switch.
             console.log("User signed out successfully.");
         }).catch((error) => {
-            // An error happened.
             console.error("Sign Out Error:", error);
             alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
         });
@@ -595,7 +603,7 @@
         window.open('https://wa.me/' + num, '_blank');
     }
 
-    // SERVICE REGISTRATION FUNCTION (Unchanged)
+    // FIXED: SERVICE REGISTRATION FUNCTION (Added Duplicate Phone Check)
     function registerService() {
         const name = document.getElementById('providerName').value;
         const phone = document.getElementById('providerPhone').value;
@@ -613,24 +621,34 @@
             alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
+        
+        // ⭐ NEW: Check for duplicate phone number
+        window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
+                return;
+            }
 
-        const providerData = {
-            name: name, phone: phone, category: category, area: area,
-            experience: experience + ' years',
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
-        };
+            // If phone number is unique, proceed to push the data
+            const providerData = {
+                name: name, phone: phone, category: category, area: area,
+                experience: experience + ' years',
+                timestamp: firebase.database.ServerValue.TIMESTAMP 
+            };
 
-        window.providersRef.push(providerData)
-            .then(() => {
-                alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-                form.reset(); 
-                loadCategories(); 
-            })
-            .catch((error) => {
-                alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
-                console.error("Firebase Error:", error);
-            });
-        return true; 
+            window.providersRef.push(providerData)
+                .then(() => {
+                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                    form.reset(); 
+                    loadCategories(); 
+                })
+                .catch((error) => {
+                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                    console.error("Firebase Error:", error);
+                });
+        });
+        
+        return false; 
     }
     // END OF SERVICE REGISTRATION FUNCTION 
 
@@ -686,7 +704,7 @@
         });
         recaptchaVerifier.render();
 
-        // 2. PERSISTENCE CHECK: User Authentication State Listener
+        // 2. PERSISTENCE CHECK: User Authentication State Listener (This ensures no logout on refresh)
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 // If user is found, load the main app directly
@@ -708,7 +726,7 @@
         });
 
 
-        // 3. SEND OTP (Registration/Login Step 1)
+        // 3. FIXED: SEND OTP (Registration/Login Step 1) - Ensures only new OTP works 
         document.getElementById('sendOtpBtn').onclick = () => {
             const name = document.getElementById('userName').value.trim();
             const area = document.getElementById('userArea').value.trim();
@@ -728,24 +746,32 @@
             document.getElementById('sendOtpBtn').innerHTML = "Sending...";
             const fullPhone = '+91' + phone;
 
-            recaptchaVerifier.verify().then(() => {
-                firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
-                    .then((result) => {
-                        confirmationResult = result;
-                        document.getElementById('profileInputSection').style.display = 'none'; // Profile fields hide
-                        document.getElementById('otpSection').style.display = 'block'; // OTP field shows
-                        document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
-                    })
-                    .catch((err) => {
-                        document.getElementById('loginMsg').innerHTML = err.message;
-                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
-                        document.getElementById('profileInputSection').style.display = 'block';
-                        document.getElementById('otpSection').style.display = 'none';
-                    });
-            });
+            // CRITICAL FIX: Logout any existing user before attempting to send a new OTP
+            firebase.auth().signOut()
+                .then(() => initiateOtpFlow(fullPhone))
+                .catch(() => initiateOtpFlow(fullPhone)); // Proceed even if no user was signed in
+
+            function initiateOtpFlow(fullPhone) {
+                recaptchaVerifier.verify().then(() => {
+                    firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                        .then((result) => {
+                            confirmationResult = result;
+                            document.getElementById('profileInputSection').style.display = 'none'; 
+                            document.getElementById('otpSection').style.display = 'block'; 
+                            document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
+                        })
+                        .catch((err) => {
+                            document.getElementById('loginMsg').innerHTML = err.message;
+                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                            document.getElementById('profileInputSection').style.display = 'block';
+                            document.getElementById('otpSection').style.display = 'none';
+                        });
+                });
+            }
         };
 
-        // 4. VERIFY OTP (Registration/Login Step 2)
+
+        // 4. VERIFY OTP (Registration/Login Step 2 - Unchanged)
         document.getElementById('verifyOtpBtn').onclick = () => {
             const otp = document.getElementById('otpInput').value;
             if (otp.length !== 6) {
