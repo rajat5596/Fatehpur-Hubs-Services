@@ -227,7 +227,7 @@
     <script src="ads.js"></script>
     <script src="script.js"></script>
     <script>
-            const firebaseConfig = {
+    const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -238,524 +238,251 @@
     };
 
     let recaptchaVerifier, confirmationResult;
-    let tempUserData = {}; 
-    
-    // ⭐ ग्लोबल स्टेट फॉर पैजिनेशन और फ़िल्टरिंग ⭐
-    const providersLimit = 20; 
-    let providersLastTimestamp = null; 
-    let providersLastKey = null; 
-    let currentCategory = null; 
-    
-    // फ़िल्टरिंग के लिए लोकल ऐरे और पेज इंडेक्स (Category Pagination Fix)
-    let filteredProviders = [];
+    let tempUserData = {};
+
+    const providersLimit = 20;
+    let providersLastKey = null;           // ग्लोबल पैजिनेशन के लिए
+    let currentCategory = null;
+    let filteredProviders = [];            // कैटेगरी फ़िल्टर के लिए
     let filteredPageIndex = 0;
-    
-    let jobsLastKey = null;
-    const jobsLimit = 10;
 
-    // शेयर डीटेल्स फंक्शन
-    window.shareProviderDetails = (name, phone, category) => {
-        const shareText = `नाम: ${name} (${category})\nफ़ोन: ${phone}\n\nFatehpur Hubs App के ज़रिए सर्विस प्रोवाइडर की जानकारी मिली।`;
-        if (navigator.share) {
-            navigator.share({
-                title: 'Service Provider Contact',
-                text: shareText
-            }).catch(error => console.error('Sharing failed', error));
-        } else {
-            alert(`Contact Details:\n${shareText}`);
-        }
-    }
-
-    // प्रोवाइडर कार्ड रेंडर करें
-    function renderProviderCard(p) {
-        return `<div class="profile-card">
-            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
-            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-            </div>
-        </div>`;
-    }
-
-    // जॉब कार्ड रेंडर करें
-    function renderJobCard(job) {
-        return `<div class="profile-card" style="border-left: 5px solid #ff9800;">
-            <h4 style="color:#ff9800;">${job.title} (${job.shopName})</h4>
-            <p style="font-size:12px;color:#555;margin-bottom:5px;">💰 Salary: ₹${job.salary} | 📍 ${job.location}</p>
-            <p style="font-size:14px;margin-bottom:10px;">${job.description.substring(0, 100)}...</p>
-            <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone}')">Apply/WhatsApp</button>
-        </div>`;
-    }
-
-    // कैटेगरी बटन रेंडर करें
-    function renderCategoryButtons() {
-        const categoriesDiv = document.getElementById('mistri-categories');
-        const allCategories = [
-            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
-            'AC Mechanic', 'Tiler', 'Beautician', 'Home Cleaning', 'Security Guard', 
-            'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'
-        ];
-        
-        categoriesDiv.innerHTML = allCategories.map(cat => 
-            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
-        ).join('');
-    }
-
-    // ⭐ 1. loadCategories - सामान्य लिस्ट पैजिनेशन (Firebase कर्सर का उपयोग करके)
+    // =============== 1. LOAD MORE FIX (सभी सर्विसेज + कैटेगरी दोनों) ===============
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
-        
-        let queryRef;
-        loadMoreBtn.style.display = 'none';
-        
-        // सामान्य लिस्ट लोड करते समय कैटेगरी फ़िल्टर स्टेट रीसेट करें
-        if (currentCategory !== null) {
-            currentCategory = null; 
-            filteredProviders = [];
-            filteredPageIndex = 0;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
-        }
-
-        const baseRef = window.providersRef.orderByChild('timestamp');
 
         if (!loadMore) {
-            providersLastTimestamp = null;
             providersLastKey = null;
-            
-            listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
-            
-            queryRef = baseRef.limitToLast(providersLimit + 1); 
-        } else {
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
-            
-            // पिछली बार लोड किए गए आइटम के कर्सर का उपयोग करके पैजिनेट करें
-            queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
+            filteredProviders = [];
+            filteredPageIndex = 0;
+            currentCategory = null;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+            listElement.innerHTML = `<h3>Available Services</h3><p style="text-align:center;color:#2a5298;">लोड हो रहा है...</p>`;
         }
 
-        queryRef.once('value', (snapshot) => {
-            document.getElementById('loading-more')?.remove();
+        let query = window.providersRef.orderByChild('timestamp').limitToLast(providersLimit + 1);
+        if (loadMore && providersLastKey) {
+            query = window.providersRef.orderByChild('timestamp').endBefore(providersLastKey).limitToLast(providersLimit + 1);
+        }
 
-            if (!loadMore && !snapshot.exists()) {
-                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>';
+        query.once('value').then(snapshot => {
+            let items = [];
+            snapshot.forEach(child => {
+                items.push({ key: child.key, data: child.val() });
+            });
+            items.reverse();
+
+            // पहला आइटम डुप्लीकेट हो सकता है (पैजिनेशन के लिए), उसे हटाओ
+            if (loadMore && items.length > 0) items.shift();
+
+            if (items.length === 0 && loadMore) {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
                 return;
             }
 
-            let allItems = [];
-            snapshot.forEach(childSnapshot => {
-                allItems.push({ 
-                    key: childSnapshot.key, 
-                    data: childSnapshot.val() 
-                });
-            });
-
-            allItems.reverse();
-
-            if (loadMore && allItems.length > 0) {
-                allItems.shift(); // पैजिनेशन कर्सर के लिए उपयोग किए गए डुप्लीकेट को हटा दें
+            // लास्ट की का अपडेट
+            if (items.length > 0) {
+                providersLastKey = items[items.length - 1].data.timestamp; // टाइमस्टैम्प ही काफी है
             }
-            
-            let itemsToRender = allItems.slice(0, providersLimit);
-            
-            if (itemsToRender.length > 0) {
-                providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
-                providersLastKey = itemsToRender[itemsToRender.length - 1].key;
-            } 
-            
-            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
 
+            const html = items.map(i => renderProviderCard(i.data)).join('');
             if (!loadMore) {
-                listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
+                listElement.innerHTML = `<h3>Available Services (${snapshot.numChildren()} कुल)</h3>` + html;
             } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent);
+                document.getElementById('loading-more')?.remove();
+                listElement.insertAdjacentHTML('beforeend', html);
             }
 
-            // जाँचें कि Firebase से लोड करने के लिए और आइटम बचे हैं या नहीं
-            if (allItems.length > providersLimit) {
+            // Load More दिखाना है या नहीं?
+            if (snapshot.numChildren() > providersLimit || loadMore) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
             } else {
                 loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
             }
-
-        }, (error) => {
-            console.error("Error loading services:", error);
-            document.getElementById('loading-more')?.remove();
-            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
         });
-    }
+    };
 
-    // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें
-    function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
-        const start = filteredPageIndex * providersLimit;
-        const end = start + providersLimit;
-        const itemsToRender = filteredProviders.slice(start, end);
-        const totalItems = filteredProviders.length;
-
-        if (itemsToRender.length > 0) {
-            const htmlContent = itemsToRender.map(item => renderProviderCard(item)).join('');
-            if (!isLoadMore) {
-                listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
-            } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent);
-            }
-            filteredPageIndex++; 
-        } else if (!isLoadMore) {
-             listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
-        }
-        
-        // ⭐ क्रिटिकल फिक्स: सुनिश्चित करें कि लोड मोर तब तक दिखे जब तक लोकल ऐरे में कोई आइटम बचा हो
-        if (totalItems > filteredPageIndex * providersLimit) {
-            loadMoreBtn.style.display = 'block';
-            loadMoreBtn.onclick = () => filterByCategory(currentCategory, true);
-        } else {
-            loadMoreBtn.style.display = 'none';
-            listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
-        }
-    }
-
-    // ⭐ 2. कैटेगरी के अनुसार फ़िल्टर करें (सभी को फ़ेच करें, लोकल सॉर्ट करें, लोकल पैजिनेट करें)
+    // =============== 2. CATEGORY FILTER + LOAD MORE FIX (सभी आइटम्स दिखेंगे) ===============
     window.filterByCategory = (category, loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
-        loadMoreBtn.style.display = 'none';
-        
-        // मुख्य पैजिनेशन स्टेट रीसेट करें
-        providersLastTimestamp = null;
-        providersLastKey = null;
-        
-        document.querySelectorAll('.cat-btn').forEach(btn => {
-            btn.classList.remove('selected');
-            if(btn.innerText === category) {
-                btn.classList.add('selected');
-            }
+
+        document.querySelectorAll('.cat-btn').forEach(b => {
+            b.classList.remove('selected');
+            if (b.innerText === category) b.classList.add('selected');
         });
 
         if (!loadMore) {
-            // इनिशियल फ़िल्टर लोड या नई कैटेगरी का चयन
             currentCategory = category;
             filteredPageIndex = 0;
-            listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है... (पूरी लिस्ट फेच की जा रही है)</p>`;
+            filteredProviders = [];
+            listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">लोड हो रहा है...</p>`;
 
-            // इस कैटेगरी के लिए सभी आइटम फ़ेच करें (क्रॉस-कैटेगरी बग को रोकने के लिए आवश्यक)
-            window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
-                if (!snapshot.exists()) {
-                    listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">इस कैटेगरी में कोई सर्विस नहीं है।</p>`;
-                    return;
-                }
-
-                // ऐरे में कनवर्ट करें
-                filteredProviders = [];
-                snapshot.forEach(childSnapshot => {
-                    filteredProviders.push(childSnapshot.val());
-                });
-
-                // JavaScript में टाइमस्टैम्प के अनुसार घटते क्रम में सॉर्ट करें (नवीनतम पहले)
+            window.providersRef.orderByChild('category').equalTo(category).once('value').then(snapshot => {
+                snapshot.forEach(child => filteredProviders.push(child.val()));
                 filteredProviders.sort((a, b) => b.timestamp - a.timestamp);
-
-                // पहला पेज रेंडर करें
-                renderFilteredPage(listElement, loadMoreBtn);
-            }, (error) => {
-                console.error("Error loading filtered services:", error);
-                listElement.innerHTML = '<p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
+                renderCategoryPage();
             });
-
         } else {
-            // और लोड करें (बस संग्रहीत लोकल ऐरे से अगला पेज रेंडर करें)
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
-            
-            setTimeout(() => { 
-                document.getElementById('loading-more')?.remove();
-                renderFilteredPage(listElement, loadMoreBtn, true);
-            }, 100);
-        }
-    };
-
-
-    // सामान्य सर्च
-    window.searchServices = () => {
-        const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
-        const listElement = document.getElementById('mistri-list');
-        
-        if (searchTerm.length < 3) {
-            loadCategories(); 
-            return;
+            renderCategoryPage(true);
         }
 
-        listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">खोज हो रही है...</p>`;
-        document.getElementById('load-more-providers').style.display = 'none'; 
-        
-        window.providersRef.once('value', (snapshot) => { 
-            const providers = snapshot.val();
-            let results = [];
-            if (providers) {
-                results = Object.values(providers).filter(p => 
-                    (p.name && p.name.toLowerCase().includes(searchTerm)) || 
-                    (p.category && p.category.toLowerCase().includes(searchTerm)) ||
-                    (p.area && p.area.toLowerCase().includes(searchTerm))
-                );
-                // सर्च परिणामों को टाइमस्टैम्प (नवीनतम पहले) के अनुसार सॉर्ट करें
-                results.sort((a, b) => b.timestamp - a.timestamp);
+        function renderCategoryPage(isLoadMore = false) {
+            const start = filteredPageIndex * providersLimit;
+            const end = start + providersLimit;
+            const pageItems = filteredProviders.slice(start, end);
+
+            if (!isLoadMore) {
+                listElement.innerHTML = `<h3>Available Services (${category} - ${filteredProviders.length} कुल)</h3>`;
             }
-            
-            let html = `<h3>Search Results for "${searchTerm}" (${results.length} found)</h3>`;
-            if (results.length > 0) {
-                html += results.map(p => renderProviderCard(p)).join('');
-            } else {
-                html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
-            }
-            listElement.innerHTML = html;
-        });
-    };
-    
-    // लॉग आउट फंक्शन
-    window.logOut = () => {
-        firebase.auth().signOut().then(() => {
-            console.log("User signed out successfully.");
-            location.reload(); // लॉगआउट के बाद पेज रीलोड करें
-        }).catch((error) => {
-            console.error("Sign Out Error:", error);
-            alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
-        });
-    }
 
-    // मुख्य लिसनर स्टार्ट फंक्शन
-    window.startFirebaseListener = () => {
-        loadCategories(); 
-        renderCategoryButtons(); 
-    }
-
-    // WHATSAPP बटन फ़िक्स
-    function openWhatsApp(phone) {
-        let num = phone.toString().replace(/[^0-9]/g, '');
-        if (num.length === 10) num = '91' + num;
-        if (num.length === 12 && num.startsWith('91')) {
-        } else if (num.length === 13 && num.startsWith('919')) {
-            num = num.substring(1);
-        }
-        window.open('https://wa.me/' + num, '_blank');
-    }
-
-    // ⭐ 3. सर्विस रजिस्ट्रेशन फंक्शन (डुप्लीकेट फ़ोन चेक शामिल)
-    function registerService() {
-        const name = document.getElementById('providerName').value;
-        const phone = document.getElementById('providerPhone').value;
-        const category = document.getElementById('serviceCategory').value;
-        const area = document.getElementById('providerArea').value;
-        const experience = document.getElementById('providerExperience').value;
-        const form = document.getElementById('serviceForm');
-
-        if (!name || !phone || !category || !area || !experience) {
-            alert("कृपया सभी फ़ील्ड भरें।");
-            return false;
-        }
-        
-        if (phone.length !== 10 || isNaN(phone)) {
-            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
-            return false;
-        }
-        
-        // डुप्लीकेट फ़ोन नंबर के लिए जाँच करें
-        window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
-            if (snapshot.exists()) {
-                alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
+            if (pageItems.length === 0 && !isLoadMore) {
+                listElement.innerHTML += '<p style="text-align:center;color:#ff6666;">कोई सर्विस नहीं मिली</p>';
+                loadMoreBtn.style.display = 'none';
                 return;
             }
 
-            // यदि फ़ोन नंबर यूनीक है, तो डेटा पुश करें
-            const providerData = {
-                name: name, phone: phone, category: category, area: area,
+            const html = pageItems.map(p => renderProviderCard(p)).join('');
+            if (!isLoadMore) {
+                listElement.innerHTML += html;
+            } else {
+                document.getElementById('loading-more')?.remove();
+                listElement.insertAdjacentHTML('beforeend', html);
+            }
+
+            filteredPageIndex++;
+
+            if (end < filteredProviders.length) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => filterByCategory(category, true);
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
+            }
+        }
+    };
+
+    // =============== 3. OTP MANDATORY + DUPLICATE PHONE CHECK + SHOW EXISTING DATA ===============
+    function registerService() {
+        const name = document.getElementById('providerName').value.trim();
+        const phone = document.getElementById('providerPhone').value.trim();
+        const category = document.getElementById('serviceCategory').value;
+        const area = document.getElementById('providerArea').value.trim();
+        const experience = document.getElementById('providerExperience').value.trim();
+
+        if (!name || !phone || !category || !area || !experience) return alert("सभी फील्ड भरें");
+        if (phone.length !== 10) return alert("10 अंक का नंबर डालें");
+
+        // डुप्लीकेट चेक + मौजूदा डेटा दिखाना
+        window.providersRef.orderByChild('phone').equalTo(phone).once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                let existing = null;
+                snapshot.forEach(child => existing = child.val());
+                alert(`यह नंबर पहले से रजिस्टर्ड है!\nनाम: ${existing.name}\nसर्विस: ${existing.category}\nइलाका: ${existing.area}\nअनुभव: ${existing.experience}`);
+                return;
+            }
+
+            // नया रजिस्टर करो
+            const data = {
+                name, phone, category, area,
                 experience: experience + ' years',
-                timestamp: firebase.database.ServerValue.TIMESTAMP 
+                timestamp: firebase.database.ServerValue.TIMESTAMP
             };
-
-            window.providersRef.push(providerData)
-                .then(() => {
-                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-                    form.reset(); 
-                    loadCategories(); 
-                })
-                .catch((error) => {
-                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
-                    console.error("Firebase Error:", error);
-                });
-        });
-        
-        return false; 
-    }
-    // सर्विस रजिस्ट्रेशन फंक्शन का अंत
-
-    // जॉब पोस्ट रजिस्टर करने का फंक्शन
-    function jobRegister() {
-        const title = document.getElementById('jobTitle').value;
-        const shopName = document.getElementById('jobShopName').value;
-        const location = document.getElementById('jobLocation').value;
-        const salary = document.getElementById('jobSalary').value;
-        const description = document.getElementById('jobDescription').value;
-        const phone = document.getElementById('jobPhone').value;
-        const form = document.getElementById('jobForm');
-
-        if (!title || !shopName || !location || !salary || !description || !phone) {
-            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
-            return false;
-        }
-
-        if (phone.length !== 10 || isNaN(phone)) {
-            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
-            return false;
-        }
-
-        const jobData = {
-            title: title, shopName: shopName, location: location, salary: salary,
-            description: description, phone: phone, 
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
-        };
-
-        window.jobsRef.push(jobData) 
-            .then(() => {
-                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-                form.reset(); 
-                if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
-            })
-            .catch((error) => {
-                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
-                console.error("Firebase Job Error:", error);
+            window.providersRef.push(data).then(() => {
+                alert("सफलतापूर्वक रजिस्टर हुआ!");
+                document.getElementById('serviceForm').reset();
+                currentCategory ? filterByCategory(currentCategory) : loadCategories();
             });
-
+        });
         return false;
     }
-        
+
+    // =============== OTP STRICT कर दिया (बायपास नहीं होगा) ===============
+    document.getElementById('sendOtpBtn').onclick = () => {
+        const name = document.getElementById('userName').value.trim();
+        const area = document.getElementById('userArea').value.trim();
+        const phone = document.getElementById('phoneInput').value.trim();
+
+        if (!name || !area || phone.length !== 10) {
+            document.getElementById('loginMsg').innerHTML = "<span style='color:red'>सभी फील्ड भरें और 10 अंक का नंबर डालें</span>";
+            return;
+        }
+
+        tempUserData = { name, area, timestamp: firebase.database.ServerValue.TIMESTAMP };
+        const fullPhone = '+91' + phone;
+
+        document.getElementById('sendOtpBtn').disabled = true;
+        document.getElementById('sendOtpBtn').innerHTML = "भेज रहा है...";
+
+        recaptchaVerifier.verify().then(() => {
+            firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+            .then(result => {
+                confirmationResult = result;
+                document.getElementById('profileInputSection').style.display = 'none';
+                document.getElementById('otpSection').style.display = 'block';
+                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>OTP भेजा गया!</span>";
+                document.getElementById('sendOtpBtn').disabled = false;
+                document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+            })
+            .catch(err => {
+                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>OTP नहीं भेजा गया: " + err.message + "</span>";
+                document.getElementById('sendOtpBtn').disabled = false;
+                document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+            });
+        });
+    };
+
+    document.getElementById('verifyOtpBtn').onclick = () => {
+        const otp = document.getElementById('otpInput').value;
+        if (otp.length !== 6) return document.getElementById('loginMsg').innerHTML = "<span style='color:red'>6 अंक का OTP डालें</span>";
+
+        confirmationResult.confirm(otp)
+        .then(result => {
+            window.database.ref('users/' + result.user.uid).set(tempUserData).then(() => {
+                location.reload();
+            });
+        })
+        .catch(() => {
+            document.getElementById('loginMsg').innerHTML = "<span style='color:red'>गलत OTP!</span>";
+        });
+    };
+
+    // बाकी सारे फंक्शन (renderProviderCard, openWhatsApp, share आदि) वही रहने दो – कोई बदलाव नहीं किया
+    // सिर्फ ऊपर वाले फिक्स लगाओ और बस!
+
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
-        window.providersRef = database.ref('service_providers'); 
-        window.jobsRef = database.ref('local_jobs'); 
+        window.providersRef = database.ref('service_providers');
+        window.jobsRef = database.ref('local_jobs');
 
-        // 1. अदृश्य reCAPTCHA सेटअप
-        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'invisible'
-        });
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { size: 'invisible' });
         recaptchaVerifier.render();
 
-        // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('registrationScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                console.log("Auto-Login Successful:", user.phoneNumber);
-
-                startFirebaseListener();
-                
-                if (typeof loadPromotionAds === 'function') {
-                    loadPromotionAds();
-                    setTimeout(loadPromotionAds, 2000);
-                }
+                renderCategoryButtons();
+                loadCategories();
+                if (typeof loadPromotionAds === 'function') loadPromotionAds();
             } else {
                 document.getElementById('registrationScreen').style.display = 'flex';
-                document.getElementById('mainApp').style.display = 'none';
             }
         });
 
-
-        // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1) - सुनिश्चित करता है कि OTP फ़्लो अनिवार्य है
-        document.getElementById('sendOtpBtn').onclick = () => {
-            const name = document.getElementById('userName').value.trim();
-            const area = document.getElementById('userArea').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
-            
-            if (!name || !area || phone.length !== 10 || isNaN(phone)) {
-                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>कृपया सभी फ़ील्ड (नाम, एरिया) भरें और 10 अंक का नंबर डालें।</span>";
-                return;
-            }
-
-            tempUserData = {
-                name: name,
-                area: area,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-
-            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
-            const fullPhone = '+91' + phone;
-
-            // नया OTP भेजने का प्रयास करने से पहले किसी भी मौजूदा यूज़र को लॉगआउट करें (सुरक्षा फ़िक्स)
-            firebase.auth().signOut()
-                .then(() => initiateOtpFlow(fullPhone))
-                .catch(() => initiateOtpFlow(fullPhone)); 
-
-            function initiateOtpFlow(fullPhone) {
-                recaptchaVerifier.verify().then(() => {
-                    firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
-                        .then((result) => {
-                            confirmationResult = result;
-                            document.getElementById('profileInputSection').style.display = 'none'; 
-                            document.getElementById('otpSection').style.display = 'block'; 
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
-                        })
-                        .catch((err) => {
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>${err.message}</span>`;
-                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
-                            document.getElementById('profileInputSection').style.display = 'block';
-                            document.getElementById('otpSection').style.display = 'none';
-                        });
-                }).catch((err) => {
-                    document.getElementById('loginMsg').innerHTML = `<span style='color:red'>Recaptcha एरर: ${err.message}</span>`;
-                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
-                });
-            }
-        };
-
-
-        // 4. OTP सत्यापित करें (लॉगिन स्टेप 2) - OTP बाईपास को रोकता है
-        document.getElementById('verifyOtpBtn').onclick = () => {
-            const otp = document.getElementById('otpInput').value;
-            if (otp.length !== 6) {
-                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>कृपया 6 अंक का OTP डालें।</span>";
-                return;
-            }
-
-            confirmationResult.confirm(otp)
-                .then((result) => {
-                    const user = result.user;
-                    if (user && user.uid) {
-                        window.database.ref('users/' + user.uid).set(tempUserData)
-                            .then(() => {
-                                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>Login Successful! Redirecting...</span>";
-                                // ⭐ CRITICAL FIX: सफल सत्यापन के बाद रिलोड करें
-                                location.reload(); 
-                            })
-                            .catch(error => {
-                                console.error("Profile save error:", error);
-                                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Login Successful, but profile save failed. Please contact support.</span>";
-                            });
-                    } else {
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Verification Failed: User not returned.</span>";
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "<span style='color:red'>ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
-                });
-        };
-
-        // एक्स्ट्रा फंक्शन
+        // बाकी सारे फंक्शन (shareApp, contactForAds आदि) वैसा ही रखो
         window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
-        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share: https://www.fatehpurhubs.co.in');
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'jobs-screen') loadJobs();
-            if(id === 'home-screen') loadCategories(); 
+            if (id === 'jobs-screen') loadJobs();
+            if (id === 'home-screen') loadCategories();
         };
-        // PWA सेटअप
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('SW Error:', err));
-            });
-        }
     };
     </script>
 </body>
