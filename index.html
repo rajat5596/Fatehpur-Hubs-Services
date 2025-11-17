@@ -6,224 +6,754 @@
     <title>Fatehpur Hubs</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff6666">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-        body{background:#f5f5f5}
-        .container{max-width:400px;margin:0 auto;background:white;min-height:100vh;padding-bottom:100px}
-        header{background:linear-gradient(135deg,#1e3c72,#2a5298);color:white;padding:15px;text-align:center}
-        .screen{display:none;padding:15px}
-        .screen.active{display:block}
-        .categories-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
-        .cat-btn{background:white;border:2px solid #e0e0e0;padding:12px;border-radius:10px;cursor:pointer;text-align:center;font-size:14px;transition:.3s}
-        .cat-btn.selected{background:#2a5298;color:white;border-color:#2a5298}
-        .profile-card{background:white;border:1px solid #e0e0e0;border-radius:10px;padding:15px;margin-bottom:15px;box-shadow:0 2px 5px rgba(0,0,0,.1)}
-        .contact-btn,.whatsapp-btn,.share-btn-inline{padding:8px 15px;border-radius:20px;cursor:pointer;border:none}
-        .contact-btn{background:#2a5298;color:white}
-        .whatsapp-btn{background:#25D366;color:white}
-        .share-btn-inline{background:#f8f9fa;color:#333;border:1px solid #e0e0e0}
-        .footer{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);width:100%;max-width:400px;background:white;padding:10px;display:flex;justify-content:space-around;border-top:1px solid #e0e0e0;z-index:1000}
-        .premium-btn{background:#ffd700;color:#333;padding:8px 15px;border-radius:20px;text-decoration:none;font-weight:bold}
-        .ad-container{margin:15px 0;text-align:center;background:#f8f9fa;padding:10px;border-radius:8px;border:1px solid #e0e0e0}
-        .reg-input{width:100%;padding:15px;margin:10px 0;border-radius:10px;border:1px solid #ddd;font-size:16px}
-        #bottom-ad{position:fixed;bottom:0;width:100%;max-width:400px;height:50px;background:#f5f5f5;display:flex;justify-content:center;align-items:center;z-index:999}
-        .load-more-btn{width:100%;padding:15px;background:#2a5298;color:white;border:none;border-radius:10px;font-weight:bold;margin:20px 0;cursor:pointer}
+        /* Basic Styling (Unchanged) */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial; }
+        body { background: #f5f5f5; }
+        /* CRITICAL FIX: Main content ko 100px padding-bottom de rahe hain (Footer 48px + Ad 50px) */
+        .container { 
+            max-width: 400px; 
+            margin: 0 auto; 
+            background: white; 
+            min-height: 100vh;
+            /* Yahan padding-bottom joD rahe hain taaki content neeche fixed bars ke peeche na chhipe */
+            padding-bottom: 100px; 
+        } 
+        header { background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 15px; text-align: center; }
+        .screen { display: none; padding: 15px; }
+        .screen.active { display: block; }
+        #main-search-bar { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 25px; margin: 10px 0 20px; }
+        .categories-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+        .cat-btn { background: white; border: 2px solid #e0e0e0; padding: 12px 8px; border-radius: 10px; cursor: pointer; text-align: center; font-size: 14px; transition: all 0.3s; }
+        .cat-btn.selected { background: #2a5298; color: white; border-color: #2a5298; }
+        .profile-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .contact-btn, .whatsapp-btn, .share-btn-inline { padding: 8px 15px; border-radius: 20px; cursor: pointer; margin: 5px; }
+        .contact-btn { background: #2a5298; color: white; border: none; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; }
+        .share-btn-inline { background: #f8f9fa; color: #333; border: 1px solid #e0e0e0; }
+        
+        /* ⭐ CRITICAL FIX 1: Footer ko Ad Unit (50px) jitna upar shift kiya gaya hai ⭐ */
+        .footer { 
+            position: fixed; 
+            bottom: 50px; /* ORIGINAL THA: bottom: 0; */
+            width: 100%; 
+            max-width: 400px; 
+            background: white; 
+            padding: 10px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            border-top: 1px solid #e0e0e0; 
+            z-index: 1000; /* Z-index badhaya takki Ad Unit se upar dikhe */
+        }
+        .premium-btn { background: #ffd700; color: #333; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; }
+        .ad-container { margin: 15px 0; text-align: center; background: #f8f9fa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .promotion-banner { background: linear-gradient(135deg, #ff6b6b, #feca57); color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 20px 0; font-weight: bold; }
+        /* Registration Specific Styles */
+        .reg-input { width:100%; padding:15px; margin:10px 0; border-radius:10px; border:1px solid #ddd; font-size:16px; }
+        
+        /* ⭐ CRITICAL FIX 2: Bottom Ad Unit ki positioning aur Z-Index ⭐ */
+        #bottom-ad {
+            position: fixed;
+            bottom: 0;
+            z-index: 999; /* Footer se kam rakha hai */
+            width: 100%;
+            max-width: 400px; /* Container ki width se match kare */
+            height: 50px; /* 320x50 ad size ke liye */
+            display: flex; /* Centering ke liye */
+            justify-content: center;
+            align-items: center;
+            background: #f5f5f5; /* Taki ad load hone se pehle white na dikhe */
+        }
+        /* Load More Button Styling */
+        .load-more-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .load-more-btn:hover {
+            background: #1e3c72;
+        }
     </style>
 </head>
 <body>
 
-<div class="ad-container">
-    <script type="text/javascript">
-        atOptions = {'key':'969a80a2e6bea9f00173f36024f32cb2','format':'iframe','height':50,'width':320,'params':{}};
-        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
-    </script>
-</div>
-
-<!-- Login Screen -->
-<div id="registrationScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
-    <div style="background:white;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px;">
-        <h2 style="color:#1e3c72;margin-bottom:20px;">Fatehpur Hubs</h2>
-        <div id="profileInputSection">
-            <input type="text" id="userName" placeholder="आपका नाम" class="reg-input">
-            <input type="text" id="userArea" placeholder="आपका इलाका" class="reg-input">
-            <input type="tel" id="phoneInput" placeholder="10 अंक का मोबाइल" maxlength="10" class="reg-input">
-            <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;margin-top:15px;cursor:pointer;">Send OTP & Login</button>
-        </div>
-        <div id="otpSection" style="display:none;margin-top:20px;">
-            <input type="text" id="otpInput" placeholder="6 अंक का OTP" maxlength="6" class="reg-input">
-            <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;margin-top:10px;">Verify OTP</button>
-        </div>
-        <p id="loginMsg" style="color:red;margin-top:15px;min-height:25px;"></p>
-        <div id="recaptcha-container"></div>
+    <div class="ad-container">
+        <!-- Ad Script 1 -->
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
+        </script>
     </div>
-</div>
 
-<div class="container" id="mainApp" style="display:none;">
-    <header><h1>Fatehpur Hubs</h1></header>
+    <!-- ⭐ UPDATED REGISTRATION/LOGIN SCREEN ⭐ -->
+    <div id="registrationScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1e3c72,#2a5298);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="background:white;padding:30px;border-radius:20px;text-align:center;width:90%;max-width:400px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+            <h2 style="color:#1e3c72; margin-bottom: 20px;">Fatehpur Hubs</h2>
+            
+            <div id="profileInputSection">
+                <p style="color:#555;margin:15px 0;">Sign Up/Login करें</p>
+                <input type="text" id="userName" placeholder="आपका पूरा नाम" class="reg-input">
+                <input type="text" id="userArea" placeholder="आपकी लोकैलिटी/Area" class="reg-input">
+                <input type="tel" id="phoneInput" placeholder="10 अंक का Mobile Number" maxlength="10" class="reg-input">
+                <button id="sendOtpBtn" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;margin-top:15px;">Send OTP & Sign Up</button>
+            </div>
 
-    <div id="home-screen" class="screen active">
-        <div class="categories-list" id="mistri-categories"></div>
+            <div id="otpSection" style="margin-top:20px;display:none;">
+                <p style="color:#555;margin:15px 0;">OTP Verify करें</p>
+                <input type="text" id="otpInput" placeholder="6 अंक का OTP" maxlength="6" class="reg-input">
+                <button id="verifyOtpBtn" style="width:100%;padding:15px;background:#ff9800;color:white;border:none;border-radius:10px;font-size:16px;cursor:pointer;">Verify OTP</button>
+                <button onclick="document.getElementById('otpSection').style.display='none'; document.getElementById('profileInputSection').style.display='block'; document.getElementById('sendOtpBtn').innerHTML='Send OTP & Sign Up';" style="background:none; border:none; color:#1e3c72; margin-top:10px; cursor:pointer;">&#8592; Edit Number</button>
+            </div>
+            
+            <p id="loginMsg" style="margin-top:15px;color:red;font-size:14px;min-height:20px;"></p>
+            <div id="recaptcha-container"></div>
+        </div>
+    </div>
+    <!-- ⭐ END OF REGISTRATION/LOGIN SCREEN ⭐ -->
+
+
+    <div class="container" id="mainApp" style="display:none;">
+        <header><h1><img src="file_0000000059806208b25eb7951e979b96.png" alt="Logo" style="height:50px;"> Fatehpur Hubs</h1></header>
+
+        <div id="home-screen" class="screen active">
+            <input type="text" id="main-search-bar" placeholder="Search Plumber, Electrician..." onkeyup="searchServices()">
+
+            <div class="promotion-banner">
+                <p>Apna Business Promote Karein! ₹500/month se shuru<br>
+                <button onclick="contactForAds()" style="background:white;color:#d35400;padding:8px 20px;border:none;border-radius:25px;margin-top:10px;font-weight:bold;">Ad Lagwayein</button></p>
+            </div>
+
+            <div class="ad-container">
+                <!-- Ad Script 2 -->
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                    document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
+                </script>
+            </div>
+
+            <div class="promotion-section" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);overflow:hidden;">
+                <h3 style="text-align:center;color:white;font-size:18px;margin:0 0 15px;font-weight:bold;">
+                    Special Offers & Promotions
+                </h3>
+                <div id="promotion-banner-area" style="position:relative;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+                    <p style="text-align:center;color:#fff;padding:20px;font-size:14px;">Loading amazing offers...</p>
+                </div>
+                <div style="text-align:center;margin-top:15px;">
+                    <button onclick="contactForAds()" style="background:#fff;color:#764ba2;padding:10px 25px;border:none;border-radius:30px;font-weight:bold;box-shadow:0 5px 15px rgba(0,0,0,0.2);">
+                        Apna Ad Lagwayein (₹500/month)
+                    </button>
+                </div>
+            </div>
+
+            <h3>Popular Services</h3>
+            <div class="categories-list" id="mistri-categories"></div>
+            <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
+                <h3 style="text-align:center;">Add Your Service</h3>
+                <form id="serviceForm" onsubmit="event.preventDefault(); return registerService();">
+                    <input type="text" id="providerName" placeholder="Your Name" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="tel" id="providerPhone" placeholder="Phone Number" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <select id="serviceCategory" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                        <option value="">Select Service</option>
+                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option>
+                        <option>Painter</option><option>AC Mechanic</option><option>Tiler</option><option>Beautician</option>
+                        <option>Home Cleaning</option><option>Security Guard</option><option>Laundry Service</option>
+                        <option>Legal Consultant</option><option>Private Teacher</option><option>Computer Repair</option><option>Welder</option>
+                    </select>
+                    <input type="text" id="providerArea" placeholder="Your Area" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <input type="text" id="providerExperience" placeholder="Experience (years)" required style="width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px;">
+                    <button type="submit" style="width:100%;background:#25D366;color:white;padding:12px;border:none;border-radius:8px;font-weight:bold;">Register Service</button>
+                </form>
+            </div>
+
+            <div id="mistri-list"><h3>Available Services</h3><p style="text-align:center;color:#2a5298;">Loading...</p></div>
+            <!-- ⭐ New "Load More" Button for Services ⭐ -->
+            <button id="load-more-providers" class="load-more-btn" onclick="loadCategories(true)" style="display:none;">Load More Services</button>
+            <div style="height:80px;"></div>
+        </div>
         
-        <div id="service-registration" style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;color:white;">
-            <h3 style="text-align:center;">अपनी सर्विस रजिस्टर करें</h3>
-            <form onsubmit="event.preventDefault(); registerService();">
-                <input type="text" id="providerName" placeholder="नाम" required class="reg-input" style="background:white;color:black;">
-                <input type="tel" id="providerPhone" placeholder="मोबाइल" required class="reg-input" style="background:white;color:black;">
-                <select id="serviceCategory" required class="reg-input" style="background:white;color:black;">
-                    <option value="">सर्विस चुनें</option>
-                    <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option><option>Painter</option>
-                    <option>AC Mechanic</option><option>Tiler</option><option>Beautician</option><option>Home Cleaning</option>
-                    <option>Security Guard</option><option>Laundry Service</option><option>Legal Consultant</option>
-                    <option>Private Teacher</option><option>Computer Repair</option><option>Welder</option>
-                </select>
-                <input type="text" id="providerArea" placeholder="इलाका" required class="reg-input" style="background:white;color:black;">
-                <input type="text" id="providerExperience" placeholder="अनुभव (साल में)" required class="reg-input" style="background:white;color:black;">
-                <button type="submit" style="width:100%;padding:15px;background:#25D366;color:white;border:none;border-radius:10px;margin-top:10px;">Register</button>
-            </form>
+        <!-- Job Screen (Structure corrected as requested previously) -->
+        <div id="jobs-screen" class="screen">
+            <h2 class="screen-title">💼 Job Listings</h2>
+
+            <!-- JOB REGISTRATION FORM -->
+            <div class="registration-section" style="padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 20px;">
+                <h3>✅ Job Post करें (Hiring)</h3>
+                <form id="jobForm" onsubmit="jobRegister(); return false;">
+                    <input type="text" id="jobTitle" placeholder="जॉब टाइटल (जैसे: सेल्समैन चाहिए)" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" id="jobShopName" placeholder="दुकान/कंपनी का नाम" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="text" id="jobLocation" placeholder="लोकेशन/पता" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="jobSalary" placeholder="सैलरी (जैसे: 8000)" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <textarea id="jobDescription" placeholder="जॉब विवरण (काम क्या करना है?)" required style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    <input type="number" id="jobPhone" placeholder="10 अंक का WhatsApp/कॉल नंबर" required maxlength="10" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    
+                    <button type="submit" class="contact-btn" style="width: 100%; background-color: #2a5298;">जॉब पोस्ट करें</button>
+                </form>
+            </div>
+            <!-- END OF JOB REGISTRATION FORM -->
+            
+            <button onclick="showScreen('home-screen')" style="background:#f8f9fa;border:1px solid #ccc;padding:8px 15px;border-radius:5px;margin-bottom:15px;cursor:pointer;">Home Screen</button>
+            <h2>Local Jobs</h2>
+            <div id="jobs-list"><p>Loading jobs...</p></div>
+            <!-- ⭐ New "Load More" Button for Jobs ⭐ -->
+            <button id="load-more-jobs" class="load-more-btn" onclick="loadJobs(true)" style="display:none;">Load More Jobs</button>
         </div>
 
-        <div id="mistri-list"></div>
-        <button id="load-more-providers" class="load-more-btn" style="display:none;">Load More</button>
+        <div class="footer">
+            <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
+            <button class="share-btn-inline" onclick="shareApp()">Share App</button>
+            <button class="share-btn-inline" onclick="showScreen('jobs-screen')">Jobs</button>
+        </div>
     </div>
 
-    <div id="jobs-screen" class="screen">
-        <button onclick="showScreen('home-screen')" style="margin-bottom:20px;padding:10px;background:#f0f0f0;">← Home</button>
-        <h2>Local Jobs</h2>
-        <div id="jobs-list"><p>Loading...</p></div>
+    <div id="bottom-ad">
+        <!-- Ad Script 3 -->
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
+        </script>
     </div>
 
-    <div class="footer">
-        <a href="https://rzp.io/rzp/4kK9deS" target="_blank" class="premium-btn">Go Premium</a>
-        <button class="share-btn-inline" onclick="shareApp()">Share</button>
-        <button class="share-btn-inline" onclick="showScreen('jobs-screen')">Jobs</button>
-    </div>
-</div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="ads.js"></script>
+    <script src="script.js"></script>
+    <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+        databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "fatehpur-hubs-a3a9f",
+        storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+        messagingSenderId: "294360741451",
+        appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    };
 
-<div id="bottom-ad">
-    <script type="text/javascript">
-        atOptions = {'key':'969a80a2e6bea9f00173f36024f32cb2','format':'iframe','height':50,'width':320,'params':{}};
-        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
-    </script>
-</div>
+    let recaptchaVerifier, confirmationResult;
+    let tempUserData = {}; 
+    
+    // ⭐ GLOBAL STATE FOR PAGINATION - FIXED AND SIMPLIFIED ⭐
+    let providersLastKey = null;
+    const providersLimit = 10;
+    let currentCategory = null; 
+    
+    let jobsLastKey = null;
+    const jobsLimit = 10;
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-    authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
-    messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const providersRef = db.ref('service_providers');
-const jobsRef = db.ref('local_jobs');
-
-let recaptchaVerifier, confirmationResult;
-let lastTimestamp = null;
-let currentCategory = null;
-let filtered = [];
-let page = 0;
-const limit = 20;
-
-function renderCard(p){return `<div class="profile-card"><h4 style="color:#2a5298">${p.name} - (${p.category})</h4><p style="font-size:12px;color:#555">${p.area} | ${p.experience}</p><div style="margin-top:10px;display:flex;gap:5px;"><button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button><button class="contact-btn" onclick="location.href='tel:${p.phone}'">Call</button></div></div>`;}
-
-function renderCategories(){
-    const cats = ['Plumber','Electrician','Carpenter','Mason','Painter','AC Mechanic','Tiler','Beautician','Home Cleaning','Security Guard','Laundry Service','Legal Consultant','Private Teacher','Computer Repair','Welder'];
-    document.getElementById('mistri-categories').innerHTML = cats.map(c=>`<button class="cat-btn" onclick="filterCategory('${c}')">${c}</button>`).join('');
-}
-
-window.loadServices = (more=false)=>{
-    const list = document.getElementById('mistri-list');
-    const btn = document.getElementById('load-more-providers');
-    btn.style.display='none';
-    if(!more){lastTimestamp=null;currentCategory=null;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('selected'));list.innerHTML='<h3>All Services</h3><p style="text-align:center">Loading...</p>';}
-    let q = providersRef.orderByChild('timestamp').limitToLast(more?limit:limit+1);
-    if(more && lastTimestamp) q = providersRef.orderByChild('timestamp').endBefore(lastTimestamp).limitToLast(limit+1);
-    q.once('value',s=>{
-        let items=[]; s.forEach(c=>items.push(c.val())); items.reverse();
-        if(more && items.length>limit) items.shift();
-        if(items.length>0) lastTimestamp = items[items.length-1].timestamp;
-        const html = items.map(renderCard).join('');
-        if(more) list.insertAdjacentHTML('beforeend',html); else list.innerHTML='<h3>All Services</h3>'+html;
-        if(s.numChildren()>limit || more){btn.style.display='block';btn.onclick=()=>loadServices(true);}
-    });
-};
-
-window.filterCategory = (cat, more=false)=>{
-    const list = document.getElementById('mistri-list');
-    const btn = document.getElementById('load-more-providers');
-    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('selected',b.innerText===cat));
-    currentCategory=cat; page=0; filtered=[];
-    if(!more) list.innerHTML=`<h3>${cat}</h3><p style="text-align:center">Loading...</p>`;
-    providersRef.orderByChild('category').equalTo(cat).once('value',s=>{
-        s.forEach(c=>filtered.push(c.val()));
-        filtered.sort((a,b)=>b.timestamp-a.timestamp);
-        showPage(more);
-    });
-    function showPage(m){const start=m?page*limit:0; const items=filtered.slice(start,start+limit); list.insertAdjacentHTML('beforeend',items.map(renderCard).join('')); page++;
-        if(start+limit < filtered.length){btn.style.display='block';btn.onclick=()=>filterCategory(cat,true);}else btn.style.display='none';
+    // Helper functions for rendering (Unchanged)
+    function renderProviderCard(p) {
+        return `<div class="profile-card">
+            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+            <div style="margin-top:10px;">
+                <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            </div>
+        </div>`;
     }
-};
 
-function registerService(){
-    const name=document.getElementById('providerName').value.trim();
-    const phone=document.getElementById('providerPhone').value.trim();
-    const cat=document.getElementById('serviceCategory').value;
-    const area=document.getElementById('providerArea').value.trim();
-    const exp=document.getElementById('providerExperience').value.trim();
-    if(!name||!phone||!cat||!area||!exp) return alert("सभी भरें");
-    if(phone.length!==10) return alert("10 अंक");
-    providersRef.orderByChild('phone').equalTo(phone).once('value',s=>{
-        if(s.exists()){let old; s.forEach(c=>old=c.val()); alert(`पहले से है!\n${old.name} - ${old.category} - ${old.area}`); return;}
-        providersRef.push({name,phone,category:cat,area,experience:exp+' years',timestamp:firebase.database.ServerValue.TIMESTAMP}).then(()=>{alert("हो गया!");document.getElementById('serviceForm').reset(); currentCategory?filterCategory(currentCategory):loadServices();});
-    });
-}
+    function renderJobCard(job) {
+        return `<div class="profile-card" style="border-left: 5px solid #ff9800;">
+            <h4 style="color:#ff9800;">${job.title} (${job.shopName})</h4>
+            <p style="font-size:12px;color:#555;margin-bottom:5px;">💰 Salary: ₹${job.salary} | 📍 ${job.location}</p>
+            <p style="font-size:14px;margin-bottom:10px;">${job.description.substring(0, 100)}...</p>
+            <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone}')">Apply/WhatsApp</button>
+        </div>`;
+    }
 
-function openWhatsApp(p){p=p.replace(/\D/g,'');if(p.length==10)p='91'+p;open('https://wa.me/'+p,'_blank');}
-function shareApp(){navigator.share?navigator.share({title:'Fatehpur Hubs',url:location.href}):alert(location.href);}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='home-screen')loadServices();}
+    function renderCategoryButtons() {
+        const categoriesDiv = document.getElementById('mistri-categories');
+        const allCategories = [
+            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
+            'AC Mechanic', 'Tiler', 'Beautician', 'Home Cleaning', 'Security Guard', 
+            'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'
+        ];
+        
+        categoriesDiv.innerHTML = allCategories.map(cat => 
+            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
+        ).join('');
+    }
 
-document.getElementById('sendOtpBtn').onclick=()=>{
-    const name=document.getElementById('userName').value.trim();
-    const area=document.getElementById('userArea').value.trim();
-    const phone=document.getElementById('phoneInput').value.trim();
-    if(!name||!area||phone.length!==10){document.getElementById('loginMsg').innerHTML='<span style="color:red">सब भरें</span>';return;}
-    document.getElementById('sendOtpBtn').disabled=true;
-    recaptchaVerifier.verify().then(()=>firebase.auth().signInWithPhoneNumber('+91'+phone,recaptchaVerifier).then(r=>{
-        confirmationResult=r;
-        document.getElementById('profileInputSection').style.display='none';
-        document.getElementById('otpSection').style.display='block';
-        document.getElementById('loginMsg').innerHTML='<span style="color:green">OTP भेजा!</span>';
-    }).catch(e=>{document.getElementById('loginMsg').innerHTML='<span style="color:red">'+e.message+'</span>';document.getElementById('sendOtpBtn').disabled=false;}));
-};
+    // ⭐ FIXED PAGINATION FUNCTION: Load Services (Providers) ⭐
+    window.loadCategories = (loadMore = false) => {
+        const listElement = document.getElementById('mistri-list');
+        const loadMoreBtn = document.getElementById('load-more-providers');
+        
+        let queryRef;
+        loadMoreBtn.style.display = 'none';
 
-document.getElementById('verifyOtpBtn').onclick=()=>{
-    const otp=document.getElementById('otpInput').value;
-    if(otp.length!==6) return document.getElementById('loginMsg').innerHTML='<span style="color:red">6 अंक</span>';
-    confirmationResult.confirm(otp).then(()=>location.reload()).catch(()=>document.getElementById('loginMsg').innerHTML='<span style="color:red">गलत OTP</span>');
-};
-
-window.onload=()=>{
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible'});
-    recaptchaVerifier.render();
-    firebase.auth().onAuthStateChanged(u=>{
-        if(u){
-            document.getElementById('registrationScreen').style.display='none';
-            document.getElementById('mainApp').style.display='block';
-            renderCategories();
-            loadServices();
-        }else{
-            document.getElementById('registrationScreen').style.display='flex';
+        if (!loadMore || currentCategory !== null) {
+            // New Query OR Filter is active: Do not reset pagination state here if filter is active.
+            // If filter is active, call filterByCategory instead.
+            if(currentCategory !== null) return;
+            
+            // New Unfiltered Query: Reset State & UI
+            providersLastKey = null;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
+            listElement.innerHTML = '<h3>Available Services (Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading latest 10 providers...</p>';
+            queryRef = window.providersRef.orderByKey().limitToFirst(providersLimit + 1);
+        } else {
+            // Load More: Use last key for unfiltered list
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
+            queryRef = window.providersRef.orderByKey().startAt(providersLastKey).limitToFirst(providersLimit + 1);
         }
-    });
-};
-</script>
+
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-more')?.remove();
+
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">No services available yet!</p>';
+                return;
+            }
+
+            let allItems = [];
+            snapshot.forEach(childSnapshot => {
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+            });
+
+            // If loading more, the first item in allItems is a duplicate (the last key from the previous batch)
+            if (loadMore && allItems.length > 0) {
+                allItems.shift(); 
+            }
+            
+            // Collect the actual 10 items to render
+            let itemsToRender = allItems.slice(0, providersLimit);
+            
+            // Set the next starting key
+            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
+
+            if (!loadMore) {
+                listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
+            } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent);
+            }
+
+            // If we got exactly 11 (or less than 10 after shift), it means more data is available
+            if (allItems.length > providersLimit) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => loadCategories(true);
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
+            }
+
+        }, (error) => {
+            console.error("Error loading services:", error);
+            document.getElementById('loading-more')?.remove();
+            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">Error loading data.</p>';
+        });
+    }
+
+
+    // ⭐ FIXED PAGINATION FUNCTION: Load Jobs ⭐
+    window.loadJobs = (loadMore = false) => {
+        const listElement = document.getElementById('jobs-list');
+        const loadMoreBtn = document.getElementById('load-more-jobs');
+        
+        let queryRef;
+        loadMoreBtn.style.display = 'none';
+
+        if (!loadMore) {
+            jobsLastKey = null;
+            listElement.innerHTML = '<h3>Local Jobs (Top 10)</h3><p>Loading latest 10 jobs...</p>';
+            queryRef = window.jobsRef.orderByKey().limitToLast(jobsLimit + 1); // Use limitToLast for jobs (to get latest first)
+        } else {
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-jobs" style="text-align:center;color:#ff9800;">Loading more jobs...</p>');
+            // Use endBefore and jobsLastKey (key of the oldest loaded item) to go backwards
+            queryRef = window.jobsRef.orderByKey().endBefore(jobsLastKey).limitToLast(jobsLimit + 1); 
+        }
+
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-jobs')?.remove();
+
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:#ff6666;">No jobs posted yet!</p>';
+                return;
+            }
+
+            let allItems = [];
+            snapshot.forEach(childSnapshot => {
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+            });
+
+            // If loading more, the items are sorted descending by key due to limitToLast, 
+            // so we reverse to process from newest to oldest.
+            allItems.reverse();
+
+            // If loading more, the first item is the duplicate (the one right before jobsLastKey)
+            if (loadMore && allItems.length > 0) {
+                allItems.shift(); 
+            }
+            
+            let itemsToRender = allItems.slice(0, jobsLimit);
+            
+            // The last key is the key of the oldest item we rendered (which will be the start point for endBefore next time)
+            jobsLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderJobCard(item.data)).join('');
+
+            if (!loadMore) {
+                listElement.innerHTML = `<h3>Local Jobs (${itemsToRender.length} loaded)</h3>` + htmlContent;
+            } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent); // Newest on top, oldest at bottom
+            }
+
+            if (allItems.length > jobsLimit) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => loadJobs(true);
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of Job List.</p>');
+            }
+        }, (error) => {
+            console.error("Error loading jobs:", error);
+            document.getElementById('loading-jobs')?.remove();
+            listElement.innerHTML = '<h3>Local Jobs</h3><p style="text-align:center;color:red;">Error loading jobs.</p>';
+        });
+    }
+
+    // ⭐ FIXED PAGINATION FUNCTION: Filter by Category ⭐
+    window.filterByCategory = (category, loadMore = false) => {
+        const listElement = document.getElementById('mistri-list');
+        const loadMoreBtn = document.getElementById('load-more-providers');
+        loadMoreBtn.style.display = 'none';
+        
+        // Buttons ko selected state dein
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.classList.remove('selected');
+            if(btn.innerText === category) {
+                btn.classList.add('selected');
+            }
+        });
+
+        let queryRef;
+        const baseRef = window.providersRef.orderByChild('category'); // Base reference: order by category
+
+        if (!loadMore) {
+            // Nayi Category Filter, state reset
+            providersLastKey = null;
+            currentCategory = category;
+            listElement.innerHTML = `<h3>Available Services (${category} - Top 10)</h3><p style="text-align:center;color:#2a5298;">Loading ${category} services...</p>`;
+            
+            // First page query: only category match, limit to 11
+            queryRef = baseRef.startAt(category).endAt(category).limitToFirst(providersLimit + 1);
+        } else {
+            // Agla page load kar rahe hain
+            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">Loading more...</p>');
+
+            // Next page query: start after the last key, but within the current category range
+            // We use startAt(value, key) to continue the pagination from the last item's key.
+            queryRef = baseRef.startAt(currentCategory, providersLastKey).endAt(currentCategory).limitToFirst(providersLimit + 1);
+        }
+        
+        queryRef.once('value', (snapshot) => {
+            document.getElementById('loading-more')?.remove();
+
+            if (!loadMore && !snapshot.exists()) {
+                listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">No ${category} services available yet!</p>`;
+                return;
+            }
+let allItems = [];
+            snapshot.forEach(childSnapshot => {
+                allItems.push({ key: childSnapshot.key, data: childSnapshot.val() });
+            });
+            
+            // Remove the duplicate first item if loading more
+            if (loadMore && allItems.length > 0) {
+                allItems.shift();
+            }
+
+            let itemsToRender = allItems.slice(0, providersLimit);
+            
+            providersLastKey = itemsToRender.length > 0 ? itemsToRender[itemsToRender.length - 1].key : null;
+
+            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
+
+            if (!loadMore) {
+                listElement.innerHTML = `<h3>Available Services (${category} - ${itemsToRender.length} loaded)</h3>` + htmlContent;
+            } else {
+                listElement.insertAdjacentHTML('beforeend', htmlContent);
+            }
+
+            if (allItems.length > providersLimit) {
+                loadMoreBtn.style.display = 'block';
+                loadMoreBtn.onclick = () => filterByCategory(currentCategory, true); 
+            } else {
+                loadMoreBtn.style.display = 'none';
+                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">End of List.</p>');
+            }
+
+        }, (error) => {
+            console.error("Error loading filtered services:", error);
+            document.getElementById('loading-more')?.remove();
+            listElement.innerHTML = '<p style="text-align:center;color:red;">Error loading data.</p>';
+        });
+    };
+
+    // Simple search for quick use (Unchanged)
+    window.searchServices = () => {
+        const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
+        const listElement = document.getElementById('mistri-list');
+        
+        if (searchTerm.length < 3) {
+            loadCategories(); // Search chhota hai, toh wapas optimized Top 10 list dikha dein
+            return;
+        }
+
+        listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">Searching...</p>`;
+        document.getElementById('load-more-providers').style.display = 'none'; // Search ke time pagination button chhupa dein
+        
+        // Note: Searching requires loading all data, which is less optimized, but necessary for a full search feature.
+        window.providersRef.once('value', (snapshot) => { // Use .once for search to avoid continuous listener
+            const providers = snapshot.val();
+            let results = [];
+            if (providers) {
+                // Object.values() function se Firebase key-value pairs ko array of objects mein convert karte hain
+                results = Object.values(providers).filter(p => 
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) || 
+                    (p.category && p.category.toLowerCase().includes(searchTerm)) ||
+                    (p.area && p.area.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            let html = `<h3>Search Results for "${searchTerm}" (${results.length} found)</h3>`;
+            if (results.length > 0) {
+                html += results.map(p => renderProviderCard(p)).join('');
+            } else {
+                html += '<p style="text-align:center;color:#ff6666;">No services found matching your search.</p>';
+            }
+            listElement.innerHTML = html;
+        });
+    };
+    
+    // Main listener start function
+    window.startFirebaseListener = () => {
+        loadCategories(); // Optimized initial load (10 items)
+        renderCategoryButtons(); // Render category buttons
+    }
+
+    // WHATSAPP BUTTON FIX — CHAHE +91 HO YA nahi, 100% KAAM KAREGA (Unchanged)
+    function openWhatsApp(phone) {
+        let num = phone.toString().replace(/[^0-9]/g, '');
+        if (num.length === 10) num = '91' + num;
+        if (num.length === 12 && num.startsWith('91')) {
+        } else if (num.length === 13 && num.startsWith('919')) {
+            num = num.substring(1);
+        }
+        window.open('https://wa.me/' + num, '_blank');
+    }
+
+    // SERVICE REGISTRATION FUNCTION (Unchanged)
+    function registerService() {
+        const name = document.getElementById('providerName').value;
+        const phone = document.getElementById('providerPhone').value;
+        const category = document.getElementById('serviceCategory').value;
+        const area = document.getElementById('providerArea').value;
+        const experience = document.getElementById('providerExperience').value;
+        const form = document.getElementById('serviceForm');
+
+        if (!name || !phone || !category || !area || !experience) {
+            alert("कृपया सभी फ़ील्ड भरें।");
+            return false;
+        }
+        
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            return false;
+        }
+
+        const providerData = {
+            name: name, phone: phone, category: category, area: area,
+            experience: experience + ' years',
+            timestamp: firebase.database.ServerValue.TIMESTAMP 
+        };
+
+        window.providersRef.push(providerData)
+            .then(() => {
+                alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                form.reset(); 
+                // Data register hone ke baad list ko refresh karein
+                loadCategories(); 
+            })
+            .catch((error) => {
+                alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                console.error("Firebase Error:", error);
+            });
+        return true; 
+    }
+    // END OF SERVICE REGISTRATION FUNCTION 
+
+    // Function to register a new job post (Unchanged)
+    function jobRegister() {
+        const title = document.getElementById('jobTitle').value;
+        const shopName = document.getElementById('jobShopName').value;
+        const location = document.getElementById('jobLocation').value;
+        const salary = document.getElementById('jobSalary').value;
+        const description = document.getElementById('jobDescription').value;
+        const phone = document.getElementById('jobPhone').value;
+        const form = document.getElementById('jobForm');
+
+        if (!title || !shopName || !location || !salary || !description || !phone) {
+            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+            return false;
+        }
+
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            return false;
+        }
+
+        const jobData = {
+            title: title, shopName: shopName, location: location, salary: salary,
+            description: description, phone: phone, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP 
+        };
+
+        window.jobsRef.push(jobData) 
+            .then(() => {
+                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                form.reset(); 
+                // Data register hone ke baad list ko refresh karein
+                if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
+            })
+            .catch((error) => {
+                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
+                console.error("Firebase Job Error:", error);
+            });
+
+        return false;
+    }
+        
+    window.onload = () => {
+        firebase.initializeApp(firebaseConfig);
+        window.database = firebase.database();
+        // Base reference: Order by key (for general listing) and order by child (for filtering)
+        window.providersRef = database.ref('service_providers'); 
+        window.jobsRef = database.ref('local_jobs'); 
+
+        // 1. INVISIBLE reCAPTCHA SETUP
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'invisible'
+        });
+        recaptchaVerifier.render();
+
+        // 2. PERSISTENCE CHECK: User Authentication State Listener
+        firebase.auth().onAuthStateChanged(user => {
+            if (user) {
+                // If user is found, load the main app directly
+                document.getElementById('registrationScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                console.log("Auto-Login Successful:", user.phoneNumber);
+
+                // ⭐ CRITICAL: Call the newly defined optimized data loading function ⭐
+                startFirebaseListener();
+                
+                // Assuming loadPromotionAds is defined somewhere else (like ads.js)
+                if (typeof loadPromotionAds === 'function') {
+                    loadPromotionAds();
+                    setTimeout(loadPromotionAds, 2000);
+                }
+            } else {
+                // अगर कोई यूजर लॉग इन नहीं है, तो रजिस्ट्रेशन स्क्रीन दिखाएँ।
+                document.getElementById('registrationScreen').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+        });
+
+
+        // 3. SEND OTP (Registration/Login Step 1)
+        document.getElementById('sendOtpBtn').onclick = () => {
+            const name = document.getElementById('userName').value.trim();
+            const area = document.getElementById('userArea').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            
+            if (!name || !area || phone.length !== 10 || isNaN(phone)) {
+                document.getElementById('loginMsg').innerHTML = "कृपया सभी फ़ील्ड (नाम, एरिया) भरें और 10 अंक का नंबर डालें।";
+                return;
+            }
+
+            // ⭐ Temporary Profile Data Save ⭐
+            tempUserData = {
+                name: name,
+                area: area,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            document.getElementById('sendOtpBtn').innerHTML = "Sending...";
+            const fullPhone = '+91' + phone;
+
+            recaptchaVerifier.verify().then(() => {
+                firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                    .then((result) => {
+                        confirmationResult = result;
+                        document.getElementById('profileInputSection').style.display = 'none'; // Profile fields hide
+                        document.getElementById('otpSection').style.display = 'block'; // OTP field shows
+                        document.getElementById('loginMsg').innerHTML = `<span style='color:green'>OTP ${fullPhone} पर भेजा गया!</span>`;
+                    })
+                    .catch((err) => {
+                        document.getElementById('loginMsg').innerHTML = err.message;
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                        document.getElementById('profileInputSection').style.display = 'block';
+                        document.getElementById('otpSection').style.display = 'none';
+                    });
+            });
+        };
+
+        // 4. VERIFY OTP (Registration/Login Step 2)
+        document.getElementById('verifyOtpBtn').onclick = () => {
+            const otp = document.getElementById('otpInput').value;
+            if (otp.length !== 6) {
+                document.getElementById('loginMsg').innerHTML = "कृपया 6 अंक का OTP डालें।";
+                return;
+            }
+
+            confirmationResult.confirm(otp)
+                .then((result) => {
+                    const user = result.user;
+                    // ⭐ CRITICAL: Save Profile data after successful sign-in ⭐
+                    if (user && user.uid) {
+                        window.database.ref('users/' + user.uid).set(tempUserData)
+                            .then(() => console.log("User profile saved/updated."))
+                            .catch(error => console.error("Profile save error:", error));
+                    }
+                    
+                    // onAuthStateChanged अब स्क्रीन स्विचिंग को संभालेगा और डेटा लोड करेगा।
+                    document.getElementById('loginMsg').innerHTML = "<span style='color:green'>Login Successful! Redirecting...</span>";
+                })
+                .catch(() => {
+                    document.getElementById('loginMsg').innerHTML = "Galat OTP";
+                });
+        };
+
+        // Extra functions
+        window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
+        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            // Job screen par jaane par, optimized loadJobs ko call karein
+            if(id === 'jobs-screen') loadJobs();
+            if(id === 'home-screen') loadCategories(); // Home screen par wapas aane par bhi optimize load ho
+        };
+        // PWA setup
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('SW Error:', err));
+            });
+        }
+    };
+    </script>
 </body>
 </html>
