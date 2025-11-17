@@ -241,39 +241,43 @@
     let tempUserData = {};
 
     const providersLimit = 20;
-    let providersLastKey = null;           // ग्लोबल पैजिनेशन के लिए
+    let providersLastKey = null;
     let currentCategory = null;
-    let filteredProviders = [];            // कैटेगरी फ़िल्टर के लिए
+    let filteredProviders = [];
     let filteredPageIndex = 0;
 
-    // =============== 1. LOAD MORE FIX (सभी सर्विसेज + कैटेगरी दोनों) ===============
+    // कैटेगरी बटन वापस बनाने का फंक्शन (ये पहले मिस हो गया था)
+    function renderCategoryButtons() {
+        const categoriesDiv = document.getElementById('mistri-categories');
+        const allCategories = ['Plumber','Electrician','Carpenter','Mason','Painter','AC Mechanic','Tiler','Beautician','Home Cleaning','Security Guard','Laundry Service','Legal Consultant','Private Teacher','Computer Repair','Welder'];
+        categoriesDiv.innerHTML = allCategories.map(cat => 
+            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
+        ).join('');
+    }
+
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
+        loadMoreBtn.style.display = 'none';
 
         if (!loadMore) {
             providersLastKey = null;
-            filteredProviders = [];
-            filteredPageIndex = 0;
             currentCategory = null;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
             listElement.innerHTML = `<h3>Available Services</h3><p style="text-align:center;color:#2a5298;">लोड हो रहा है...</p>`;
         }
 
-        let query = window.providersRef.orderByChild('timestamp').limitToLast(providersLimit + 1);
+        let query = window.providersRef.orderByChild('timestamp').limitToLast(providersLimit + (loadMore ? 1 : 0));
         if (loadMore && providersLastKey) {
             query = window.providersRef.orderByChild('timestamp').endBefore(providersLastKey).limitToLast(providersLimit + 1);
         }
 
         query.once('value').then(snapshot => {
             let items = [];
-            snapshot.forEach(child => {
-                items.push({ key: child.key, data: child.val() });
-            });
+            snapshot.forEach(child => items.push({key: child.key, data: child.val()}));
             items.reverse();
 
-            // पहला आइटम डुप्लीकेट हो सकता है (पैजिनेशन के लिए), उसे हटाओ
-            if (loadMore && items.length > 0) items.shift();
+            if (loadMore && items.length > 0) items.shift(); // डुप्लीकेट हटाओ
 
             if (items.length === 0 && loadMore) {
                 loadMoreBtn.style.display = 'none';
@@ -281,30 +285,21 @@
                 return;
             }
 
-            // लास्ट की का अपडेट
             if (items.length > 0) {
-                providersLastKey = items[items.length - 1].data.timestamp; // टाइमस्टैम्प ही काफी है
+                providersLastKey = items[items.length - 1].data.timestamp;
             }
 
             const html = items.map(i => renderProviderCard(i.data)).join('');
-            if (!loadMore) {
-                listElement.innerHTML = `<h3>Available Services (${snapshot.numChildren()} कुल)</h3>` + html;
-            } else {
-                document.getElementById('loading-more')?.remove();
-                listElement.insertAdjacentHTML('beforeend', html);
-            }
+            if (!loadMore) listElement.innerHTML = `<h3>Available Services</h3>` + html;
+            else listElement.insertAdjacentHTML('beforeend', html);
 
-            // Load More दिखाना है या नहीं?
-            if (snapshot.numChildren() > providersLimit || loadMore) {
+            if (snapshot.numChildren() > (loadMore ? providersLimit : 0)) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
-            } else {
-                loadMoreBtn.style.display = 'none';
             }
         });
     };
 
-    // =============== 2. CATEGORY FILTER + LOAD MORE FIX (सभी आइटम्स दिखेंगे) ===============
     window.filterByCategory = (category, loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
@@ -319,6 +314,7 @@
             filteredPageIndex = 0;
             filteredProviders = [];
             listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">लोड हो रहा है...</p>`;
+            loadMoreBtn.style.display = 'none';
 
             window.providersRef.orderByChild('category').equalTo(category).once('value').then(snapshot => {
                 snapshot.forEach(child => filteredProviders.push(child.val()));
@@ -334,23 +330,16 @@
             const end = start + providersLimit;
             const pageItems = filteredProviders.slice(start, end);
 
-            if (!isLoadMore) {
-                listElement.innerHTML = `<h3>Available Services (${category} - ${filteredProviders.length} कुल)</h3>`;
-            }
+            if (!isLoadMore) listElement.innerHTML = `<h3>Available Services (${category} - ${filteredProviders.length} कुल)</h3>`;
 
-            if (pageItems.length === 0 && !isLoadMore) {
+            if (pageItems.length === 0 && filteredProviders.length === 0) {
                 listElement.innerHTML += '<p style="text-align:center;color:#ff6666;">कोई सर्विस नहीं मिली</p>';
-                loadMoreBtn.style.display = 'none';
                 return;
             }
 
             const html = pageItems.map(p => renderProviderCard(p)).join('');
-            if (!isLoadMore) {
-                listElement.innerHTML += html;
-            } else {
-                document.getElementById('loading-more')?.remove();
-                listElement.insertAdjacentHTML('beforeend', html);
-            }
+            if (!isLoadMore) listElement.innerHTML += html;
+            else listElement.insertAdjacentHTML('beforeend', html);
 
             filteredPageIndex++;
 
@@ -359,12 +348,34 @@
                 loadMoreBtn.onclick = () => filterByCategory(category, true);
             } else {
                 loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
+                if (pageItems.length > 0) listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">लिस्ट समाप्त।</p>');
             }
         }
     };
 
-    // =============== 3. OTP MANDATORY + DUPLICATE PHONE CHECK + SHOW EXISTING DATA ===============
+    function renderProviderCard(p) {
+        return `<div class="profile-card">
+            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+            <div style="margin-top:10px;display:flex;gap:5px;">
+                <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+                <button class="share-btn-inline" onclick="shareProviderDetails('${p.name}','${p.phone}','${p.category}')">Share</button>
+            </div>
+        </div>`;
+    }
+
+    function openWhatsApp(phone) {
+        let num = phone.replace(/[^0-9]/g,'');
+        if (num.length === 10) num = '91' + num;
+        window.open('https://wa.me/' + num, '_blank');
+    }
+
+    window.shareProviderDetails = (name, phone, category) => {
+        const text = `नाम: ${name} (${category})\nफ़ोन: ${phone}\n\nFatehpur Hubs App से`;
+        navigator.share ? navigator.share({title: 'Service Provider', text}) : alert(text);
+    };
+
     function registerService() {
         const name = document.getElementById('providerName').value.trim();
         const phone = document.getElementById('providerPhone').value.trim();
@@ -375,7 +386,6 @@
         if (!name || !phone || !category || !area || !experience) return alert("सभी फील्ड भरें");
         if (phone.length !== 10) return alert("10 अंक का नंबर डालें");
 
-        // डुप्लीकेट चेक + मौजूदा डेटा दिखाना
         window.providersRef.orderByChild('phone').equalTo(phone).once('value')
         .then(snapshot => {
             if (snapshot.exists()) {
@@ -384,13 +394,7 @@
                 alert(`यह नंबर पहले से रजिस्टर्ड है!\nनाम: ${existing.name}\nसर्विस: ${existing.category}\nइलाका: ${existing.area}\nअनुभव: ${existing.experience}`);
                 return;
             }
-
-            // नया रजिस्टर करो
-            const data = {
-                name, phone, category, area,
-                experience: experience + ' years',
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
+            const data = { name, phone, category, area, experience: experience + ' years', timestamp: firebase.database.ServerValue.TIMESTAMP };
             window.providersRef.push(data).then(() => {
                 alert("सफलतापूर्वक रजिस्टर हुआ!");
                 document.getElementById('serviceForm').reset();
@@ -400,7 +404,7 @@
         return false;
     }
 
-    // =============== OTP STRICT कर दिया (बायपास नहीं होगा) ===============
+    // OTP सख्त है – बिना OTP नहीं खुलेगा
     document.getElementById('sendOtpBtn').onclick = () => {
         const name = document.getElementById('userName').value.trim();
         const area = document.getElementById('userArea').value.trim();
@@ -436,22 +440,13 @@
     };
 
     document.getElementById('verifyOtpBtn').onclick = () => {
-        const otp = document.getElementById('otpInput').value;
+        const otp = document.getElementById('otpInput').value.trim();
         if (otp.length !== 6) return document.getElementById('loginMsg').innerHTML = "<span style='color:red'>6 अंक का OTP डालें</span>";
 
         confirmationResult.confirm(otp)
-        .then(result => {
-            window.database.ref('users/' + result.user.uid).set(tempUserData).then(() => {
-                location.reload();
-            });
-        })
-        .catch(() => {
-            document.getElementById('loginMsg').innerHTML = "<span style='color:red'>गलत OTP!</span>";
-        });
+        .then(() => location.reload())
+        .catch(() => document.getElementById('loginMsg').innerHTML = "<span style='color:red'>गलत OTP!</span>");
     };
-
-    // बाकी सारे फंक्शन (renderProviderCard, openWhatsApp, share आदि) वही रहने दो – कोई बदलाव नहीं किया
-    // सिर्फ ऊपर वाले फिक्स लगाओ और बस!
 
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
@@ -466,24 +461,22 @@
             if (user) {
                 document.getElementById('registrationScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
-                renderCategoryButtons();
-                loadCategories();
+                renderCategoryButtons();        // ← ये लाइन वापस डाली है
+                loadCategories();               // पहली बार 20 दिखेंगे
                 if (typeof loadPromotionAds === 'function') loadPromotionAds();
             } else {
                 document.getElementById('registrationScreen').style.display = 'flex';
             }
         });
 
-        // बाकी सारे फंक्शन (shareApp, contactForAds आदि) वैसा ही रखो
         window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
         window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share: https://www.fatehpurhubs.co.in');
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if (id === 'jobs-screen') loadJobs();
             if (id === 'home-screen') loadCategories();
         };
     };
-    </script>
+</script>
 </body>
 </html>
