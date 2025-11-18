@@ -639,136 +639,75 @@
     }
 
     // ⭐ 1. loadCategories - सामान्य लिस्ट पैजिनेशन (Ads injected)
-    window.loadCategories = (loadMore = false) => {
-        const listElement = document.getElementById('mistri-list');
-        const loadMoreBtn = document.getElementById('load-more-providers');
-        
-        let queryRef;
-        loadMoreBtn.style.display = 'none';
-        
-        if (currentCategory !== null) {
-            currentCategory = null; 
-            filteredProviders = [];
-            filteredPageIndex = 0;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
-        }
-
-        const baseRef = window.providersRef.orderByChild('timestamp');
-
-        if (!loadMore) {
-            providersLastTimestamp = null;
-            providersLastKey = null;
-            
-            listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
-            
-            queryRef = baseRef.limitToLast(providersLimit + 1); 
-        } else {
-            listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
-            
-            queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
-        }
-
-        queryRef.once('value', (snapshot) => {
-            document.getElementById('loading-more')?.remove();
-
-            if (!loadMore && !snapshot.exists()) {
-                listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>';
-                return;
-            }
-
-            let allItems = [];
-            let snapshotSize = 0; 
-            
-            snapshot.forEach(childSnapshot => {
-                allItems.push({ 
-                    key: childSnapshot.key, 
-                    data: childSnapshot.val() 
-                });
-                snapshotSize++; 
-            });
-
-            allItems.reverse();
-            
-            if (loadMore && allItems.length > 0) {
-                allItems.shift(); 
-            }
-            
-            let itemsToRender = allItems.slice(0, providersLimit);
-            
-            if (itemsToRender.length > 0) {
-                providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
-                providersLastKey = itemsToRender[itemsToRender.length - 1].key;
-            } 
-            
-            // --- AD INJECTION LOGIC (New) ---
-            let contentArray = [];
-            for (let i = 0; i < itemsToRender.length; i++) {
-                contentArray.push(renderProviderCard(itemsToRender[i].data));
-                
-                // Inject Middle Ad after 5 items on the initial load
-                if (i === 4 && !loadMore) {
-                    contentArray.push(renderAdCard('ad-placeholder-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Middle Ad)'));
-                }
-            }
-
-            const htmlContent = contentArray.join('');
-            
-            if (!loadMore) {
-                listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
-                
-                // Inject Bottom Ad after all rendered items on initial load
-                if (itemsToRender.length > 0) {
-                    listElement.insertAdjacentHTML('beforeend', renderAdCard('ad-placeholder-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Bottom Ad)'));
-                }
-            } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent);
-            }
-            // --- END AD INJECTION LOGIC ---
-
-            if (snapshotSize > providersLimit) {
-                loadMoreBtn.style.display = 'block';
-                loadMoreBtn.onclick = () => loadCategories(true);
-            } else {
-                loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
-            }
-
-        }, (error) => {
-            console.error("Error loading services:", error);
-            document.getElementById('loading-more')?.remove();
-            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
-        });
+window.loadCategories = (loadMore = false) => {
+    const listElement = document.getElementById('mistri-list');
+    const loadMoreBtn = document.getElementById('load-more-providers');
+    
+    let queryRef;
+    loadMoreBtn.style.display = 'none';
+    const providersLimit = 10; // Firebase लोड लिमिट
+    
+    // अगर किसी कैटेगरी फ़िल्टर में हैं, तो पहले उसे रीसेट करें
+    if (currentCategory !== null) {
+        currentCategory = null; 
+        filteredProviders = [];
+        filteredPageIndex = 0;
+        document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
     }
 
-    // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
-    function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
-        const start = filteredPageIndex * providersLimit;
-        const end = start + providersLimit;
-        const itemsToRender = filteredProviders.slice(start, end);
-        const totalItems = filteredProviders.length;
-        const isLastPage = totalItems <= end;
+    const baseRef = window.providersRef.orderByChild('timestamp');
 
-
-        if (itemsToRender.length > 0) {
-            
-            // --- AD INJECTION LOGIC (Filtered List) ---
-            let contentArray = [];
-            for(let i=0; i < itemsToRender.length; i++){
-                contentArray.push(renderProviderCard(itemsToRender[i]));
-                // Inject Middle Ad only on the very first page of the filtered list, after 5 items.
-                if(start === 0 && i === 4 && itemsToRender.length > 5 && !isLoadMore){
-                     contentArray.push(renderAdCard('filter-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Filtered Middle Ad)'));
-                }
-            }
-            const htmlContent = contentArray.join('');
+    if (!loadMore) {
+        providersLastTimestamp = null;
+        providersLastKey = null;
         
-        // --- AD INJECTION LOGIC (New and Improved) ---
+        listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
+        
+        queryRef = baseRef.limitToLast(providersLimit + 1); 
+    } else {
+        listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
+        
+        queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
+    }
+
+    queryRef.once('value', (snapshot) => {
+        document.getElementById('loading-more')?.remove();
+
+        if (!loadMore && !snapshot.exists()) {
+            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>';
+            return;
+        }
+
+        let allItems = [];
+        let snapshotSize = 0; 
+        
+        snapshot.forEach(childSnapshot => {
+            allItems.push({ 
+                key: childSnapshot.key, 
+                data: childSnapshot.val() 
+            });
+            snapshotSize++; 
+        });
+
+        allItems.reverse();
+        
+        if (loadMore && allItems.length > 0) {
+            allItems.shift(); // पिछली लिस्ट का अंतिम आइटम छोड़ दें
+        }
+        
+        let itemsToRender = allItems.slice(0, providersLimit);
+        
+        if (itemsToRender.length > 0) {
+            providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
+            providersLastKey = itemsToRender[itemsToRender.length - 1].key;
+        } 
+        
+        // --- AD INJECTION LOGIC (General List - Every 4 Cards) ---
         let contentArray = [];
         const adInjectionInterval = 4; // हर 4 कार्ड के बाद एड दिखाएँ
 
         for (let i = 0; i < itemsToRender.length; i++) {
             // 1. सर्विस कार्ड जोड़ें
-            // renderProviderCard फ़ंक्शन को यहाँ कॉल किया जाता है
             contentArray.push(window.renderProviderCard(itemsToRender[i].data));
             
             // 2. एड कंटेनर इंजेक्ट करें (हर 4 कार्ड के बाद)
@@ -787,95 +726,105 @@
                 `);
             }
         }
-        
-        // कंटेंट को रेंडर करें
-        const newContent = contentArray.join('');
-        
-        if (loadMore) {
-            listElement.insertAdjacentHTML('beforeend', newContent);
-        } else {
-            // यदि यह पहला लोड है, तो पुराने 'नवीनतम प्रोवाइडर्स' संदेश को हटाकर नया कंटेंट डालें
-            listElement.innerHTML = `<h3>Available Services</h3>` + newContent;
-        }
+        // --- END AD INJECTION LOGIC ---
 
+        const htmlContent = contentArray.join('');
+        
+        if (!loadMore) {
+            listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
+            
+            // पुराने बॉटम एड को हटा दिया गया है
+        } else {
+            listElement.insertAdjacentHTML('beforeend', htmlContent);
+        }
+        
         // --- AD LOADER CALL ---
         // रेंडरिंग के बाद, डायनेमिकली इंजेक्ट किए गए एड्स को लोड करें
-        // यह ads.js में मौजूद नया फ़ंक्शन है
         if (typeof window.loadInjectedPromotionAds === 'function') {
             window.loadInjectedPromotionAds(); 
         }
 
-        // Load More बटन दिखाना/छिपाना
-        if (allItems.length > providersLimit) {
+        if (snapshotSize > providersLimit) {
             loadMoreBtn.style.display = 'block';
+            loadMoreBtn.onclick = () => loadCategories(true);
         } else {
             loadMoreBtn.style.display = 'none';
+            listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
         }
+
+    }, (error) => {
+        console.error("Error loading services:", error);
+        document.getElementById('loading-more')?.remove();
+        listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
     });
-};
-            // --- END AD INJECTION LOGIC ---
+} // window.loadCategories फ़ंक्शन का क्लोजिंग ब्रैकेट
 
-            if (snapshotSize > providersLimit) {
-                loadMoreBtn.style.display = 'block';
-                loadMoreBtn.onclick = () => loadCategories(true);
-            } else {
-                loadMoreBtn.style.display = 'none';
-                listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
-            }
-
-        }, (error) => {
-            console.error("Error loading services:", error);
-            document.getElementById('loading-more')?.remove();
-            listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
-        });
-    }
-
-    // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
-    function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
-        const start = filteredPageIndex * providersLimit;
-        const end = start + providersLimit;
-        const itemsToRender = filteredProviders.slice(start, end);
-        const totalItems = filteredProviders.length;
-        const isLastPage = totalItems <= end;
+// फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
+function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
+    const providersLimit = 10;
+    const start = filteredPageIndex * providersLimit;
+    const end = start + providersLimit;
+    const itemsToRender = filteredProviders.slice(start, end);
+    const totalItems = filteredProviders.length;
+    const isLastPage = totalItems <= end;
 
 
-        if (itemsToRender.length > 0) {
+    if (itemsToRender.length > 0) {
+        
+        // --- AD INJECTION LOGIC (Filtered List - Every 4 Cards) ---
+        let contentArray = [];
+        const adInjectionInterval = 4; // हर 4 कार्ड के बाद एड दिखाएँ
+
+        for(let i=0; i < itemsToRender.length; i++){
+            // 1. सर्विस कार्ड जोड़ें
+            contentArray.push(window.renderProviderCard(itemsToRender[i]));
             
-            // --- AD INJECTION LOGIC (Filtered List) ---
-            let contentArray = [];
-            for(let i=0; i < itemsToRender.length; i++){
-                contentArray.push(renderProviderCard(itemsToRender[i]));
-                // Inject Middle Ad only on the very first page of the filtered list, after 5 items.
-                if(start === 0 && i === 4 && itemsToRender.length > 5 && !isLoadMore){
-                     contentArray.push(renderAdCard('filter-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Filtered Middle Ad)'));
-                }
+            // 2. एड कंटेनर इंजेक्ट करें (हर 4 कार्ड के बाद)
+            if ((i + 1) % adInjectionInterval === 0 && (i + 1) < itemsToRender.length) {
+                contentArray.push(`
+                    <!-- **PROMOTION AD INJECTION POINT (Filtered List)** -->
+                    <div class="promotion-ad-block" 
+                         style="text-align: center; margin: 30px 0; padding: 10px; border: 1px dashed #ffc107; border-radius: 8px; background-color: #fff8e1;">
+                        <p style="font-size: 0.9em; color: #ff9800; font-weight: bold; margin-bottom: 10px;">-- विशेष प्रचार (Special Promotion) --</p>
+                        <div class="ad-placeholder-dynamic">
+                            <!-- Ads will be rendered here by ads.js function call -->
+                            <div style="min-height: 100px; color: #aaa;">विज्ञापन लोड हो रहा है...</div>
+                        </div>
+                    </div>
+                `);
             }
-            const htmlContent = contentArray.join('');
-            // --- END AD INJECTION LOGIC ---
-            
-            if (!isLoadMore) {
-                listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
-            } else {
-                listElement.insertAdjacentHTML('beforeend', htmlContent);
-            }
-            filteredPageIndex++; 
-        } else if (!isLoadMore) {
-             listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
+        }
+        // --- END AD INJECTION LOGIC ---
+
+        const htmlContent = contentArray.join('');
+    
+        if (!isLoadMore) {
+            listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
+        } else {
+            listElement.insertAdjacentHTML('beforeend', htmlContent);
         }
         
-        if (totalItems > filteredPageIndex * providersLimit) {
-            loadMoreBtn.style.display = 'block';
-            loadMoreBtn.onclick = () => filterByCategory(currentCategory, true);
-        } else {
-            loadMoreBtn.style.display = 'none';
-            listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त।</p>');
-            
-            // Inject Bottom Ad on the last page of the filtered list
-            if(totalItems > 0) {
-                 listElement.insertAdjacentHTML('beforeend', renderAdCard('filter-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Filtered Bottom Ad)'));
-            }
+        // --- AD LOADER CALL ---
+        // रेंडरिंग के बाद, डायनेमिकली इंजेक्ट किए गए एड्स को लोड करें
+        if (typeof window.loadInjectedPromotionAds === 'function') {
+            window.loadInjectedPromotionAds(); 
         }
+
+        filteredPageIndex++; 
+    } else if (!isLoadMore) {
+         listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
     }
+    
+    if (totalItems > filteredPageIndex * providersLimit) {
+        loadMoreBtn.style.display = 'block';
+        loadMoreBtn.onclick = () => filterByCategory(currentCategory, true);
+    } else {
+        loadMoreBtn.style.display = 'none';
+        listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त।</p>');
+        
+        // Bottom Ad हटा दिया गया है
+    }
+                }
 
     // ⭐ 2. कैटेगरी के अनुसार फ़िल्टर करें 
     window.filterByCategory = (category, loadMore = false) => {
