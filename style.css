@@ -618,47 +618,29 @@ input[type="tel"]:focus, input[type="text"]:focus {
     transform: scale(0.85); /* Mobile adjustment */
     transform-origin: center;
 }
-/* --- AD UNIT FIXES (To place the fixed ad below the fixed footer) --- */
-
-/* 1. Nav Bar (footer-actions) को ऐड यूनिट से ऊपर उठाएं और z-index बढ़ाएं */
+/* 1. Nav Bar (footer-actions) को ऐड यूनिट से ऊपर उठाएं */
 .footer-actions {
-    /* आपकी मौजूदा styles यहाँ जारी रहेंगी */
-    /* bottom: 0; रहेगा, लेकिन हम इसे index.html में #nav-bar के साथ fixed-bottom-ad-container के ऊपर लाएंगे */
-    z-index: 1001 !important; /* Ad unit (1000) से ऊपर */
+    z-index: 1001 !important; 
 }
 
-/* 2. Main Content को ऊपर उठाना (सबसे जरूरी फिक्स) */
-/* यह सुनिश्चित करता है कि कंटेंट फिक्स्ड फूटर और फिक्स्ड ऐड दोनों के पीछे न छिपे */
+/* 2. Main Content को ऊपर उठाना (सबसे जरूरी) */
 #mainAppContent {
-    /* 100px से 120px तक की पैडिंग देनी होगी। 
-       Footer लगभग 50px लेता है, और Ad Unit 50-60px लेगा। */
     padding-bottom: 120px !important; 
     box-sizing: border-box;
 }
 
 /* 3. Fixed Ad Container के लिए CSS */
 #fixed-bottom-ad-container {
-    position: fixed; /* <--- यह लाइन अब ACTIVE है! */
-    bottom: 0;      /* <--- यह लाइन बहुत ज़रूरी है! */
+    position: fixed;
+    bottom: 0; 
     left: 0; 
     right: 0;
     width: 100%;
-    max-width: 500px; /* app-container की width के बराबर */
+    max-width: 500px; 
     margin: 0 auto;
     z-index: 1000;
-    background-color: #fff;
+    background-color: #ffdddd; /* TESTING: इसे वापस #fff कर दें अगर लाल पट्टी दिख रही है */
     padding: 2px 0;
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* 1. Nav Bar (footer-actions) को ऐड यूनिट से ऊपर उठाएं और z-index बढ़ाएं */
-.footer-actions {
-    z-index: 1001 !important; /* Ad unit (1000) से ऊपर */
-}
-
-/* 2. Main Content को ऊपर उठाना */
-#mainAppContent {
-    padding-bottom: 120px !important; 
-    box-sizing: border-box;
 }
