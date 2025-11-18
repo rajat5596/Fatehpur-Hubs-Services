@@ -242,7 +242,7 @@
             color: white;
         }
 
-        /* Promotion Ad Card */
+        /* Promotion Ad Card (Previous Banner) */
         .ad-card {
             background-color: #e3f2fd; /* Light blue */
             padding: 15px;
@@ -261,6 +261,24 @@
             margin-top: 10px;
         }
 
+        /* Adsterra Unit Style (New) */
+        .adsterra-card {
+            background-color: #fff3e0; /* Light Orange */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 1px solid #ff9800;
+        }
+
+        /* Manual Promotion Style (New) */
+        .manual-promo-card {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
         /* Form Styles */
         .form-container {
             background-color: #f9f9f9;
@@ -345,12 +363,18 @@
 
                 <!-- 1. HOME/MISTRI SCREEN -->
                 <div id="home-screen" class="screen active">
-                    <!-- TOP Ad Placeholder -->
+                    <!-- TOP Ad Placeholder (General Banner) -->
                     <div id="ad-placeholder-top" class="ad-card" onclick="window.contactForAds()">
                         <p style="font-size: 1.1rem; font-weight: bold; color: #2a5298;">🤝 अपने बिज़नेस का Ad यहाँ लगवाएँ! (Top Ad)</p>
                         <p style="font-size: 0.9rem; color: #555;">अपने कस्टमर्स तक पहुँचें।</p>
                         <button>Contact for Ads</button>
                     </div>
+                    
+                    <!-- Adsterra Unit 1 (Top) -->
+                    <div id="adsterra-unit-1"></div>
+                    
+                    <!-- Manual Promotion 1 (Top) -->
+                    <div id="manual-promo-1"></div>
 
                     <!-- Search -->
                     <div id="search-container">
@@ -362,14 +386,27 @@
                         <!-- Category buttons will be rendered here -->
                     </div>
 
-                    <!-- Provider List (Middle and Bottom Ads injected here) -->
+                    <!-- Provider List (Middle Ads injected here) -->
                     <div id="mistri-list">
                         <!-- Services will be loaded here -->
                     </div>
 
-                    <button id="load-more-providers" class="main-btn" style="display:none; margin-top: 15px; margin-bottom: 15px;" onclick="loadCategories(true)">
+                    <button id="load-more-providers" class="main-btn" style="display:none; margin-top: 15px;" onclick="loadCategories(true)">
                         Load More Services
                     </button>
+                    
+                    <!-- BOTTOM ADS SECTION (Outside the list loop) -->
+                    
+                    <!-- General Promotion Banner (Bottom) -->
+                    <div id="ad-placeholder-bottom-section"></div>
+                    
+                    <!-- Adsterra Unit 3 (Bottom) -->
+                    <div id="adsterra-unit-3"></div>
+                    
+                    <!-- Manual Promotion 3 & 4 (Bottom) -->
+                    <div id="manual-promo-3"></div>
+                    <div id="manual-promo-4"></div>
+
                 </div>
 
                 <!-- 2. SERVICE ADD SCREEN -->
@@ -494,7 +531,7 @@
 
     <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+        apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwN",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "fatehpur-hubs-a3a9f",
@@ -512,26 +549,56 @@
     let providersLastKey = null; 
     let currentCategory = null; 
     
-    // फ़िल्टरिंग के लिए लोकल ऐरे और पेज इंडेक्स (Category Pagination Fix)
+    // फ़िल्टरिंग के लिए लोकल ऐरे और पेज इंडेक्स
     let filteredProviders = [];
     let filteredPageIndex = 0;
     
     let jobsLastKey = null;
     const jobsLimit = 10;
     
-    // --- AD CARD RENDERER (New Helper Function) ---
+    // --- AD MOCK FUNCTIONS (New & Updated) ---
+    
+    // 1. General Promo Banner
     function renderAdCard(id, title = "अपने बिज़नेस का Ad यहाँ लगवाएँ!") {
-        // यह फंक्शन विज्ञापन कार्ड का HTML बनाता है
         return `<div id="${id}" class="ad-card" onclick="window.contactForAds()">
             <p style="font-size: 1.1rem; font-weight: bold; color: #2a5298;">🤝 ${title}</p>
             <p style="font-size: 0.9rem; color: #555;">अपने कस्टमर्स तक पहुँचें।</p>
             <button>Contact for Ads</button>
         </div>`;
     }
-    // --- END AD CARD RENDERER ---
 
+    // 2. Adsterra Units (Placeholder for JS Injection)
+    function renderAdsterraUnit(id, type = "Standard Banner") {
+        return `<div id="${id}" class="adsterra-card">
+            <p style="font-weight: bold; color: #ff9800;">📢 Adsterra Unit: ${type}</p>
+            <p style="font-size: 0.8rem; color: #777;">(Content Injected by Adsterra JS)</p>
+            <div style="height: 60px; background-color: #ffe0b2; border-radius: 6px; margin-top: 5px; border: 1px dashed #ffb74d;"></div>
+        </div>`;
+    }
+    
+    // 3. Manual Promotions (Mocks the content from the deleted ads.js)
+    function getManualPromotions() {
+        return [
+            { id: 'manual-promo-1', title: '🥇 Fatehpur\'s Top Shop', subtitle: 'इलेक्ट्रॉनिक्स पर 50% की छूट पाएं! जल्दी करें!', linkText: 'View Deal', linkUrl: '#topshop', color: '#ff5722' },
+            { id: 'manual-promo-2', title: '🚗 Cab Service in Town', subtitle: 'लोकल बुकिंग पर ₹50 ऑफ। अभी बुक करें।', linkText: 'Book Now', linkUrl: '#cab', color: '#00bcd4' },
+            { id: 'manual-promo-3', title: '🏡 Property Deals', subtitle: 'Fatehpur में सबसे सस्ते प्लॉट और मकान।', linkText: 'Contact Agent', linkUrl: '#property', color: '#4caf50' },
+            { id: 'manual-promo-4', title: '🏥 Health Checkup Offer', subtitle: 'पूरे परिवार के लिए फ्री ब्लड टेस्ट।', linkText: 'Register', linkUrl: '#health', color: '#9c27b0' }
+        ];
+    }
+    
+    function renderManualPromotion(promo) {
+        return `<div id="${promo.id}" class="manual-promo-card" style="border-left: 5px solid ${promo.color}; background-color: ${promo.color}11;">
+            <h5 style="color: ${promo.color}; font-weight: bold; margin: 0 0 5px 0;">${promo.title}</h5>
+            <p style="font-size: 0.9rem; margin: 0 0 10px 0;">${promo.subtitle}</p>
+            <button style="background-color: ${promo.color}; color: white; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;"
+                    onclick="window.open('${promo.linkUrl}', '_blank')">${promo.linkText}</button>
+        </div>`;
+    }
+    // --- END AD MOCK FUNCTIONS ---
+    
     // --- MOCK JOB LOAD FUNCTION (TO PREVENT ERRORS) ---
     function loadJobs() {
+        // Mock data loading... (rest of the function is the same as before)
         const listElement = document.getElementById('job-list');
         listElement.innerHTML = `<p style="text-align:center;color:#2a5298;">नौकरियाँ लोड हो रही हैं...</p>`;
 
@@ -546,7 +613,7 @@
                 allJobs.push(childSnapshot.val());
             });
 
-            allJobs.reverse(); // नवीनतम पहले
+            allJobs.reverse(); 
             
             const htmlContent = allJobs.map(job => renderJobCard(job)).join('');
             listElement.innerHTML = htmlContent;
@@ -612,10 +679,12 @@
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
+        const manualPromos = getManualPromotions(); // 4 manual promotions
         
         let queryRef;
         loadMoreBtn.style.display = 'none';
         
+        // Ensure no category is selected when loading all
         if (currentCategory !== null) {
             currentCategory = null; 
             filteredProviders = [];
@@ -629,6 +698,16 @@
             providersLastTimestamp = null;
             providersLastKey = null;
             
+            // Render Top Ads (Outside the list loop)
+            document.getElementById('adsterra-unit-1').innerHTML = renderAdsterraUnit('adsterra-top', 'Top Adsterra');
+            document.getElementById('manual-promo-1').innerHTML = renderManualPromotion(manualPromos[0]);
+            
+            // Clear Bottom Ad placeholders for now
+            document.getElementById('ad-placeholder-bottom-section').innerHTML = '';
+            document.getElementById('adsterra-unit-3').innerHTML = '';
+            document.getElementById('manual-promo-3').innerHTML = '';
+            document.getElementById('manual-promo-4').innerHTML = '';
+
             listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
             
             queryRef = baseRef.limitToLast(providersLimit + 1); 
@@ -670,14 +749,16 @@
                 providersLastKey = itemsToRender[itemsToRender.length - 1].key;
             } 
             
-            // --- AD INJECTION LOGIC (New) ---
+            // --- AD INJECTION LOGIC (Middle Ads) ---
             let contentArray = [];
             for (let i = 0; i < itemsToRender.length; i++) {
                 contentArray.push(renderProviderCard(itemsToRender[i].data));
                 
-                // Inject Middle Ad after 5 items on the initial load
+                // Inject Middle Ads after 5 items on the initial load
                 if (i === 4 && !loadMore) {
-                    contentArray.push(renderAdCard('ad-placeholder-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Middle Ad)'));
+                    contentArray.push(renderAdCard('ad-placeholder-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (General Middle Ad)'));
+                    contentArray.push(renderAdsterraUnit('adsterra-middle', 'Middle Adsterra'));
+                    contentArray.push(renderManualPromotion(manualPromos[1])); // Manual Promo 2
                 }
             }
 
@@ -686,14 +767,21 @@
             if (!loadMore) {
                 listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
                 
-                // Inject Bottom Ad after all rendered items on initial load
+                // --- AD INJECTION LOGIC (Bottom Ads, on initial load) ---
                 if (itemsToRender.length > 0) {
-                    listElement.insertAdjacentHTML('beforeend', renderAdCard('ad-placeholder-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Bottom Ad)'));
+                    // General Promo Banner (Bottom)
+                    document.getElementById('ad-placeholder-bottom-section').innerHTML = renderAdCard('ad-placeholder-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (General Bottom Ad)');
+                    // Adsterra Unit 3 (Bottom)
+                    document.getElementById('adsterra-unit-3').innerHTML = renderAdsterraUnit('adsterra-bottom', 'Bottom Adsterra');
+                    // Manual Promotion 3 & 4
+                    document.getElementById('manual-promo-3').innerHTML = renderManualPromotion(manualPromos[2]);
+                    document.getElementById('manual-promo-4').innerHTML = renderManualPromotion(manualPromos[3]);
                 }
+                // --- END AD INJECTION LOGIC (Bottom Ads) ---
             } else {
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
-            // --- END AD INJECTION LOGIC ---
+            // --- END AD INJECTION LOGIC (Middle Ads) ---
 
             if (snapshotSize > providersLimit) {
                 loadMoreBtn.style.display = 'block';
@@ -712,6 +800,7 @@
 
     // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
     function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
+        const manualPromos = getManualPromotions();
         const start = filteredPageIndex * providersLimit;
         const end = start + providersLimit;
         const itemsToRender = filteredProviders.slice(start, end);
@@ -721,13 +810,15 @@
 
         if (itemsToRender.length > 0) {
             
-            // --- AD INJECTION LOGIC (Filtered List) ---
+            // --- AD INJECTION LOGIC (Filtered List - Middle Ads) ---
             let contentArray = [];
             for(let i=0; i < itemsToRender.length; i++){
                 contentArray.push(renderProviderCard(itemsToRender[i]));
-                // Inject Middle Ad only on the very first page of the filtered list, after 5 items.
+                // Inject Middle Ads only on the very first page of the filtered list, after 5 items.
                 if(start === 0 && i === 4 && itemsToRender.length > 5 && !isLoadMore){
-                     contentArray.push(renderAdCard('filter-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Filtered Middle Ad)'));
+                     contentArray.push(renderAdCard('filter-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Filtered General Ad)'));
+                     contentArray.push(renderAdsterraUnit('adsterra-filter-middle', 'Filtered Middle Adsterra'));
+                     contentArray.push(renderManualPromotion(manualPromos[1])); // Manual Promo 2
                 }
             }
             const htmlContent = contentArray.join('');
@@ -735,6 +826,13 @@
             
             if (!isLoadMore) {
                 listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
+                // Top ads are already rendered by loadCategories
+                
+                // Clear Bottom Ad placeholders if filtering starts
+                document.getElementById('ad-placeholder-bottom-section').innerHTML = '';
+                document.getElementById('adsterra-unit-3').innerHTML = '';
+                document.getElementById('manual-promo-3').innerHTML = '';
+                document.getElementById('manual-promo-4').innerHTML = '';
             } else {
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
@@ -750,9 +848,15 @@
             loadMoreBtn.style.display = 'none';
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त।</p>');
             
-            // Inject Bottom Ad on the last page of the filtered list
-            if(totalItems > 0) {
-                 listElement.insertAdjacentHTML('beforeend', renderAdCard('filter-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Filtered Bottom Ad)'));
+            // Inject Bottom Ads on the last page of the filtered list
+            if(totalItems > 0 && isLastPage) {
+                 // General Promo Banner (Bottom)
+                document.getElementById('ad-placeholder-bottom-section').innerHTML = renderAdCard('filter-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Filtered General Bottom Ad)');
+                // Adsterra Unit 3 (Bottom)
+                document.getElementById('adsterra-unit-3').innerHTML = renderAdsterraUnit('adsterra-filter-bottom', 'Filtered Bottom Adsterra');
+                // Manual Promotion 3 & 4
+                document.getElementById('manual-promo-3').innerHTML = renderManualPromotion(manualPromos[2]);
+                document.getElementById('manual-promo-4').innerHTML = renderManualPromotion(manualPromos[3]);
             }
         }
     }
@@ -776,6 +880,12 @@
         if (!loadMore) {
             currentCategory = category;
             filteredPageIndex = 0;
+            
+            // Render Top Ads again when filter is applied (ensures visibility)
+            const manualPromos = getManualPromotions();
+            document.getElementById('adsterra-unit-1').innerHTML = renderAdsterraUnit('adsterra-top', 'Top Adsterra');
+            document.getElementById('manual-promo-1').innerHTML = renderManualPromotion(manualPromos[0]);
+            
             listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है... (पूरी लिस्ट फेच की जा रही है)</p>`;
 
             window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
@@ -808,10 +918,11 @@
     };
 
 
-    // सामान्य सर्च (Ads injected)
+    // सामान्य सर्च (Ads injected - logic is similar to filter, but all data is fetched)
     window.searchServices = () => {
         const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
         const listElement = document.getElementById('mistri-list');
+        const manualPromos = getManualPromotions();
         
         if (searchTerm.length < 3) {
             loadCategories(); 
@@ -820,6 +931,15 @@
 
         listElement.innerHTML = `<h3>Search Results for "${searchTerm}"</h3><p style="text-align:center;color:#2a5298;">खोज हो रही है...</p>`;
         document.getElementById('load-more-providers').style.display = 'none'; 
+        
+        // Render Top Ads
+        document.getElementById('adsterra-unit-1').innerHTML = renderAdsterraUnit('adsterra-top', 'Top Adsterra');
+        document.getElementById('manual-promo-1').innerHTML = renderManualPromotion(manualPromos[0]);
+        // Clear Bottom Ad placeholders
+        document.getElementById('ad-placeholder-bottom-section').innerHTML = '';
+        document.getElementById('adsterra-unit-3').innerHTML = '';
+        document.getElementById('manual-promo-3').innerHTML = '';
+        document.getElementById('manual-promo-4').innerHTML = '';
         
         window.providersRef.once('value', (snapshot) => { 
             const providers = snapshot.val();
@@ -838,16 +958,21 @@
             let contentArray = [];
             for (let i = 0; i < results.length; i++) {
                 contentArray.push(renderProviderCard(results[i]));
-                if (i === 4 && results.length > 5) { // Inject middle ad after 5th item
-                    contentArray.push(renderAdCard('search-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Search Middle Ad)'));
+                if (i === 4 && results.length > 5) { // Inject middle ads after 5th item
+                    contentArray.push(renderAdCard('search-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Search General Ad)'));
+                    contentArray.push(renderAdsterraUnit('adsterra-search-middle', 'Search Middle Adsterra'));
+                    contentArray.push(renderManualPromotion(manualPromos[1])); // Manual Promo 2
                 }
             }
             
             let html = `<h3>Search Results for "${searchTerm}" (${results.length} found)</h3>`;
             if (results.length > 0) {
                 html += contentArray.join('');
-                // Inject bottom ad
-                html += renderAdCard('search-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Search Bottom Ad)');
+                // Inject bottom ads
+                document.getElementById('ad-placeholder-bottom-section').innerHTML = renderAdCard('search-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Search General Bottom Ad)');
+                document.getElementById('adsterra-unit-3').innerHTML = renderAdsterraUnit('adsterra-search-bottom', 'Search Bottom Adsterra');
+                document.getElementById('manual-promo-3').innerHTML = renderManualPromotion(manualPromos[2]);
+                document.getElementById('manual-promo-4').innerHTML = renderManualPromotion(manualPromos[3]);
             } else {
                 html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
             }
@@ -860,7 +985,7 @@
     window.logOut = () => {
         firebase.auth().signOut().then(() => {
             console.log("User signed out successfully.");
-            location.reload(); // लॉगआउट के बाद पेज रीलोड करें
+            location.reload(); 
         }).catch((error) => {
             console.error("Sign Out Error:", error);
             alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
@@ -989,7 +1114,7 @@
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('registrationScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('mainApp').style.display = 'flex'; // Changed to flex for proper layout
                 console.log("Auto-Login Successful:", user.phoneNumber);
 
                 startFirebaseListener();
@@ -1001,7 +1126,7 @@
         });
 
 
-        // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1) - इसमें आक्रामक एरर डायग्नोस्टिक्स हैं।
+        // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1)
         document.getElementById('sendOtpBtn').onclick = () => {
             const name = document.getElementById('userName').value.trim();
             const area = document.getElementById('userArea').value.trim();
@@ -1022,15 +1147,12 @@
             const fullPhone = '+91' + phone;
             document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>OTP भेजने की प्रक्रिया शुरू हो रही है...</span>";
 
-            // नया OTP भेजने का प्रयास करने से पहले किसी भी मौजूदा यूज़र को लॉगआउट करें (सुरक्षा फ़िक्स)
             firebase.auth().signOut()
                 .then(() => initiateOtpFlow(fullPhone))
                 .catch(() => initiateOtpFlow(fullPhone)); 
 
             function initiateOtpFlow(fullPhone) {
-                console.log("Attempting reCAPTCHA verification for:", fullPhone);
                 recaptchaVerifier.verify().then(() => {
-                    console.log("reCAPTCHA Verified. Sending SMS now...");
                     document.getElementById('loginMsg').innerHTML = `<span style='color:#2a5298'>सुरक्षा जाँच पूरी हुई। ${fullPhone} पर OTP भेजा जा रहा है...</span>`;
 
                     firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
@@ -1041,17 +1163,14 @@
                             document.getElementById('loginMsg').innerHTML = `<span style='color:green'>✅ OTP ${fullPhone} पर भेजा गया!</span>`;
                         })
                         .catch((err) => {
-                            // ⭐ OTP Failures often land here (Error Diagnostics)
                             console.error("Firebase SMS Send Error:", err.code, err.message);
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ OTP भेजने में एरर आई: ${err.message} (कोड: ${err.code}). कृपया दोबारा कोशिश करें या कुछ देर इंतज़ार करें।</span>`;
+                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ OTP भेजने में एरर आई: ${err.message}. कृपया दोबारा कोशिश करें।</span>`;
                             document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
                             document.getElementById('profileInputSection').style.display = 'block';
                             document.getElementById('otpSection').style.display = 'none';
-                            // reCAPTCHA को रीसेट करें ताकि यह फिर से काम करे
                             recaptchaVerifier.clear();
                         });
                 }).catch((err) => {
-                    // ⭐ reCAPTCHA failures land here (Error Diagnostics)
                     console.error("reCAPTCHA Verification Error:", err.message);
                     document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ reCAPTCHA जाँच में एरर: ${err.message}. कृपया पेज रीलोड करके फिर से कोशिश करें।</span>`;
                     document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
@@ -1060,7 +1179,7 @@
         };
 
 
-        // 4. OTP सत्यापित करें (लॉगिन स्टेप 2) - सुरक्षा की पुष्टि
+        // 4. OTP सत्यापित करें (लॉगिन स्टेप 2)
         document.getElementById('verifyOtpBtn').onclick = () => {
             const otp = document.getElementById('otpInput').value;
             if (otp.length !== 6) {
@@ -1078,7 +1197,6 @@
                         window.database.ref('users/' + user.uid).set(tempUserData)
                             .then(() => {
                                 document.getElementById('loginMsg').innerHTML = "<span style='color:green'>✅ Login Successful! Redirecting...</span>";
-                                // ⭐ CRITICAL FIX: सफल सत्यापन के बाद रिलोड करें
                                 location.reload(); 
                             })
                             .catch(error => {
@@ -1114,3 +1232,4 @@
     </script>
 </body>
 </html>
+
