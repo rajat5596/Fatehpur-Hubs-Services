@@ -345,9 +345,9 @@
 
                 <!-- 1. HOME/MISTRI SCREEN -->
                 <div id="home-screen" class="screen active">
-                    <!-- Promotion Ad -->
-                    <div id="ad-placeholder" class="ad-card" onclick="window.contactForAds()">
-                        <p style="font-size: 1.1rem; font-weight: bold; color: #2a5298;">🤝 अपने बिज़नेस का Ad यहाँ लगवाएँ!</p>
+                    <!-- TOP Ad Placeholder -->
+                    <div id="ad-placeholder-top" class="ad-card" onclick="window.contactForAds()">
+                        <p style="font-size: 1.1rem; font-weight: bold; color: #2a5298;">🤝 अपने बिज़नेस का Ad यहाँ लगवाएँ! (Top Ad)</p>
                         <p style="font-size: 0.9rem; color: #555;">अपने कस्टमर्स तक पहुँचें।</p>
                         <button>Contact for Ads</button>
                     </div>
@@ -362,7 +362,7 @@
                         <!-- Category buttons will be rendered here -->
                     </div>
 
-                    <!-- Provider List -->
+                    <!-- Provider List (Middle and Bottom Ads injected here) -->
                     <div id="mistri-list">
                         <!-- Services will be loaded here -->
                     </div>
@@ -507,7 +507,6 @@
     let tempUserData = {}; 
     
     // ⭐ GLOBAL STATE AND LIMITS ⭐
-    // यूज़र के अनुरोध पर लिमिट 20 पर वापस सेट
     const providersLimit = 20; 
     let providersLastTimestamp = null; 
     let providersLastKey = null; 
@@ -520,12 +519,22 @@
     let jobsLastKey = null;
     const jobsLimit = 10;
     
+    // --- AD CARD RENDERER (New Helper Function) ---
+    function renderAdCard(id, title = "अपने बिज़नेस का Ad यहाँ लगवाएँ!") {
+        // यह फंक्शन विज्ञापन कार्ड का HTML बनाता है
+        return `<div id="${id}" class="ad-card" onclick="window.contactForAds()">
+            <p style="font-size: 1.1rem; font-weight: bold; color: #2a5298;">🤝 ${title}</p>
+            <p style="font-size: 0.9rem; color: #555;">अपने कस्टमर्स तक पहुँचें।</p>
+            <button>Contact for Ads</button>
+        </div>`;
+    }
+    // --- END AD CARD RENDERER ---
+
     // --- MOCK JOB LOAD FUNCTION (TO PREVENT ERRORS) ---
     function loadJobs() {
         const listElement = document.getElementById('job-list');
         listElement.innerHTML = `<p style="text-align:center;color:#2a5298;">नौकरियाँ लोड हो रही हैं...</p>`;
 
-        // यह केवल एक मॉक फ़ंक्शन है। असल में आपको यहाँ पैजिनेशन के साथ डेटाबेस क्वेरी चाहिए होगी।
         window.jobsRef.limitToLast(jobsLimit).once('value', (snapshot) => {
             if (!snapshot.exists()) {
                 listElement.innerHTML = '<p style="text-align:center;color:#ff6666;">अभी कोई नौकरी उपलब्ध नहीं है।</p>';
@@ -599,7 +608,7 @@
         ).join('');
     }
 
-    // ⭐ 1. loadCategories - सामान्य लिस्ट पैजिनेशन (Firebase कर्सर का उपयोग करके)
+    // ⭐ 1. loadCategories - सामान्य लिस्ट पैजिनेशन (Ads injected)
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
@@ -607,7 +616,6 @@
         let queryRef;
         loadMoreBtn.style.display = 'none';
         
-        // सामान्य लिस्ट लोड करते समय कैटेगरी फ़िल्टर स्टेट रीसेट करें
         if (currentCategory !== null) {
             currentCategory = null; 
             filteredProviders = [];
@@ -623,12 +631,10 @@
             
             listElement.innerHTML = `<h3>Available Services (Top ${providersLimit})</h3><p style="text-align:center;color:#2a5298;">नवीनतम ${providersLimit} प्रोवाइडर्स लोड हो रहे हैं...</p>`;
             
-            // providersLimit + 1 से यह सुनिश्चित होता है कि हमें यह जानने के लिए एक अतिरिक्त आइटम मिलता है कि और डेटा है या नहीं।
             queryRef = baseRef.limitToLast(providersLimit + 1); 
         } else {
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
             
-            // पिछली बार लोड किए गए आइटम के कर्सर का उपयोग करके पैजिनेट करें
             queryRef = baseRef.endBefore(providersLastTimestamp, providersLastKey).limitToLast(providersLimit + 1);
         }
 
@@ -651,39 +657,48 @@
                 snapshotSize++; 
             });
 
-            // सबसे नए आइटम को सबसे पहले दिखाने के लिए रिवर्स करें
             allItems.reverse();
             
-            // ⭐ लोडमोर होने पर कर्सर के रूप में उपयोग किए गए डुप्लीकेट को हटा दें
             if (loadMore && allItems.length > 0) {
-                // यह आइटम पिछली बार का आखिरी आइटम था, इसलिए इसे हटा दें।
                 allItems.shift(); 
             }
             
-            // रेंडर करने के लिए आइटम की संख्या
             let itemsToRender = allItems.slice(0, providersLimit);
             
-            // अगले पेज के लिए कर्सर सेट करें (वर्तमान पेज का अंतिम आइटम)
             if (itemsToRender.length > 0) {
                 providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
                 providersLastKey = itemsToRender[itemsToRender.length - 1].key;
             } 
             
-            const htmlContent = itemsToRender.map(item => renderProviderCard(item.data)).join('');
+            // --- AD INJECTION LOGIC (New) ---
+            let contentArray = [];
+            for (let i = 0; i < itemsToRender.length; i++) {
+                contentArray.push(renderProviderCard(itemsToRender[i].data));
+                
+                // Inject Middle Ad after 5 items on the initial load
+                if (i === 4 && !loadMore) {
+                    contentArray.push(renderAdCard('ad-placeholder-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Middle Ad)'));
+                }
+            }
 
+            const htmlContent = contentArray.join('');
+            
             if (!loadMore) {
                 listElement.innerHTML = `<h3>Available Services (${itemsToRender.length} loaded)</h3>` + htmlContent;
+                
+                // Inject Bottom Ad after all rendered items on initial load
+                if (itemsToRender.length > 0) {
+                    listElement.insertAdjacentHTML('beforeend', renderAdCard('ad-placeholder-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Bottom Ad)'));
+                }
             } else {
                 listElement.insertAdjacentHTML('beforeend', htmlContent);
             }
+            // --- END AD INJECTION LOGIC ---
 
-            // ⭐ CRITICAL FIX: यह जाँचें कि क्या Firebase ने LIMIT + 1 (i.e., 21) आइटम लौटाए हैं,
-            // जिससे यह सुनिश्चित हो सके कि आगे लोड करने के लिए और डेटा है।
             if (snapshotSize > providersLimit) {
                 loadMoreBtn.style.display = 'block';
                 loadMoreBtn.onclick = () => loadCategories(true);
             } else {
-                // अगर लौटाए गए आइटम LIMIT (20) से कम या बराबर हैं, तो लिस्ट समाप्त हो गई है।
                 loadMoreBtn.style.display = 'none';
                 listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
             }
@@ -695,15 +710,29 @@
         });
     }
 
-    // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें
+    // फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
     function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         const start = filteredPageIndex * providersLimit;
         const end = start + providersLimit;
         const itemsToRender = filteredProviders.slice(start, end);
         const totalItems = filteredProviders.length;
+        const isLastPage = totalItems <= end;
+
 
         if (itemsToRender.length > 0) {
-            const htmlContent = itemsToRender.map(item => renderProviderCard(item)).join('');
+            
+            // --- AD INJECTION LOGIC (Filtered List) ---
+            let contentArray = [];
+            for(let i=0; i < itemsToRender.length; i++){
+                contentArray.push(renderProviderCard(itemsToRender[i]));
+                // Inject Middle Ad only on the very first page of the filtered list, after 5 items.
+                if(start === 0 && i === 4 && itemsToRender.length > 5 && !isLoadMore){
+                     contentArray.push(renderAdCard('filter-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Filtered Middle Ad)'));
+                }
+            }
+            const htmlContent = contentArray.join('');
+            // --- END AD INJECTION LOGIC ---
+            
             if (!isLoadMore) {
                 listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
             } else {
@@ -714,13 +743,17 @@
              listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
         }
         
-        // ⭐ क्रिटिकल फिक्स: सुनिश्चित करें कि लोड मोर तब तक दिखे जब तक लोकल ऐरे में कोई आइटम बचा हो
         if (totalItems > filteredPageIndex * providersLimit) {
             loadMoreBtn.style.display = 'block';
             loadMoreBtn.onclick = () => filterByCategory(currentCategory, true);
         } else {
             loadMoreBtn.style.display = 'none';
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त।</p>');
+            
+            // Inject Bottom Ad on the last page of the filtered list
+            if(totalItems > 0) {
+                 listElement.insertAdjacentHTML('beforeend', renderAdCard('filter-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Filtered Bottom Ad)'));
+            }
         }
     }
 
@@ -730,7 +763,6 @@
         const loadMoreBtn = document.getElementById('load-more-providers');
         loadMoreBtn.style.display = 'none';
         
-        // मुख्य पैजिनेशन स्टेट रीसेट करें
         providersLastTimestamp = null;
         providersLastKey = null;
         
@@ -742,28 +774,23 @@
         });
 
         if (!loadMore) {
-            // इनिशियल फ़िल्टर लोड या नई कैटेगरी का चयन
             currentCategory = category;
             filteredPageIndex = 0;
             listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है... (पूरी लिस्ट फेच की जा रही है)</p>`;
 
-            // इस कैटेगरी के लिए सभी आइटम फ़ेच करें 
             window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
                 if (!snapshot.exists()) {
                     listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">इस कैटेगरी में कोई सर्विस नहीं है।</p>`;
                     return;
                 }
 
-                // ऐरे में कनवर्ट करें
                 filteredProviders = [];
                 snapshot.forEach(childSnapshot => {
                     filteredProviders.push(childSnapshot.val());
                 });
 
-                // JavaScript में टाइमस्टैम्प के अनुसार घटते क्रम में सॉर्ट करें (नवीनतम पहले)
                 filteredProviders.sort((a, b) => b.timestamp - a.timestamp);
 
-                // पहला पेज रेंडर करें
                 renderFilteredPage(listElement, loadMoreBtn);
             }, (error) => {
                 console.error("Error loading filtered services:", error);
@@ -771,7 +798,6 @@
             });
 
         } else {
-            // और लोड करें (बस संग्रहीत लोकल ऐरे से अगला पेज रेंडर करें)
             listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
             
             setTimeout(() => { 
@@ -782,7 +808,7 @@
     };
 
 
-    // सामान्य सर्च
+    // सामान्य सर्च (Ads injected)
     window.searchServices = () => {
         const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
         const listElement = document.getElementById('mistri-list');
@@ -804,17 +830,29 @@
                     (p.category && p.category.toLowerCase().includes(searchTerm)) ||
                     (p.area && p.area.toLowerCase().includes(searchTerm))
                 );
-                // सर्च परिणामों को टाइमस्टैम्प (नवीनतम पहले) के अनुसार सॉर्ट करें
+                
                 results.sort((a, b) => b.timestamp - a.timestamp);
+            }
+            
+            // --- AD INJECTION LOGIC (Search Results) ---
+            let contentArray = [];
+            for (let i = 0; i < results.length; i++) {
+                contentArray.push(renderProviderCard(results[i]));
+                if (i === 4 && results.length > 5) { // Inject middle ad after 5th item
+                    contentArray.push(renderAdCard('search-ad-middle', '🌟 आपके एरिया का सबसे बढ़िया ऑफ़र! (Search Middle Ad)'));
+                }
             }
             
             let html = `<h3>Search Results for "${searchTerm}" (${results.length} found)</h3>`;
             if (results.length > 0) {
-                html += results.map(p => renderProviderCard(p)).join('');
+                html += contentArray.join('');
+                // Inject bottom ad
+                html += renderAdCard('search-ad-bottom', '⬇️ फतेहपुर के टॉप डील्स यहाँ देखें ⬇️ (Search Bottom Ad)');
             } else {
                 html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
             }
             listElement.innerHTML = html;
+            // --- END AD INJECTION LOGIC ---
         });
     };
     
@@ -950,18 +988,12 @@
         // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
-                // यूज़र पहले से लॉग इन है (Persistence), तो सीधे मेन ऐप दिखाएं।
                 document.getElementById('registrationScreen').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
                 console.log("Auto-Login Successful:", user.phoneNumber);
 
                 startFirebaseListener();
                 
-                // loadPromotionAds function is not defined, skipping or mocking
-                // if (typeof loadPromotionAds === 'function') {
-                //     loadPromotionAds();
-                //     setTimeout(loadPromotionAds, 2000);
-                // }
             } else {
                 document.getElementById('registrationScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
