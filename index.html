@@ -368,38 +368,39 @@
                     <div id="mistri-categories">
                         <!-- Category buttons will be rendered here -->
                     </div>
-                    <!-- Provider List (Middle and Bottom Ads injected here) -->
+
+                    <!-- Provider List (Services will be loaded here) -->
                     <div id="mistri-list">
                         <!-- Services will be loaded here -->
                     </div>
                     
-                    <!-- -------------------- MIDDLE AD UNIT (330x250) -------------------- -->
+                    <!-- -------------------- MIDDLE AD UNIT (300x250) -------------------- -->
                     <div class="ad-container" style="
-                        width: 330px; 
+                        width: 300px; /* 300px width */
                         height: 250px; 
                         margin: 20px auto; 
                         border: 1px solid #ddd;
                         text-align: center;">
                         
-                        <!-- Ad Script 2: Yahan apna Adsterra JS Code Paste Karein -->
+                        <!-- Ad Script 2: Your 300x250 Adsterra Code -->
                         <script type="text/javascript">
-                            atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/YOUR_MIDDLE_AD_KEY/invoke.js"><\/script>');
+                            atOptions = {
+                                'key' : 'd65603602583bbe6bc3308e8ee8ab792',
+                                'format' : 'iframe',
+                                'height' : 250,
+                                'width' : 300,
+                                'params' : {}
+                            };
                         </script>
+                        <script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"></script>
                     </div>
                     <!-- -------------------------------------------------------------------- -->
 
                     <button id="load-more-providers" class="main-btn" style="display:none; margin-top: 15px; margin-bottom: 15px;" onclick="loadCategories(true)">
-
-                        
-                    <!-- Provider List (Middle and Bottom Ads injected here) -->
-                    <div id="mistri-list">
-                        <!-- Services will be loaded here -->
-                    </div>
-
-                    <button id="load-more-providers" class="main-btn" style="display:none; margin-top: 15px; margin-bottom: 15px;" onclick="loadCategories(true)">
                         Load More Services
                     </button>
+
+                    
                 </div>
 
                 <!-- 2. SERVICE ADD SCREEN -->
