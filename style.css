@@ -637,18 +637,28 @@ input[type="tel"]:focus, input[type="text"]:focus {
 }
 
 /* 3. Fixed Ad Container के लिए CSS */
-/* यह कंटेनर index.html में </body> से पहले पेस्ट होगा */
 #fixed-bottom-ad-container {
-    position: fixed;
-    bottom: 0; 
+    position: fixed; /* <--- यह लाइन अब ACTIVE है! */
+    bottom: 0;      /* <--- यह लाइन बहुत ज़रूरी है! */
     left: 0; 
     right: 0;
     width: 100%;
-    max-width: 500px; /* .app-container की width के बराबर */
+    max-width: 500px; /* app-container की width के बराबर */
     margin: 0 auto;
     z-index: 1000;
     background-color: #fff;
     padding: 2px 0;
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 1. Nav Bar (footer-actions) को ऐड यूनिट से ऊपर उठाएं और z-index बढ़ाएं */
+.footer-actions {
+    z-index: 1001 !important; /* Ad unit (1000) से ऊपर */
+}
+
+/* 2. Main Content को ऊपर उठाना */
+#mainAppContent {
+    padding-bottom: 120px !important; 
+    box-sizing: border-box;
 }
