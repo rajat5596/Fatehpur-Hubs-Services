@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (v8 for stability) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -159,9 +159,13 @@
         .main-btn:hover {
             background-color: #1e3a66;
         }
+        /* Message Area Style */
         #loginMsg {
             margin-top: 15px;
             font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            min-height: 40px; /* Ensure space is reserved */
         }
 
         /* Home/List Styles */
@@ -242,7 +246,7 @@
             color: white;
         }
 
-        /* Promotion Ad Card (Previous Banner) */
+        /* Promotion Ad Card (General Banner) */
         .ad-card {
             background-color: #e3f2fd; /* Light blue */
             padding: 15px;
@@ -261,7 +265,7 @@
             margin-top: 10px;
         }
 
-        /* Adsterra Unit Style (New) */
+        /* Adsterra Unit Style */
         .adsterra-card {
             background-color: #fff3e0; /* Light Orange */
             padding: 15px;
@@ -271,7 +275,7 @@
             border: 1px solid #ff9800;
         }
 
-        /* Manual Promotion Style (New) */
+        /* Manual Promotion Style */
         .manual-promo-card {
             padding: 15px;
             border-radius: 10px;
@@ -491,7 +495,7 @@
 
                     <h3 style="color: #2a5298;">🌟 उपलब्ध नौकरियाँ</h3>
                     <div id="job-list">
-                         <p style="text-align:center; color:#555;">जॉब यहाँ लोड होंगी। (Job loading function is currently mock/needs full implementation)</p>
+                         <p style="text-align:center; color:#555;">जॉब यहाँ लोड होंगी।</p>
                     </div>
                 </div>
 
@@ -530,7 +534,11 @@
 
 
     <script>
-    const firebaseConfig = {
+    // ----------------------------------------------------------------------
+    // 🔥 CRITICAL FIX: Firebase Configuration and Environment Check
+    // ----------------------------------------------------------------------
+    let firebaseConfig = {
+        // User's hardcoded config as a robust fallback
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwN",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
         databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -540,6 +548,17 @@
         appId: "1:294360741451:web:3bc85078805750b9fabfce"
     };
 
+    if (typeof __firebase_config !== 'undefined') {
+        try {
+            // Overwrite with environment config
+            firebaseConfig = JSON.parse(__firebase_config);
+            console.log("Using environment Firebase configuration.");
+        } catch (e) {
+            console.error("Error parsing __firebase_config, falling back to hardcoded config.", e);
+        }
+    }
+    // ----------------------------------------------------------------------
+    
     let recaptchaVerifier, confirmationResult;
     let tempUserData = {}; 
     
@@ -553,9 +572,39 @@
     let filteredProviders = [];
     let filteredPageIndex = 0;
     
-    let jobsLastKey = null;
     const jobsLimit = 10;
     
+    // --- Message Utility (REPLACING ALL ALERTS) ---
+    /**
+     * Shows a non-blocking message to the user in the designated area.
+     * @param {string} message - The message content.
+     * @param {string} type - 'info', 'success', 'error', 'warning'.
+     * @param {number} duration - How long to show the message (ms).
+     */
+    function displayMessage(message, type = 'info', duration = 5000) {
+        const msgElement = document.getElementById('loginMsg');
+        if (!msgElement) return;
+
+        let color = '#2a5298'; // info
+        if (type === 'success') color = 'green';
+        if (type === 'error') color = 'red';
+        if (type === 'warning') color = 'orange';
+
+        msgElement.style.display = 'block';
+        msgElement.style.padding = '10px';
+        msgElement.style.border = `1px solid ${color}`;
+        msgElement.innerHTML = `<span style='color:${color}; font-weight: bold;'>${message}</span>`;
+        
+        // Clear the message after the duration
+        setTimeout(() => {
+            msgElement.innerHTML = 'कृपया लॉगिन करें'; // Revert back to original message
+            msgElement.style.padding = '0';
+            msgElement.style.border = 'none';
+        }, duration);
+    }
+    window.displayMessage = displayMessage; // Expose globally for convenience
+    // --- END Message Utility ---
+
     // --- AD MOCK FUNCTIONS (New & Updated) ---
     
     // 1. General Promo Banner
@@ -576,7 +625,7 @@
         </div>`;
     }
     
-    // 3. Manual Promotions (Mocks the content from the deleted ads.js)
+    // 3. Manual Promotions 
     function getManualPromotions() {
         return [
             { id: 'manual-promo-1', title: '🥇 Fatehpur\'s Top Shop', subtitle: 'इलेक्ट्रॉनिक्स पर 50% की छूट पाएं! जल्दी करें!', linkText: 'View Deal', linkUrl: '#topshop', color: '#ff5722' },
@@ -596,11 +645,12 @@
     }
     // --- END AD MOCK FUNCTIONS ---
     
-    // --- MOCK JOB LOAD FUNCTION (TO PREVENT ERRORS) ---
-    function loadJobs() {
-        // Mock data loading... (rest of the function is the same as before)
+    // --- JOB LOAD FUNCTION ---
+    window.loadJobs = () => {
         const listElement = document.getElementById('job-list');
         listElement.innerHTML = `<p style="text-align:center;color:#2a5298;">नौकरियाँ लोड हो रही हैं...</p>`;
+
+        if (!window.jobsRef) return; 
 
         window.jobsRef.limitToLast(jobsLimit).once('value', (snapshot) => {
             if (!snapshot.exists()) {
@@ -621,9 +671,10 @@
         }, (error) => {
             console.error("Error loading jobs:", error);
             listElement.innerHTML = '<p style="text-align:center;color:red;">जॉब्स लोड करने में एरर आई।</p>';
+            displayMessage("जॉब्स लोड करने में एरर आई।", 'error');
         });
     }
-    // --- END MOCK JOB LOAD FUNCTION ---
+    // --- END JOB LOAD FUNCTION ---
 
     // शेयर डीटेल्स फंक्शन
     window.shareProviderDetails = (name, phone, category) => {
@@ -634,7 +685,8 @@
                 text: shareText
             }).catch(error => console.error('Sharing failed', error));
         } else {
-            alert(`Contact Details:\n${shareText}`);
+            // FIX: Using displayMessage instead of complex alert replacement
+            displayMessage(`शेयर टेक्स्ट कॉपी करने के लिए तैयार: ${shareText.replace(/\n/g, ' / ')}`, 'info', 7000);
         }
     }
 
@@ -679,12 +731,13 @@
     window.loadCategories = (loadMore = false) => {
         const listElement = document.getElementById('mistri-list');
         const loadMoreBtn = document.getElementById('load-more-providers');
-        const manualPromos = getManualPromotions(); // 4 manual promotions
+        const manualPromos = getManualPromotions(); 
         
         let queryRef;
         loadMoreBtn.style.display = 'none';
         
-        // Ensure no category is selected when loading all
+        if (!window.providersRef) return; 
+
         if (currentCategory !== null) {
             currentCategory = null; 
             filteredProviders = [];
@@ -795,6 +848,7 @@
             console.error("Error loading services:", error);
             document.getElementById('loading-more')?.remove();
             listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
+            displayMessage("सर्विसेज लोड करने में एरर आई।", 'error');
         });
     }
 
@@ -826,7 +880,6 @@
             
             if (!isLoadMore) {
                 listElement.innerHTML = `<h3>Available Services (${currentCategory} - ${Math.min(end, totalItems)}/${totalItems} loaded)</h3>` + htmlContent;
-                // Top ads are already rendered by loadCategories
                 
                 // Clear Bottom Ad placeholders if filtering starts
                 document.getElementById('ad-placeholder-bottom-section').innerHTML = '';
@@ -869,6 +922,8 @@
         
         providersLastTimestamp = null;
         providersLastKey = null;
+
+        if (!window.providersRef) return; 
         
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.classList.remove('selected');
@@ -905,6 +960,7 @@
             }, (error) => {
                 console.error("Error loading filtered services:", error);
                 listElement.innerHTML = '<p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
+                displayMessage("फिल्टर्ड सर्विस लोड करने में एरर आई।", 'error');
             });
 
         } else {
@@ -918,11 +974,13 @@
     };
 
 
-    // सामान्य सर्च (Ads injected - logic is similar to filter, but all data is fetched)
+    // सामान्य सर्च 
     window.searchServices = () => {
         const searchTerm = document.getElementById('main-search-bar').value.toLowerCase().trim();
         const listElement = document.getElementById('mistri-list');
         const manualPromos = getManualPromotions();
+
+        if (!window.providersRef) return; 
         
         if (searchTerm.length < 3) {
             loadCategories(); 
@@ -988,7 +1046,7 @@
             location.reload(); 
         }).catch((error) => {
             console.error("Sign Out Error:", error);
-            alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
+            displayMessage("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।", 'error');
         });
     }
 
@@ -1017,21 +1075,24 @@
         const area = document.getElementById('providerArea').value;
         const experience = document.getElementById('providerExperience').value;
         const form = document.getElementById('serviceForm');
+        
+        if (!window.providersRef) return false;
 
         if (!name || !phone || !category || !area || !experience) {
-            alert("कृपया सभी फ़ील्ड भरें।");
+            displayMessage("कृपया सभी फ़ील्ड भरें।", 'warning');
             return false;
         }
         
         if (phone.length !== 10 || isNaN(phone)) {
-            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            displayMessage("कृपया 10 अंक का वैध फ़ोन नंबर डालें।", 'warning');
             return false;
         }
         
         // डुप्लीकेट फ़ोन नंबर के लिए जाँच करें
         window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
             if (snapshot.exists()) {
-                alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
+                console.error("❌ This phone number is already registered.");
+                displayMessage("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।", 'error', 7000);
                 return;
             }
 
@@ -1044,12 +1105,12 @@
 
             window.providersRef.push(providerData)
                 .then(() => {
-                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                    displayMessage("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।", 'success');
                     form.reset(); 
                     loadCategories(); 
                 })
                 .catch((error) => {
-                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                    displayMessage("❌ रजिस्ट्रेशन में एरर आई: " + error.message, 'error', 7000);
                     console.error("Firebase Error:", error);
                 });
         });
@@ -1067,14 +1128,16 @@
         const description = document.getElementById('jobDescription').value;
         const phone = document.getElementById('jobPhone').value;
         const form = document.getElementById('jobForm');
+        
+        if (!window.jobsRef) return false;
 
         if (!title || !shopName || !location || !salary || !description || !phone) {
-            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+            displayMessage("कृपया जॉब के सभी फ़ील्ड भरें।", 'warning');
             return false;
         }
 
         if (phone.length !== 10 || isNaN(phone)) {
-            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            displayMessage("कृपया जॉब संपर्क के लिए 10 अंक का फ़ोन नंबर डालें।", 'warning');
             return false;
         }
 
@@ -1086,12 +1149,12 @@
 
         window.jobsRef.push(jobData) 
             .then(() => {
-                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                displayMessage("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।", 'success');
                 form.reset(); 
                 if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
             })
             .catch((error) => {
-                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
+                displayMessage("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message, 'error', 7000);
                 console.error("Firebase Job Error:", error);
             });
 
@@ -1099,6 +1162,13 @@
     }
         
     window.onload = () => {
+        if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+             console.error("Firebase configuration is missing or invalid. Cannot initialize app.");
+             document.getElementById('registrationScreen').innerHTML = "<h2>Configuration Error</h2><p>Firebase configuration is missing or invalid. Please check the settings.</p>";
+             document.getElementById('registrationScreen').style.display = 'flex';
+             return;
+        }
+
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
         window.providersRef = database.ref('service_providers'); 
@@ -1108,13 +1178,14 @@
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
             'size': 'invisible'
         });
-        recaptchaVerifier.render();
+        // reCAPTCHA रेंडर करना आवश्यक है
+        recaptchaVerifier.render().catch(e => console.error("reCAPTCHA Render Error:", e));
 
         // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('registrationScreen').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'flex'; // Changed to flex for proper layout
+                document.getElementById('mainApp').style.display = 'flex'; 
                 console.log("Auto-Login Successful:", user.phoneNumber);
 
                 startFirebaseListener();
@@ -1122,6 +1193,7 @@
             } else {
                 document.getElementById('registrationScreen').style.display = 'flex';
                 document.getElementById('mainApp').style.display = 'none';
+                displayMessage("कृपया लॉगिन करने के लिए अपना नाम और फ़ोन नंबर दर्ज करें।", 'info', 10000);
             }
         });
 
@@ -1133,7 +1205,7 @@
             const phone = document.getElementById('phoneInput').value.trim();
             
             if (!name || !area || phone.length !== 10 || isNaN(phone)) {
-                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>कृपया सभी फ़ील्ड (नाम, एरिया) भरें और 10 अंक का नंबर डालें।</span>";
+                displayMessage("कृपया सभी फ़ील्ड (नाम, एरिया) भरें और 10 अंक का नंबर डालें।", 'warning');
                 return;
             }
 
@@ -1145,35 +1217,39 @@
 
             document.getElementById('sendOtpBtn').innerHTML = "Sending...";
             const fullPhone = '+91' + phone;
-            document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>OTP भेजने की प्रक्रिया शुरू हो रही है...</span>";
+            displayMessage("OTP भेजने की प्रक्रिया शुरू हो रही है...", 'info');
 
+            // Force sign out (if any previous session exists) to ensure clean login
             firebase.auth().signOut()
                 .then(() => initiateOtpFlow(fullPhone))
                 .catch(() => initiateOtpFlow(fullPhone)); 
 
             function initiateOtpFlow(fullPhone) {
-                recaptchaVerifier.verify().then(() => {
-                    document.getElementById('loginMsg').innerHTML = `<span style='color:#2a5298'>सुरक्षा जाँच पूरी हुई। ${fullPhone} पर OTP भेजा जा रहा है...</span>`;
+                // Ensure recaptcha is rendered before verification
+                recaptchaVerifier.render().then(() => {
+                    recaptchaVerifier.verify().then(() => {
+                        displayMessage(`सुरक्षा जाँच पूरी हुई। ${fullPhone} पर OTP भेजा जा रहा है...`, 'info', 5000);
 
-                    firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
-                        .then((result) => {
-                            confirmationResult = result;
-                            document.getElementById('profileInputSection').style.display = 'none'; 
-                            document.getElementById('otpSection').style.display = 'block'; 
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:green'>✅ OTP ${fullPhone} पर भेजा गया!</span>`;
-                        })
-                        .catch((err) => {
-                            console.error("Firebase SMS Send Error:", err.code, err.message);
-                            document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ OTP भेजने में एरर आई: ${err.message}. कृपया दोबारा कोशिश करें।</span>`;
-                            document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
-                            document.getElementById('profileInputSection').style.display = 'block';
-                            document.getElementById('otpSection').style.display = 'none';
-                            recaptchaVerifier.clear();
-                        });
-                }).catch((err) => {
-                    console.error("reCAPTCHA Verification Error:", err.message);
-                    document.getElementById('loginMsg').innerHTML = `<span style='color:red'>❌ reCAPTCHA जाँच में एरर: ${err.message}. कृपया पेज रीलोड करके फिर से कोशिश करें।</span>`;
-                    document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                        firebase.auth().signInWithPhoneNumber(fullPhone, recaptchaVerifier)
+                            .then((result) => {
+                                confirmationResult = result;
+                                document.getElementById('profileInputSection').style.display = 'none'; 
+                                document.getElementById('otpSection').style.display = 'block'; 
+                                displayMessage(`✅ OTP ${fullPhone} पर भेजा गया!`, 'success');
+                            })
+                            .catch((err) => {
+                                console.error("Firebase SMS Send Error:", err.code, err.message);
+                                displayMessage(`❌ OTP भेजने में एरर आई: ${err.message}. कृपया दोबारा कोशिश करें।`, 'error', 10000);
+                                document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                                document.getElementById('profileInputSection').style.display = 'block';
+                                document.getElementById('otpSection').style.display = 'none';
+                                recaptchaVerifier.clear();
+                            });
+                    }).catch((err) => {
+                        console.error("reCAPTCHA Verification Error:", err.message);
+                        displayMessage(`❌ reCAPTCHA जाँच में एरर: ${err.message}. कृपया पेज रीलोड करके फिर से कोशिश करें।`, 'error', 10000);
+                        document.getElementById('sendOtpBtn').innerHTML = "Send OTP & Sign Up";
+                    });
                 });
             }
         };
@@ -1183,11 +1259,11 @@
         document.getElementById('verifyOtpBtn').onclick = () => {
             const otp = document.getElementById('otpInput').value;
             if (otp.length !== 6) {
-                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>कृपया 6 अंक का OTP डालें।</span>";
+                displayMessage("कृपया 6 अंक का OTP डालें।", 'warning');
                 return;
             }
             
-            document.getElementById('loginMsg').innerHTML = "<span style='color:orange'>सत्यापन किया जा रहा है...</span>";
+            displayMessage("सत्यापन किया जा रहा है...", 'info');
 
 
             confirmationResult.confirm(otp)
@@ -1196,25 +1272,26 @@
                     if (user && user.uid) {
                         window.database.ref('users/' + user.uid).set(tempUserData)
                             .then(() => {
-                                document.getElementById('loginMsg').innerHTML = "<span style='color:green'>✅ Login Successful! Redirecting...</span>";
+                                displayMessage("✅ Login Successful! Redirecting...", 'success');
                                 location.reload(); 
                             })
                             .catch(error => {
                                 console.error("Profile save error:", error);
-                                document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Login Successful, but profile save failed. Please contact support.</span>";
+                                displayMessage("Login Successful, but profile save failed. Please contact support.", 'error', 10000);
                             });
                     } else {
-                        document.getElementById('loginMsg').innerHTML = "<span style='color:red'>Verification Failed: User not returned.</span>";
+                        displayMessage("Verification Failed: User not returned.", 'error');
                     }
                 })
-                .catch(() => {
-                    document.getElementById('loginMsg').innerHTML = "<span style='color:red'>❌ ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
+                .catch((e) => {
+                    console.error("OTP Confirmation Error:", e);
+                    displayMessage("❌ ग़लत OTP! कृपया सही 6 अंक का OTP डालें।", 'error', 5000);
                 });
         };
 
         // एक्स्ट्रा फंक्शन
         window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
-        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : displayMessage('Share link: https://www.fatehpurhubs.co.in (मैन्युअल शेयर करें)', 'info', 5000);
         window.showScreen = (id) => {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
