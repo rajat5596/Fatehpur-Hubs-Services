@@ -1167,40 +1167,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                     document.getElementById('loginMsg').innerHTML = "<span style='color:red'>❌ ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
                 });
         };
-
-        // एक्स्ट्रा फंक्शन
-        window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
-        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
-        window.showScreen = (id) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            // केवल तभी लोड करें जब स्क्रीन दिखाई दे
-            if(id === 'jobs-screen') loadJobs();
-            if(id === 'home-screen') loadCategories(); 
-        };
-        // PWA सेटअप
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // service worker registration logic goes here
-            });
-        }
-    };
-    </script>
-    <script type="text/javascript" src="ads.js"></script>
-<script>
-    // Service Worker Registration (यह सुनिश्चित करता है कि आपकी PWA ठीक से काम करे)
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(registration => {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                })
-                .catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-        });
-    }
-            <!-- Navigation Bar -->
+<!-- Navigation Bar -->
             <div id="nav-bar">
                 <div class="nav-item active" onclick="showScreen('home-screen')">
                     <i class="fas fa-home"></i> होम
@@ -1246,7 +1213,40 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 #nav-bar {
     z-index: 1000; 
     /* bottom: 0 पहले से होगा */
+                                }
+        // एक्स्ट्रा फंक्शन
+        window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
+        window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
+        window.showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            // केवल तभी लोड करें जब स्क्रीन दिखाई दे
+            if(id === 'jobs-screen') loadJobs();
+            if(id === 'home-screen') loadCategories(); 
+        };
+        // PWA सेटअप
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // service worker registration logic goes here
+            });
+        }
+    };
+    </script>
+    <script type="text/javascript" src="ads.js"></script>
+<script>
+    // Service Worker Registration (यह सुनिश्चित करता है कि आपकी PWA ठीक से काम करे)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
     }
+            
 </script>
 </body>
 </html>
