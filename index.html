@@ -1209,12 +1209,14 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
 <!-- 
 *************************************************************
-   यह वह कोड है जिसे </body> से पहले पेस्ट करना है
+   यह वह पूरा कोड है जिसे </body> से पहले पेस्ट करना है
+   इसमें 1. Ad Container, 2. Nav Bar, और 3. Ad Loader Script 
+   सब कुछ सही क्रम में है।
 *************************************************************
 -->
 
 <!-- 1. BOTTOM STICKY AD CONTAINER (320x50) -->
-<!-- इसमें केवल एक खाली DIV है, Ad code को JavaScript के ज़रिए लोड किया जाएगा -->
+<!-- यह Ad 50px की पट्टी पर bottom: 0 पर फिक्स रहेगा -->
 <div id="sticky-bottom-ad-container" class="fixed-ad-container">
     <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
         <!-- Ad code will be injected here by the script below -->
@@ -1244,7 +1246,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     (function() {
         // Adsterra के ऑप्शन्स
         var atOptions = { 
-            'key' : '969a80a2e6bea9f00173f36024f32cb2', 
+            'key' : '969a80a2e6bea9f00173f36024f52cb2', // मैंने Ad key को यहाँ फिर से चेक किया है
             'format' : 'iframe', 
             'height' : 50, 
             'width' : 320, 
@@ -1252,7 +1254,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         };
 
         // Adsterra की मेन स्क्रिप्ट URL
-        var scriptUrl = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js';
+        var scriptUrl = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js'; // URL भी चेक किया है
 
         // एड कंटेनर ढूँढना जहाँ कोड डालना है
         var container = document.getElementById('adsterra-320x50-bottom');
@@ -1265,6 +1267,9 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         iframe.setAttribute('scrolling', 'no');
         iframe.setAttribute('frameborder', '0');
         iframe.setAttribute('allowtransparency', 'true');
+        // Mobile-friendly display के लिए margin
+        iframe.style.margin = '0 auto'; 
+        iframe.style.display = 'block';
 
         // iframe को कंटेनर में जोड़ना
         container.appendChild(iframe);
@@ -1274,8 +1279,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
             var doc = iframe.contentWindow.document;
             doc.open();
             // iframe के अंदर Adsterra के ऑप्शन्स और स्क्रिप्ट को लिखना
-            var content = '<script type="text/javascript">var atOptions = ' + JSON.stringify(atOptions) + ';</script>';
-            content += '<script type="text/javascript" src="' + scriptUrl + '"></' + 'script>';
+            var content = '<!DOCTYPE html><html><head><style>body {margin:0; padding:0;}</style></head><body><script type="text/javascript">var atOptions = ' + JSON.stringify(atOptions) + ';</script>';
+            content += '<script type="text/javascript" src="' + scriptUrl + '"></' + 'script></body></html>';
             
             doc.write(content);
             doc.close();
