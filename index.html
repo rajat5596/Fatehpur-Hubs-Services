@@ -1195,11 +1195,11 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     }
 </script>
 
-<!-- PERFECT BOTTOM ADS & NAV BAR - NO SPACE -->
-<div style="position:fixed; bottom:50px; left:0; right:0; background:white; z-index:9998; padding:0; border-top:1px solid #ddd;">
+<!-- SIMPLE BOTTOM ADS & NAV BAR -->
+<div style="position:fixed; bottom:50px; left:0; right:0; background:#f0f0f0; z-index:9998; padding:0; border-top:1px solid #ddd;">
     <div style="width:100%; max-width:500px; margin:0 auto;">
-        <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto;">
-            <!-- Ads will load here -->
+        <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto; display:flex; align-items:center; justify-content:center; color:#666; background:#e0e0e0;">
+            Loading Ads...
         </div>
     </div>
 </div>
@@ -1226,42 +1226,32 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 </div>
 
 <script>
-// Working ad loader - Direct method
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        var container = document.getElementById('adsterra-320x50-bottom');
-        if(container) {
-            // Method 1: Direct script injection
-            var atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f52cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-            
-            // Create the script
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.innerHTML = 'atOptions = ' + JSON.stringify(atOptions);
-            document.head.appendChild(script);
-            
-            // Load the adsterra script
-            var adScript = document.createElement('script');
-            adScript.type = 'text/javascript';
-            adScript.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
-            document.head.appendChild(adScript);
-            
-            // Fallback - if no ads after 3 seconds
-            setTimeout(function() {
-                if (container.innerHTML === '' || container.innerHTML.includes('adsterra-320x50-bottom')) {
-                    // Try alternative method
-                    container.innerHTML = '<script type="text/javascript">atOptions = { \\'key\\' : \\'969a80a2e6bea9f00173f36024f52cb2\\', \\'format\\' : \\'iframe\\', \\'height\\' : 50, \\'width\\' : 320, \\'params\\' : {} };<\/script><script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>';
-                }
-            }, 3000);
-        }
-    }, 1000);
-});
+// Simple and effective ad loader
+setTimeout(function() {
+    var container = document.getElementById('adsterra-320x50-bottom');
+    if(container) {
+        // Method 1: Direct HTML injection
+        container.innerHTML = `
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '969a80a2e6bea9f00173f36024f52cb2',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            <\/script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>
+        `;
+        
+        // Fallback after 5 seconds
+        setTimeout(function() {
+            if(container.innerHTML.includes('Loading Ads')) {
+                container.innerHTML = '<div style="width:320px; height:50px; display:flex; align-items:center; justify-content:center; color:#666; background:#e0e0e0; font-size:14px;">Ad Space - 320x50</div>';
+            }
+        }, 5000);
+    }
+}, 1000);
 </script>
 
 </body>
