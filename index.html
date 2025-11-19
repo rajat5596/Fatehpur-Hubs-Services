@@ -1247,127 +1247,43 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                 });
         });
     }
-        <!-- 1. BOTTOM STICKY AD CONTAINER (320x50) -->
-<div id="sticky-bottom-ad-container" class="fixed-ad-container">
+        
+<!-- SIMPLE BOTTOM NAV BAR -->
+<div style="position: fixed; bottom: 0; left: 0; right: 0; background: #2c3e50; display: flex; z-index: 9999; padding: 10px 0;">
+    <div style="flex: 1; text-align: center; color: white; font-size: 12px;">
+        <div>🏠</div>
+        <div>होम</div>
+    </div>
+    <div style="flex: 1; text-align: center; color: white; font-size: 12px;">
+        <div>🔧</div>
+        <div>सर्विस</div>
+    </div>
+    <div style="flex: 1; text-align: center; color: white; font-size: 12px;">
+        <div>💼</div>
+        <div>नौकरियाँ</div>
+    </div>
+    <div style="flex: 1; text-align: center; color: white; font-size: 12px;">
+        <div>📤</div>
+        <div>शेयर</div>
+    </div>
+</div>
+
+<!-- SIMPLE AD CONTAINER -->
+<div style="position: fixed; bottom: 60px; left: 0; right: 0; background: white; z-index: 9998; padding: 5px 0; text-align: center;">
     <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
-        <!-- Ad code will be injected here by the script below -->
+        Loading ad...
     </div>
 </div>
 
-<!-- 2. FOOTER NAVIGATION MENU (Nav Bar) -->
-<div id="nav-bar">
-    <div class="nav-item active" onclick="showScreen('home-screen')">
-        <i class="fas fa-home"></i>
-        <span>होम</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('add-service-screen')">
-        <i class="fas fa-tools"></i>
-        <span>सर्विस जोड़ें</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('jobs-screen')">
-        <i class="fas fa-briefcase"></i>
-        <span>नौकरियाँ</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('share-screen')">
-        <i class="fas fa-share-alt"></i>
-        <span>शेयर</span>
-    </div>
-</div>
-
-<!-- 3. AD LOADER SCRIPT -->
-<script type="text/javascript">
-    (function() {
-        // Wait for page to load completely
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadAd);
-        } else {
-            loadAd();
-        }
-
-        function loadAd() {
-            var atOptions = {
-                'key': '969a80a2e6bea9f00173f36024f52cb2',
-                'format': 'iframe',
-                'height': 50,
-                'width': 320,
-                'params': {}
-            };
-
-            var container = document.getElementById('adsterra-320x50-bottom');
-            
-            if (!container) {
-                console.error('Ad container not found');
-                return;
-            }
-
-            // Clear container first
-            container.innerHTML = '';
-
-            var iframe = document.createElement('iframe');
-            iframe.style.width = '320px';
-            iframe.style.height = '50px';
-            iframe.style.border = 'none';
-            iframe.style.margin = '0 auto';
-            iframe.style.display = 'block';
-            iframe.setAttribute('scrolling', 'no');
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allowtransparency', 'true');
-
-            container.appendChild(iframe);
-
-            // Add loading indicator
-            container.innerHTML += '<div style="text-align:center; color:#666; font-size:12px;">Loading ad...</div>';
-
-            iframe.onload = function() {
-                try {
-                    var doc = iframe.contentWindow.document;
-                    doc.open();
-                    var content = '<!DOCTYPE html><html><head><title>Ad</title><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body>';
-                    content += '<script>var atOptions = ' + JSON.stringify(atOptions) + ';<\/script>';
-                    content += '<script src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>';
-                    content += '</body></html>';
-                    doc.write(content);
-                    doc.close();
-                } catch (e) {
-                    console.error('Error loading ad:', e);
-                    container.innerHTML = '<div style="text-align:center; color:#999; font-size:12px;">Ad not available</div>';
-                }
-            };
-
-            // Fallback in case iframe fails to load
-            setTimeout(function() {
-                if (container.querySelector('iframe') && !container.querySelector('iframe').contentWindow.document.body.innerHTML) {
-                    container.innerHTML = '<div style="text-align:center; color:#999; font-size:12px;">Ad not available</div>';
-                }
-            }, 3000);
-        }
-
-        // Function to handle screen switching (if not already defined)
-        if (typeof showScreen !== 'function') {
-            window.showScreen = function(screenId) {
-                // Hide all screens
-                var screens = document.querySelectorAll('[id$="-screen"]');
-                screens.forEach(function(screen) {
-                    screen.style.display = 'none';
-                });
-                
-                // Show selected screen
-                var selectedScreen = document.getElementById(screenId);
-                if (selectedScreen) {
-                    selectedScreen.style.display = 'block';
-                }
-                
-                // Update active nav item
-                var navItems = document.querySelectorAll('.nav-item');
-                navItems.forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                event.currentTarget.classList.add('active');
-            }
-        }
-    })();
+<script>
+// Simple ad loader
+setTimeout(function() {
+    var container = document.getElementById('adsterra-320x50-bottom');
+    if(container) {
+        container.innerHTML = '<div style="color:#666; text-align:center; padding:15px;">Ad Space</div>';
+    }
+}, 1000);
 </script>
-
 </body>
 </html>
 
