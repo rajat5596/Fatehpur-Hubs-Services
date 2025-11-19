@@ -1195,11 +1195,11 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     }
 </script>
 
-<!-- SIMPLE BOTTOM ADS & NAV BAR -->
+<!-- BOTTOM ADS & NAV BAR -->
 <div style="position:fixed; bottom:50px; left:0; right:0; background:#f0f0f0; z-index:9998; padding:0; border-top:1px solid #ddd;">
     <div style="width:100%; max-width:500px; margin:0 auto;">
-        <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto; display:flex; align-items:center; justify-content:center; color:#666; background:#e0e0e0;">
-            Loading Ads...
+        <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto;">
+            <!-- Ads will load here -->
         </div>
     </div>
 </div>
@@ -1226,30 +1226,23 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 </div>
 
 <script>
-// Simple and effective ad loader
+// Correct ad loader with right key
 setTimeout(function() {
     var container = document.getElementById('adsterra-320x50-bottom');
     if(container) {
-        // Method 1: Direct HTML injection
+        // Use the CORRECT key from your adsterra code
         container.innerHTML = `
             <script type="text/javascript">
                 atOptions = {
-                    'key' : '969a80a2e6bea9f00173f36024f52cb2',
+                    'key' : '969a80a2e6bea9f00173f36024f32cb2',
                     'format' : 'iframe',
                     'height' : 50,
                     'width' : 320,
                     'params' : {}
                 };
             <\/script>
-            <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>
         `;
-        
-        // Fallback after 5 seconds
-        setTimeout(function() {
-            if(container.innerHTML.includes('Loading Ads')) {
-                container.innerHTML = '<div style="width:320px; height:50px; display:flex; align-items:center; justify-content:center; color:#666; background:#e0e0e0; font-size:14px;">Ad Space - 320x50</div>';
-            }
-        }, 5000);
     }
 }, 1000);
 </script>
