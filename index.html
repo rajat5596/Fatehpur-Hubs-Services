@@ -574,8 +574,8 @@
                 <span>शेयर</span>
             </div>
         </div>
-                </div>
-                    <script>
+    </div>
+        <script>
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -1029,9 +1029,65 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
             if (snapshot.exists()) {
                 alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
-                return;false;
+                return;
             }
-                
+
+            // यदि फ़ोन नंबर यूनीक है, तो डेटा पुश करें
+            const providerData = {
+                name: name, phone: phone, category: category, area: area,experience: experience + ' years',
+                timestamp: firebase.database.ServerValue.TIMESTAMP 
+            };
+
+            window.providersRef.push(providerData)
+                .then(() => {
+                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                    form.reset(); 
+                    loadCategories(); 
+                })
+                .catch((error) => { alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                    console.error("Firebase Error:", error);
+                });
+        });
+        
+        return false; 
+    }
+    // सर्विस रजिस्ट्रेशन फंक्शन का अंत
+
+    // जॉब पोस्ट रजिस्टर करने का फंक्शन
+    function jobRegister() {
+        const title = document.getElementById('jobTitle').value;
+        const shopName = document.getElementById('jobShopName').value;const location = document.getElementById('jobLocation').value;
+        const salary = document.getElementById('jobSalary').value;
+        const description = document.getElementById('jobDescription').value;
+        const phone = document.getElementById('jobPhone').value;
+        const form = document.getElementById('jobForm');if (!title || !shopName || !location || !salary || !description || !phone) {
+            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
+            return false;
+        }
+
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
+            return false;
+        }
+        const jobData = {
+            title: title, shopName: shopName, location: location, salary: salary,
+            description: description, phone: phone, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP 
+        };
+
+        window.jobsRef.push(jobData) 
+            .then(() => {
+                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");form.reset(); 
+                if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
+            })
+            .catch((error) => {
+                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
+                console.error("Firebase Job Error:", error);
+            });
+
+        return false;
+    }
+                    
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
