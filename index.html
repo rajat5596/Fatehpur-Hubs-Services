@@ -527,24 +527,6 @@
 
             </div>
 
-            <!-- Navigation Bar -->
-            <div id="nav-bar">
-                <div class="nav-item active" onclick="showScreen('home-screen')">
-                    <i class="fas fa-home"></i> होम
-                </div>
-                <div class="nav-item" onclick="showScreen('add-service-screen')">
-                    <i class="fas fa-tools"></i> सर्विस जोड़ें
-                </div>
-                <div class="nav-item" onclick="showScreen('jobs-screen')">
-                    <i class="fas fa-briefcase"></i> नौकरियाँ
-                </div>
-                <div class="nav-item" onclick="showScreen('share-screen')">
-                    <i class="fas fa-share-alt"></i> शेयर
-                </div>
-            </div>
-
-        </div>
-    </div>
 
     <script>
     const firebaseConfig = {
@@ -1218,6 +1200,24 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                 });
         });
     }
+    <!-- Navigation Bar -->
+            <div id="nav-bar">
+                <div class="nav-item active" onclick="showScreen('home-screen')">
+                    <i class="fas fa-home"></i> होम
+                </div>
+                <div class="nav-item" onclick="showScreen('add-service-screen')">
+                    <i class="fas fa-tools"></i> सर्विस जोड़ें
+                </div>
+                <div class="nav-item" onclick="showScreen('jobs-screen')">
+                    <i class="fas fa-briefcase"></i> नौकरियाँ
+                </div>
+                <div class="nav-item" onclick="showScreen('share-screen')">
+                    <i class="fas fa-share-alt"></i> शेयर
+                </div>
+            </div>
+
+        </div>
+    </div>
     /* --- 1. Ad Container Fixed Style (Nav Bar के ऊपर) --- */
 /* यह एड को Nav Bar (लगभग 60px) के ठीक ऊपर 60px पर चिपकाएगा */
 #ad-container-fixed {
