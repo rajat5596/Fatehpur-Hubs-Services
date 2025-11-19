@@ -1217,23 +1217,13 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         });
     }
             
-<!-- Navigation Bar और Ad Container को </body> से ठीक पहले रखें -->
+<!-- Nav Bar और Ad Container को </body> से ठीक पहले रखें -->
 
 <!-- 1. Ad Container Fixed Style (Nav Bar के ठीक ऊपर) -->
 <div id="ad-container-fixed">
-    <!-- यह ID आपकी CSS में #ad-container-fixed से मैच करती है -->
-    <div id="adsterra-320x50-bottom" style="height:50px;">
-        <!-- Adsterra 320x50 Fixed Ad Code Paste Karein -->
-        <script type="text/javascript">
-            var atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-            document.write('<scr' + 'ipt type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></scr' + 'ipt>');
-        </script>
+    <!-- Adsterra Code को iframe में लोड करने के लिए एक प्लेसहोल्डर div -->
+    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
+        <!-- Ad code will be injected here by the script below -->
     </div>
 </div>
 
@@ -1254,14 +1244,57 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 </div>
 <!-- /div (nav-bar खत्म) -->
 
-<!-- आपकी पुरानी Script, जिसे आपने Nav Bar के ऊपर रखा था -->
-<script>
-    // यह स्क्रिप्ट पहले से ही मौजूद है
+
+<!-- 3. AD LOADER SCRIPT (यह Ad को iframe में लोड करेगी) -->
+<!-- यह स्क्रिप्ट Adsterra कोड को सुरक्षित रूप से iframe में लोड करेगी ताकि Ad दिख सके -->
+<script type="text/javascript">
+    (function() {
+        // Adsterra के ऑप्शन्स
+        var atOptions = { 
+            // **कृपया अपनी Adsterra कुंजी यहाँ बदलें**
+            'key' : '969a80a2e6bea9f00173f36024f32cb2', 
+            'format' : 'iframe', 
+            'height' : 50, 
+            'width' : 320, 
+            'params' : {} 
+        };
+
+        // Adsterra की मेन स्क्रिप्ट URL
+        // **यह URL भी आपकी कुंजी के अनुसार हो सकता है, कृपया इसे अपनी कुंजी के साथ बदलें**
+        var scriptUrl = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js';
+
+        // एड कंटेनर ढूँढना जहाँ कोड डालना है
+        var container = document.getElementById('adsterra-320x50-bottom');
+        
+        // एक नया iframe बनाना
+        var iframe = document.createElement('iframe');
+        iframe.style.width = '320px';
+        iframe.style.height = '50px';
+        iframe.style.border = 'none';
+        iframe.setAttribute('scrolling', 'no');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowtransparency', 'true');
+        iframe.style.margin = '0 auto'; 
+        iframe.style.display = 'block';
+
+        // iframe को कंटेनर में जोड़ना
+        container.appendChild(iframe);
+
+        // iframe के अंदर document.write लॉजिक को अनुकरण करना
+        iframe.onload = function() {
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            // iframe के अंदर Adsterra के ऑप्शन्स और स्क्रिप्ट को लिखना
+            var content = '<!DOCTYPE html><html><head><style>body {margin:0; padding:0;}</style></head><body><script type="text/javascript">var atOptions = ' + JSON.stringify(atOptions) + ';</script>';
+            content += '<script type="text/javascript" src="' + scriptUrl + '"></' + 'script></body></html>';
+            
+            doc.write(content);
+            doc.close();
+        };
+
+    })();
 </script>
 
-<!-- </body> और </html> पहले से ही आपकी फाइल के अंत में हैं -->
-
-    
-    </script>
+            
 </body>
 </html>
