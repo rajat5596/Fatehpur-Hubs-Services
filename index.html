@@ -302,29 +302,32 @@
             font-size: 1rem;
             width: 100%;
         }
-/* --- 1. Ad Container Fixed Style --- */
-/* यह एड को स्क्रीन के बॉटम एज पर चिपकाएगा */
+/* --- STICKY AD & NAV BAR FIXES --- */
+/* 1. Ad Container Fixed Style */
 .fixed-ad-container {
     position: fixed;
     bottom: 0px; 
     left: 0;
     width: 100%;
+    /* ⚠️ यह सबसे महत्वपूर्ण फिक्स है! यह एड के लिए 50px की जगह सुनिश्चित करता है। */
+    height: 50px; 
     z-index: 1000; /* Ad sabse upar rahe */
     text-align: center;
     background-color: #ffffff;
     padding: 0;
     margin: 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
 }
 
-/* --- 2. Navigation Bar (Footer) Adjustment --- */
-/* #nav-bar पहले से fixed है, ab use 50px upar shift karna hai */
+/* 2. Navigation Bar (Footer) Adjustment */
+/* #nav-bar को 50px ऊपर शिफ्ट करना है ताकि Ad के लिए जगह बन जाए */
 #nav-bar {
-    bottom: 50px !important; /* Ad ki height 50px hai, isliye isko 50px upar shift kiya */
-    z-index: 1001; /* Nav bar Ad se bhi upar rahe */
+    bottom: 50px !important; /* Ad की height 50px है */
+    z-index: 1001; /* Nav bar Ad से भी ऊपर रहे */
 }
 
-/* --- 3. Main Content Padding Fix --- */
-/* Content ko upar shift karein taki woh footer aur ad ke peeche na chhupe */
+/* 3. Main Content Padding Fix */
+/* Content को ऊपर शिफ्ट करें ताकि वह Footer और Ad के पीछे न छुपे */
 #mainAppContent {
     /* Nav bar (approx 60px) + Ad (50px) = 110px padding */
     padding-bottom: 110px !important; 
