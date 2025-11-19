@@ -72,7 +72,7 @@
             background-color: #d9363e;
         }
 
-        /* Navigation Bar */
+        /* Navigation Bar - (UPDATED FOR CENTERING) */
         #nav-bar {
             display: flex;
             justify-content: space-around;
@@ -83,7 +83,10 @@
             width: 100%;
             max-width: 420px;
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-            z-index: 10;
+            z-index: 1000;
+            /* Nav Bar को स्क्रीन के केंद्र में लाने के लिए */
+            left: 50%;
+            transform: translateX(-50%);
         }
         .nav-item {
             flex-grow: 1;
@@ -103,7 +106,7 @@
             margin-bottom: 3px;
         }
 
-        /* Main Content Area - UPDATED FOR AD SPACE */
+        /* Main Content Area */
         #mainApp {
             flex-grow: 1;
             overflow-y: auto;
@@ -304,12 +307,11 @@
             width: 100%;
         }
         
-        /* --- STICKY AD FIXES (NEW BLOCK) --- */
+        /* --- STICKY AD FIXES (FINAL BLOCK) --- */
         /* Ad Container Fixed Style: Nav Bar के ठीक ऊपर */
         #ad-container-fixed {
             position: fixed;
             bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px है, इसलिए Ad 60px ऊपर रहेगा */
-            left: 0;
             width: 100%;
             max-width: 420px; /* Mobile कंटेनर के समान चौड़ाई */
             height: 50px; /* Ad की हाइट */
@@ -317,9 +319,9 @@
             text-align: center;
             background-color: #ffffff;
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-            /* सुनिश्चित करें कि यह हमेशा #app-container के केंद्र में रहे */
-            transform: translateX(50%);
-            right: 50%; 
+            /* एड को सेंटर करने के लिए - यह फिक्स पिछले ट्रांसफॉर्म को बदल देगा */
+            left: 50%;
+            transform: translateX(-50%);
         }
 </style>
 
