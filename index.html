@@ -489,7 +489,7 @@
                     </div>
                 </div>
 
-                <!-- 4. SHARE SCREEN -->
+                 <!-- 4. SHARE SCREEN -->
                 <div id="share-screen" class="screen">
                     <div class="ad-card" style="margin-top: 30px; padding: 40px;">
                         <i class="fas fa-share-alt" style="font-size: 3rem; color: #2a5298; margin-bottom: 15px;"></i>
@@ -600,8 +600,7 @@
             alert(`Contact Details:\n${shareText}`);
         }
     }
-
-    // प्रोवाइडर कार्ड रेंडर करें
+          // प्रोवाइडर कार्ड रेंडर करें
     function renderProviderCard(p) {
         return `<div class="profile-card">
             <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
@@ -700,7 +699,9 @@ window.loadCategories = (loadMore = false) => {
         if (itemsToRender.length > 0) {
             providersLastTimestamp = itemsToRender[itemsToRender.length - 1].data.timestamp;
             providersLastKey = itemsToRender[itemsToRender.length - 1].key;
-            // --- AD INJECTION LOGIC (General List - Every 4 Cards) ---
+        } 
+        
+        // --- AD INJECTION LOGIC (General List - Every 4 Cards) ---
         let contentArray = [];
         const adInjectionInterval = 4; // हर 4 कार्ड के बाद एड दिखाएँ
 
@@ -1126,7 +1127,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         };
 
 
-          // 4. OTP सत्यापित करें (लॉगिन स्टेप 2) - सुरक्षा की पुष्टि
+        // 4. OTP सत्यापित करें (लॉगिन स्टेप 2) - सुरक्षा की पुष्टि
         document.getElementById('verifyOtpBtn').onclick = () => {
             const otp = document.getElementById('otpInput').value;
             if (otp.length !== 6) {
