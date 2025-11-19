@@ -526,7 +526,53 @@
                 </div>
 
             </div>
+<!-- Navigation Bar -->
+            <div id="nav-bar">
+                <div class="nav-item active" onclick="showScreen('home-screen')">
+                    <i class="fas fa-home"></i> होम
+                </div>
+                <div class="nav-item" onclick="showScreen('add-service-screen')">
+                    <i class="fas fa-tools"></i> सर्विस जोड़ें
+                </div>
+                <div class="nav-item" onclick="showScreen('jobs-screen')">
+                    <i class="fas fa-briefcase"></i> नौकरियाँ
+                </div>
+                <div class="nav-item" onclick="showScreen('share-screen')">
+                    <i class="fas fa-share-alt"></i> शेयर
+                </div>
+            </div>
 
+        </div>
+    </div>
+    /* --- 1. Ad Container Fixed Style (Nav Bar के ऊपर) --- */
+/* यह एड को Nav Bar (लगभग 60px) के ठीक ऊपर 60px पर चिपकाएगा */
+#ad-container-fixed {
+    position: fixed;
+    bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px */
+    left: 0;
+    width: 100%;
+    z-index: 1001; /* Ad Nav Bar (1000) से ऊपर रहेगा */
+    text-align: center;
+    background-color: #ffffff;
+    height: 50px; /* Ad की निश्चित ऊँचाई */
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 2. Main Content Padding Fix --- */
+/* Content को ऊपर शिफ्ट करे ताकि वह Nav Bar (60px) और Ad (50px) = 110px के पीछे न छुप जाए */
+#mainAppContent {
+    padding-bottom: 110px !important; 
+    box-sizing: border-box;
+}
+
+/* --- 3. Nav Bar Fix (सुनिश्चित करने के लिए) --- */
+/* यह सुनिश्चित करता है कि Nav Bar bottom: 0 पर रहे और Ad से नीचे न दबे */
+#nav-bar {
+    z-index: 1000; 
+    /* bottom: 0 पहले से होगा */
+                                }
 
     <script>
     const firebaseConfig = {
@@ -1167,53 +1213,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                     document.getElementById('loginMsg').innerHTML = "<span style='color:red'>❌ ग़लत OTP! कृपया सही 6 अंक का OTP डालें।</span>";
                 });
         };
-<!-- Navigation Bar -->
-            <div id="nav-bar">
-                <div class="nav-item active" onclick="showScreen('home-screen')">
-                    <i class="fas fa-home"></i> होम
-                </div>
-                <div class="nav-item" onclick="showScreen('add-service-screen')">
-                    <i class="fas fa-tools"></i> सर्विस जोड़ें
-                </div>
-                <div class="nav-item" onclick="showScreen('jobs-screen')">
-                    <i class="fas fa-briefcase"></i> नौकरियाँ
-                </div>
-                <div class="nav-item" onclick="showScreen('share-screen')">
-                    <i class="fas fa-share-alt"></i> शेयर
-                </div>
-            </div>
 
-        </div>
-    </div>
-    /* --- 1. Ad Container Fixed Style (Nav Bar के ऊपर) --- */
-/* यह एड को Nav Bar (लगभग 60px) के ठीक ऊपर 60px पर चिपकाएगा */
-#ad-container-fixed {
-    position: fixed;
-    bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px */
-    left: 0;
-    width: 100%;
-    z-index: 1001; /* Ad Nav Bar (1000) से ऊपर रहेगा */
-    text-align: center;
-    background-color: #ffffff;
-    height: 50px; /* Ad की निश्चित ऊँचाई */
-    padding: 0;
-    margin: 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* --- 2. Main Content Padding Fix --- */
-/* Content को ऊपर शिफ्ट करे ताकि वह Nav Bar (60px) और Ad (50px) = 110px के पीछे न छुप जाए */
-#mainAppContent {
-    padding-bottom: 110px !important; 
-    box-sizing: border-box;
-}
-
-/* --- 3. Nav Bar Fix (सुनिश्चित करने के लिए) --- */
-/* यह सुनिश्चित करता है कि Nav Bar bottom: 0 पर रहे और Ad से नीचे न दबे */
-#nav-bar {
-    z-index: 1000; 
-    /* bottom: 0 पहले से होगा */
-                                }
         // एक्स्ट्रा फंक्शन
         window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
         window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
