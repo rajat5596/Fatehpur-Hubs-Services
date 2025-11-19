@@ -1194,31 +1194,29 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         });
     }
 </script>
-    
-    </script>
 
-<!-- BOTTOM ADS & NAV BAR -->
-<div id="sticky-bottom-ad-container" style="position:fixed; bottom:60px; left:50%; transform:translateX(-50%); width:100%; max-width:420px; height:60px; z-index:9998; text-align:center; background:white; padding:5px 0;">
-    <div id="adsterra-320x50-bottom" style="height:60px; width:320px; margin:0 auto;">
+<!-- BOTTOM ADS & NAV BAR - THIN VERSION -->
+<div id="sticky-bottom-ad-container" style="position:fixed; bottom:50px; left:50%; transform:translateX(-50%); width:100%; max-width:420px; height:50px; z-index:9998; text-align:center; background:white; padding:3px 0;">
+    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin:0 auto;">
         Loading ad...
     </div>
 </div>
 
-<div id="nav-bar" style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:#2c3e50; display:flex; padding:10px 0; z-index:9999;">
-    <div style="flex:1; text-align:center; color:white; font-size:12px;" onclick="showScreen('home-screen')">
-        <i class="fas fa-home"></i>
+<div id="nav-bar" style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:#2c3e50; display:flex; padding:8px 0; z-index:9999;">
+    <div style="flex:1; text-align:center; color:white; font-size:11px;" onclick="showScreen('home-screen')">
+        <i class="fas fa-home" style="font-size:16px;"></i>
         <div>होम</div>
     </div>
-    <div style="flex:1; text-align:center; color:white; font-size:12px;" onclick="showScreen('add-service-screen')">
-        <i class="fas fa-tools"></i>
+    <div style="flex:1; text-align:center; color:white; font-size:11px;" onclick="showScreen('add-service-screen')">
+        <i class="fas fa-tools" style="font-size:16px;"></i>
         <div>सर्विस</div>
     </div>
-    <div style="flex:1; text-align:center; color:white; font-size:12px;" onclick="showScreen('jobs-screen')">
-        <i class="fas fa-briefcase"></i>
+    <div style="flex:1; text-align:center; color:white; font-size:11px;" onclick="showScreen('jobs-screen')">
+        <i class="fas fa-briefcase" style="font-size:16px;"></i>
         <div>नौकरियाँ</div>
     </div>
-    <div style="flex:1; text-align:center; color:white; font-size:12px;" onclick="showScreen('share-screen')">
-        <i class="fas fa-share-alt"></i>
+    <div style="flex:1; text-align:center; color:white; font-size:11px;" onclick="showScreen('share-screen')">
+        <i class="fas fa-share-alt" style="font-size:16px;"></i>
         <div>शेयर</div>
     </div>
 </div>
@@ -1231,7 +1229,7 @@ setTimeout(function() {
         var atOptions = {
             'key' : '969a80a2e6bea9f00173f36024f52cb2',
             'format' : 'iframe',
-            'height' : 60,
+            'height' : 50,  <!-- 60 → 50 -->
             'width' : 320,
             'params' : {}
         };
@@ -1242,7 +1240,5 @@ setTimeout(function() {
 }, 1000);
 </script>
 
-</body>
-</html>
 </body>
 </html>
