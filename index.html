@@ -302,32 +302,49 @@
             font-size: 1rem;
             width: 100%;
         }
-        /* --- Ad को Nav Bar के ठीक ऊपर चिपकाने के लिए --- */
-.ad-above-nav {
+        <!--
+    आपके मौजूदा CSS को देखते हुए, Nav Bar (id="nav-bar") की default height लगभग 60px है।
+    एड कंटेनर की हाइट 50px है।
+    इसलिए Main Content को 60px (Nav Bar) + 50px (Ad) = 110px का पैडिंग दिया जाएगा।
+-->
+<style>
+/* ... (Existing CSS from line 1 to ~300) ... */
+
+/* --- STICKY AD & NAV BAR FIXES --- */
+
+/* 1. Ad Container Fixed Style */
+#ad-container-fixed {
     position: fixed;
-    /* Nav Bar की height लगभग 60px है। Ad को उसके ऊपर चिपकाओ। */
-    bottom: 60px; 
+    bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px है, इसलिए Ad 60px ऊपर रहेगा */
     left: 0;
     width: 100%;
-    z-index: 11; /* Nav Bar (z-index 10) से ऊपर रहेगा */
+    height: 50px; /* Ad की हाइट */
+    z-index: 1001; /* Ad सबसे ऊपर रहेगा */
     text-align: center;
     background-color: #ffffff;
-    height: 50px; /* Ad की निश्चित ऊँचाई */
     padding: 0;
     margin: 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Content Padding Fix (अगर ज़रूरी हो) --- */
-/* अगर मेन कंटेंट Nav Bar के नीचे छिप रहा था (जो 60px है), 
-   तो अब Nav Bar + Ad (60px + 50px) = 110px की padding चाहिए। 
-   अगर आपका कंटेंट पहले से ही सही दिख रहा है, तो इसे छोड़ सकते हैं, 
-   लेकिन सुरक्षित रहने के लिए इसे जोड़ दें। */
+/* 2. Nav Bar (Footer) Adjustment */
+/* Nav Bar अपनी जगह पर ही fixed bottom: 0 पर रहेगा */
+#nav-bar {
+    bottom: 0px !important; 
+    z-index: 1000; /* Ad से थोड़ा नीचे, पर fixed */
+}
+
+/* 3. Main Content Padding Fix */
+/* Content को ऊपर शिफ्ट करे ताकि वह Footer और Ad के पीछे न छुपे */
 #mainAppContent {
-    padding-bottom: 110px !important; 
+    padding-bottom: 110px !important; /* Nav Bar (approx 60px) + Ad (50px) = 110px padding */
     box-sizing: border-box;
 }
 
-    </style>
+</style>
+<!-- ... (Rest of CSS and HTML) ... -->
+
+    
 </head>
 <body>
     <div id="app-container">
