@@ -1176,11 +1176,21 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     }
 </script>
 
-<!-- BOTTOM ADS & NAV BAR - FIXED DISPLAY -->
+<!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
 <div style="position:fixed; bottom:50px; left:0; right:0; z-index:9998; padding:0;">
     <div style="width:100%; max-width:500px; margin:0 auto;">
-        <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto; overflow:hidden; background:transparent;">
-            <!-- Ads will show here -->
+        <div class="ad-container" style="width:320px; height:50px; margin:0 auto; text-align:center;">
+            <!-- Ad Script: EXACTLY like middle ads -->
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '969a80a2e6bea9f00173f36024f32cb2',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"></script>
         </div>
     </div>
 </div>
@@ -1205,50 +1215,6 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         </div>
     </div>
 </div>
-
-<script>
-// Final fix for ads display
-setTimeout(function() {
-    var container = document.getElementById('adsterra-320x50-bottom');
-    if(container) {
-        // EXACTLY same method as top ads
-        var adScript = document.createElement('script');
-        adScript.innerHTML = `
-            atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f32cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        `;
-        document.head.appendChild(adScript);
-        
-        var invokeScript = document.createElement('script');
-        invokeScript.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js';
-        document.head.appendChild(invokeScript);
-        
-        // Check and force display
-        setTimeout(function() {
-            var iframes = container.getElementsByTagName('iframe');
-            if(iframes.length > 0) {
-                console.log('✅ Bottom ads iframe found');
-                // Force iframe display
-                for(var i = 0; i < iframes.length; i++) {
-                    iframes[i].style.width = '320px';
-                    iframes[i].style.height = '50px';
-                    iframes[i].style.border = 'none';
-                    iframes[i].style.display = 'block';
-                    iframes[i].style.visibility = 'visible';
-                }
-            } else {
-                console.log('❌ No iframe found in bottom ads');
-                container.innerHTML = '<div style="width:320px; height:50px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#666;">Ad Space</div>';
-            }
-        }, 2000);
-    }
-}, 1000);
-</script>
 
 </body>
 </html>
