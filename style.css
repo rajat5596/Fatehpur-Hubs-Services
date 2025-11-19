@@ -644,3 +644,73 @@ input[type="tel"]:focus, input[type="text"]:focus {
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
+
+/* === FIXED BOTTOM ADS & NAV BAR === */
+/* 1. Bottom Ad Container */
+.fixed-ad-container {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 500px;
+    height: 50px;
+    z-index: 9998;
+    text-align: center;
+    background-color: #ffffff;
+    padding: 5px 0;
+    margin: 0 auto;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. Navigation Bar */
+#nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 500px;
+    background: #2c3e50;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 9999;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    height: 60px;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+/* Nav Items */
+.nav-item {
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    flex: 1;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 3px;
+}
+
+.nav-item.active {
+    color: #3498db;
+}
+
+/* 3. Main Content Fix */
+.app-container {
+    padding-bottom: 120px !important;
+}
+
+/* 4. Ensure Content Visibility */
+#home-screen {
+    display: block !important;
+    padding-top: 0 !important;
+}
