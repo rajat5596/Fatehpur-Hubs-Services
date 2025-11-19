@@ -103,11 +103,12 @@
             margin-bottom: 3px;
         }
 
-        /* Main Content Area */
+        /* Main Content Area - UPDATED FOR AD SPACE */
         #mainApp {
             flex-grow: 1;
             overflow-y: auto;
-            padding-bottom: 60px; /* Space for fixed navbar */
+            /* Nav Bar (60px) + Ad (50px) = 110px के लिए जगह */
+            padding-bottom: 110px; 
         }
         .screen {
             display: none;
@@ -302,47 +303,25 @@
             font-size: 1rem;
             width: 100%;
         }
-        <!--
-    आपके मौजूदा CSS को देखते हुए, Nav Bar (id="nav-bar") की default height लगभग 60px है।
-    एड कंटेनर की हाइट 50px है।
-    इसलिए Main Content को 60px (Nav Bar) + 50px (Ad) = 110px का पैडिंग दिया जाएगा।
--->
-<style>
-/* ... (Existing CSS from line 1 to ~300) ... */
-
-/* --- STICKY AD & NAV BAR FIXES --- */
-
-/* 1. Ad Container Fixed Style */
-#ad-container-fixed {
-    position: fixed;
-    bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px है, इसलिए Ad 60px ऊपर रहेगा */
-    left: 0;
-    width: 100%;
-    height: 50px; /* Ad की हाइट */
-    z-index: 1001; /* Ad सबसे ऊपर रहेगा */
-    text-align: center;
-    background-color: #ffffff;
-    padding: 0;
-    margin: 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* 2. Nav Bar (Footer) Adjustment */
-/* Nav Bar अपनी जगह पर ही fixed bottom: 0 पर रहेगा */
-#nav-bar {
-    bottom: 0px !important; 
-    z-index: 1000; /* Ad से थोड़ा नीचे, पर fixed */
-}
-
-/* 3. Main Content Padding Fix */
-/* Content को ऊपर शिफ्ट करे ताकि वह Footer और Ad के पीछे न छुपे */
-#mainAppContent {
-    padding-bottom: 110px !important; /* Nav Bar (approx 60px) + Ad (50px) = 110px padding */
-    box-sizing: border-box;
-}
-
+        
+        /* --- STICKY AD FIXES (NEW BLOCK) --- */
+        /* Ad Container Fixed Style: Nav Bar के ठीक ऊपर */
+        #ad-container-fixed {
+            position: fixed;
+            bottom: 60px; /* Nav Bar की अनुमानित ऊँचाई 60px है, इसलिए Ad 60px ऊपर रहेगा */
+            left: 0;
+            width: 100%;
+            max-width: 420px; /* Mobile कंटेनर के समान चौड़ाई */
+            height: 50px; /* Ad की हाइट */
+            z-index: 1001; /* Ad सबसे ऊपर रहेगा */
+            text-align: center;
+            background-color: #ffffff;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            /* सुनिश्चित करें कि यह हमेशा #app-container के केंद्र में रहे */
+            transform: translateX(50%);
+            right: 50%; 
+        }
 </style>
-<!-- ... (Rest of CSS and HTML) ... -->
 
     
 </head>
@@ -1217,8 +1196,6 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         });
     }
             
-<!-- Nav Bar और Ad Container को </body> से ठीक पहले रखें -->
-
 <!-- 1. Ad Container Fixed Style (Nav Bar के ठीक ऊपर) -->
 <div id="ad-container-fixed">
     <!-- Adsterra Code को iframe में लोड करने के लिए एक प्लेसहोल्डर div -->
@@ -1227,25 +1204,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     </div>
 </div>
 
-<!-- 2. FOOTER NAVIGATION MENU (Nav Bar) -->
-<div id="nav-bar">
-    <div class="nav-item active" onclick="showScreen('home-screen')">
-        <i class="fas fa-home"></i> होम
-    </div>
-    <div class="nav-item" onclick="showScreen('add-service-screen')">
-        <i class="fas fa-tools"></i> सर्विस जोड़ें
-    </div>
-    <div class="nav-item" onclick="showScreen('jobs-screen')">
-        <i class="fas fa-briefcase"></i> नौकरियाँ
-    </div>
-    <div class="nav-item" onclick="showScreen('share-screen')">
-        <i class="fas fa-share-alt"></i> शेयर
-    </div>
-</div>
-<!-- /div (nav-bar खत्म) -->
-
-
-<!-- 3. AD LOADER SCRIPT (यह Ad को iframe में लोड करेगी) -->
+<!-- 2. AD LOADER SCRIPT (यह Ad को iframe में लोड करेगी) -->
 <!-- यह स्क्रिप्ट Adsterra कोड को सुरक्षित रूप से iframe में लोड करेगी ताकि Ad दिख सके -->
 <script type="text/javascript">
     (function() {
@@ -1260,7 +1219,6 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         };
 
         // Adsterra की मेन स्क्रिप्ट URL
-        // **यह URL भी आपकी कुंजी के अनुसार हो सकता है, कृपया इसे अपनी कुंजी के साथ बदलें**
         var scriptUrl = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js';
 
         // एड कंटेनर ढूँढना जहाँ कोड डालना है
@@ -1293,6 +1251,24 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         };
 
     })();
+
+<!-- 2. FOOTER NAVIGATION MENU (Nav Bar) -->
+<div id="nav-bar">
+    <div class="nav-item active" onclick="showScreen('home-screen')">
+        <i class="fas fa-home"></i> होम
+    </div>
+    <div class="nav-item" onclick="showScreen('add-service-screen')">
+        <i class="fas fa-tools"></i> सर्विस जोड़ें
+    </div>
+    <div class="nav-item" onclick="showScreen('jobs-screen')">
+        <i class="fas fa-briefcase"></i> नौकरियाँ
+    </div>
+    <div class="nav-item" onclick="showScreen('share-screen')">
+        <i class="fas fa-share-alt"></i> शेयर
+    </div>
+</div>
+<!-- /div (nav-bar खत्म) -->
+
 </script>
 
             
