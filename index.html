@@ -13,63 +13,297 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script type="text/javascript" src="ads.js"></script>
-        <!-- BOTTOM AD CONTAINER -->
-<div id="sticky-bottom-ad-container" class="fixed-ad-container">
-    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
-        Loading ad...
-    </div>
-</div>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-<!-- NAVIGATION BAR -->
-<div id="nav-bar">
-    <div class="nav-item active" onclick="showScreen('home-screen')">
-        <i class="fas fa-home"></i>
-        <span>होम</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('add-service-screen')">
-        <i class="fas fa-tools"></i>
-        <span>सर्विस जोड़ें</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('jobs-screen')">
-        <i class="fas fa-briefcase"></i>
-        <span>नौकरियाँ</span>
-    </div>
-    <div class="nav-item" onclick="showScreen('share-screen')">
-        <i class="fas fa-share-alt"></i>
-        <span>शेयर</span>
-    </div>
-</div>
+        /* Container for mobile simulation */
+        #app-container {
+            width: 100%;
+            max-width: 420px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-<!-- AD LOADER SCRIPT -->
-<script>
-// Simple ad loader
-setTimeout(function() {
-    var container = document.getElementById('adsterra-320x50-bottom');
-    if(container) {
-        // Simple ad implementation
-        container.innerHTML = '<div style="width:320px; height:50px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px;">Advertisement Space</div>';
-        
-        // Optional: Load actual ad after 2 seconds
-        setTimeout(function() {
-            try {
-                var atOptions = {
-                    'key' : '969a80a2e6bea9f00173f36024f52cb2',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
-                document.head.appendChild(script);
-            } catch(e) {
-                console.log('Ad loading failed');
-            }
-        }, 2000);
-    }
-}, 1000);
-</script>
+        /* Header Style */
+        #app-header {
+            background-color: #2a5298; /* Dark Blue */
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .logout-btn {
+            background-color: #ff4d4f; /* Red for emphasis */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .logout-btn:hover {
+            background-color: #d9363e;
+        }
+
+        /* Navigation Bar */
+        #nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+        .nav-item {
+            flex-grow: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            color: #777;
+            font-size: 0.75rem;
+            transition: color 0.2s;
+        }
+        .nav-item.active {
+            color: #2a5298;
+        }
+        .nav-item i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        /* Main Content Area */
+        #mainApp {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 60px; /* Space for fixed navbar */
+        }
+        .screen {
+            display: none;
+            padding: 15px;
+            min-height: 100%;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Registration Screen Style */
+        #registrationScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+            height: 100vh;
+        }
+        #registrationScreen h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+        }
+        .input-group, #otpSection {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .main-btn {
+            background-color: #2a5298;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .main-btn:hover {
+            background-color: #1e3a66;
+        }
+        #loginMsg {
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        /* Home/List Styles */
+        #mistri-categories {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 0;
+            white-space: nowrap;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .cat-btn {
+            padding: 8px 15px;
+            margin-right: 10px;
+            background-color: #e5e7eb;
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+        .cat-btn.selected {
+            background-color: #2a5298;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Search Bar */
+        #search-container {
+            margin-bottom: 15px;
+        }
+        #main-search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #ffc107; /* Yellow border for Providers */
+        }
+        .profile-card h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+        .profile-card p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .whatsapp-btn, .contact-btn, .share-btn {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .whatsapp-btn {
+            background-color: #25d366;
+            color: white;
+        }
+        .contact-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .share-btn {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        /* Promotion Ad Card */
+        .ad-card {
+            background-color: #e3f2fd; /* Light blue */
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 1px dashed #2a5298;
+        }
+        .ad-card button {
+            background-color: #ff9800;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .form-container h3 {
+            color: #2a5298;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .form-field input, .form-field select, .form-field textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+        .submit-btn {
+            background-color: #4caf50; /* Green submit button */
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+    </style>
 </head>
 <body>
     <div id="app-container">
@@ -243,7 +477,7 @@ setTimeout(function() {
                             </div>
                             <div class="form-field">
                                 <label for="jobDescription">जॉब का विवरण (Details)</label>
-               <textarea id="jobDescription" rows="3" required></textarea>
+                                <textarea id="jobDescription" rows="3" required></textarea>
                             </div>
                             <button type="submit" class="submit-btn" style="background-color: #ff9800;">जॉब पोस्ट करें</button>
                         </form>
@@ -268,37 +502,27 @@ setTimeout(function() {
                 </div>
 
             </div>
-        </div>
 
-        <!-- ******************** FOOTER ADS & NAV BAR ******************** -->
-        <!-- 1. BOTTOM STICKY AD CONTAINER (320x50) -->
-        <div id="sticky-bottom-ad-container" class="fixed-ad-container">
-            <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
-                <!-- Ad code will be injected here by the script below -->
+            <!-- Navigation Bar -->
+            <div id="nav-bar">
+                <div class="nav-item active" onclick="showScreen('home-screen')">
+                    <i class="fas fa-home"></i> होम
+                </div>
+                <div class="nav-item" onclick="showScreen('add-service-screen')">
+                    <i class="fas fa-tools"></i> सर्विस जोड़ें
+                </div>
+                <div class="nav-item" onclick="showScreen('jobs-screen')">
+                    <i class="fas fa-briefcase"></i> नौकरियाँ
+                </div>
+                <div class="nav-item" onclick="showScreen('share-screen')">
+                    <i class="fas fa-share-alt"></i> शेयर
+                </div>
             </div>
-        </div>
 
-        <!-- 2. FOOTER NAVIGATION MENU (Nav Bar) -->
-        <div id="nav-bar">
-            <div class="nav-item active" onclick="showScreen('home-screen')">
-                <i class="fas fa-home"></i>
-                <span>होम</span>
-            </div>
-            <div class="nav-item" onclick="showScreen('add-service-screen')">
-                <i class="fas fa-tools"></i>
-                <span>सर्विस जोड़ें</span>
-            </div>
-            <div class="nav-item" onclick="showScreen('jobs-screen')">
-                <i class="fas fa-briefcase"></i>
-                <span>नौकरियाँ</span>
-            </div>
-            <div class="nav-item" onclick="showScreen('share-screen')">
-                <i class="fas fa-share-alt"></i>
-                <span>शेयर</span>
-            </div>
         </div>
     </div>
-        <script>
+
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
         authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -546,8 +770,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
 
     if (itemsToRender.length > 0) {
-        
-        // --- AD INJECTION LOGIC (Filtered List - Every 4 Cards) ---
+// --- AD INJECTION LOGIC (Filtered List - Every 4 Cards) ---
         let contentArray = [];
         const adInjectionInterval = 4; // हर 4 कार्ड के बाद एड दिखाएँ
 
@@ -757,7 +980,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
             // यदि फ़ोन नंबर यूनीक है, तो डेटा पुश करें
             const providerData = {
-                name: name, phone: phone, category: category, area: area,experience: experience + ' years',
+                name: name, phone: phone, category: category, area: area,
+                experience: experience + ' years',
                 timestamp: firebase.database.ServerValue.TIMESTAMP 
             };
 
@@ -767,7 +991,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                     form.reset(); 
                     loadCategories(); 
                 })
-                .catch((error) => { alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
+                .catch((error) => {
+                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
                     console.error("Firebase Error:", error);
                 });
         });
@@ -779,11 +1004,14 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     // जॉब पोस्ट रजिस्टर करने का फंक्शन
     function jobRegister() {
         const title = document.getElementById('jobTitle').value;
-        const shopName = document.getElementById('jobShopName').value;const location = document.getElementById('jobLocation').value;
+        const shopName = document.getElementById('jobShopName').value;
+        const location = document.getElementById('jobLocation').value;
         const salary = document.getElementById('jobSalary').value;
         const description = document.getElementById('jobDescription').value;
         const phone = document.getElementById('jobPhone').value;
-        const form = document.getElementById('jobForm');if (!title || !shopName || !location || !salary || !description || !phone) {
+        const form = document.getElementById('jobForm');
+
+        if (!title || !shopName || !location || !salary || !description || !phone) {
             alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
             return false;
         }
@@ -792,6 +1020,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
             alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
             return false;
         }
+
         const jobData = {
             title: title, shopName: shopName, location: location, salary: salary,
             description: description, phone: phone, 
@@ -800,7 +1029,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
         window.jobsRef.push(jobData) 
             .then(() => {
-                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");form.reset(); 
+                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
+                form.reset(); 
                 if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
             })
             .catch((error) => {
@@ -810,7 +1040,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
         return false;
     }
-                    
+        
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
@@ -942,77 +1172,17 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
             if(id === 'jobs-screen') loadJobs();
             if(id === 'home-screen') loadCategories(); 
         };
+        // PWA सेटअप
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // service worker registration logic goes here
+            });
+        }
     };
-
-    // ******************** BOTTOM AD LOADER SCRIPT ********************
-    (function() {
-        // Wait for page to load completely
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadBottomAd);
-        } else {
-            loadBottomAd();
-        }
-
-        function loadBottomAd() {
-            var atOptions = {
-                'key': '969a80a2e6bea9f00173f36024f52cb2',
-                'format': 'iframe',
-                'height': 50,
-                'width': 320,
-                'params': {}
-            };
-
-            var container = document.getElementById('adsterra-320x50-bottom');
-            
-            if (!container) {
-                console.error('Bottom ad container not found');
-                return;
-            }
-
-            // Clear container first
-            container.innerHTML = '';
-
-            var iframe = document.createElement('iframe');
-            iframe.style.width = '320px';
-            iframe.style.height = '50px';
-            iframe.style.border = 'none';
-            iframe.style.margin = '0 auto';
-            iframe.style.display = 'block';
-            iframe.setAttribute('scrolling', 'no');
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allowtransparency', 'true');
-
-            container.appendChild(iframe);
-
-            // Add loading indicator
-            container.innerHTML += '<div style="text-align:center; color:#666; font-size:12px; padding:15px 0;">Loading ad...</div>';
-
-            iframe.onload = function() {
-                try {
-                    var doc = iframe.contentWindow.document;
-                    doc.open();
-                    var content = '<!DOCTYPE html><html><head><title>Ad</title><style>body{margin:0;padding:0;overflow:hidden;}</style></head><body>';
-                    content += '<script>var atOptions = ' + JSON.stringify(atOptions) + ';<\/script>';
-                    content += '<script src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>';
-                    content += '</body></html>';
-                    doc.write(content);
-                    doc.close();
-                } catch (e) {
-                    console.error('Error loading bottom ad:', e);
-                    container.innerHTML = '<div style="text-align:center; color:#999; font-size:12px; padding:15px 0;">Ad not available</div>';
-                }
-            };
-
-            // Fallback in case iframe fails to load
-            setTimeout(function() {
-                if (container.querySelector('iframe') && !container.querySelector('iframe').contentWindow.document.body.innerHTML) {
-                    container.innerHTML = '<div style="text-align:center; color:#999; font-size:12px; padding:15px 0;">Ad not available</div>';
-                }
-            }, 3000);
-        }
-    })();
-
-    // Service Worker Registration
+    </script>
+    <script type="text/javascript" src="ads.js"></script>
+<script>
+    // Service Worker Registration (यह सुनिश्चित करता है कि आपकी PWA ठीक से काम करे)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
@@ -1024,8 +1194,6 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                 });
         });
     }
-    </script>
-
-<script type="text/javascript" src="ads.js"></script>
+</script>
 </body>
 </html>
