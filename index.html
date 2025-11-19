@@ -13,340 +13,65 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script type="text/javascript" src="ads.js"></script>
-    <style>
-        /* Base styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        <!-- ******************** BOTTOM AD LOADER SCRIPT ******************** -->
+    <script type="text/javascript">
+    (function() {
+        function loadBottomAd() {
+            var atOptions = {
+                'key': '969a80a2e6bea9f00173f36024f52cb2',
+                'format': 'iframe',
+                'height': 50,
+                'width': 320,
+                'params': {}
+            };
+
+            var container = document.getElementById('adsterra-320x50-bottom');
+            
+            if (!container) {
+                console.log('Bottom ad container not found, retrying...');
+                setTimeout(loadBottomAd, 1000);
+                return;
+            }
+
+            // Clear container first
+            container.innerHTML = '';
+
+            // Create direct script injection (simpler method)
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
+            
+            // Create ad container div
+            var adDiv = document.createElement('div');
+            adDiv.id = 'adsterra-ad';
+            adDiv.style.width = '320px';
+            adDiv.style.height = '50px';
+            adDiv.style.margin = '0 auto';
+            adDiv.style.textAlign = 'center';
+            
+            container.appendChild(adDiv);
+            
+            // Add the script
+            document.head.appendChild(script);
+            
+            // Fallback if ad doesn't load
+            setTimeout(function() {
+                if (adDiv.innerHTML === '' || adDiv.innerHTML.includes('adsterra-ad')) {
+                    adDiv.innerHTML = '<div style="color:#666; text-align:center; padding:15px 0; font-size:12px;">Advertisement</div>';
+                }
+            }, 2000);
         }
 
-        /* Container for mobile simulation */
-        #app-container {
-            width: 100%;
-            max-width: 420px;
-            background-color: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            position: relative;
+        // Wait for page to load completely
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(loadBottomAd, 1000);
+            });
+        } else {
+            setTimeout(loadBottomAd, 1000);
         }
-
-        /* Header Style */
-        #app-header {
-            background-color: #2a5298;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .logout-btn {
-            background-color: #ff4d4f;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .logout-btn:hover {
-            background-color: #d9363e;
-        }
-
-        /* Main Content Area */
-        #mainApp {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-bottom: 120px; /* Space for nav bar + ad */
-        }
-        .screen {
-            display: none;
-            padding: 15px;
-            min-height: 100%;
-        }
-        .screen.active {
-            display: block;
-        }
-
-        /* Registration Screen Style */
-        #registrationScreen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            text-align: center;
-            height: 100vh;
-        }
-        #registrationScreen h2 {
-            color: #2a5298;
-            margin-bottom: 20px;
-        }
-        .input-group, #otpSection {
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        .main-btn {
-            background-color: #2a5298;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: background-color 0.2s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .main-btn:hover {
-            background-color: #1e3a66;
-        }
-        #loginMsg {
-            margin-top: 15px;
-            font-weight: 600;
-        }
-
-        /* Home/List Styles */
-        #mistri-categories {
-            display: flex;
-            overflow-x: auto;
-            padding: 10px 0;
-            white-space: nowrap;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .cat-btn {
-            padding: 8px 15px;
-            margin-right: 10px;
-            background-color: #e5e7eb;
-            color: #333;
-            border: none;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            flex-shrink: 0;
-        }
-        .cat-btn.selected {
-            background-color: #2a5298;
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Search Bar */
-        #search-container {
-            margin-bottom: 15px;
-        }
-        #main-search-bar {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        /* Profile Card */
-        .profile-card {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid #ffc107;
-        }
-        .profile-card h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
-        }
-        .profile-card p {
-            margin: 0;
-            font-size: 0.9rem;
-        }
-        .whatsapp-btn, .contact-btn, .share-btn {
-            padding: 8px 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-        .whatsapp-btn {
-            background-color: #25d366;
-            color: white;
-        }
-        .contact-btn {
-            background-color: #007bff;
-            color: white;
-        }
-        .share-btn {
-            background-color: #9c27b0;
-            color: white;
-        }
-
-        /* Promotion Ad Card */
-        .ad-card {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            border: 1px dashed #2a5298;
-        }
-        .ad-card button {
-            background-color: #ff9800;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-
-        /* Form Styles */
-        .form-container {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-        }
-        .form-container h3 {
-            color: #2a5298;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-            margin-top: 0;
-        }
-        .form-field {
-            margin-bottom: 15px;
-        }
-        .form-field label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-        .form-field input, .form-field select, .form-field textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 0.95rem;
-        }
-        .submit-btn {
-            background-color: #4caf50;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        /* --- STICKY AD & NAV BAR FIXES --- */
-        /* 1. Ad Container Fixed Style */
-        .fixed-ad-container {
-            position: fixed;
-            bottom: 60px;
-            left: 0;
-            right: 0;
-            width: 100%;
-            max-width: 420px;
-            height: 50px;
-            z-index: 9998;
-            text-align: center;
-            background-color: #ffffff;
-            padding: 5px 0;
-            margin: 0 auto;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 2. Navigation Bar Fixed at Bottom */
-        #nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            max-width: 420px;
-            background: #2c3e50;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 9999;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            height: 60px;
-            box-sizing: border-box;
-            margin: 0 auto;
-        }
-
-        /* Nav Items Styling */
-        .nav-item {
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            flex: 1;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
-        }
-
-        .nav-item i {
-            font-size: 18px;
-            margin-bottom: 3px;
-        }
-
-        .nav-item.active {
-            color: #3498db;
-        }
-
-        /* 3. Main Content Padding Fix */
-        #mainAppContent {
-            padding-bottom: 20px;
-            box-sizing: border-box;
-            min-height: calc(100vh - 120px);
-        }
-
-        /* 4. Ensure proper heights */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-    </style>
+    })();
+    </script>
 </head>
 <body>
     <div id="app-container">
