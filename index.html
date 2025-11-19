@@ -1029,7 +1029,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
             if (snapshot.exists()) {
                 alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
-                return;
+                return;false;
+            }
                 
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
