@@ -302,7 +302,34 @@
             font-size: 1rem;
             width: 100%;
         }
+/* --- 1. Ad Container Fixed Style --- */
+/* यह एड को स्क्रीन के बॉटम एज पर चिपकाएगा */
+.fixed-ad-container {
+    position: fixed;
+    bottom: 0px; 
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ad sabse upar rahe */
+    text-align: center;
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
 
+/* --- 2. Navigation Bar (Footer) Adjustment --- */
+/* #nav-bar पहले से fixed है, ab use 50px upar shift karna hai */
+#nav-bar {
+    bottom: 50px !important; /* Ad ki height 50px hai, isliye isko 50px upar shift kiya */
+    z-index: 1001; /* Nav bar Ad se bhi upar rahe */
+}
+
+/* --- 3. Main Content Padding Fix --- */
+/* Content ko upar shift karein taki woh footer aur ad ke peeche na chhupe */
+#mainAppContent {
+    /* Nav bar (approx 60px) + Ad (50px) = 110px padding */
+    padding-bottom: 110px !important; 
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -502,25 +529,6 @@
                 </div>
 
             </div>
-
-            <!-- Navigation Bar -->
-            <div id="nav-bar">
-                <div class="nav-item active" onclick="showScreen('home-screen')">
-                    <i class="fas fa-home"></i> होम
-                </div>
-                <div class="nav-item" onclick="showScreen('add-service-screen')">
-                    <i class="fas fa-tools"></i> सर्विस जोड़ें
-                </div>
-                <div class="nav-item" onclick="showScreen('jobs-screen')">
-                    <i class="fas fa-briefcase"></i> नौकरियाँ
-                </div>
-                <div class="nav-item" onclick="showScreen('share-screen')">
-                    <i class="fas fa-share-alt"></i> शेयर
-                </div>
-            </div>
-
-        </div>
-    </div>
 
     <script>
     const firebaseConfig = {
@@ -1195,6 +1203,53 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                 });
         });
     }
+    <!-- Navigation Bar -->
+            <div id="nav-bar">
+                <div class="nav-item active" onclick="showScreen('home-screen')">
+                    <i class="fas fa-home"></i> होम
+                </div>
+                <div class="nav-item" onclick="showScreen('add-service-screen')">
+                    <i class="fas fa-tools"></i> सर्विस जोड़ें
+                </div>
+                <div class="nav-item" onclick="showScreen('jobs-screen')">
+                    <i class="fas fa-briefcase"></i> नौकरियाँ
+                </div>
+                <div class="nav-item" onclick="showScreen('share-screen')">
+                    <i class="fas fa-share-alt"></i> शेयर
+                </div>
+            </div>
+
+        </div>
+    </div>
+    /* --- 1. Ad Container Fixed Style --- */
+/* यह एड को स्क्रीन के बॉटम एज पर चिपकाएगा */
+.fixed-ad-container {
+    position: fixed;
+    bottom: 0px; 
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Ad sabse upar rahe */
+    text-align: center;
+    background-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- 2. Navigation Bar (Footer) Adjustment --- */
+/* #nav-bar पहले से fixed है, ab use 50px upar shift karna hai */
+#nav-bar {
+    /* आपकी पुरानी फिक्सिंग स्टाइलिंग यहाँ होगी */
+    bottom: 50px !important; /* Ad ki height 50px hai, isliye isko 50px upar shift kiya */
+    z-index: 1001; /* Nav bar Ad se bhi upar rahe */
+}
+
+/* --- 3. Main Content Padding Fix --- */
+/* Content ko upar shift karein taki woh footer aur ad ke peeche na chhupe */
+#mainAppContent {
+    /* Nav bar (approx 60px) + Ad (50px) = 110px padding */
+    padding-bottom: 110px !important; 
+    box-sizing: border-box;
+        }
 </script>
 </body>
 </html>
