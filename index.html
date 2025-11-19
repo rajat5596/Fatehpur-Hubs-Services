@@ -1247,29 +1247,45 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         <span>शेयर</span>
     </div>
 </div>
+</script>
+
+<!-- CLEAN BOTTOM ADS & NAV BAR -->
+<div id="sticky-bottom-ad-container" style="position:fixed; bottom:60px; left:50%; transform:translateX(-50%); width:100%; max-width:320px; height:50px; z-index:9998; text-align:center; background:#f8f9fa; border:1px solid #ddd;">
+    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin:0 auto; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px;">
+        Advertisement
+    </div>
+</div>
+
+<div id="nav-bar" style="position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:320px; background:#2c3e50; display:flex; padding:10px 0; z-index:9999; border-radius:10px 10px 0 0;">
+    <div style="flex:1; text-align:center; color:white; font-size:12px; display:flex; flex-direction:column; align-items:center;" onclick="showScreen('home-screen')">
+        <i class="fas fa-home" style="font-size:18px; margin-bottom:2px;"></i>
+        <span>होम</span>
+    </div>
+    <div style="flex:1; text-align:center; color:white; font-size:12px; display:flex; flex-direction:column; align-items:center;" onclick="showScreen('add-service-screen')">
+        <i class="fas fa-tools" style="font-size:18px; margin-bottom:2px;"></i>
+        <span>सर्विस</span>
+    </div>
+    <div style="flex:1; text-align:center; color:white; font-size:12px; display:flex; flex-direction:column; align-items:center;" onclick="showScreen('jobs-screen')">
+        <i class="fas fa-briefcase" style="font-size:18px; margin-bottom:2px;"></i>
+        <span>नौकरियाँ</span>
+    </div>
+    <div style="flex:1; text-align:center; color:white; font-size:12px; display:flex; flex-direction:column; align-items:center;" onclick="showScreen('share-screen')">
+        <i class="fas fa-share-alt" style="font-size:18px; margin-bottom:2px;"></i>
+        <span>शेयर</span>
+    </div>
+</div>
 
 <script>
-// Fixed ad loader with proper 320px width
+// Clean ad loader - Only load if good ads available
 setTimeout(function() {
     var container = document.getElementById('adsterra-320x50-bottom');
     if(container) {
-        container.innerHTML = '';
+        // Simple placeholder - Remove foreign ads
+        container.innerHTML = '<div style="height:50px; width:320px; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px; background:#f8f9fa;">Sponsored Content</div>';
         
-        var iframe = document.createElement('iframe');
-        iframe.style.width = '320px';
-        iframe.style.height = '50px';
-        iframe.style.border = 'none';
-        iframe.style.margin = '0 auto';
-        iframe.style.display = 'block';
-        iframe.setAttribute('scrolling', 'no');
-        iframe.setAttribute('frameborder', '0');
-        
-        container.appendChild(iframe);
-        
-        iframe.onload = function() {
+        // Optional: Try loading ads after some time
+        setTimeout(function() {
             try {
-                var doc = iframe.contentWindow.document;
-                doc.open();
                 var atOptions = {
                     'key' : '969a80a2e6bea9f00173f36024f52cb2',
                     'format' : 'iframe',
@@ -1277,16 +1293,14 @@ setTimeout(function() {
                     'width' : 320,
                     'params' : {}
                 };
-                var content = '<!DOCTYPE html><html><head><style>body{margin:0;padding:0;}</style></head><body>';
-                content += '<script>var atOptions = ' + JSON.stringify(atOptions) + ';<\/script>';
-                content += '<script src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js"><\/script>';
-                content += '</body></html>';
-                doc.write(content);
-                doc.close();
+                var script = document.createElement('script');
+                script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
+                document.head.appendChild(script);
             } catch(e) {
-                container.innerHTML = '<div style="height:50px; width:320px; display:flex; align-items:center; justify-content:center; color:#666; font-size:14px; background:#f0f0f0;">Advertisement</div>';
+                // Keep simple placeholder if ads fail
+                console.log('Ads not loaded');
             }
-        };
+        }, 3000);
     }
 }, 1000);
 </script>
