@@ -309,7 +309,7 @@
     bottom: 0px; 
     left: 0;
     width: 100%;
-    /* ⚠️ यह सबसे महत्वपूर्ण फिक्स है! यह एड के लिए 50px की जगह सुनिश्चित करता है। */
+    /* ⚠️ यह एड के लिए 50px की जगह सुनिश्चित करता है। */
     height: 50px; 
     z-index: 1000; /* Ad sabse upar rahe */
     text-align: center;
@@ -1206,24 +1206,23 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
                 });
         });
     }
-    <!-- 
+
+<!-- 
 *************************************************************
-   यहाँ से शुरू करें (लाइन 1184 के आस-पास, </body> से पहले)
+   यह वह कोड है जिसे </body> से पहले पेस्ट करना है
 *************************************************************
 -->
 
-<!-- 1. BOTTOM STICKY AD CONTAINER (320x50) - Screen के किनारे पर chipkega -->
+<!-- 1. BOTTOM STICKY AD CONTAINER (320x50) -->
+<!-- इसमें केवल एक खाली DIV है, Ad code को JavaScript के ज़रिए लोड किया जाएगा -->
 <div id="sticky-bottom-ad-container" class="fixed-ad-container">
-    <div id="adsterra-320x50-bottom" style="height:50px;">
-        <!-- Aapki original ad unit yahan hai -->
-        <script type="text/javascript">
-            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
-        </script>
+    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin: 0 auto;">
+        <!-- Ad code will be injected here by the script below -->
     </div>
 </div>
 
-<!-- 2. FOOTER NAVIGATION MENU (Nav Bar) - Jo aapne line 505 se cut kiya tha -->
+<!-- 2. FOOTER NAVIGATION MENU (Nav Bar) -->
+<!-- यह Nav Bar Ad के ठीक ऊपर (bottom: 50px) फिक्स रहेगा -->
 <div id="nav-bar">
     <div class="nav-item active" onclick="showScreen('home-screen')">
         <i class="fas fa-home"></i> होम
@@ -1238,6 +1237,54 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         <i class="fas fa-share-alt"></i> शेयर
     </div>
 </div>
+
+<!-- 3. AD LOADER SCRIPT -->
+<!-- यह स्क्रिप्ट Adsterra कोड को सुरक्षित रूप से iframe में लोड करेगी ताकि Ad दिख सके -->
+<script type="text/javascript">
+    (function() {
+        // Adsterra के ऑप्शन्स
+        var atOptions = { 
+            'key' : '969a80a2e6bea9f00173f36024f32cb2', 
+            'format' : 'iframe', 
+            'height' : 50, 
+            'width' : 320, 
+            'params' : {} 
+        };
+
+        // Adsterra की मेन स्क्रिप्ट URL
+        var scriptUrl = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js';
+
+        // एड कंटेनर ढूँढना जहाँ कोड डालना है
+        var container = document.getElementById('adsterra-320x50-bottom');
+        
+        // एक नया iframe बनाना
+        var iframe = document.createElement('iframe');
+        iframe.style.width = '320px';
+        iframe.style.height = '50px';
+        iframe.style.border = 'none';
+        iframe.setAttribute('scrolling', 'no');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowtransparency', 'true');
+
+        // iframe को कंटेनर में जोड़ना
+        container.appendChild(iframe);
+
+        // iframe के अंदर document.write लॉजिक को अनुकरण करना
+        iframe.onload = function() {
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            // iframe के अंदर Adsterra के ऑप्शन्स और स्क्रिप्ट को लिखना
+            var content = '<script type="text/javascript">var atOptions = ' + JSON.stringify(atOptions) + ';</script>';
+            content += '<script type="text/javascript" src="' + scriptUrl + '"></' + 'script>';
+            
+            doc.write(content);
+            doc.close();
+        };
+
+    })();
+</script>
+
+            
 
 </body>
 </html>
