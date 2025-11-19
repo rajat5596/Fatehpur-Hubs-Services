@@ -1194,5 +1194,107 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         });
     }
 </script>
+    <!-- === BOTTOM ADS & NAV BAR === -->
+<style>
+/* Temporary fix for bottom elements */
+#sticky-bottom-ad-container {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    height: 50px;
+    z-index: 9998;
+    text-align: center;
+    background: white;
+    padding: 5px 0;
+}
+
+#nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background: #2c3e50;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 9999;
+}
+
+.nav-item {
+    color: white;
+    text-align: center;
+    flex: 1;
+    font-size: 12px;
+}
+
+.nav-item i {
+    font-size: 18px;
+    margin-bottom: 3px;
+}
+
+/* Ensure main content is visible */
+#mainApp {
+    padding-bottom: 120px !important;
+}
+</style>
+
+<!-- Ad Container -->
+<div id="sticky-bottom-ad-container">
+    <div id="adsterra-320x50-bottom" style="height:50px; width:320px; margin:0 auto; background:#f0f0f0; display:flex; align-items:center; justify-content:center; color:#666;">
+        Loading ad...
+    </div>
+</div>
+
+<!-- Navigation Bar -->
+<div id="nav-bar">
+    <div class="nav-item active" onclick="showScreen('home-screen')">
+        <i class="fas fa-home"></i>
+        <div>होम</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('add-service-screen')">
+        <i class="fas fa-tools"></i>
+        <div>सर्विस</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('jobs-screen')">
+        <i class="fas fa-briefcase"></i>
+        <div>नौकरियाँ</div>
+    </div>
+    <div class="nav-item" onclick="showScreen('share-screen')">
+        <i class="fas fa-share-alt"></i>
+        <div>शेयर</div>
+    </div>
+</div>
+
+<script>
+// Simple ad loader - No conflicts
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var container = document.getElementById('adsterra-320x50-bottom');
+        if(container) {
+            try {
+                // Your Adsterra code
+                var atOptions = {
+                    'key' : '969a80a2e6bea9f00173f36024f52cb2',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+                var script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
+                document.head.appendChild(script);
+            } catch(e) {
+                container.innerHTML = '<div style="padding:15px; color:#999;">Ad</div>';
+            }
+        }
+    }, 2000);
+});
+</script>
 </body>
 </html>
