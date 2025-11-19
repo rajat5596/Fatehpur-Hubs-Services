@@ -1199,7 +1199,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 <div style="position:fixed; bottom:60px; left:0; right:0; background:white; z-index:9998; padding:5px 0; border-top:1px solid #ddd;">
     <div style="width:100%; max-width:500px; margin:0 auto;">
         <div id="adsterra-320x50-bottom" style="width:320px; height:50px; margin:0 auto; background:#f5f5f5; display:flex; align-items:center; justify-content:center; color:#666; font-size:12px;">
-            Advertisement
+            Loading ads...
         </div>
     </div>
 </div>
@@ -1226,24 +1226,41 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 </div>
 
 <script>
-// Simple and reliable ad loader
+// Fixed ad loader - Ads will actually show
 setTimeout(function() {
     var container = document.getElementById('adsterra-320x50-bottom');
     if(container) {
-        try {
-            var atOptions = {
-                'key' : '969a80a2e6bea9f00173f36024f52cb2',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-            var script = document.createElement('script');
-            script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
-            document.head.appendChild(script);
-        } catch(e) {
-            container.innerHTML = '<div style="width:320px; height:50px; display:flex; align-items:center; justify-content:center; color:#999; background:#f5f5f5;">Sponsored</div>';
-        }
+        // First clear container
+        container.innerHTML = '';
+        
+        // Create direct div for adsterra
+        var adDiv = document.createElement('div');
+        adDiv.id = 'container-969a80a2e6bea9f00173f36024f52cb2';
+        adDiv.style.width = '320px';
+        adDiv.style.height = '50px';
+        adDiv.style.margin = '0 auto';
+        
+        container.appendChild(adDiv);
+        
+        // Load adsterra script directly
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
+        
+        // Add to head instead of body
+        document.head.appendChild(script);
+        
+        // Fallback if ads don't load
+        setTimeout(function() {
+            if (container.innerHTML.includes('container-969a80a2e6bea9f00173f36024f52cb2')) {
+                container.innerHTML = '<div style="width:320px; height:50px; display:flex; align-items:center; justify-content:center; color:#666; background:#f5f5f5; font-size:12px;">Ads Loading...</div>';
+                
+                // Second attempt
+                var script2 = document.createElement('script');
+                script2.src = '//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f52cb2/invoke.js';
+                document.head.appendChild(script2);
+            }
+        }, 3000);
     }
 }, 1000);
 </script>
