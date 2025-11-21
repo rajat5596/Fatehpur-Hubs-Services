@@ -5,9 +5,9 @@
 // Note: endDate ko "YYYY-MM-DD" format mein daalen. Agar hamesha chalana hai, toh null rakhen.
 // *************************************************************
 const promotionAds = [
-    { name: "Rajat Enterprises", image: "https://i.ibb.co/MDcL6w49/IMG-20251029-120527.jpg", link: "https://wa.me/919889904191", endDate: "2025-11-20" },
+    { name: "Rajat Enterprises", image: "https://i.ibb.co/MDcL6w49/IMG-20251029-120527.jpg", link: "https://wa.me/919889904191", endDate: "2025-11-26" },
     { name: "Rajat Aluminium", image: "https://i.ibb.co/0y4K0cR/rajat-aluminium.jpg", link: "https://wa.me/919889904191", endDate: null },
-    { name: "ABC Hardware Store", image: "https://via.placeholder.com/350x100/333333/FFFFFF?text=ABC+Hardware", link: "https://wa.me/99999999999", endDate: "2025-11-20" },
+    { name: "ABC Hardware Store", image: "https://via.placeholder.com/350x100/333333/FFFFFF?text=ABC+Hardware", link: "https://wa.me/99999999999", endDate: "2025-11-26" },
     { name: "PQR Services", image: "https://via.placeholder.com/350x100/007bff/FFFFFF?text=PQR+Services", link: "tel:+918888888888", endDate: null },
     // Naye Ad ki expiry date yahan set karein
 ];
