@@ -1,5 +1,5 @@
 // sw.js - 100% WORKING WITH OTP + PWA + NO POP-UP
-const CACHE_NAME = 'fatehpur-hubs-v2';
+const CACHE_NAME = 'fatehpur-hubs-v3'; // ▲ ONLY v2 → v3
 
 const urlsToCache = [
   '/',
