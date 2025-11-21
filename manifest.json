@@ -1,13 +1,53 @@
 {
-  "name": "Fatehpur Hubs",
-  "short_name": "FatehpurHubs",
+  "name": "Fatehpur Hubs - Local Services & Jobs",
+  "short_name": "Fatehpur Hubs",
+  "description": "Find trusted plumbers, electricians, carpenters, painters and job opportunities in Fatehpur. 15+ service categories with direct contact.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ff6666",
+  "background_color": "#2a5298",
+  "theme_color": "#2a5298",
   "orientation": "portrait",
-  "id": "/fatehpurhubs",
-  "description": "Fatehpur ka No.1 local services app",
+  "scope": "/",
+  "id": "/",
+  "lang": "hi",
+  "categories": ["business", "shopping", "social"],
+  "screenshots": [
+    {
+      "src": "https://i.ibb.co/your-image-1/home-screen.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home - Services & Search"
+    },
+    {
+      "src": "https://i.ibb.co/your-image-2/service-providers.png",
+      "sizes": "1080x1920",
+      "type": "image/png", 
+      "form_factor": "narrow",
+      "label": "Local Service Providers"
+    },
+    {
+      "src": "https://i.ibb.co/your-image-3/add-service.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Register Service Provider"
+    },
+    {
+      "src": "https://i.ibb.co/your-image-4/post-job.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Post Job Opportunity"
+    },
+    {
+      "src": "https://i.ibb.co/your-image-5/local-jobs.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Local Job Listings"
+    }
+  ],
   "icons": [
     {
       "src": "https://i.ibb.co/NgZFh1Mz/icon512.png",
@@ -16,44 +56,17 @@
       "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/dsTcKs7B/icon1024.png",
+      "src": "https://i.ibb.co/dsTcKs7B/icon1024.png", 
       "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.ibb.co/your-icon-192/icon192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "https://i.ibb.co/KjDTmLth/s1.png",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Login"
-    },
-    {
-      "src": "https://i.ibb.co/gbxfp4bd/s2.png",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Home"
-    },
-    {
-      "src": "https://i.ibb.co/jPZbBrNX/s3.png",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Services"
-    },
-    {
-      "src": "https://i.ibb.co/R4Vk38kY/s4.png",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Add Service"
-    },
-    {
-      "src": "https://i.ibb.co/pBVQv0M7/s5.png",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Jobs"
-    }
-  ],
-  "categories": ["business", "productivity", "utilities"],
   "prefer_related_applications": false
 }
