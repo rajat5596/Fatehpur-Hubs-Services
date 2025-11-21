@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "in.co.fatehpurhubs",
+        "sha256_cert_fingerprints": ["5C:6A:E9:42:41:F0:DC:52:5D:F8:C1:97:26:AA:BC:5F:10:00:2E:DD:69:22:91:6E:83:14:E8:BB:8B:13:93:93"]
+      }
+    }]
