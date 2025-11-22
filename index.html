@@ -938,7 +938,8 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
     }
 
     // =======================================================
-// 1. सर्विस रजिस्ट्रेशन (registerService()) - फाइनल फिक्स (Re-pasting the correct version)
+// 1. सर्विस रजिस्ट्रेशन (registerService()) - क्रिटिकल फिक्स (पुष्टि की गई)
+// यह कोड डेटा ऑब्जेक्ट को सही से डिक्लेयर करता है और रीलोड रोकेगा।
 // =======================================================
 function registerService() {
     const user = firebase.auth().currentUser;
@@ -970,18 +971,18 @@ function registerService() {
             return; 
         }
 
-        // डेटा सेव करें
-        const serviceData = {
+        // 3. CRITICAL FIX: providerData ऑब्जेक्ट को यहीं डिफाइन करें (पहले यह गलती थी)
+        const providerData = { 
             name: name,
             phone: phone,
             category: category,
             area: area,
             experience: experience,
-            userId: userId, // <-- Edit/Delete के लिए ज़रूरी
+            userId: userId, // Edit/Delete के लिए ज़रूरी
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
         
-        window.providersRef.push(serviceData)
+        window.providersRef.push(providerData) // अब providerData सही है
         .then(() => {
             alert('✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
             
@@ -1007,7 +1008,7 @@ function registerService() {
         alert("माफ़ करें, डेटा चेक करने में कोई त्रुटि आई। कृपया फिर से कोशिश करें।");
     });
 
-    return false; // **पेज रीलोड रोकने के लिए**
+    return false; 
 }
 
 // =======================================================
