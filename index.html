@@ -939,7 +939,7 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 
     // =======================================================
 // 1. सर्विस रजिस्ट्रेशन (registerService()) - UPDATED और SECURE
-// इसमें 'userId' और डुप्लीकेट फ़ोन नंबर चेक शामिल है।
+// यह फ़ंक्शन Service Form से कॉल होता है और userId को सेव करता है।
 // =======================================================
 function registerService() {
     // 1. लॉग-इन यूज़र की जानकारी लें और चेक करें
@@ -966,35 +966,29 @@ function registerService() {
         return false;
     }
 
-    // 2. डुप्लीकेट फ़ोन नंबर चेक (आपका लॉजिक)
-    // providersRef में 'phone' नंबर के आधार पर एक बार चेक करें
+    // 2. डुप्लीकेट फ़ोन नंबर चेक (जैसा कि आपने लागू किया था)
     window.providersRef.orderByChild('phone').equalTo(phone).once('value', snapshot => {
         if (snapshot.exists()) {
-            // अगर कोई एंट्री इस फ़ोन नंबर के साथ पहले से मौजूद है
             alert('❌ यह फ़ोन नंबर पहले से ही रजिस्टर है! डुप्लीकेट एंट्री की अनुमति नहीं है।');
-            return; // आगे push नहीं करना है
+            return;
         }
 
         // 3. डेटा सेव करें (अगर डुप्लीकेट नहीं है)
-        // इस ब्लॉक के अंदर userId को जोड़कर डेटा सेव करें
         const serviceData = {
             name: name,
             phone: phone,
             category: category,
             area: area,
             experience: experience,
-            // *** RULES COMPLIANCE: यह फ़ील्ड जोड़ा गया है ***
-            userId: userId, 
+            userId: userId, // <--- Rules के लिए ज़रूरी
             timestamp: firebase.database.ServerValue.TIMESTAMP
         };
         
         window.providersRef.push(serviceData)
         .then(() => {
             alert('✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
-            // फॉर्म रीसेट
             const form = document.getElementById('service-form');
             if (form) form.reset();
-            // स्क्रीन बदलने का लॉजिक
             showScreen('home-screen'); 
         })
         .catch((error) => {
@@ -1004,37 +998,18 @@ function registerService() {
 
     })
     .catch(error => {
-        // डेटाबेस क्वेरी में कोई एरर आए तो यहाँ हैंडल करें
         console.error("Firebase Read Error during duplicate check:", error);
         alert("माफ़ करें, डेटा चेक करने में कोई त्रुटि आई। कृपया फिर से कोशिश करें।");
     });
 
+    return false;
+}
 
-    return false; // फ़ॉर्म सबमिट होने से रोकें
-              }
-    // सर्विस रजिस्ट्रेशन फंक्शन का अंत
-
-    // जॉब पोस्ट रजिस्टर करने का फंक्शन
-    function jobRegister() {
-        const title = document.getElementById('jobTitle').value;
-        const shopName = document.getElementById('jobShopName').value;
-        const location = document.getElementById('jobLocation').value;
-        const salary = document.getElementById('jobSalary').value;
-        const description = document.getElementById('jobDescription').value;
-        const phone = document.getElementById('jobPhone').value;
-        const form = document.getElementById('jobForm');
-
-        if (!title || !shopName || !location || !salary || !description || !phone) {
-            alert(" कृपया जॉब रजिस्ट्रेशन के सभी फ़ील्ड भरें।");
-            return false;
-        }
-
-        if (phone.length !== 10 || isNaN(phone)) {
-            alert(" कृपया 10 अंक का सही फ़ोन नंबर डालें।");
-            return false;
-        }
-
-        function registerJob() {
+// =======================================================
+// 2. जॉब रजिस्ट्रेशन (registerJob()) - UPDATED और SECURE
+// यह फ़ंक्शन Job Form से कॉल होता है (onsubmit="return registerJob()")
+// =======================================================
+function registerJob() {
     // 1. लॉग-इन चेक (सुरक्षा के लिए)
     const user = firebase.auth().currentUser;
 
@@ -1046,7 +1021,7 @@ function registerService() {
     // Rules के लिए ज़रूरी: यूज़र की UID
     const posterId = user.uid; 
     
-    // फ़ॉर्म से डेटा इकट्ठा करें (IDs index.html से ली गई हैं)
+    // फ़ॉर्म से डेटा इकट्ठा करें
     const title = document.getElementById('jobTitle').value;
     const shopName = document.getElementById('jobShopName').value;
     const location = document.getElementById('jobLocation').value;
@@ -1055,8 +1030,8 @@ function registerService() {
     const description = document.getElementById('jobDescription').value;
 
     // वैलिडेशन चेक
-    if (phone.length !== 10) {
-        alert("फ़ोन नंबर 10 अंकों का होना चाहिए।");
+    if (!title || !shopName || !location || !salary || !phone || !description || phone.length !== 10) {
+        alert("कृपया सभी ज़रूरी फ़ील्ड भरें और फ़ोन नंबर 10 अंकों का हो।");
         return false;
     }
     
@@ -1068,8 +1043,7 @@ function registerService() {
         phone: phone,
         description: description,
         
-        // *** RULES COMPLIANCE: यह फ़ील्ड जोड़ा गया है ***
-        posterId: posterId, 
+        posterId: posterId, // <--- Rules के लिए ज़रूरी
         
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
@@ -1077,15 +1051,10 @@ function registerService() {
     window.jobsRef.push(jobData)
     .then(() => {
         alert('जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
-        // फॉर्म रीसेट करने के लिए:
-        const form = document.getElementById('jobs-form');
+        const form = document.getElementById('jobs-form'); // या जो भी जॉब फॉर्म की ID है
         if (form) form.reset();
 
-        // स्क्रीन बदलने का लॉजिक
-        if (document.getElementById('jobs-screen')) {
-             document.getElementById('jobs-screen').classList.remove('active');
-             document.getElementById('loadJobs').classList.add('active');
-        }
+        showScreen('jobs-screen'); // स्क्रीन बदलने का लॉजिक
     })
     .catch((error) => {
         alert('त्रुटि: जॉब पोस्टिंग फ़ेल हो गई।');
@@ -1094,6 +1063,16 @@ function registerService() {
 
     return false;
 }
+
+// =======================================================
+// 3. jobRegister() फ़ंक्शन (प्लेसहोल्डर)
+// यह पुराना नाम है। अगर आपका HTML इसे कॉल करता है, तो यह 'registerJob' को कॉल करेगा।
+// अगर आपका HTML onsubmit="return registerJob()" को कॉल करता है, तो आप इसे हटा सकते हैं।
+// हमने इसे सिर्फ़ बैकवर्ड कम्पैटिबिलिटी के लिए रखा है।
+// =======================================================
+function jobRegister() {
+    return registerJob();
+        }
         
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
