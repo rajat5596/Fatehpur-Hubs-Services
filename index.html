@@ -937,53 +937,81 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         window.open('https://wa.me/' + num, '_blank');
     }
 
-    // ⭐ 3. सर्विस रजिस्ट्रेशन फंक्शन (डुप्लीकेट फ़ोन चेक शामिल)
-    function registerService() {
-        const name = document.getElementById('providerName').value;
-        const phone = document.getElementById('providerPhone').value;
-        const category = document.getElementById('serviceCategory').value;
-        const area = document.getElementById('providerArea').value;
-        const experience = document.getElementById('providerExperience').value;
-        const form = document.getElementById('serviceForm');
+    // =======================================================
+// 1. सर्विस रजिस्ट्रेशन (registerService()) - UPDATED और SECURE
+// इसमें 'userId' और डुप्लीकेट फ़ोन नंबर चेक शामिल है।
+// =======================================================
+function registerService() {
+    // 1. लॉग-इन यूज़र की जानकारी लें और चेक करें
+    const user = firebase.auth().currentUser;
 
-        if (!name || !phone || !category || !area || !experience) {
-            alert("कृपया सभी फ़ील्ड भरें।");
-            return false;
-        }
-        
-        if (phone.length !== 10 || isNaN(phone)) {
-            alert("कृपया 10 अंक का सही फ़ोन नंबर डालें।");
-            return false;
-        }
-        
-        // डुप्लीकेट फ़ोन नंबर के लिए जाँच करें
-        window.providersRef.orderByChild('phone').equalTo(phone).once('value', (snapshot) => {
-            if (snapshot.exists()) {
-                alert("❌ यह फ़ोन नंबर पहले ही रजिस्टर हो चुका है। डुप्लीकेट एंट्री की अनुमति नहीं है।");
-                return;
-            }
-
-            // यदि फ़ोन नंबर यूनीक है, तो डेटा पुश करें
-            const providerData = {
-                name: name, phone: phone, category: category, area: area,
-                experience: experience + ' years',
-                timestamp: firebase.database.ServerValue.TIMESTAMP 
-            };
-
-            window.providersRef.push(providerData)
-                .then(() => {
-                    alert("✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-                    form.reset(); 
-                    loadCategories(); 
-                })
-                .catch((error) => {
-                    alert("❌ रजिस्ट्रेशन में एरर आई: " + error.message);
-                    console.error("Firebase Error:", error);
-                });
-        });
-        
-        return false; 
+    if (!user) {
+        alert('कृपया पहले OTP से लॉग-इन करें। यह ज़रूरी है।'); 
+        return false;
     }
+
+    // Rules के लिए ज़रूरी: यूज़र की UID
+    const userId = user.uid; 
+    
+    // फ़ॉर्म से डेटा इकट्ठा करें
+    const name = document.getElementById('providerName').value;
+    const phone = document.getElementById('providerPhone').value;
+    const category = document.getElementById('providerCategory').value;
+    const area = document.getElementById('providerArea').value;
+    const experience = document.getElementById('providerExperience').value;
+    
+    // वैलिडेशन चेक
+    if (!name || !phone || !category || !area || !experience || phone.length !== 10) {
+        alert("कृपया सभी ज़रूरी फ़ील्ड भरें और फ़ोन नंबर 10 अंकों का हो।");
+        return false;
+    }
+
+    // 2. डुप्लीकेट फ़ोन नंबर चेक (आपका लॉजिक)
+    // providersRef में 'phone' नंबर के आधार पर एक बार चेक करें
+    window.providersRef.orderByChild('phone').equalTo(phone).once('value', snapshot => {
+        if (snapshot.exists()) {
+            // अगर कोई एंट्री इस फ़ोन नंबर के साथ पहले से मौजूद है
+            alert('❌ यह फ़ोन नंबर पहले से ही रजिस्टर है! डुप्लीकेट एंट्री की अनुमति नहीं है।');
+            return; // आगे push नहीं करना है
+        }
+
+        // 3. डेटा सेव करें (अगर डुप्लीकेट नहीं है)
+        // इस ब्लॉक के अंदर userId को जोड़कर डेटा सेव करें
+        const serviceData = {
+            name: name,
+            phone: phone,
+            category: category,
+            area: area,
+            experience: experience,
+            // *** RULES COMPLIANCE: यह फ़ील्ड जोड़ा गया है ***
+            userId: userId, 
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        window.providersRef.push(serviceData)
+        .then(() => {
+            alert('✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
+            // फॉर्म रीसेट
+            const form = document.getElementById('service-form');
+            if (form) form.reset();
+            // स्क्रीन बदलने का लॉजिक
+            showScreen('home-screen'); 
+        })
+        .catch((error) => {
+            console.error("सर्विस रजिस्टर करने में त्रुटि: ", error);
+            alert('त्रुटि: रजिस्ट्रेशन फ़ेल हो गया। ' + error.message); 
+        });
+
+    })
+    .catch(error => {
+        // डेटाबेस क्वेरी में कोई एरर आए तो यहाँ हैंडल करें
+        console.error("Firebase Read Error during duplicate check:", error);
+        alert("माफ़ करें, डेटा चेक करने में कोई त्रुटि आई। कृपया फिर से कोशिश करें।");
+    });
+
+
+    return false; // फ़ॉर्म सबमिट होने से रोकें
+              }
     // सर्विस रजिस्ट्रेशन फंक्शन का अंत
 
     // जॉब पोस्ट रजिस्टर करने का फंक्शन
