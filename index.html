@@ -1224,48 +1224,7 @@ function registerJob() {
                 });
         });
     }
-    // =======================================================
-// डिलीट और एडिट फ़ंक्शन्स (इनकी ज़रूरत Edit/Delete बटन को काम करने के लिए है)
-// =======================================================
-
-function deleteService(serviceId) {
-    if (window.confirm('क्या आप सच में यह सर्विस हटाना चाहते हैं?')) {
-        // Firebase Rules सुरक्षा चेक करता है कि यह रिकॉर्ड इसी यूज़र का है या नहीं।
-        window.providersRef.child(serviceId).remove()
-        .then(() => {
-            alert('सर्विस सफलतापूर्वक हटा दी गई है।');
-        })
-        .catch(error => {
-            console.error("Service Delete Error:", error);
-            // Rules फेल होने पर यह एरर आता है
-            alert('त्रुटि: आप सिर्फ़ अपना डेटा हटा सकते हैं।');
-        });
-    }
-}
-
-function deleteJob(jobId) {
-    if (window.confirm('क्या आप सच में यह जॉब पोस्ट हटाना चाहते हैं?')) {
-        // Firebase Rules सुरक्षा चेक करता है कि यह रिकॉर्ड इसी यूज़र का है या नहीं।
-        window.jobsRef.child(jobId).remove()
-        .then(() => {
-            alert('जॉब सफलतापूर्वक हटा दी गई है।');
-        })
-        .catch(error => {
-            console.error("Job Delete Error:", error);
-            alert('त्रुटि: आप सिर्फ़ अपनी पोस्ट हटा सकते हैं।');
-        });
-    }
-}
-
-function editService(serviceId) {
-    // यह फ़ंक्शन सिर्फ़ एक प्लेसहोल्डर है।
-    alert(`Editing Service ID: ${serviceId}. एडिट फ़ंक्शन अभी जोड़ा नहीं गया है।`);
-}
-
-function editJob(jobId) {
-    // यह फ़ंक्शन सिर्फ़ एक प्लेसहोल्डर है।
-    alert(`Editing Job ID: ${jobId}. एडिट फ़ंक्शन अभी जोड़ा नहीं गया है।`);
-    }
+    
 </script>
 
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
