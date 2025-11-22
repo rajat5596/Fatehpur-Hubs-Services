@@ -1006,25 +1006,66 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
             return false;
         }
 
-        const jobData = {
-            title: title, shopName: shopName, location: location, salary: salary,
-            description: description, phone: phone, 
-            timestamp: firebase.database.ServerValue.TIMESTAMP 
-        };
+        function registerJob() {
+    // 1. लॉग-इन चेक (सुरक्षा के लिए)
+    const user = firebase.auth().currentUser;
 
-        window.jobsRef.push(jobData) 
-            .then(() => {
-                alert("✅ जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।");
-                form.reset(); 
-                if(document.getElementById('jobs-screen').classList.contains('active')) loadJobs();
-            })
-            .catch((error) => {
-                alert("❌ जॉब रजिस्ट्रेशन में एरर आई: " + error.message);
-                console.error("Firebase Job Error:", error);
-            });
+    if (!user) {
+        alert('जॉब पोस्ट करने से पहले आपको लॉग-इन करना होगा।'); 
+        return false; // फ़ॉर्म सबमिट होने से रोकें
+    }
 
+    // Rules के लिए ज़रूरी: यूज़र की UID
+    const posterId = user.uid; 
+    
+    // फ़ॉर्म से डेटा इकट्ठा करें (IDs index.html से ली गई हैं)
+    const title = document.getElementById('jobTitle').value;
+    const shopName = document.getElementById('jobShopName').value;
+    const location = document.getElementById('jobLocation').value;
+    const salary = document.getElementById('jobSalary').value;
+    const phone = document.getElementById('jobPhone').value;
+    const description = document.getElementById('jobDescription').value;
+
+    // वैलिडेशन चेक
+    if (phone.length !== 10) {
+        alert("फ़ोन नंबर 10 अंकों का होना चाहिए।");
         return false;
     }
+    
+    const jobData = {
+        title: title, 
+        shopName: shopName, 
+        location: location,
+        salary: salary,
+        phone: phone,
+        description: description,
+        
+        // *** RULES COMPLIANCE: यह फ़ील्ड जोड़ा गया है ***
+        posterId: posterId, 
+        
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    window.jobsRef.push(jobData)
+    .then(() => {
+        alert('जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
+        // फॉर्म रीसेट करने के लिए:
+        const form = document.getElementById('jobs-form');
+        if (form) form.reset();
+
+        // स्क्रीन बदलने का लॉजिक
+        if (document.getElementById('jobs-screen')) {
+             document.getElementById('jobs-screen').classList.remove('active');
+             document.getElementById('loadJobs').classList.add('active');
+        }
+    })
+    .catch((error) => {
+        alert('त्रुटि: जॉब पोस्टिंग फ़ेल हो गई।');
+        console.error("Firebase Job Error:", error);
+    });
+
+    return false;
+}
         
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
