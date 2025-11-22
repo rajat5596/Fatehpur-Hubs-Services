@@ -103,21 +103,7 @@ function loadPromotionAds() {
     console.log("Loading promotion ads...");
 }
 
-function displayJobs(jobs) {
-    const list = document.getElementById('jobs-list');
-    if (jobs.length === 0) { 
-        list.innerHTML = '<p>No jobs posted yet</p>'; 
-        return; 
-    }
-    list.innerHTML = jobs.map(j => `
-        <div class="profile-card">
-            <h4>${j.title}</h4>
-            <p>${j.shopName} | ${j.location} | ₹${j.salary}</p>
-            <p>${j.description}</p>
-            <button class="whatsapp-btn" onclick="openWhatsApp('${j.phone}')">Contact</button>
-        </div>
-    `).join('');
-} 
+
 
 function loadJobs() {
     // This function can be called to explicitly reload jobs, though the listener is running.
@@ -127,19 +113,34 @@ function loadJobs() {
     }
 }
 // Function 1: HTML Card banane ke liye
-function displayJobs(jobs) {
     const container = document.getElementById('jobs-list');
-    container.innerHTML = ''; // Pehle se मौजूद 'Loading jobs...' ya purana data hatao
+    // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें (Used for owner check)
+    const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
+    
+    container.innerHTML = ''; // Clear the container
 
     if (!jobs || jobs.length === 0) {
         container.innerHTML = '<p style="text-align:center; padding:20px; color:#555;">अभी कोई जॉब पोस्ट नहीं हुई है।</p>';
         return;
     }
 
-    // Har job ke liye ek card banao
     jobs.forEach(job => {
         const card = document.createElement('div');
         card.className = 'profile-card job-card';
+        
+        // Check: Is this record owned by the current logged-in user?
+        const isOwner = currentUserId && job.posterId === currentUserId;
+
+        // Edit/Delete buttons for the owner
+        const ownerActions = isOwner ? `
+            <div style="margin-top:15px; text-align:right; display:flex; justify-content: flex-end; gap: 10px;">
+                <!-- These functions will be defined in index.html -->
+                <button class="edit-btn" onclick="editJob('${job.id}')">Edit</button>
+                <button class="delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
+            </div>
+            <p style="color:green;font-size:10px;text-align:right;">(आपकी जॉब)</p>
+        ` : '';
+
         card.innerHTML = `
             <h3 style="color:#2a5298; margin-bottom:5px;">${job.title}</h3>
             <p><strong>दुकान/कंपनी:</strong> ${job.shopName}</p>
@@ -151,10 +152,10 @@ function displayJobs(jobs) {
                     WhatsApp/Call (${job.phone})
                 </button>
             </div>
+            ${ownerActions}
         `;
         container.appendChild(card);
     });
-}
 
 
 // Function 2: Firebase se data fetch karne ke liye
