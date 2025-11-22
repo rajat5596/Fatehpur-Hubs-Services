@@ -47,11 +47,15 @@ function searchServices() {
 }
 
 function displayServices() {
-    let filtered = serviceProviders;
+    let filtered = window.serviceProviders;
     const search = document.getElementById('main-search-bar').value.toLowerCase();
     
+    // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें 
+    // यह ID हमें यह चेक करने में मदद करेगी कि कौन रिकॉर्ड का मालिक है।
+    const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
+
     // Filter logic
-    if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
+    if (window.currentFilter) filtered = filtered.filter(p => p.category === window.currentFilter);
     if (search) {
         filtered = filtered.filter(p => 
             p.name.toLowerCase().includes(search) || 
@@ -62,21 +66,36 @@ function displayServices() {
 
     const list = document.getElementById('mistri-list');
     if (filtered.length === 0) {
-        list.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:#999;">Koi service nahi mili</p>';
+        list.innerHTML = '<h3>उपलब्ध सेवाएं</h3><p style="text-align:center;color:#999;">कोई सर्विस नहीं मिली</p>';
         return;
     }
 
-    list.innerHTML = '<h3>Available Services</h3>' + filtered.map(p => `
-        <div class="profile-card">
-            <h4 style="margin:0 0 5px;color:#2a5298;">${p.name} <span style="font-size:12px;color:#666;">(${p.category})</span></h4>
-            <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience}</p>
-            <div style="display:flex;justify-content:space-between;margin-top:10px;">
-                <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
-                <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                <button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'https://www.fatehpurhubs.co.in'})">Share</button>
+    list.innerHTML = '<h3>उपलब्ध सेवाएं</h3>' + filtered.map(p => {
+        // चेक करें: क्या यह रिकॉर्ड वर्तमान लॉग-इन यूज़र का है?
+        const isOwner = currentUserId && p.userId === currentUserId;
+
+        // ओनर के लिए Edit/Delete बटन का HTML
+        const ownerActions = isOwner ? `
+            <button class="edit-btn" onclick="editService('${p.id}')">Edit</button>
+            <button class="delete-btn" onclick="deleteService('${p.id}')">Delete</button>
+        ` : ''; 
+
+        return `
+            <div class="profile-card">
+                <h4 style="margin:0 0 5px;color:#2a5298;">${p.name} <span style="font-size:12px;color:#666;">(${p.category})</span></h4>
+                <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience}</p>
+                <div style="display:flex;justify-content:space-between;margin-top:10px; flex-wrap: wrap; gap: 8px;">
+                    <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                    
+                    ${isOwner ? '' : `<button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'${window.location.href}'})">Share</button>`}
+                    
+                    ${ownerActions}
+                </div>
+                ${isOwner ? '<p style="color:green;font-size:10px;text-align:right;">(आपका डेटा)</p>' : ''}
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function loadPromotionAds() { 
