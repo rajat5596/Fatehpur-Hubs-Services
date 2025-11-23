@@ -1013,6 +1013,8 @@ function registerService() {
 // 2. जॉब रजिस्ट्रेशन (registerJob()) - फाइनल फिक्स (Reset Fix)
 // =======================================================
 function registerJob() {
+    event.preventDefault();
+    
     const user = firebase.auth().currentUser;
 
     if (!user) {
@@ -1043,32 +1045,23 @@ function registerJob() {
         salary: salary,
         phone: phone,
         description: description,
-        
-        posterId: posterId, // <-- Edit/Delete के लिए ज़रूरी
-        
+        posterId: posterId,
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
 
     window.jobsRef.push(jobData)
     .then(() => {
-        alert('जॉब सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
+        alert('✅ जॉब सफलतापूर्वक पोस्ट हो गई!'); 
         
-        // फिक्स: फ़ॉर्म को रीसेट करें
-        const form = document.getElementById('jobs-form'); 
-        if (form) form.reset();
-
-        // स्क्रीन बदलें
-        if (document.getElementById('jobs-screen')) {
-             document.getElementById('jobs-screen').classList.remove('active');
-             document.getElementById('loadJobs').classList.add('active');
-        }
+        // ✅ SIMPLE FORM RESET
+        document.getElementById('jobForm').reset();
     })
     .catch((error) => {
-        alert('त्रुटि: जॉब पोस्टिंग फ़ेल हो गई।');
-        console.error("Firebase Job Error:", error);
+        console.error("Job Error:", error);
+        alert('❌ जॉब पोस्ट करने में त्रुटि आई।');
     });
 
-    return false; // **पेज रीलोड रोकने के लिए**
+    return false;
         }
         
     window.onload = () => {
