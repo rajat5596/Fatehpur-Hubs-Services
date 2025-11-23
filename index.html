@@ -459,7 +459,7 @@
                 <div id="jobs-screen" class="screen">
                     <div class="form-container">
                         <h3>💼 जॉब पोस्ट करें</h3>
-                        <form id="jobForm" onsubmit="return jobRegister()">
+                        <form id="jobForm" onsubmit="event.preventDefault(); return registerJob();">
                             <div class="form-field">
                                 <label for="jobTitle">जॉब टाइटल (जैसे: सेल्समैन)</label>
                                 <input type="text" id="jobTitle" required>
