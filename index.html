@@ -617,20 +617,6 @@
         </div>`;
     }
 
-    // कैटेगरी बटन रेंडर करें
-    function renderCategoryButtons() {
-        const categoriesDiv = document.getElementById('mistri-categories');
-        const allCategories = [
-            'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter', 
-            'AC Mechanic', 'Tiler', 'Beautician', 'Home Cleaning', 'Security Guard', 
-            'Laundry Service', 'Legal Consultant', 'Private Teacher', 'Computer Repair', 'Welder'
-        ];
-        
-        categoriesDiv.innerHTML = allCategories.map(cat => 
-            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
-        ).join('');
-    }
-
     // ⭐ 1. loadCategories - सामान्य लिस्ट पैजिनेशन (Ads injected)
 window.loadCategories = (loadMore = false) => {
     const listElement = document.getElementById('mistri-list');
