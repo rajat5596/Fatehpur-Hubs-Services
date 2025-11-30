@@ -23,9 +23,6 @@ function startFirebaseListener() {
         snapshot.forEach(child => jobs.push({ id: child.key, ...child.val() }));
         displayJobs(jobs);
     });
-
-    // ✅ CATEGORIES LOAD CALL ADD KARO
-    loadCategories();
 }
 
 function loadCategories() {
@@ -38,11 +35,9 @@ function loadCategories() {
     ];
     
     const container = document.getElementById('mistri-categories');
-    if (container) {
-        container.innerHTML = categories.map(cat => 
-            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
-        ).join('');
-    }
+    container.innerHTML = categories.map(cat => 
+        `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
+    ).join('');
 }
 
 function filterByCategory(cat) {
@@ -61,14 +56,15 @@ function searchServices() {
 }
 
 function displayServices() {
-    let filtered = serviceProviders; // ✅ window.serviceProviders -> serviceProviders
+    let filtered = window.serviceProviders;
     const search = document.getElementById('main-search-bar').value.toLowerCase();
     
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें 
+    // यह ID हमें यह चेक करने में मदद करेगी कि कौन रिकॉर्ड का मालिक है।
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
 
     // Filter logic
-    if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter); // ✅ window.currentFilter -> currentFilter
+    if (window.currentFilter) filtered = filtered.filter(p => p.category === window.currentFilter);
     if (search) {
         filtered = filtered.filter(p => 
             p.name.toLowerCase().includes(search) || 
@@ -111,8 +107,21 @@ function displayServices() {
     }).join('');
 }
 
-// ✅ COMPLETE displayJobs FUNCTION ADD KARO
-function displayJobs(jobs) {
+function loadPromotionAds() { 
+    // This is often where special ad/promotion banners are loaded from DB.
+    console.log("Loading promotion ads...");
+}
+
+
+
+function loadJobs() {
+    // This function can be called to explicitly reload jobs, though the listener is running.
+    console.log("Loading job list screen...");
+    if (!window.jobsRef) {
+        console.error("Jobs reference not initialized.");
+    }
+}
+// Function 1: HTML Card banane ke liye
     const container = document.getElementById('jobs-list');
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें (Used for owner check)
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
@@ -132,6 +141,90 @@ function displayJobs(jobs) {
         const isOwner = currentUserId && job.posterId === currentUserId;
 
         // Edit/Delete buttons for the owner
+        const ownerActions = isOwner ? `
+            <div style="margin-top:15px; text-align:right; display:flex; justify-content: flex-end; gap: 10px;">
+                <!-- These functions will be defined in index.html -->
+                <button class="edit-btn" onclick="editJob('${job.id}')">Edit</button>
+                <button class="delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
+            </div>
+            <p style="color:green;font-size:10px;text-align:right;">(आपकी जॉब)</p>
+        ` : '';
+
+        card.innerHTML = `
+            <h3 style="color:#2a5298; margin-bottom:5px;">${job.title}</h3>
+            <p><strong>दुकान/कंपनी:</strong> ${job.shopName}</p>
+            <p><strong>लोकेशन:</strong> ${job.location}</p>
+            <p><strong>सैलरी:</strong> ₹${job.salary} / महीना</p>
+            <p style="margin-top:10px;">${job.description}</p>
+            <div style="margin-top:15px; text-align:right;">
+                <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone}')">
+                    WhatsApp/Call (${job.phone})
+                </button>
+            </div>
+            ${ownerActions}
+        `;
+        container.appendChild(card);
+    });
+
+
+// Function 2: Firebase se data fetch karne ke liye
+function loadJobs() {
+    // Check if jobsRef is initialized (from index.html window.onload)
+    if (!window.jobsRef) {
+        console.error("jobsRef is not initialized. Firebase might not be fully loaded.");
+        // If not loaded, wait a moment and try again (Handles script timing)
+        setTimeout(loadJobs, 500); 
+        return;
+    }
+
+    // Data ko Realtime Database se fetch karo
+    window.jobsRef.on('value', (snapshot) => {
+        const jobs = [];
+        snapshot.forEach((childSnapshot) => {
+            const job = childSnapshot.val();
+            // Job data ko array mein add karo
+            jobs.push(job);
+        });
+
+        // Nayi jobs ko display karo
+        displayJobs(jobs.reverse()); // Jobs ko latest se pehle dikhane ke liye reverse()
+        
+        console.log(`Loaded ${jobs.length} jobs.`);
+    }, (error) => {
+        console.error("Firebase Jobs Load Error:", error);
+        document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
+    });
+} Dekho ye mera pora js hai kya gadbadi hai ye pora js code diya to hai new cotegory kyu nahi show kr rhi
+function startFirebaseListener() {
+    // ... आपका existing code
+
+    window.jobsRef.on('value', snapshot => {
+        const jobs = [];
+        snapshot.forEach(child => jobs.push({ id: child.key, ...child.val() }));
+        displayJobs(jobs);
+    });
+
+    // ✅ YEH EK LINE ADD KARO
+    loadCategories();
+}
+// ✅ YEH COMPLETE FUNCTION ADD KARO
+function displayJobs(jobs) {
+    const container = document.getElementById('jobs-list');
+    const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
+    
+    container.innerHTML = '';
+
+    if (!jobs || jobs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:#555;">अभी कोई जॉब पोस्ट नहीं हुई है।</p>';
+        return;
+    }
+
+    jobs.forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'profile-card job-card';
+        
+        const isOwner = currentUserId && job.posterId === currentUserId;
+
         const ownerActions = isOwner ? `
             <div style="margin-top:15px; text-align:right; display:flex; justify-content: flex-end; gap: 10px;">
                 <button class="edit-btn" onclick="editJob('${job.id}')">Edit</button>
@@ -155,18 +248,4 @@ function displayJobs(jobs) {
         `;
         container.appendChild(card);
     });
-}
-
-function loadPromotionAds() { 
-    // This is often where special ad/promotion banners are loaded from DB.
-    console.log("Loading promotion ads...");
-}
-
-// ✅ SINGLE loadJobs FUNCTION ONLY
-function loadJobs() {
-    // This function can be called to explicitly reload jobs, though the listener is running.
-    console.log("Loading job list screen...");
-    if (!window.jobsRef) {
-        console.error("Jobs reference not initialized.");
-    }
 }
