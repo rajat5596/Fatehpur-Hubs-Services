@@ -26,7 +26,9 @@ function startFirebaseListener() {
 }
 
 function loadCategories() {
-    const categories = ["Plumber","Electrician","Carpenter","Mason","Painter","AC Mechanic","Tiler","Beautician","Home Cleaning","Security Guard","Laundry Service","Legal Consultant","Private Teacher","Computer Repair","Welder"];
+    const categories = ["Plumber","Electrician","Carpenter","Mason","Painter","AC Mechanic","Tiler","Beautician","Home Cleaning","Security Guard","Laundry Service","Legal Consultant","Private Teacher","Computer Repair","Welder"// NEW CATEGORIES
+        'DJ Service', 'Driver', 'Catering', 'Event Planner', 'Photographer', 'Car Mechanic'
+    ];
     const container = document.getElementById('mistri-categories');
     container.innerHTML = categories.map(cat => `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`).join('');
 }
