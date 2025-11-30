@@ -23,6 +23,9 @@ function startFirebaseListener() {
         snapshot.forEach(child => jobs.push({ id: child.key, ...child.val() }));
         displayJobs(jobs);
     });
+
+    // ✅ CATEGORIES LOAD CALL ADD KARO
+    loadCategories();
 }
 
 function loadCategories() {
@@ -35,9 +38,11 @@ function loadCategories() {
     ];
     
     const container = document.getElementById('mistri-categories');
-    container.innerHTML = categories.map(cat => 
-        `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
-    ).join('');
+    if (container) {
+        container.innerHTML = categories.map(cat => 
+            `<button class="cat-btn" onclick="filterByCategory('${cat}')">${cat}</button>`
+        ).join('');
+    }
 }
 
 function filterByCategory(cat) {
@@ -56,15 +61,14 @@ function searchServices() {
 }
 
 function displayServices() {
-    let filtered = window.serviceProviders;
+    let filtered = serviceProviders; // ✅ window.serviceProviders -> serviceProviders
     const search = document.getElementById('main-search-bar').value.toLowerCase();
     
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें 
-    // यह ID हमें यह चेक करने में मदद करेगी कि कौन रिकॉर्ड का मालिक है।
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
 
     // Filter logic
-    if (window.currentFilter) filtered = filtered.filter(p => p.category === window.currentFilter);
+    if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter); // ✅ window.currentFilter -> currentFilter
     if (search) {
         filtered = filtered.filter(p => 
             p.name.toLowerCase().includes(search) || 
@@ -107,21 +111,8 @@ function displayServices() {
     }).join('');
 }
 
-function loadPromotionAds() { 
-    // This is often where special ad/promotion banners are loaded from DB.
-    console.log("Loading promotion ads...");
-}
-
-
-
-function loadJobs() {
-    // This function can be called to explicitly reload jobs, though the listener is running.
-    console.log("Loading job list screen...");
-    if (!window.jobsRef) {
-        console.error("Jobs reference not initialized.");
-    }
-}
-// Function 1: HTML Card banane ke liye
+// ✅ COMPLETE displayJobs FUNCTION ADD KARO
+function displayJobs(jobs) {
     const container = document.getElementById('jobs-list');
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें (Used for owner check)
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
@@ -143,7 +134,6 @@ function loadJobs() {
         // Edit/Delete buttons for the owner
         const ownerActions = isOwner ? `
             <div style="margin-top:15px; text-align:right; display:flex; justify-content: flex-end; gap: 10px;">
-                <!-- These functions will be defined in index.html -->
                 <button class="edit-btn" onclick="editJob('${job.id}')">Edit</button>
                 <button class="delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
             </div>
@@ -165,33 +155,18 @@ function loadJobs() {
         `;
         container.appendChild(card);
     });
+}
 
+function loadPromotionAds() { 
+    // This is often where special ad/promotion banners are loaded from DB.
+    console.log("Loading promotion ads...");
+}
 
-// Function 2: Firebase se data fetch karne ke liye
+// ✅ SINGLE loadJobs FUNCTION ONLY
 function loadJobs() {
-    // Check if jobsRef is initialized (from index.html window.onload)
+    // This function can be called to explicitly reload jobs, though the listener is running.
+    console.log("Loading job list screen...");
     if (!window.jobsRef) {
-        console.error("jobsRef is not initialized. Firebase might not be fully loaded.");
-        // If not loaded, wait a moment and try again (Handles script timing)
-        setTimeout(loadJobs, 500); 
-        return;
+        console.error("Jobs reference not initialized.");
     }
-
-    // Data ko Realtime Database se fetch karo
-    window.jobsRef.on('value', (snapshot) => {
-        const jobs = [];
-        snapshot.forEach((childSnapshot) => {
-            const job = childSnapshot.val();
-            // Job data ko array mein add karo
-            jobs.push(job);
-        });
-
-        // Nayi jobs ko display karo
-        displayJobs(jobs.reverse()); // Jobs ko latest se pehle dikhane ke liye reverse()
-        
-        console.log(`Loaded ${jobs.length} jobs.`);
-    }, (error) => {
-        console.error("Firebase Jobs Load Error:", error);
-        document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
-    });
 }
