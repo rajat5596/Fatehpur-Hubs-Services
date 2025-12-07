@@ -195,3 +195,37 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
+function submitReview(serviceId) {
+    // 1. HTML से रेटिंग और रिव्यू टेक्स्ट लेना
+    const rating = document.getElementById('selected-rating').value;
+    const reviewText = document.getElementById('review-text').value;
+
+    if (rating == 0 || reviewText.trim() === "") {
+        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+        return;
+    }
+
+    // 2. Firebase में डेटा भेजने का Reference
+    // यह 'reviews' नोड को अपने आप बना देगा
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    
+    // 3. रिव्यू डेटा ऑब्जेक्ट बनाना
+    const newReview = {
+        rating: rating,
+        text: reviewText,
+        reviewer: 'User', // इसे बाद में सही यूज़रनाम से बदल सकते हैं
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    // 4. RTDB में डेटा भेजना
+    reviewsRef.push(newReview)
+        .then(() => {
+            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            document.getElementById('review-text').value = '';
+            // हम अगले स्टेप में डिस्प्ले (loadAndDisplayReviews) फ़ंक्शन जोड़ेंगे
+        })
+        .catch(error => {
+            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
+            alert("रिव्यू सबमिट नहीं हो सका। कृपया पुनः प्रयास करें।");
+        });
+}
