@@ -628,30 +628,6 @@
                 <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
                 <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
                 <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-                <div id="average-rating-display">
-    </div>
-
-<div id="review-submission-form">
-    <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
-    <div class="rating-stars">
-        <span class="star" data-rating="1">★</span>
-        <span class="star" data-rating="2">★</span>
-        <span class="star" data-rating="3">★</span>
-        <span class="star" data-rating="4">★</span>
-        <span class="star" data-rating="5">★</span>
-    </div>
-    
-    <input type="hidden" id="selected-rating" value="0">
-    <textarea id="review-text" placeholder="अपने अनुभव के बारे में लिखें..." rows="3"></textarea>
-    
-    <button onclick="submitReview('service_id')">रिव्यू सबमिट करें</button>
-</div>
-
-<div id="all-reviews-display">
-    <h4>यूज़र रिव्यू</h4>
-    </div>
-    
-            </div>
         </div>`;
     }
 
