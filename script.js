@@ -229,3 +229,31 @@ function submitReview(serviceId) {
             alert("रिव्यू सबमिट नहीं हो सका। कृपया पुनः प्रयास करें।");
         });
 }
+// यह कोड स्टार्स पर क्लिक करने पर रेटिंग की वैल्यू को सेव करता है और रंग बदलता है।
+
+function initializeRatingHandlers() {
+    // यह फ़ंक्शन रिव्यू सबमिशन फॉर्म के अंदर के स्टार्स को ढूंढता है
+    document.querySelectorAll('#review-submission-form .star').forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            document.getElementById('selected-rating').value = rating;
+            
+            // विज़ुअल फीडबैक के लिए स्टार्स को रंगना
+            // (यह केवल #review-submission-form के अंदर ही काम करेगा)
+            let currentContainer = this.closest('#review-submission-form');
+
+            currentContainer.querySelectorAll('.star').forEach(s => {
+                if (parseInt(s.getAttribute('data-rating')) <= rating) {
+                    s.classList.add('rated');
+                } else {
+                    s.classList.remove('rated');
+                }
+            });
+        });
+    });
+}
+
+// चूंकि आपका HTML डायनामिक रूप से बनता है (JavaScript द्वारा), 
+// आपको यह फ़ंक्शन तब कॉल करना होगा जब मिस्त्री की डिटेल स्क्रीन लोड हो जाए। 
+// यह कोड अभी के लिए जोड़ दें।
+// initializeRatingHandlers(); 
