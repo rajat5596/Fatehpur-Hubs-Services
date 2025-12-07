@@ -619,42 +619,47 @@
             alert(`Contact Details:\n${shareText}`);
         }
     }
-          // प्रोवाइडर कार्ड रेंडर करें
-    function renderProviderCard(p) {
-        return `<div class="profile-card">
-            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
-            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-        </div>`;
-    }<hr style="margin-top: 20px; border-top: 1px solid #eee;">
+          // // प्रोवाइडर कार्ड रेंडर करें
+function renderProviderCard(p) {
+    return `<div class="profile-card">
+        <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+        <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
 
-<div id="average-rating-display" style="padding: 10px 0;">
-    <h4>कुल रेटिंग: 0 / 5</h4>
-</div>
-
-<div id="review-submission-form" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
-    <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
-    <div class="rating-stars">
-        <span class="star" data-rating="1">★</span>
-        <span class="star" data-rating="2">★</span>
-        <span class="star" data-rating="3">★</span>
-        <span class="star" data-rating="4">★</span>
-        <span class="star" data-rating="5">★</span>
-    </div>
-    
-    <input type="hidden" id="selected-rating" value="0">
-    <textarea id="review-text" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
-    
-    <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">रिव्यू सबमिट करें</button>
-</div>
-
-<div id="all-reviews-display" style="margin-top: 20px;">
-    <h4>यूज़र रिव्यू</h4>
-    </div>
+        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+        </div>
         
+        <hr style="margin-top: 20px; border-top: 1px solid #eee;">
+
+        <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
+            <h4>कुल रेटिंग: अभी कोई नहीं</h4>
+        </div>
+
+        <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
+            <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
+            <div class="rating-stars-${p.key}">
+                <span class="star" data-rating="1">★</span>
+                <span class="star" data-rating="2">★</span>
+                <span class="star" data-rating="3">★</span>
+                <span class="star" data-rating="4">★</span>
+                <span class="star" data-rating="5">★</span>
+            </div>
+            
+            <input type="hidden" id="selected-rating-${p.key}" value="0">
+            <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
+            
+            <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">रिव्यू सबमिट करें</button>
+        </div>
+
+        <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
+            <h4>यूज़र रिव्यू</h4>
+        </div>
+
+    </div>`; // यह फ़ंक्शन को बंद करता है
+}
+
 
     // जॉब कार्ड रेंडर करें
     function renderJobCard(job) {
