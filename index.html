@@ -631,35 +631,41 @@ function renderProviderCard(p) {
             <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
         </div>
         
-        <hr style="margin-top: 20px; border-top: 1px solid #eee;">
+                <hr style="margin-top: 20px; border-top: 1px solid #eee;">
 
-        <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
-            <h4>कुल रेटिंग: अभी कोई नहीं</h4>
-        </div>
+        <button id="toggle-btn-${p.key}" 
+                onclick="toggleReviewSection('${p.key}')" 
+                style="width: 100%; padding: 8px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                रिव्यू और रेटिंग देखें (0)
+        </button>
 
-        <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
-            <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
-            <div class="rating-stars-${p.key}">
-                <span class="star" data-rating="1">★</span>
-                <span class="star" data-rating="2">★</span>
-                <span class="star" data-rating="3">★</span>
-                <span class="star" data-rating="4">★</span>
-                <span class="star" data-rating="5">★</span>
+        <div id="review-section-${p.key}" style="display: none;">
+            
+            <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
+                <h4 style="margin-bottom: 5px;">कुल रेटिंग: अभी कोई नहीं</h4>
             </div>
-            
-            <input type="hidden" id="selected-rating-${p.key}" value="0">
-            <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
-            
-            <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">रिव्यू सबमिट करें</button>
+
+            <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
+                <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
+                <div class="rating-stars-${p.key}">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                
+                <input type="hidden" id="selected-rating-${p.key}" value="0">
+                <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
+                
+                <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">रिव्यू सबमिट करें</button>
+            </div>
+
+            <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
+                <h4>यूज़र रिव्यू</h4>
+            </div>
         </div>
-
-        <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
-            <h4>यूज़र रिव्यू</h4>
-        </div>
-
-    </div>`; // यह फ़ंक्शन को बंद करता है
-}
-
+        
 
     // जॉब कार्ड रेंडर करें
     function renderJobCard(job) {
