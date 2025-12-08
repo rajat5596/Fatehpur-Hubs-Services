@@ -630,6 +630,26 @@ function renderProviderCard(p) {
             <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
             <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
         </div>
+        <br>
+<button class="review-toggle-btn" onclick="toggleReviewSection('${p.key}')">
+    रिव्यू और रेटिंग देखें (<span id="review-count-${p.key}">0</span>)
+</button>
+
+<div id="review-section-${p.key}" class="review-section" style="display:none; background:#f8f9fa; padding:15px; margin-top:10px; border-radius:8px;">
+    <div style="font-weight:bold; color:#e91e63;" id="avg-rating-${p.key}">कुल रेटिंग: अभी कोई नहीं</div>
+    <div id="reviews-list-${p.key}" style="margin:10px 0; max-height:200px; overflow-y:auto;"></div>
+    <hr>
+    <p style="margin:5px 0;"><b>अपना रिव्यू दें:</b></p>
+    <div class="star-rating" id="star-rating-${p.key}">
+        <span class="star" data-value="1">☆</span>
+        <span class="star" data-value="2">☆</span>
+        <span class="star" data-value="3">☆</span>
+        <span class="star" data-value="4">☆</span>
+        <span class="star" data-value="5">☆</span>
+    </div>
+    <textarea id="comment-${p.key}" placeholder="अपना अनुभव लिखें..." style="width:100%; height:60px; margin:8px 0; padding:8px;"></textarea>
+    <button onclick="submitReview('${p.key}')" style="background:#e91e63; color:white; padding:10px 20px; border:none; border-radius:5px;">सबमिट करें</button>
+</div>
           </div>`;
         }
 
