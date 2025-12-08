@@ -618,3 +618,8 @@ input[type="tel"]:focus, input[type="text"]:focus {
     transform: scale(0.85); /* Mobile adjustment */
     transform-origin: center;
 }
+.review-section { border: 1px solid #ddd; }
+.star { font-size: 32px; cursor: pointer; color: #ddd; }
+.star.selected, .star:hover { color: gold !important; }
+.review-item { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.review-item strong { color: #e91e63; }
