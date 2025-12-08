@@ -195,3 +195,148 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
+// D. औसत रेटिंग लोड करने और डिस्प्ले करने का फ़ंक्शन
+function loadAverageRating(serviceId) {
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    
+    reviewsRef.once('value', function(snapshot) {
+        let totalRating = 0;
+        let reviewCount = 0;
+
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const review = childSnapshot.val();
+                if (review.rating) {
+                    totalRating += review.rating;
+                    reviewCount++;
+                }
+            });
+        }
+
+        const avgRating = reviewCount > 0 ? (totalRating / reviewCount).toFixed(1) : 0;
+        
+        // रेटिंग डिस्प्ले अपडेट करें
+        const displayElement = document.getElementById('average-rating-display-' + serviceId);
+        if (displayElement) {
+            displayElement.innerHTML = `
+                <h4 style="margin-bottom: 5px;">कुल रेटिंग: ${avgRating} / 5 (${reviewCount} रिव्यू)</h4>
+            `;
+        }
+
+        // रिव्यू बटन पर काउंट अपडेट करें
+        const toggleButton = document.getElementById('toggle-btn-' + serviceId);
+        if (toggleButton) {
+             if (reviewCount > 0) {
+                 toggleButton.innerHTML = `रिव्यू और रेटिंग देखें (${reviewCount}) ⭐ ${avgRating}`;
+             } else {
+                 toggleButton.innerHTML = `रिव्यू और रेटिंग देखें (0)`;
+             }
+        }
+    });
+                 }
+// E. टेक्स्ट रिव्यू लोड करने और डिस्प्ले करने का फ़ंक्शन
+function loadAndDisplayReviews(serviceId) {
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    const displayContainer = document.getElementById('all-reviews-display-' + serviceId);
+    
+    if (!displayContainer) return;
+
+    reviewsRef.once('value', function(snapshot) {
+        let reviewsHtml = '<h4>यूज़र रिव्यू</h4>';
+        
+        if (snapshot.exists()) {
+            snapshot.forEach(childSnapshot => {
+                const review = childSnapshot.val();
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const reviewDate = review.timestamp ? new Date(review.timestamp).toLocaleDateString() : 'Unknown Date'; 
+
+                reviewsHtml += `
+                    <div style="border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 5px; background-color: #f9f9f9;">
+                        <p style="margin: 0; font-size: 14px; color: #555;">
+                            ${stars} (${review.rating}/5)
+                        </p>
+                        <p style="margin-top: 5px; font-weight: bold;">"${review.text}"</p>
+                        <small style="color: #888;">- ${review.reviewer} | ${reviewDate}</small>
+                    </div>
+                `;
+            });
+        } else {
+             reviewsHtml += `<p style="color: #888;">अभी कोई रिव्यू उपलब्ध नहीं है।</p>`;
+        }
+        
+        displayContainer.innerHTML = reviewsHtml;
+    });
+}
+// C. रिव्यू सेक्शन को दिखाने/छिपाने का फ़ंक्शन
+function toggleReviewSection(serviceId) {
+    const section = document.getElementById('review-section-' + serviceId);
+    const button = document.getElementById('toggle-btn-' + serviceId);
+
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
+        initializeRatingHandlers(serviceId); // स्टार्स को एक्टिवेट करें
+        loadAndDisplayReviews(serviceId); // रिव्यू लोड करें
+    } else {
+        section.style.display = 'none';
+        // जब छिपता है, तब रेटिंग और रिव्यू काउंट वाला टेक्स्ट वापस आ जाता है
+        loadAverageRating(serviceId); 
+    }
+}
+// B. स्टार क्लिक को हैंडल करने का फ़ंक्शन
+function initializeRatingHandlers(serviceId) {
+    const container = document.querySelector('.rating-stars-' + serviceId);
+    if (!container) return; 
+
+    container.querySelectorAll('.star').forEach(star => {
+        if (star.getAttribute('data-handler') === 'true') return; 
+
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            document.getElementById('selected-rating-' + serviceId).value = rating; 
+            
+            container.querySelectorAll('.star').forEach(s => {
+                if (parseInt(s.getAttribute('data-rating')) <= rating) {
+                    s.classList.add('rated');
+                } else {
+                    s.classList.remove('rated');
+                }
+            });
+        });
+        star.setAttribute('data-handler', 'true'); // हैंडलर को मार्क करें
+    });
+}
+// A. रिव्यू सबमिट करने का फ़ंक्शन
+function submitReview(serviceId) {
+    const rating = document.getElementById('selected-rating-' + serviceId).value;
+    const reviewText = document.getElementById('review-text-' + serviceId).value;
+
+    if (rating == 0 || reviewText.trim() === "") {
+        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+        return;
+    }
+
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    
+    const newReview = {
+        rating: parseInt(rating),
+        text: reviewText,
+        reviewer: 'User', 
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    reviewsRef.push(newReview)
+        .then(() => {
+            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            document.getElementById('review-text-' + serviceId).value = ''; 
+            document.getElementById('selected-rating-' + serviceId).value = '0';
+            
+            // सक्सेस के बाद रेटिंग और रिव्यू को तुरंत अपडेट करें
+            loadAverageRating(serviceId);
+            loadAndDisplayReviews(serviceId);
+        })
+        .catch(error => {
+            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
+            alert("रिव्यू सबमिट नहीं हो सका।");
+        });
+}
