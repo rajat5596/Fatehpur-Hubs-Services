@@ -195,3 +195,104 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+// Firebase Config - अपना डाल देना (तू पहले से यूज़ कर रहा है OTP में)
+const firebaseConfig = {
+    apiKey: "AIzaSyDxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    authDomain: "fatehpur-hubs.firebaseapp.com",
+    databaseURL: "https://fatehpur-hubs-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "fatehpur-hubs",
+    storageBucket: "fatehpur-hubs.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abc123def456"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Toggle Review Section
+function toggleReviewSection(key) {
+    const section = document.getElementById('review-section-' + key);
+    const btn = document.querySelector(`button[onclick="toggleReviewSection('${key}')"]`);
+    if (section.style.display === 'none' || !section.style.display) {
+        section.style.display = 'block';
+        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+        loadReviews(key);
+    } else {
+        section.style.display = 'none';
+        btn.innerHTML = `रिव्यू और रेटिंग देखें (<span id="review-count-${key}">0</span>)`;
+    }
+}
+
+// Load Reviews from Firebase
+function loadReviews(key) {
+    db.ref('reviews/' + key).on('value', (snapshot) => {
+        const reviews = snapshot.val() || {};
+        const list = document.getElementById('reviews-list-' + key);
+        const countSpan = document.getElementById('review-count-' + key);
+        const avgSpan = document.getElementById('avg-rating-' + key);
+        
+        let total = 0, count = 0;
+        list.innerHTML = '';
+
+        for (let id in reviews) {
+            const r = reviews[id];
+            total += r.rating;
+            count++;
+            list.innerHTML += `<div class="review-item"><strong>\( {r.rating}★</strong> \){r.comment}</div>`;
+        }
+
+        const avg = count > 0 ? (total / count).toFixed(1) : 0;
+        avgSpan.innerHTML = `कुल रेटिंग: \( {avg}★ ( \){count} रिव्यू)`;
+        if (countSpan) countSpan.innerHTML = count;
+        if (count === 0) list.innerHTML = '<p style="color:#666;">अभी कोई रिव्यू नहीं।</p>';
+    });
+}
+
+// Submit Review
+function submitReview(key) {
+    const stars = document.querySelectorAll(`#star-rating-${key} .star.selected`);
+    const rating = stars.length > 0 ? stars[stars.length - 1].getAttribute('data-value') : 0;
+    const comment = document.getElementById('comment-' + key).value.trim();
+
+    if (rating == 0) return alert("स्टार रेटिंग दें ⭐");
+    if (!comment) return alert("कमेंट लिखें");
+
+    db.ref('reviews/' + key).push({
+        rating: parseInt(rating),
+        comment: comment,
+        timestamp: Date.now()
+    }).then(() => {
+        document.getElementById('comment-' + key).value = '';
+        document.querySelectorAll(`#star-rating-${key} .star`).forEach(s => s.classList.remove('selected'));
+        alert("धन्यवाद! रिव्यू सबमिट हो गया");
+    });
+}
+
+// Star Rating Click
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('star')) {
+        const parent = e.target.parentElement;
+        const value = e.target.getAttribute('data-value');
+        parent.querySelectorAll('.star').forEach((s, i) => {
+            if (i < value) s.classList.add('selected');
+            else s.classList.remove('selected');
+        });
+    }
+});
+
+// Load all reviews when page loads
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.querySelectorAll('[id^="toggle-btn"], .review-toggle-btn').forEach(btn => {
+            const onclick = btn.getAttribute('onclick');
+            if (onclick && onclick.includes('toggleReviewSection')) {
+                const key = onclick.match(/'(.+?)'/)[1];
+                loadReviews(key);
+            }
+        });
+    }, 2000);
+});
+</script>
