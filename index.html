@@ -1352,9 +1352,9 @@ document.addEventListener('click', function(e) {
         if (rating === 0) return alert("स्टार रेटिंग दें");
         if (!comment) return alert("कमेंट लिखें");
 
-        let reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
-        reviews.push({ rating, comment, time: new Date().toLocaleString('hi-IN') });
-        localStorage.setItem('reviews-' + key, JSON.stringify(reviews));
+        let reviews = JSON.parse(localStorage.getItem('reviews_' + key) || '[]');
+reviews.push({ rating, comment, time: new Date().toLocaleString('hi-IN') });
+localStorage.setItem('reviews_' + key, JSON.stringify(reviews));
 
         section.querySelector('.review-comment').value = '';
         stars.forEach(star => { star.style.color = '#ddd'; star.innerHTML = '☆'; });
@@ -1369,7 +1369,7 @@ function loadAllReviews() {
         const key = btn.getAttribute('data-key');  // ← ये सही key लेगा हर मिस्त्री का
         if (!key) return;
 
-        const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
+        const reviews = JSON.parse(localStorage.getItem('reviews_' + key) || '[]');
         const count = reviews.length;
         const total = reviews.reduce((sum, r) => sum + r.rating, 0);
         const avg = count > 0 ? (total / count).toFixed(1) : 0;
