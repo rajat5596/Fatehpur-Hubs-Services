@@ -195,54 +195,39 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-function submitReview(serviceId) {
-    // 1. HTML से रेटिंग और रिव्यू टेक्स्ट लेना
-    const rating = document.getElementById('selected-rating').value;
-    const reviewText = document.getElementById('review-text').value;
+// यह फ़ंक्शन रिव्यू सेक्शन को दिखाता/छिपाता है
+function toggleReviewSection(serviceId) {
+    const section = document.getElementById('review-section-' + serviceId);
+    const button = document.getElementById('toggle-btn-' + serviceId);
 
-    if (rating == 0 || reviewText.trim() === "") {
-        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
-        return;
+    // स्टार हैंडलर को एक्टिवेट करें ताकि स्टार्स पर क्लिक करने पर रंग बदले
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
+        // जब सेक्शन खुलता है, तभी स्टार हैंडलर को एक्टिवेट करें
+        initializeRatingHandlers(serviceId); 
+    } else {
+        section.style.display = 'none';
+        button.textContent = 'रिव्यू और रेटिंग देखें (0)';
     }
-
-    // 2. Firebase में डेटा भेजने का Reference
-    // यह 'reviews' नोड को अपने आप बना देगा
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    
-    // 3. रिव्यू डेटा ऑब्जेक्ट बनाना
-    const newReview = {
-        rating: rating,
-        text: reviewText,
-        reviewer: 'User', // इसे बाद में सही यूज़रनाम से बदल सकते हैं
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // 4. RTDB में डेटा भेजना
-    reviewsRef.push(newReview)
-        .then(() => {
-            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
-            document.getElementById('review-text').value = '';
-            // हम अगले स्टेप में डिस्प्ले (loadAndDisplayReviews) फ़ंक्शन जोड़ेंगे
-        })
-        .catch(error => {
-            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
-            alert("रिव्यू सबमिट नहीं हो सका। कृपया पुनः प्रयास करें।");
-        });
 }
-// यह कोड स्टार्स पर क्लिक करने पर रेटिंग की वैल्यू को सेव करता है और रंग बदलता है।
+// यह फ़ंक्शन स्टार्स पर क्लिक करने पर रेटिंग की वैल्यू को सेव करता है और रंग बदलता है।
+function initializeRatingHandlers(serviceId) {
+    // यह केवल उस मिस्त्री के स्टार्स को ढूंढेगा
+    const container = document.querySelector('.rating-stars-' + serviceId);
+    if (!container) return; 
 
-function initializeRatingHandlers() {
-    // यह फ़ंक्शन रिव्यू सबमिशन फॉर्म के अंदर के स्टार्स को ढूंढता है
-    document.querySelectorAll('#review-submission-form .star').forEach(star => {
+    container.querySelectorAll('.star').forEach(star => {
+        // यह चेक करता है कि हैंडलर पहले से जुड़ा तो नहीं है
+        if (star.getAttribute('data-handler') === 'true') return; 
+
         star.addEventListener('click', function() {
             const rating = parseInt(this.getAttribute('data-rating'));
-            document.getElementById('selected-rating').value = rating;
+            // सही मिस्त्री के हिडन इनपुट में रेटिंग की वैल्यू सेव करें
+            document.getElementById('selected-rating-' + serviceId).value = rating; 
             
-            // विज़ुअल फीडबैक के लिए स्टार्स को रंगना
-            // (यह केवल #review-submission-form के अंदर ही काम करेगा)
-            let currentContainer = this.closest('#review-submission-form');
-
-            currentContainer.querySelectorAll('.star').forEach(s => {
+            // केवल वर्तमान मिस्त्री के स्टार्स को रंगना
+            container.querySelectorAll('.star').forEach(s => {
                 if (parseInt(s.getAttribute('data-rating')) <= rating) {
                     s.classList.add('rated');
                 } else {
@@ -250,10 +235,6 @@ function initializeRatingHandlers() {
                 }
             });
         });
+        star.setAttribute('data-handler', 'true'); // हैंडलर को मार्क करें
     });
 }
-
-// चूंकि आपका HTML डायनामिक रूप से बनता है (JavaScript द्वारा), 
-// आपको यह फ़ंक्शन तब कॉल करना होगा जब मिस्त्री की डिटेल स्क्रीन लोड हो जाए। 
-// यह कोड अभी के लिए जोड़ दें।
-// initializeRatingHandlers(); 
