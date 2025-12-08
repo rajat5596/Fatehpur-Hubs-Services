@@ -1275,6 +1275,36 @@ function registerJob() {
     }
     
 </script>
+            <script>
+    function toggleReviewSection(key) {
+        const reviewSection = document.getElementById('review-section-' + key);
+        const toggleBtn = document.getElementById('toggle-btn-' + key);
+
+        if (!reviewSection || !toggleBtn) return;
+
+        if (reviewSection.style.display === 'none' || reviewSection.style.display === '') {
+            reviewSection.style.display = 'block';
+            toggleBtn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+        } else {
+            reviewSection.style.display = 'none';
+            toggleBtn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
+        }
+    }
+
+    // Extra safety (जरूरी है क्योंकि तुम्हारा content बाद में load होता है)
+    setInterval(() => {
+        document.querySelectorAll('[id^="toggle-btn-"]').forEach(btn => {
+            if (!btn.dataset.fixed) {
+                btn.dataset.fixed = "true";
+                btn.onclick = function() {
+                    toggleReviewSection(this.id.replace('toggle-btn-', ''));
+                };
+            }
+        });
+    }, 800);
+
+    console.log("Review Button Fix Loaded!");
+            </script>
 
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
 <div style="position:fixed; bottom:50px; left:0; right:0; z-index:9998; padding:0;">
