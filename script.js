@@ -195,122 +195,69 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-// ==================== ULTIMATE FIX - NO HTML CHANGE ====================
-console.log("🚀 Review System Script Loaded");
+function submitReview(serviceId) {
+    const rating = document.getElementById('selected-rating-' + serviceId).value;
+    const reviewText = document.getElementById('review-text-' + serviceId).value;
 
-// 1. PAGE LOAD EVENT
-window.onload = function() {
-    console.log("✅ Page loaded completely");
-    fixAllButtons();
-    addEmergencyButton();
-};
-
-// 2. FIX ALL BUTTONS FUNCTION
-function fixAllButtons() {
-    console.log("🛠️ Fixing all buttons...");
-    
-    // Find ALL buttons on page
-    const allButtons = document.getElementsByTagName('button');
-    console.log("Total buttons found:", allButtons.length);
-    
-    for (let btn of allButtons) {
-        // Check if this is a review button
-        if (btn.innerHTML.includes('रिव्यू') || btn.innerHTML.includes('देखें')) {
-            console.log("Found review button:", btn.innerHTML);
-            
-            // Remove all old events
-            btn.onclick = null;
-            btn.onclick = function() {
-                alert("🎯 Review button clicked!\n\nThis is a test alert.\nIf you see this, buttons are working.");
-                
-                // Find the review section
-                const sectionId = 'review-section-' + btn.id.replace('toggle-btn-', '');
-                const section = document.getElementById(sectionId);
-                
-                if (section) {
-                    if (section.style.display === 'none') {
-                        section.style.display = 'block';
-                        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
-                    } else {
-                        section.style.display = 'none';
-                        btn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
-                    }
-                }
-            };
-        }
+    if (rating == 0 || reviewText.trim() === "") {
+        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+        return;
     }
-}
 
-// 3. EMERGENCY TEST BUTTON
-function addEmergencyButton() {
-    // Create BIG RED TEST BUTTON
-    const testBtn = document.createElement('button');
-    testBtn.innerHTML = '🔥 TEST BUTTON HERE';
-    testBtn.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(45deg, #FF0000, #FF5722);
-        color: white;
-        padding: 25px 40px;
-        border: none;
-        border-radius: 15px;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-        z-index: 999999;
-        box-shadow: 0 10px 30px rgba(255,0,0,0.5);
-        animation: pulse 2s infinite;
-    `;
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
     
-    // Add CSS animation
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-            100% { transform: translate(-50%, -50%) scale(1); }
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Button click action
-    testBtn.onclick = function() {
-        alert("✅ JAVASCRIPT IS WORKING!\n\nNow all review buttons should work.\nClick any 'रिव्यू और रेटिंग देखें' button.");
-        fixAllButtons();
+    const newReview = {
+        rating: rating,
+        text: reviewText,
+        reviewer: 'User', // इसे बाद में यूज़रनाम से बदल सकते हैं
+        timestamp: firebase.database.ServerValue.TIMESTAMP
     };
-    
-    document.body.appendChild(testBtn);
-    console.log("🔥 Emergency test button added");
-}
 
-// 4. AUTO-CLICK TEST (After 3 seconds)
-setTimeout(function() {
-    // Try to click first review button automatically
-    const reviewButtons = document.querySelectorAll('button');
-    for (let btn of reviewButtons) {
-        if (btn.innerHTML.includes('रिव्यू') || btn.innerHTML.includes('देखें')) {
-            console.log("Trying to auto-click button:", btn.innerHTML);
-            btn.click();
-            break;
-        }
+    reviewsRef.push(newReview)
+        .then(() => {
+            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            document.getElementById('review-text-' + serviceId).value = ''; // टेक्स्ट खाली करें
+            // रेटिंग को रीसेट करने का कोड (अगर ज़रूरत हो)
+        })
+        .catch(error => {
+            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
+            alert("रिव्यू सबमिट नहीं हो सका।");
+        });
+}
+function toggleReviewSection(serviceId) {
+    const section = document.getElementById('review-section-' + serviceId);
+    const button = document.getElementById('toggle-btn-' + serviceId);
+
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
+        initializeRatingHandlers(serviceId); // स्टार्स को एक्टिवेट करें
+    } else {
+        section.style.display = 'none';
+        button.textContent = 'रिव्यू और रेटिंग देखें (0)';
     }
-}, 3000);
-
-// 5. SIMPLE STAR RATING
-function setupStarsSimple(serviceId) {
-    const stars = document.querySelectorAll('.rating-stars-' + serviceId + ' .star');
-    stars.forEach(star => {
-        star.onclick = function() {
-            alert("⭐ Star clicked! Rating: " + this.getAttribute('data-rating'));
-            this.style.color = 'gold';
-        };
-    });
 }
+function initializeRatingHandlers(serviceId) {
+    const container = document.querySelector('.rating-stars-' + serviceId);
+    if (!container) return; 
 
-// 6. SIMPLE SUBMIT
-function submitReviewSimple(serviceId) {
-    alert("✅ Review submitted successfully!\n\nThis is working.");
-    return true;
+    container.querySelectorAll('.star').forEach(star => {
+        // अगर हैंडलर पहले से जुड़ा है तो दोबारा न जोड़ें
+        if (star.getAttribute('data-handler') === 'true') return; 
+
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.getAttribute('data-rating'));
+            document.getElementById('selected-rating-' + serviceId).value = rating; 
+            
+            // केवल वर्तमान मिस्त्री के स्टार्स को रंगना
+            container.querySelectorAll('.star').forEach(s => {
+                if (parseInt(s.getAttribute('data-rating')) <= rating) {
+                    s.classList.add('rated');
+                } else {
+                    s.classList.remove('rated');
+                }
+            });
+        });
+        star.setAttribute('data-handler', 'true'); // हैंडलर को मार्क करें
+    });
 }
