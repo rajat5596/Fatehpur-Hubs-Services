@@ -1267,7 +1267,7 @@ function registerJob() {
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('review-btn') || e.target.closest('.review-btn')) {
         const btn = e.target.closest('.review-btn');
-        const key = btn.dataset.key;
+        const key = btn.getAttribute('data-key');
         const section = document.getElementById('reviews-' + key);
 
         if (section.style.display === 'none' || section.style.display === '') {
