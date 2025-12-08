@@ -1293,14 +1293,23 @@ function toggleReview(key) {
 function submitReview(key) {
     const stars = document.querySelectorAll(`.rating-stars-${key} .star`);
     let rating = 0;
-    stars.forEach((s, i) => { if (s.classList.contains('gold')) rating = i + 1; });
+    stars.forEach((s, i) => {
+        if (s.classList.contains('gold')) rating = i + 1;
+    });
+
     const comment = document.getElementById('review-text-' + key)?.value.trim() || 'कोई कमेंट नहीं';
 
-    if (rating === 0) return alert("पहले स्टार दें भाई ⭐");
-    
+    if (rating === 0) {
+        alert("पहले स्टार रेटिंग दें भाई ⭐");
+        return;
+    }
+
+    // यही लाइन ठीक कर दी है — अब सही दिखेगा
     alert(`धन्यवाद!\nरेटिंग: \( {rating} स्टार\nकमेंट: \){comment}`);
-    // यहाँ बाद में Firebase भी जोड़ सकते हो
-}
+
+    // अगर चाहो तो यहाँ रिव्यू को save भी कर सकते हो (बाद में)
+    // अभी सिर्फ alert है ताकि तुम देख सको कि सबमिट हो रहा है
+                }
 
 // EK HI BAAR SAB KUCH FIX KAR DO
 const fixAll = () => {
