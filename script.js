@@ -195,35 +195,58 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-// यह फ़ंक्शन रिव्यू सेक्शन को दिखाता/छिपाता है
+function submitReview(serviceId) {
+    const rating = document.getElementById('selected-rating-' + serviceId).value;
+    const reviewText = document.getElementById('review-text-' + serviceId).value;
+
+    if (rating == 0 || reviewText.trim() === "") {
+        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+        return;
+    }
+
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    
+    const newReview = {
+        rating: rating,
+        text: reviewText,
+        reviewer: 'User', // इसे बाद में यूज़रनाम से बदल सकते हैं
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    reviewsRef.push(newReview)
+        .then(() => {
+            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            document.getElementById('review-text-' + serviceId).value = ''; // टेक्स्ट खाली करें
+            // रेटिंग को रीसेट करने का कोड (अगर ज़रूरत हो)
+        })
+        .catch(error => {
+            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
+            alert("रिव्यू सबमिट नहीं हो सका।");
+        });
+}
 function toggleReviewSection(serviceId) {
     const section = document.getElementById('review-section-' + serviceId);
     const button = document.getElementById('toggle-btn-' + serviceId);
 
-    // स्टार हैंडलर को एक्टिवेट करें ताकि स्टार्स पर क्लिक करने पर रंग बदले
     if (section.style.display === 'none') {
         section.style.display = 'block';
         button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
-        // जब सेक्शन खुलता है, तभी स्टार हैंडलर को एक्टिवेट करें
-        initializeRatingHandlers(serviceId); 
+        initializeRatingHandlers(serviceId); // स्टार्स को एक्टिवेट करें
     } else {
         section.style.display = 'none';
         button.textContent = 'रिव्यू और रेटिंग देखें (0)';
     }
 }
-// यह फ़ंक्शन स्टार्स पर क्लिक करने पर रेटिंग की वैल्यू को सेव करता है और रंग बदलता है।
 function initializeRatingHandlers(serviceId) {
-    // यह केवल उस मिस्त्री के स्टार्स को ढूंढेगा
     const container = document.querySelector('.rating-stars-' + serviceId);
     if (!container) return; 
 
     container.querySelectorAll('.star').forEach(star => {
-        // यह चेक करता है कि हैंडलर पहले से जुड़ा तो नहीं है
+        // अगर हैंडलर पहले से जुड़ा है तो दोबारा न जोड़ें
         if (star.getAttribute('data-handler') === 'true') return; 
 
         star.addEventListener('click', function() {
             const rating = parseInt(this.getAttribute('data-rating'));
-            // सही मिस्त्री के हिडन इनपुट में रेटिंग की वैल्यू सेव करें
             document.getElementById('selected-rating-' + serviceId).value = rating; 
             
             // केवल वर्तमान मिस्त्री के स्टार्स को रंगना
