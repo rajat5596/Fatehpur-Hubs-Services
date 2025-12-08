@@ -1276,67 +1276,55 @@ function registerJob() {
     
 </script>
             <script>
-// FINAL FIX - दोनों प्रॉब्लम एक साथ खत्म 🔥
+// ULTIMATE FINAL FIX - SAB MISTRI KA BUTTON + STAR 100% KAM KAREGA 🔥
 
 function toggleReviewSection(key) {
-    const reviewSection = document.getElementById('review-section-' + key);
-    const toggleBtn = document.getElementById('toggle-btn-' + key);
-
-    if (!reviewSection || !toggleBtn) return;
-
-    if (reviewSection.style.display === 'none' || reviewSection.style.display === '') {
-        reviewSection.style.display = 'block';
-        toggleBtn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+    const section = document.getElementById('review-section-' + key);
+    const btn = document.getElementById('toggle-btn-' + key);
+    
+    if (!section || !btn) return;
+    
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
     } else {
-        reviewSection.style.display = 'none';
-        toggleBtn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
+        section.style.display = 'none';
+        btn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
     }
 }
 
-// ⭐ STAR RATING FIX (सभी मिस्त्री के स्टार काम करेंगे)
-function setupStarRating(key) {
+// स्टार रेटिंग फंक्शन
+function setupStars(key) {
     const stars = document.querySelectorAll(`.rating-stars-${key} .star`);
-    let selectedRating = 0;
-
-    stars.forEach((star, index) => {
-        star.style.cursor = "pointer";
+    stars.forEach((star, i) => {
         star.onclick = function() {
-            selectedRating = index + 1;
-            stars.forEach((s, i) => {
-                s.style.color = (i < selectedRating) ? "gold" : "#ccc";
-                s.innerHTML = (i < selectedRating) ? "★" : "☆";
+            stars.forEach((s, j) => {
+                s.style.color = j <= i ? 'gold' : '#ccc';
+                s.innerHTML = j <= i ? '★' : '☆';
             });
-            // hidden input में value सेट कर दो (submit के लिए)
-            const hiddenInput = document.querySelector(`input[name="rating-${key}"]`);
-            if (hiddenInput) hiddenInput.value = selectedRating;
         };
     });
 }
 
-// MAIN FIXER - हर 1 सेकंड चेक करेगा कि नया मिस्त्री आया है या नहीं
-setInterval(function() {
-    document.querySelectorAll('.profile-card').forEach(card => {
-        if (!card.dataset.fixed) {
-            card.dataset.fixed = "true";
-
-            const key = card.querySelector('[id^="toggle-btn-"]')?.id.replace('toggle-btn-', '');
-            if (key) {
-                // toggle button को फिर से attach कर दो
-                const btn = document.getElementById('toggle-btn-' + key);
-                if (btn) {
-                    btn.onclick = () => toggleReviewSection(key);
-                }
-
-                // स्टार रेटिंग को activate कर दो
-                setupStarRating(key);
-            }
+// हर 500ms में चेक करो कि नये मिस्त्री आए हैं या नहीं
+setInterval(() => {
+    document.querySelectorAll('button[id^="toggle-btn-"]').forEach(btn => {
+        if (!btn.dataset.ready) {
+            btn.dataset.ready = "true";
+            
+            const key = btn.id.replace('toggle-btn-', '');
+            
+            // बटन को फिर से कनेक्ट करो
+            btn.onclick = () => toggleReviewSection(key);
+            
+            // स्टार रेटिंग भी एक्टिवेट करो
+            setupStars(key);
         }
     });
-}, 800);
+}, 500);
 
-console.log("FINAL FIX: सारे बटन + सारे स्टार अब काम करेंगे! 🔥");
+console.log("सारे मिस्त्री का रिव्यू बटन + स्टार अब काम करेगा - FINAL FIX 🔥");
             </script>
-
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
 <div style="position:fixed; bottom:50px; left:0; right:0; z-index:9998; padding:0;">
     <div style="width:100%; max-width:500px; margin:0 auto;">
