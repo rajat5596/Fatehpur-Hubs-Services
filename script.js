@@ -195,118 +195,224 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-// ==================== रिव्यू और रेटिंग सिस्टम ====================
+// ==================== SIMPLE RATING SYSTEM ====================
 
-// स्टार रेटिंग सेटअप करने का फंक्शन
-function setupRatingStars(serviceId) {
+// 1. TOGGLE BUTTON FUNCTION
+function toggleReviewSection(serviceId) {
+    console.log("Button clicked for:", serviceId);
+    
+    // Find elements
+    const section = document.getElementById('review-section-' + serviceId);
+    const button = document.getElementById('toggle-btn-' + serviceId);
+    
+    if (!section) {
+        alert("Error: review-section-" + serviceId + " not found!");
+        return;
+    }
+    
+    if (!button) {
+        alert("Error: toggle-btn-" + serviceId + " not found!");
+        return;
+    }
+    
+    console.log("Section found:", section);
+    console.log("Button found:", button);
+    
+    // Toggle display
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
+        console.log("Section shown");
+    } else {
+        section.style.display = 'none';
+        button.textContent = 'रिव्यू और रेटिंग देखें (0)';
+        console.log("Section hidden");
+    }
+}
+
+// 2. STAR RATING FUNCTION
+function setupStars(serviceId) {
+    console.log("Setting up stars for:", serviceId);
+    
     const stars = document.querySelectorAll('.rating-stars-' + serviceId + ' .star');
     const hiddenInput = document.getElementById('selected-rating-' + serviceId);
+    
+    if (!stars.length) {
+        console.error("No stars found for:", serviceId);
+        return;
+    }
+    
+    if (!hiddenInput) {
+        console.error("Hidden input not found for:", serviceId);
+        return;
+    }
     
     stars.forEach(star => {
         star.onclick = function() {
             const rating = this.getAttribute('data-rating');
+            console.log("Star clicked:", rating);
             hiddenInput.value = rating;
             
-            // स्टार्स को रंगो
+            // Color all stars
             stars.forEach(s => {
-                const sRating = s.getAttribute('data-rating');
-                if (sRating <= rating) {
-                    s.style.color = 'gold';
+                if (s.getAttribute('data-rating') <= rating) {
+                    s.style.color = '#FFD700'; // GOLD
                 } else {
-                    s.style.color = 'lightgray';
+                    s.style.color = '#CCCCCC'; // GRAY
                 }
             });
         };
     });
 }
 
-// रिव्यू सेक्शन टॉगल करें
-function toggleReviewSection(serviceId) {
-    const section = document.getElementById('review-section-' + serviceId);
-    const button = document.getElementById('toggle-btn-' + serviceId);
-    
-    if (section.style.display === 'none' || !section.style.display) {
-        // दिखाएं
-        section.style.display = 'block';
-        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
-        
-        // स्टार्स तैयार करें
-        setupRatingStars(serviceId);
-    } else {
-        // छुपाएं
-        section.style.display = 'none';
-        button.textContent = 'रिव्यू और रेटिंग देखें (0)';
-    }
-}
-
-// रिव्यू सबमिट करें
+// 3. SUBMIT REVIEW FUNCTION
 function submitReview(serviceId) {
-    const rating = document.getElementById('selected-rating-' + serviceId).value;
-    const reviewText = document.getElementById('review-text-' + serviceId).value;
+    console.log("Submit review for:", serviceId);
     
-    if (rating == 0 || reviewText.trim() === "") {
-        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+    const ratingInput = document.getElementById('selected-rating-' + serviceId);
+    const reviewText = document.getElementById('review-text-' + serviceId);
+    
+    if (!ratingInput) {
+        alert("Error: Rating input not found!");
         return;
     }
     
-    // फायरबेस कोड यहाँ आएगा
-    alert("रिव्यू सबमिट हो गया! रेटिंग: " + rating + ", रिव्यू: " + reviewText);
+    if (!reviewText) {
+        alert("Error: Review textarea not found!");
+        return;
+    }
     
-    // फॉर्म रीसेट करें
-    document.getElementById('selected-rating-' + serviceId).value = 0;
-    document.getElementById('review-text-' + serviceId).value = '';
+    const rating = ratingInput.value;
+    const text = reviewText.value;
     
-    // स्टार्स रीसेट करें
+    console.log("Rating:", rating, "Review:", text);
+    
+    if (rating == 0) {
+        alert("कृपया स्टार रेटिंग दें!");
+        return;
+    }
+    
+    if (text.trim() === "") {
+        alert("कृपया रिव्यू लिखें!");
+        return;
+    }
+    
+    // SUCCESS
+    alert("✅ रिव्यू सबमिट हो गया!\nरेटिंग: " + rating + " स्टार\nरिव्यू: " + text);
+    
+    // Reset form
+    ratingInput.value = 0;
+    reviewText.value = "";
+    
+    // Reset stars
     const stars = document.querySelectorAll('.rating-stars-' + serviceId + ' .star');
     stars.forEach(star => {
-        star.style.color = 'lightgray';
+        star.style.color = '#CCCCCC';
     });
 }
 
-// ==================== मिस्त्री कार्ड रेंडर ====================
+// ==================== RENDER CARD FUNCTION ====================
 function renderProviderCard(p) {
-    return `<div class="profile-card">
+    return `
+    <div class="profile-card" style="border:1px solid #ddd; border-radius:10px; padding:15px; margin:10px 0; background:white;">
         <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
         <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
 
-        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+        <div style="margin-top:10px; display:flex; gap:5px;">
+            <button onclick="window.open('https://wa.me/${p.phone}', '_blank')" style="flex:1; background:#25D366; color:white; border:none; padding:8px; border-radius:5px;">WhatsApp</button>
+            <button onclick="window.location='tel:${p.phone}'" style="flex:1; background:#007bff; color:white; border:none; padding:8px; border-radius:5px;">Call Now</button>
+            <button onclick="alert('Share feature')" style="flex:1; background:#6c757d; color:white; border:none; padding:8px; border-radius:5px;">Share</button>
         </div>
         
-        <hr style="margin-top: 20px; border-top: 1px solid #eee;">
-
-        <button id="toggle-btn-${p.key}" 
-                onclick="toggleReviewSection('${p.key}')" 
-                style="width: 100%; padding: 8px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                रिव्यू और रेटिंग देखें (0)
+        <hr style="margin:15px 0;">
+        
+        <!-- REVIEW BUTTON -->
+        <button 
+            id="toggle-btn-${p.key}" 
+            onclick="toggleReviewSection('${p.key}')" 
+            style="width:100%; padding:10px; background:#4CAF50; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px;">
+            🔍 रिव्यू और रेटिंग देखें
         </button>
-
-        <div id="review-section-${p.key}" style="display: none;">
-            <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
-                <h4 style="margin-bottom: 5px;">कुल रेटिंग: अभी कोई नहीं</h4>
+        
+        <!-- REVIEW SECTION (HIDDEN BY DEFAULT) -->
+        <div id="review-section-${p.key}" style="display:none; margin-top:15px; padding:15px; border:1px solid #eee; border-radius:8px;">
+            <h4 style="color:#333;">⭐ अपना रिव्यू दें</h4>
+            
+            <!-- STAR RATING -->
+            <div class="rating-stars-${p.key}" style="font-size:30px; margin:10px 0;">
+                <span class="star" data-rating="1" style="color:#CCCCCC; cursor:pointer; margin:0 5px;">★</span>
+                <span class="star" data-rating="2" style="color:#CCCCCC; cursor:pointer; margin:0 5px;">★</span>
+                <span class="star" data-rating="3" style="color:#CCCCCC; cursor:pointer; margin:0 5px;">★</span>
+                <span class="star" data-rating="4" style="color:#CCCCCC; cursor:pointer; margin:0 5px;">★</span>
+                <span class="star" data-rating="5" style="color:#CCCCCC; cursor:pointer; margin:0 5px;">★</span>
             </div>
-
-            <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
-                <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
-                <div class="rating-stars-${p.key}" style="font-size: 24px; margin: 10px 0;">
-                    <span class="star" data-rating="1" style="color: lightgray; cursor: pointer;">★</span>
-                    <span class="star" data-rating="2" style="color: lightgray; cursor: pointer;">★</span>
-                    <span class="star" data-rating="3" style="color: lightgray; cursor: pointer;">★</span>
-                    <span class="star" data-rating="4" style="color: lightgray; cursor: pointer;">★</span>
-                    <span class="star" data-rating="5" style="color: lightgray; cursor: pointer;">★</span>
-                </div>
-                
-                <input type="hidden" id="selected-rating-${p.key}" value="0">
-                <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
-                
-                <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">रिव्यू सबमिट करें</button>
-            </div>
-
-            <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
-                <h4>यूज़र रिव्यू</h4>
-            </div>
+            
+            <input type="hidden" id="selected-rating-${p.key}" value="0">
+            
+            <!-- REVIEW TEXT -->
+            <textarea 
+                id="review-text-${p.key}" 
+                placeholder="अपने अनुभव के बारे में लिखें..." 
+                rows="3" 
+                style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
+            </textarea>
+            
+            <!-- SUBMIT BUTTON -->
+            <button 
+                onclick="submitReview('${p.key}')" 
+                style="width:100%; padding:12px; background:#2196F3; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px;">
+                📤 रिव्यू सबमिट करें
+            </button>
         </div>
-    </div>`;
+    </div>
+    `;
 }
+
+// ==================== TEST FUNCTION ====================
+// इस फंक्शन को कॉल करके टेस्ट करो
+function testReviewSystem() {
+    console.log("=== TESTING REVIEW SYSTEM ===");
+    
+    // Create a test provider
+    const testProvider = {
+        key: "test123",
+        name: "Test Mistri",
+        category: "Plumber",
+        area: "Fatehpur",
+        experience: "5 years",
+        phone: "9999999999"
+    };
+    
+    // Add to page
+    document.body.innerHTML += renderProviderCard(testProvider);
+    
+    // Show message
+    alert("Test card added! Click the GREEN button to test.");
+    
+    // Auto-setup stars after a delay
+    setTimeout(() => {
+        setupStars("test123");
+        console.log("Stars setup complete for test123");
+    }, 500);
+}
+
+// पेज लोड होने पर टेस्ट बटन जोड़ें
+window.onload = function() {
+    // Add test button to page
+    const testBtn = document.createElement('button');
+    testBtn.innerHTML = "🧪 टेस्ट रिव्यू सिस्टम";
+    testBtn.style.position = 'fixed';
+    testBtn.style.top = '10px';
+    testBtn.style.right = '10px';
+    testBtn.style.zIndex = '1000';
+    testBtn.style.padding = '10px';
+    testBtn.style.background = '#FF9800';
+    testBtn.style.color = 'white';
+    testBtn.style.border = 'none';
+    testBtn.style.borderRadius = '5px';
+    testBtn.style.cursor = 'pointer';
+    testBtn.onclick = testReviewSystem;
+    
+    document.body.appendChild(testBtn);
+    console.log("Test button added to page");
+};
