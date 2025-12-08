@@ -681,24 +681,24 @@ function renderProviderCard(p) {
             <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
         </div>
         <br>
-<button id="toggle-btn-\( {p.key}" class="toggle-btn" onclick="toggleReview(' \){p.key}')">
-    रिव्यू और रेटिंग देखें (0)
+<button class="review-btn" data-key="${p.key}">
+    रिव्यू और रेटिंग देखें (<span class="review-count">0</span>)
 </button>
 
-<div id="review-section-${p.key}" class="review-section">
-    <div class="average-rating">कुल रेटिंग: 0 ★ (0 रिव्यू)</div>
+<div class="review-section" id="reviews-${p.key}" style="display:none;background:#f9f9f9;padding:15px;margin-top:10px;border-radius:8px;border:1px solid #eee;">
+    <div class="avg-rating" style="font-weight:bold;color:#d81b60;">कुल रेटिंग: 0 ★ (0 रिव्यू)</div>
     <div class="reviews-list"></div>
     <hr>
-    <p>अपना रिव्यू दें:</p>
-    <div class="rating-stars-${p.key}">
-        <span class="star" data-rating="1">☆</span>
-        <span class="star" data-rating="2">☆</span>
-        <span class="star" data-rating="3">☆</span>
-        <span class="star" data-rating="4">☆</span>
-        <span class="star" data-rating="5">☆</span>
+    <p style="margin:8px 0;"><b>अपना रिव्यू दें:</b></p>
+    <div class="star-widget">
+        <span class="star" data-value="1">☆</span>
+        <span class="star" data-value="2">☆</span>
+        <span class="star" data-value="3">☆</span>
+        <span class="star" data-value="4">☆</span>
+        <span class="star" data-value="5">☆</span>
     </div>
-    <textarea id="review-text-${p.key}" placeholder="कमेंट लिखें..."></textarea>
-    <button class="submit-btn" onclick="submitReview('${p.key}')">रिव्यू सबमिट करें</button>
+    <textarea class="review-comment" placeholder="अपना अनुभव लिखें..." style="width:100%;height:70px;margin:10px 0;padding:10px;border-radius:8px;border:1px solid #ccc;"></textarea>
+    <button class="submit-review" style="background:#d81b60;color:white;padding:12px 25px;border:none;border-radius:8px;">सबमिट करें</button>
 </div>
           </div>`;
         }
