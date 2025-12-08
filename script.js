@@ -195,69 +195,118 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-function submitReview(serviceId) {
-    const rating = document.getElementById('selected-rating-' + serviceId).value;
-    const reviewText = document.getElementById('review-text-' + serviceId).value;
+// ==================== रिव्यू और रेटिंग सिस्टम ====================
 
-    if (rating == 0 || reviewText.trim() === "") {
-        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
-        return;
-    }
-
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+// स्टार रेटिंग सेटअप करने का फंक्शन
+function setupRatingStars(serviceId) {
+    const stars = document.querySelectorAll('.rating-stars-' + serviceId + ' .star');
+    const hiddenInput = document.getElementById('selected-rating-' + serviceId);
     
-    const newReview = {
-        rating: rating,
-        text: reviewText,
-        reviewer: 'User', // इसे बाद में यूज़रनाम से बदल सकते हैं
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    reviewsRef.push(newReview)
-        .then(() => {
-            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
-            document.getElementById('review-text-' + serviceId).value = ''; // टेक्स्ट खाली करें
-            // रेटिंग को रीसेट करने का कोड (अगर ज़रूरत हो)
-        })
-        .catch(error => {
-            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
-            alert("रिव्यू सबमिट नहीं हो सका।");
-        });
+    stars.forEach(star => {
+        star.onclick = function() {
+            const rating = this.getAttribute('data-rating');
+            hiddenInput.value = rating;
+            
+            // स्टार्स को रंगो
+            stars.forEach(s => {
+                const sRating = s.getAttribute('data-rating');
+                if (sRating <= rating) {
+                    s.style.color = 'gold';
+                } else {
+                    s.style.color = 'lightgray';
+                }
+            });
+        };
+    });
 }
+
+// रिव्यू सेक्शन टॉगल करें
 function toggleReviewSection(serviceId) {
     const section = document.getElementById('review-section-' + serviceId);
     const button = document.getElementById('toggle-btn-' + serviceId);
-
-    if (section.style.display === 'none') {
+    
+    if (section.style.display === 'none' || !section.style.display) {
+        // दिखाएं
         section.style.display = 'block';
         button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
-        initializeRatingHandlers(serviceId); // स्टार्स को एक्टिवेट करें
+        
+        // स्टार्स तैयार करें
+        setupRatingStars(serviceId);
     } else {
+        // छुपाएं
         section.style.display = 'none';
         button.textContent = 'रिव्यू और रेटिंग देखें (0)';
     }
 }
-function initializeRatingHandlers(serviceId) {
-    const container = document.querySelector('.rating-stars-' + serviceId);
-    if (!container) return; 
 
-    container.querySelectorAll('.star').forEach(star => {
-        // अगर हैंडलर पहले से जुड़ा है तो दोबारा न जोड़ें
-        if (star.getAttribute('data-handler') === 'true') return; 
-
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            document.getElementById('selected-rating-' + serviceId).value = rating; 
-            
-            // केवल वर्तमान मिस्त्री के स्टार्स को रंगना
-            container.querySelectorAll('.star').forEach(s => {
-                if (parseInt(s.getAttribute('data-rating')) <= rating) {
-                    s.classList.add('rated');
-                } else {
-                    s.classList.remove('rated');
-                }
-            });
-        });
-        star.setAttribute('data-handler', 'true'); // हैंडलर को मार्क करें
+// रिव्यू सबमिट करें
+function submitReview(serviceId) {
+    const rating = document.getElementById('selected-rating-' + serviceId).value;
+    const reviewText = document.getElementById('review-text-' + serviceId).value;
+    
+    if (rating == 0 || reviewText.trim() === "") {
+        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
+        return;
+    }
+    
+    // फायरबेस कोड यहाँ आएगा
+    alert("रिव्यू सबमिट हो गया! रेटिंग: " + rating + ", रिव्यू: " + reviewText);
+    
+    // फॉर्म रीसेट करें
+    document.getElementById('selected-rating-' + serviceId).value = 0;
+    document.getElementById('review-text-' + serviceId).value = '';
+    
+    // स्टार्स रीसेट करें
+    const stars = document.querySelectorAll('.rating-stars-' + serviceId + ' .star');
+    stars.forEach(star => {
+        star.style.color = 'lightgray';
     });
+}
+
+// ==================== मिस्त्री कार्ड रेंडर ====================
+function renderProviderCard(p) {
+    return `<div class="profile-card">
+        <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+        <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+
+        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+        </div>
+        
+        <hr style="margin-top: 20px; border-top: 1px solid #eee;">
+
+        <button id="toggle-btn-${p.key}" 
+                onclick="toggleReviewSection('${p.key}')" 
+                style="width: 100%; padding: 8px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                रिव्यू और रेटिंग देखें (0)
+        </button>
+
+        <div id="review-section-${p.key}" style="display: none;">
+            <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
+                <h4 style="margin-bottom: 5px;">कुल रेटिंग: अभी कोई नहीं</h4>
+            </div>
+
+            <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
+                <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
+                <div class="rating-stars-${p.key}" style="font-size: 24px; margin: 10px 0;">
+                    <span class="star" data-rating="1" style="color: lightgray; cursor: pointer;">★</span>
+                    <span class="star" data-rating="2" style="color: lightgray; cursor: pointer;">★</span>
+                    <span class="star" data-rating="3" style="color: lightgray; cursor: pointer;">★</span>
+                    <span class="star" data-rating="4" style="color: lightgray; cursor: pointer;">★</span>
+                    <span class="star" data-rating="5" style="color: lightgray; cursor: pointer;">★</span>
+                </div>
+                
+                <input type="hidden" id="selected-rating-${p.key}" value="0">
+                <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
+                
+                <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">रिव्यू सबमिट करें</button>
+            </div>
+
+            <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
+                <h4>यूज़र रिव्यू</h4>
+            </div>
+        </div>
+    </div>`;
 }
