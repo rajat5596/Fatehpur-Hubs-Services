@@ -307,7 +307,57 @@
             font-size: 1rem;
             width: 100%;
         }
-
+.review-section { 
+    display: none; 
+    padding: 15px; 
+    background: #f9f9f9; 
+    border-radius: 8px; 
+    margin-top: 10px; 
+    border: 1px solid #eee;
+}
+.toggle-btn { 
+    background: #f0f0f0; 
+    width: 100%; 
+    padding: 12px; 
+    font-size: 15px; 
+    margin-top: 10px; 
+    border: none;
+    border-radius: 6px;
+}
+.star { 
+    font-size: 28px; 
+    cursor: pointer; 
+    color: #ccc; 
+}
+.star.gold { 
+    color: gold !important; 
+}
+.reviews-list { 
+    margin: 10px 0; 
+}
+.review-item { 
+    padding: 8px 0; 
+    border-bottom: 1px solid #ddd; 
+}
+.average-rating { 
+    font-weight: bold; 
+    color: #d81b60; 
+}
+textarea { 
+    width: 100%; 
+    height: 70px; 
+    margin: 10px 0; 
+    padding: 10px; 
+    border-radius: 6px; 
+    border: 1px solid #ddd;
+}
+.submit-btn { 
+    background: #d81b60; 
+    color: white; 
+    padding: 10px 20px; 
+    border: none; 
+    border-radius: 6px; 
+}
     </style>
 </head>
 <body>
@@ -630,26 +680,25 @@ function renderProviderCard(p) {
             <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
             <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
         </div>
-        <!-- पुराना बटन हटाओ और ये डालो -->
-<button class="review-btn" data-key="${p.key}">
-    रिव्यू और रेटिंग देखें (<span class="review-count">0</span>)
+        <br>
+<button id="toggle-btn-\( {p.key}" class="toggle-btn" onclick="toggleReview(' \){p.key}')">
+    रिव्यू और रेटिंग देखें (0)
 </button>
 
-<!-- रिव्यू सेक्शन भी बिल्कुल ऐसे होना चाहिए -->
-<div class="review-section" id="reviews-${p.key}" style="display:none;">
-    <div class="avg-rating" style="font-weight:bold; color:#d81b60;">कुल रेटिंग: अभी कोई नहीं</div>
+<div id="review-section-${p.key}" class="review-section">
+    <div class="average-rating">कुल रेटिंग: 0 ★ (0 रिव्यू)</div>
     <div class="reviews-list"></div>
     <hr>
-    <p><b>अपना रिव्यू दें:</b></p>
-    <div class="star-widget" data-key="${p.key}">
-        <span class="star" data-value="1">☆</span>
-        <span class="star" data-value="2">☆</span>
-        <span class="star" data-value="3">☆</span>
-        <span class="star" data-value="4">☆</span>
-        <span class="star" data-value="5">☆</span>
+    <p>अपना रिव्यू दें:</p>
+    <div class="rating-stars-${p.key}">
+        <span class="star" data-rating="1">☆</span>
+        <span class="star" data-rating="2">☆</span>
+        <span class="star" data-rating="3">☆</span>
+        <span class="star" data-rating="4">☆</span>
+        <span class="star" data-rating="5">☆</span>
     </div>
-    <textarea class="review-comment" placeholder="अपना अनुभव लिखें..." style="width:100%; height:60px; margin:8px 0;"></textarea>
-    <button class="submit-review" style="background:#d81b60; color:white; padding:10px;">सबमिट करें</button>
+    <textarea id="review-text-${p.key}" placeholder="कमेंट लिखें..."></textarea>
+    <button class="submit-btn" onclick="submitReview('${p.key}')">रिव्यू सबमिट करें</button>
 </div>
           </div>`;
         }
@@ -1261,93 +1310,85 @@ function registerJob() {
     
 </script>
             <script>
-// 100% काम करने वाला FINAL CODE — अभी 2 मिनट पहले टेस्ट किया
+// ये पूरा JS पेस्ट कर दे — localStorage से काम करेगा, Firebase की जरूरत नहीं
 
-// Anonymous login
-firebase.auth().signInAnonymously();
+function loadReviews(key) {
+    const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
+    const list = document.querySelector('#review-section-' + key + ' .reviews-list');
+    const avgDiv = document.querySelector('#review-section-' + key + ' .average-rating');
+    const toggleBtn = document.getElementById('toggle-btn-' + key);
 
-// Toggle + Star + Submit + Load — सब कुछ सही
-document.addEventListener('click', function(e) {
-    // Toggle बटन
-    if (e.target.closest('.review-btn')) {
-        const btn = e.target.closest('.review-btn');
-        const key = btn.dataset.key;
-        const sec = document.getElementById('reviews-' + key);
-        if (!sec) return;
-        if (sec.style.display === 'none' || sec.style.display === '') {
-            sec.style.display = 'block';
-            btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
-        } else {
-            sec.style.display = 'none';
-            const cnt = btn.querySelector('.review-count')?.textContent || '0';
-            btn.innerHTML = `रिव्यू और रेटिंग देखें (<span class="review-count">${cnt}</span>)`;
-        }
+    list.innerHTML = reviews.length ? '' : '<p style="color:#888;">अभी कोई रिव्यू नहीं।</p>';
+    reviews.forEach(r => {
+        list.innerHTML += `<div class="review-item"><strong>\( {r.rating} ★</strong> \){r.comment}</div>`;
+    });
+
+    const avg = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : 0;
+    avgDiv.innerHTML = `कुल रेटिंग: \( {avg} ★ ( \){reviews.length} रिव्यू)`;
+    toggleBtn.innerHTML = `रिव्यू और रेटिंग देखें (${reviews.length})`;
+}
+
+function toggleReview(key) {
+    const section = document.getElementById('review-section-' + key);
+    const btn = document.getElementById('toggle-btn-' + key);
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+        loadReviews(key);
+    } else {
+        section.style.display = 'none';
+        const count = JSON.parse(localStorage.getItem('reviews-' + key) || '[]').length;
+        btn.innerHTML = `रिव्यू और रेटिंग देखें (${count})`;
     }
+}
 
-    // Star
-    if (e.target.classList.contains('star')) {
-        const val = e.target.dataset.value;
-        const stars = e.target.closest('.star-widget').querySelectorAll('.star');
-        stars.forEach((s, i) => {
-            s.style.color = i < val ? 'gold' : '#ddd';
-            s.innerHTML = i < val ? '★' : '☆';
-        });
-    }
+function submitReview(key) {
+    const stars = document.querySelectorAll(`.rating-stars-${key} .star`);
+    let rating = 0;
+    stars.forEach((s, i) => { if (s.classList.contains('gold')) rating = i + 1; });
+    const comment = document.getElementById('review-text-' + key).value.trim();
 
-    // Submit
-    if (e.target.classList.contains('submit-review')) {
-        if (!firebase.auth().currentUser) return alert("लॉगिन हो रहा है...");
-        const sec = e.target.closest('.review-section');
-        const key = sec.id.replace('reviews-', '');
-        const stars = sec.querySelectorAll('.star');
-        let rating = 0;
-        stars.forEach((s, i) => { if (s.innerHTML === '★') rating = i + 1; });
-        const comment = sec.querySelector('.review-comment').value.trim();
-        if (rating === 0) return alert("स्टार दें");
-        if (!comment) return alert("कमेंट लिखें");
+    if (rating === 0) return alert('स्टार रेटिंग दें');
+    if (!comment) return alert('कमेंट लिखें');
 
-        const uid = firebase.auth().currentUser.uid;
-        firebase.database().ref(`reviews/\( {uid}/ \){key}`).push({
-            rating, comment,
-            time: new Date().toLocaleString('hi-IN')
-        }).then(() => {
-            sec.querySelector('.review-comment').value = '';
-            stars.forEach(s => { s.style.color = '#ddd'; s.innerHTML = '☆'; });
-            alert("धन्यवाद! रिव्यू सबमिट हो गया");
-        });
-    }
-});
+    const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
+    reviews.push({ rating, comment });
+    localStorage.setItem('reviews-' + key, JSON.stringify(reviews));
 
-// Load reviews real-time
-setTimeout(() => {
-    firebase.auth().onAuthStateChanged(user => {
-        if (!user) return;
-        const uid = user.uid;
-        document.querySelectorAll('.review-btn').forEach(btn => {
-            const key = btn.dataset.key;
-            firebase.database().ref(`reviews/\( {uid}/ \){key}`).on('value', snap => {
-                const data = snap.val() || {};
-                const count = Object.keys(data).length;
-                const total = Object.values(data).reduce((a, r) => a + (r?.rating || 0), 0);
-                const avg = count > 0 ? (total / count).toFixed(1) : 0;
+    document.getElementById('review-text-' + key).value = '';
+    stars.forEach(s => { s.classList.remove('gold'); s.innerHTML = '☆'; });
+    loadReviews(key);
+    alert('धन्यवाद! रिव्यू सबमिट हो गया');
+}
 
-                const span = btn.querySelector('.review-count');
-                if (span) span.textContent = count;
-
-                const avgEl = document.querySelector(`#reviews-${key} .avg-rating`);
-                if (avgEl) avgEl.innerHTML = `कुल रेटिंग: \( {avg}★ ( \){count} रिव्यू)`;
-
-                const sec = document.getElementById(`reviews-${key}`);
-                if (sec && sec.style.display !== 'none') {
-                    const list = sec.querySelector('.reviews-list');
-                    list.innerHTML = count === 0 ? '<p style="color:#888;">अभी कोई रिव्यू नहीं।</p>' : '';
-                    Object.keys(data).forEach(id => {
-                        const r = data[id];
-                        list.innerHTML += `<div class="review-item"><strong>\( {r.rating}★</strong> \){r.comment}<br><small>${r.time}</small></div>`;
-                    });
-                }
+function setupStars(key) {
+    document.querySelectorAll(`.rating-stars-${key} .star`).forEach((star, i) => {
+        star.onclick = () => {
+            document.querySelectorAll(`.rating-stars-${key} .star`).forEach((s, j) => {
+                if (j <= i) { s.classList.add('gold'); s.innerHTML = '★'; }
+                else { s.classList.remove('gold'); s.innerHTML = '☆'; }
             });
-        });
+        };
+    });
+}
+
+// हर मिस्त्री के लिए शुरू करो
+setInterval(() => {
+    document.querySelectorAll('.profile-card').forEach(card => {
+        if (!card.dataset.reviewReady) {
+            card.dataset.reviewReady = "true";
+            const key = card.querySelector('[id^="toggle-btn-"]').id.replace('toggle-btn-', '');
+            loadReviews(key);
+            setupStars(key);
+        }
+    });
+}, 1000);
+
+window.onload = () => setTimeout(() => {
+    document.querySelectorAll('[id^="toggle-btn-"]').forEach(btn => {
+        const key = btn.id.replace('toggle-btn-', '');
+        loadReviews(key);
+        setupStars(key);
     });
 }, 1000);
             </script>
