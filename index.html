@@ -631,43 +631,6 @@ function renderProviderCard(p) {
             <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
         </div>
         
-        <hr style="margin-top: 20px; border-top: 1px solid #eee;">
-
-        <button id="toggle-btn-${p.key}" 
-                onclick="toggleReviewSection('${p.key}')" 
-                style="width: 100%; padding: 8px; background-color: #f0f0f0; border: 1px solid #ddd; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                रिव्यू और रेटिंग देखें (0)
-        </button>
-
-        <div id="review-section-${p.key}" style="display: none;">
-            
-            <div id="average-rating-display-${p.key}" style="padding: 10px 0;">
-                <h4 style="margin-bottom: 5px;">कुल रेटिंग: अभी कोई नहीं</h4>
-            </div>
-
-            <div id="review-submission-form-${p.key}" style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 15px;">
-                <h3>⭐ अपना रिव्यू और रेटिंग दें</h3>
-                <div class="rating-stars-${p.key}">
-                    <span class="star" data-rating="1">★</span>
-                    <span class="star" data-rating="2">★</span>
-                    <span class="star" data-rating="3">★</span>
-                    <span class="star" data-rating="4">★</span>
-                    <span class="star" data-rating="5">★</span>
-                </div>
-                
-                <input type="hidden" id="selected-rating-${p.key}" value="0">
-                <textarea id="review-text-${p.key}" placeholder="अपने अनुभव के बारे में लिखें..." rows="3" style="width: 100%; margin-top: 10px; padding: 5px;"></textarea>
-                
-                <button onclick="submitReview('${p.key}')" style="background-color: #007bff; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">रिव्यू सबमिट करें</button>
-            </div>
-
-            <div id="all-reviews-display-${p.key}" style="margin-top: 20px;">
-                <h4>यूज़र रिव्यू</h4>
-            </div>
-        </div>
-    </div>`;
-}
-        
 
     // जॉब कार्ड रेंडर करें
     function renderJobCard(job) {
@@ -1275,74 +1238,7 @@ function registerJob() {
     }
     
 </script>
-            <script>
-// YE WAALA CODE 100% TESTED HAI - SAB KUCH KAAM KAREGA
-
-function toggleReview(key) {
-    const sec = document.getElementById('review-section-' + key);
-    const btn = document.getElementById('toggle-btn-' + key);
-    if (sec.style.display === 'none' || sec.style.display === '') {
-        sec.style.display = 'block';
-        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
-    } else {
-        sec.style.display = 'none';
-        btn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
-    }
-}
-
-function submitReview(key) {
-    const stars = document.querySelectorAll(`.rating-stars-${key} .star`);
-    let rating = 0;
-    stars.forEach((s, i) => {
-        if (s.classList.contains('gold')) rating = i + 1;
-    });
-
-    const comment = document.getElementById('review-text-' + key)?.value.trim() || 'कोई कमेंट नहीं';
-
-    if (rating === 0) {
-        alert("पहले स्टार रेटिंग दें भाई ⭐");
-        return;
-    }
-
-    // यही लाइन ठीक कर दी है — अब सही दिखेगा
-    alert(`धन्यवाद!\nरेटिंग: \( {rating} स्टार\nकमेंट: \){comment}`);
-
-    // अगर चाहो तो यहाँ रिव्यू को save भी कर सकते हो (बाद में)
-    // अभी सिर्फ alert है ताकि तुम देख सको कि सबमिट हो रहा है
-                }
-
-// EK HI BAAR SAB KUCH FIX KAR DO
-const fixAll = () => {
-    document.querySelectorAll('button[id^="toggle-btn-"]').forEach(btn => {
-        if (btn.dataset.done) return;
-        btn.dataset.done = "yes";
-        const key = btn.id.replace('toggle-btn-', '');
-        
-        btn.onclick = () => toggleReview(key);
-
-        // Stars
-        document.querySelectorAll(`.rating-stars-${key} .star`).forEach((star, idx) => {
-            star.onclick = () => {
-                document.querySelectorAll(`.rating-stars-${key} .star`).forEach((s, i) => {
-                    if (i <= idx) { s.classList.add('gold'); s.innerHTML = '★'; }
-                    else { s.classList.remove('gold'); s.innerHTML = '☆'; }
-                });
-            };
-        });
-
-        // Submit button
-        const submitBtn = document.querySelector(`#review-submission-form-\( {key} button, button[onclick*="submitReview(' \){key}')"]`);
-        if (submitBtn) submitBtn.onclick = () => submitReview(key);
-    });
-};
-
-// Har 500ms mein check karo (dynamic content ke liye)
-setInterval(fixAll, 500);
-// Pehli baar bhi chalao
-fixAll();
-
-console.log("अब सच में सब मिस्त्री का रिव्यू + स्टार + सबमिट काम करेगा - 100% TESTED");
-            </script>
+            
             
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
 <div style="position:fixed; bottom:50px; left:0; right:0; z-index:9998; padding:0;">
