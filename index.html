@@ -1272,11 +1272,13 @@ document.addEventListener('click', function(e) {
 
         if (section.style.display === 'none' || section.style.display === '') {
             section.style.display = 'block';
-            btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+            btn.firstChild.nodeValue = 'रिव्यू और रेटिंग छुपाएँ ';  // सिर्फ टेक्स्ट बदलेगा, span बरकरार रहेगा
         } else {
             section.style.display = 'none';
             const count = btn.querySelector('.review-count').textContent;
-            btn.innerHTML = `रिव्यू और रेटिंग देखें (<span class="review-count">${count}</span>)`;
+            btn.firstChild.nodeValue = 'रिव्यू और रेटिंग देखें (';
+btn.querySelector('.review-count').textContent = count;
+btn.lastChild.nodeValue = ')';
         }
     }
 
