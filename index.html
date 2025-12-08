@@ -1353,6 +1353,23 @@ setTimeout(() => {
 
 console.log("भाई अब तो 1000% काम करेगा - v8 के साथ टेस्टेड!");
             </script>
+            <script>
+// Anonymous Login — बिल्कुल सेफ, कोई mail नहीं आएगा
+firebase.auth().signInAnonymously()
+  .then(() => {
+    console.log("Anonymous login successful - अब रिव्यू सबमिट होगा!");
+  })
+  .catch((error) => {
+    console.log("Anonymous login error: ", error);
+  });
+
+// अगर पहले से logged-in है तो दोबारा नहीं करेगा
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    console.log("User is signed in (anonymous): " + user.uid);
+  }
+});
+            </script>
             
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
 <div style="position:fixed; bottom:50px; left:0; right:0; z-index:9998; padding:0;">
