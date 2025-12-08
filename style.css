@@ -618,15 +618,56 @@ input[type="tel"]:focus, input[type="text"]:focus {
     transform: scale(0.85); /* Mobile adjustment */
     transform-origin: center;
 }
-/* Star रेटिंग के लिए बेसिक स्टाइलिंग */
-.rating-stars .star {
+/* रेटिंग स्टार्स स्टाइल */
+.star {
     font-size: 24px;
-    color: #ccc; /* धूसर रंग: बिना रेट किया गया स्टार */
+    color: lightgray;
     cursor: pointer;
-    margin-right: 2px;
+    transition: color 0.2s;
+    margin: 0 2px;
 }
 
-/* जब यूज़र स्टार पर क्लिक करे (यानी रेटेड) */
-.rating-stars .star.rated {
-    color: #FFD700; /* सुनहरा पीला रंग: रेटेड स्टार */
+.star:hover {
+    color: orange;
+}
+
+/* बटन्स के लिए */
+.whatsapp-btn {
+    background-color: #25D366;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.contact-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.share-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.profile-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 15px 0;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
