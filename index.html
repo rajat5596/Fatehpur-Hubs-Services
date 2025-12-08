@@ -1310,87 +1310,89 @@ function registerJob() {
     
 </script>
             <script>
-// ये पूरा JS पेस्ट कर दे — localStorage से काम करेगा, Firebase की जरूरत नहीं
+// FINAL WORKING JS — localStorage + 100% काम करेगा
 
-function loadReviews(key) {
-    const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
-    const list = document.querySelector('#review-section-' + key + ' .reviews-list');
-    const avgDiv = document.querySelector('#review-section-' + key + ' .average-rating');
-    const toggleBtn = document.getElementById('toggle-btn-' + key);
-
-    list.innerHTML = reviews.length ? '' : '<p style="color:#888;">अभी कोई रिव्यू नहीं।</p>';
-    reviews.forEach(r => {
-        list.innerHTML += `<div class="review-item"><strong>\( {r.rating} ★</strong> \){r.comment}</div>`;
-    });
-
-    const avg = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : 0;
-    avgDiv.innerHTML = `कुल रेटिंग: \( {avg} ★ ( \){reviews.length} रिव्यू)`;
-    toggleBtn.innerHTML = `रिव्यू और रेटिंग देखें (${reviews.length})`;
-}
-
-function toggleReview(key) {
-    const section = document.getElementById('review-section-' + key);
-    const btn = document.getElementById('toggle-btn-' + key);
-    if (section.style.display === 'none' || section.style.display === '') {
-        section.style.display = 'block';
-        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
-        loadReviews(key);
-    } else {
-        section.style.display = 'none';
-        const count = JSON.parse(localStorage.getItem('reviews-' + key) || '[]').length;
-        btn.innerHTML = `रिव्यू और रेटिंग देखें (${count})`;
+document.addEventListener('click', function(e) {
+    // Toggle Review Section
+    if (e.target.closest('.review-btn')) {
+        const btn = e.target.closest('.review-btn');
+        const key = btn.getAttribute('data-key');
+        const section = document.getElementById('reviews-' + key);
+        if (section.style.display === 'none' || section.style.display === '') {
+            section.style.display = 'block';
+            btn.innerHTML = 'रिव्यू और रेटिंग छुपाएँ';
+        } else {
+            section.style.display = 'none';
+            const count = btn.querySelector('.review-count')?.textContent || '0';
+            btn.innerHTML = `रिव्यू और रेटिंग देखें (<span class="review-count">${count}</span>)`;
+        }
     }
-}
 
-function submitReview(key) {
-    const stars = document.querySelectorAll(`.rating-stars-${key} .star`);
-    let rating = 0;
-    stars.forEach((s, i) => { if (s.classList.contains('gold')) rating = i + 1; });
-    const comment = document.getElementById('review-text-' + key).value.trim();
+    // Star Rating
+    if (e.target.classList.contains('star')) {
+        const value = e.target.getAttribute('data-value');
+        const stars = e.target.closest('.star-widget').querySelectorAll('.star');
+        stars.forEach((star, index) => {
+            star.style.color = (index < value) ? 'gold' : '#ddd';
+            star.innerHTML = (index < value) ? '★' : '☆';
+        });
+    }
 
-    if (rating === 0) return alert('स्टार रेटिंग दें');
-    if (!comment) return alert('कमेंट लिखें');
+    // Submit Review
+    if (e.target.classList.contains('submit-review')) {
+        const section = e.target.closest('.review-section');
+        const key = section.id.replace('reviews-', '');
+        const stars = section.querySelectorAll('.star');
+        let rating = 0;
+        stars.forEach((star, i) => {
+            if (star.innerHTML === '★') rating = i + 1;
+        });
+        const comment = section.querySelector('.review-comment').value.trim();
 
-    const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
-    reviews.push({ rating, comment });
-    localStorage.setItem('reviews-' + key, JSON.stringify(reviews));
+        if (rating === 0) return alert("स्टार रेटिंग दें");
+        if (!comment) return alert("कमेंट लिखें");
 
-    document.getElementById('review-text-' + key).value = '';
-    stars.forEach(s => { s.classList.remove('gold'); s.innerHTML = '☆'; });
-    loadReviews(key);
-    alert('धन्यवाद! रिव्यू सबमिट हो गया');
-}
+        let reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
+        reviews.push({ rating, comment, time: new Date().toLocaleString('hi-IN') });
+        localStorage.setItem('reviews-' + key, JSON.stringify(reviews));
 
-function setupStars(key) {
-    document.querySelectorAll(`.rating-stars-${key} .star`).forEach((star, i) => {
-        star.onclick = () => {
-            document.querySelectorAll(`.rating-stars-${key} .star`).forEach((s, j) => {
-                if (j <= i) { s.classList.add('gold'); s.innerHTML = '★'; }
-                else { s.classList.remove('gold'); s.innerHTML = '☆'; }
+        section.querySelector('.review-comment').value = '';
+        stars.forEach(star => { star.style.color = '#ddd'; star.innerHTML = '☆'; });
+        alert("धन्यवाद! रिव्यू सबमिट हो गया");
+        loadAllReviews();
+    }
+});
+
+// Load all reviews on page load and every second (for dynamic cards)
+function loadAllReviews() {
+    document.querySelectorAll('.review-btn').forEach(btn => {
+        const key = btn.getAttribute('data-key');
+        if (!key) return;
+        const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
+        const count = reviews.length;
+        const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+        const avg = count > 0 ? (total / count).toFixed(1) : 0;
+
+        const countSpan = btn.querySelector('.review-count');
+        if (countSpan) countSpan.textContent = count;
+
+        const avgEl = document.querySelector(`#reviews-${key} .avg-rating`);
+        if (avgEl) avgEl.innerHTML = `कुल रेटिंग: \( {avg}★ ( \){count} रिव्यू)`;
+
+        const section = document.getElementById(`reviews-${key}`);
+        if (section && section.style.display !== 'none') {
+            const list = section.querySelector('.reviews-list');
+            list.innerHTML = count === 0 ? '<p style="color:#888;">अभी कोई रिव्यू नहीं</p>' : '';
+            reviews.forEach(r => {
+                list.innerHTML += `<div class="review-item"><strong>\( {r.rating}★</strong> \){r.comment}<br><small>${r.time}</small></div>`;
             });
-        };
-    });
-}
-
-// हर मिस्त्री के लिए शुरू करो
-setInterval(() => {
-    document.querySelectorAll('.profile-card').forEach(card => {
-        if (!card.dataset.reviewReady) {
-            card.dataset.reviewReady = "true";
-            const key = card.querySelector('[id^="toggle-btn-"]').id.replace('toggle-btn-', '');
-            loadReviews(key);
-            setupStars(key);
         }
     });
-}, 1000);
+}
 
-window.onload = () => setTimeout(() => {
-    document.querySelectorAll('[id^="toggle-btn-"]').forEach(btn => {
-        const key = btn.id.replace('toggle-btn-', '');
-        loadReviews(key);
-        setupStars(key);
-    });
-}, 1000);
+// Run on load and every second
+window.addEventListener('load', () => setTimeout(loadAllReviews, 1000));
+setInterval(loadAllReviews, 1500);
             </script>
             
 <!-- BOTTOM ADS & NAV BAR - EXACTLY LIKE MIDDLE ADS -->
