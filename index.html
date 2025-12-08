@@ -1366,29 +1366,37 @@ document.addEventListener('click', function(e) {
 // Load all reviews on page load and every second (for dynamic cards)
 function loadAllReviews() {
     document.querySelectorAll('.review-btn').forEach(btn => {
-        const key = btn.getAttribute('data-key');
+        const key = btn.getAttribute('data-key');  // ← ये सही key लेगा हर मिस्त्री का
         if (!key) return;
+
         const reviews = JSON.parse(localStorage.getItem('reviews-' + key) || '[]');
         const count = reviews.length;
         const total = reviews.reduce((sum, r) => sum + r.rating, 0);
         const avg = count > 0 ? (total / count).toFixed(1) : 0;
 
+        // काउंट अपडेट
         const countSpan = btn.querySelector('.review-count');
         if (countSpan) countSpan.textContent = count;
 
+        // एवरेज अपडेट
         const avgEl = document.querySelector(`#reviews-${key} .avg-rating`);
         if (avgEl) avgEl.innerHTML = `कुल रेटिंग: \( {avg}★ ( \){count} रिव्यू)`;
 
+        // सिर्फ वही सेक्शन जो खुला है, उसमें लिस्ट दिखाओ
         const section = document.getElementById(`reviews-${key}`);
         if (section && section.style.display !== 'none') {
             const list = section.querySelector('.reviews-list');
-            list.innerHTML = count === 0 ? '<p style="color:#888;">अभी कोई रिव्यू नहीं</p>' : '';
-            reviews.forEach(r => {
-                list.innerHTML += `<div class="review-item"><strong>\( {r.rating}★</strong> \){r.comment}<br><small>${r.time}</small></div>`;
-            });
+            list.innerHTML = '';
+            if (count === 0) {
+                list.innerHTML = '<p style="color:#888;">अभी कोई रिव्यू नहीं।</p>';
+            } else {
+                reviews.forEach(r => {
+                    list.innerHTML += `<div class="review-item"><strong>\( {r.rating}★</strong> \){r.comment}<br><small>${r.time}</small></div>`;
+                });
+            }
         }
     });
-}
+                }
 
 // Run on load and every second
 window.addEventListener('load', () => setTimeout(loadAllReviews, 1000));
