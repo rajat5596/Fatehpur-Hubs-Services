@@ -106,6 +106,11 @@ function displayServices() {
         `;
     }).join('');
 }
+    // लिस्ट में HTML जोड़ने के बाद, हर प्रोवाइडर के लिए रेटिंग लोड करें
+    filtered.forEach(p => {
+        loadAverageRating(p.id); // p.id का उपयोग करें
+    });
+} // <--- displayServices फ़ंक्शन यहाँ बंद होता है
 
 function loadPromotionAds() { 
     // This is often where special ad/promotion banners are loaded from DB.
