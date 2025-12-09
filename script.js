@@ -196,100 +196,218 @@ function loadJobs() {
         `;
         container.appendChild(card);
     });
+// ====================== पूरा नया script.js (Copy-Paste करो) ======================
+let serviceProviders = [];
+let currentFilter = '';
 
-function toggleReviewSection(serviceId) {
-    const section = document.getElementById('review-section-' + serviceId);
-    const btn = document.getElementById('toggle-btn-' + serviceId);
-    
+// 1. Toggle Review Section (बटन दबाने पर खुलना/बंद होना)
+function toggleReviewSection(key) {
+    const section = document.getElementById('review-section-' + key);
+    const btn = document.getElementById('toggle-btn-' + key);
+
     if (section.style.display === 'none' || section.style.display === '') {
         section.style.display = 'block';
-        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएं ↑';
-        loadAndDisplayReviews(serviceId); // रिव्यू लोड करो जब खोलें
+        btn.innerHTML = 'रिव्यू छुपाएं ↑';
+        loadAndDisplayReviews(key);           // रिव्यू लोड करो
     } else {
         section.style.display = 'none';
-        btn.innerHTML = 'रिव्यू और रेटिंग देखें (' + 
-            (document.querySelectorAll('#all-reviews-display-' + serviceId + ' .review-item').length || 0) + ')';
+        const count = document.querySelectorAll('#all-reviews-display-' + key + ' .review-item').length;
+        btn.innerHTML = 'रिव्यू और रेटिंग देखें (' + count + ')';
     }
 }
-function loadAndDisplayReviews(serviceId) {
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    const displayDiv = document.getElementById('all-reviews-display-' + serviceId);
 
-    reviewsRef.on('value', snapshot => {
-        displayDiv.innerHTML = '<h4>यूज़र रिव्यू</h4>';
-        if (!snapshot.exists()) {
-            displayDiv.innerHTML += '<p style="color:#999;">अभी कोई रिव्यू नहीं है।</p>';
+// 2. Average Rating + Review Count दिखाना
+function loadAverageRating(key) {
+    const ref = firebase.database().ref('reviews/' + key);
+    const display = document.getElementById('average-rating-display-' + key);
+    const btn = document.getElementById('toggle-btn-' + key);
+
+    ref.on('value', snap => {
+        if (!snap.exists()) {
+            display.innerHTML = '<p style="color:#999;">अभी कोई रेटिंग नहीं</p>';
+            if (btn) btn.innerHTML = 'रिव्यू और रेटिंग देखें (0)';
+            return;
+        }
+
+        let total = 0, count = 0;
+        snap.forEach(child => {
+            total += child.val().rating;
+            count++;
+        });
+        const avg = (total / count).toFixed(1);
+
+        display.innerHTML = `<strong style="color:#e67e22;font-size:18px;">⭐ \( {avg}/5</strong> ( \){count} रिव्यू)`;
+        if (btn) btn.innerHTML = 'रिव्यू और रेटिंग देखें (' + count + ')';
+    });
+}
+
+// 3. सारे रिव्यू दिखाना
+function loadAndDisplayReviews(key) {
+    const ref = firebase.database().ref('reviews/' + key);
+    const container = document.getElementById('all-reviews-display-' + key);
+
+    ref.once('value', snap => {
+        container.innerHTML = '<h4 style="margin:10px 0 5px;">यूज़र रिव्यू</h4>';
+        if (!snap.exists()) {
+            container.innerHTML += '<p style="color:#999;">अभी कोई रिव्यू नहीं है।</p>';
             return;
         }
 
         const reviews = [];
-        snapshot.forEach(child => {
-            reviews.push({ id: child.key, ...child.val() });
-        });
+        snap.forEach(child => reviews.push({id: child.key, ...child.val()}));
+        reviews.reverse();
 
-        // लेटेस्ट रिव्यू सबसे ऊपर
-        reviews.reverse().forEach(r => {
+        reviews.forEach(r => {
             const date = new Date(r.timestamp).toLocaleDateString('hi-IN');
-            displayDiv.innerHTML += `
-                <div class="review-item" style="border-bottom:1px solid #eee; padding:10px 0; margin-bottom:10px;">
-                    <div style="display:flex; justify-content:space-between;">
+            container.innerHTML += `
+                <div class="review-item" style="border-bottom:1px solid #eee;padding:10px 0;">
+                    <div style="display:flex;justify-content:space-between;">
                         <strong>${r.reviewer || 'Anonymous'}</strong>
-                        <span style="color:#f39c12;">\( {'★'.repeat(r.rating)} ( \){r.rating}/5)</span>
+                        <span style="color:#f39c12;">${'★'.repeat(r.rating)}</span>
                     </div>
-                    <p style="margin:8px 0; color:#333;">${r.text}</p>
+                    <p style="margin:5px 0;">${r.text}</p>
                     <small style="color:#888;">${date}</small>
-                </div>
-            `;
+                </div>`;
         });
     });
 }
-function loadAverageRating(serviceId) {
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    const displayDiv = document.getElementById('average-rating-display-' + serviceId);
 
-    reviewsRef.on('value', snapshot => {
-        if (!snapshot.exists()) {
-            displayDiv.innerHTML = '<p style="color:#999;">अभी कोई रेटिंग नहीं</p>';
-            return;
-        }
-
-        let total = 0;
-        let count = 0;
-        snapshot.forEach(child => {
-            total += child.val().rating;
-            count++;
-        });
-
-        const avg = (total / count).toFixed(1);
-        displayDiv.innerHTML = `
-            <div style="background:#f0f8ff; padding:8px; border-radius:8px; text-align:center;">
-                <strong style="color:#2a5298; font-size:18px;">⭐ ${avg}/5</strong> 
-                <span style="color:#555;">(${count} रिव्यू)</span>
-            </div>
-        `;
-
-        // बटन पर भी काउंट अपडेट कर दो
-        const toggleBtn = document.getElementById('toggle-btn-' + serviceId);
-        if (toggleBtn) {
-            toggleBtn.innerHTML = `रिव्यू और रेटिंग देखें (${count})`;
-        }
-    });
-}
-// स्टार रेटिंग के लिए (हर कार्ड के लिए अलग से attach करना पड़ेगा)
+// 4. स्टार रेटिंग पर क्लिक करना
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('star')) {
         const rating = e.target.getAttribute('data-rating');
-        const serviceId = e.target.closest('.rating-stars').classList[1].split('-')[2]; // rating-stars-${id}
+        const key = e.target.closest('.rating-stars').className.split('rating-stars-')[1];
 
-        // सिलेक्टेड रेटिंग सेट करो
-        document.getElementById('selected-rating-' + serviceId).value = rating;
+        document.getElementById('selected-rating-' + key).value = rating;
 
-        // सभी स्टार्स का कलर रीसेट करो
-        document.querySelectorAll(`.rating-stars-${serviceId} .star`).forEach(star => {
-            star.classList.remove('rated');
-            if (star.getAttribute('data-rating') <= rating) {
-                star.classList.add('rated');
+        document.querySelectorAll('.rating-stars-' + key + ' .star').forEach(s => {
+            if (parseInt(s.getAttribute('data-rating')) <= rating) {
+                s.style.color = '#f39c12';
+            } else {
+                s.style.color = '#ccc';
             }
         });
     }
 });
+
+// 5. रिव्यू सबमिट करना
+function submitReview(key) {
+    const rating = document.getElementById('selected-rating-' + key).value;
+    const text = document.getElementById('review-text-' + key).value.trim();
+    const user = firebase.auth().currentUser;
+
+    if (!user) { alert("लॉगिन करें"); return; }
+    if (rating == 0 || text === '') { alert("रेटिंग और रिव्यू दोनों दें"); return; }
+
+    const newReview = {
+        rating: parseInt(rating),
+        text: text,
+        reviewer: user.displayName || user.email.split('@')[0],
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    firebase.database().ref('reviews/' + key).push(newReview)
+        .then(() => {
+            alert("रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            document.getElementById('review-text-' + key).value = '';
+            document.getElementById('selected-rating-' + key).value = '0';
+            document.querySelectorAll('.rating-stars-' + key + ' .star').forEach(s => s.style.color = '#ccc');
+            loadAverageRating(key);
+        })
+        .catch(err => alert("Error: " + err.message));
+}
+
+// 6. WhatsApp खोलना
+function openWhatsApp(phone) {
+    window.open('https://wa.me/91' + phone, '_blank');
+}
+
+// 7. एक कार्ड बनाना (सबसे जरूरी)
+function renderProviderCard(p) {
+    const key = p.key || p.id;  // दोनों में से कोई एक होगा
+
+    return `<div class="profile-card">
+        <h4 style="color:#2a5298;margin:0;">\( {p.name} - ( \){p.category})</h4>
+        <p style="font-size:12px;color:#555;margin:5px 0;">\( {p.area} | Experience: \){p.experience}</p>
+
+        <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap;">
+            <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+            <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <button class="share-btn" onclick="navigator.share({title:'\( {p.name}',text:' \){p.category} in ${p.area}'});">Share</button>
+        </div>
+
+        <div id="average-rating-display-${key}" style="margin:15px 0;"></div>
+
+        <button id="toggle-btn-\( {key}" onclick="toggleReviewSection(' \){key}')"
+            style="width:100%;padding:10px;background:#f8f9fa;border:1px solid #ddd;border-radius:8px;cursor:pointer;">
+            रिव्यू और रेटिंग देखें (0)
+        </button>
+
+        <div id="review-section-${key}" style="display:none;margin-top:15px;padding:15px;background:#f9f9f9;border-radius:8px;">
+            <div style="margin-bottom:15px;">
+                <h4>अपना रिव्यू दें</h4>
+                <div class="rating-stars rating-stars-${key}" style="font-size:28px;">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                <input type="hidden" id="selected-rating-${key}" value="0">
+                <textarea id="review-text-${key}" placeholder="अपना अनुभव लिखें..." rows="3" style="width:100%;margin-top:10px;padding:8px;"></textarea>
+                <button onclick="submitReview('${key}')" style="margin-top:10px;padding:8px 15px;background:#007bff;color:white;border:none;border-radius:5px;">
+                    सबमिट करें
+                </button>
+            </div>
+            <div id="all-reviews-display-${key}"></div>
+        </div>
+    </div>`;
+}
+
+// 8. सारे मिस्त्री दिखाना (सबसे जरूरी बदलाव)
+function displayServices() {
+    let filtered = serviceProviders;
+    const search = document.getElementById('main-search-bar')?.value.toLowerCase() || '';
+
+    if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
+    if (search) {
+        filtered = filtered.filter(p =>
+            p.name.toLowerCase().includes(search) ||
+            p.category.toLowerCase().includes(search) ||
+            p.area.toLowerCase().includes(search)
+        );
+    }
+
+    const list = document.getElementById('mistri-list');
+    if (filtered.length === 0) {
+        list.innerHTML = '<h3>उपलब्ध सेवाएं</h3><p style="text-align:center;color:#999;">कोई मिस्त्री नहीं मिला</p>';
+        return;
+    }
+
+    list.innerHTML = '<h3>उपलब्ध सेवाएं</h3>' + filtered.map(p => renderProviderCard(p)).join('');
+
+    // हर कार्ड के लिए रेटिंग लोड करो
+    filtered.forEach(p => {
+        const key = p.key || p.id;
+        loadAverageRating(key);
+    });
+}
+
+// 9. Firebase से डेटा लाना (पहले जैसा ही)
+function startFirebaseListener() {
+    if (!window.providersRef) return console.error("providersRef not found");
+
+    window.providersRef.on('value', snapshot => {
+        serviceProviders = [];
+        snapshot.forEach(child => {
+            serviceProviders.push({ key: child.key, ...child.val() });
+        });
+        displayServices();
+    });
+}
+
+// 10. शुरू करते ही चलाओ
+window.onload = function() {
+    startFirebaseListener();
+    // बाकी तुम्हारे पुराने फंक्शन जैसे loadCategories() भी यहाँ call कर सकते हो
+};
