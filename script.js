@@ -60,7 +60,6 @@ function displayServices() {
     const search = document.getElementById('main-search-bar').value.toLowerCase();
     
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें 
-    // यह ID हमें यह चेक करने में मदद करेगी कि कौन रिकॉर्ड का मालिक है।
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
 
     // Filter logic
@@ -80,10 +79,8 @@ function displayServices() {
     }
 
     list.innerHTML = '<h3>उपलब्ध सेवाएं</h3>' + filtered.map(p => {
-        // चेक करें: क्या यह रिकॉर्ड वर्तमान लॉग-इन यूज़र का है?
         const isOwner = currentUserId && p.userId === currentUserId;
 
-        // ओनर के लिए Edit/Delete बटन का HTML
         const ownerActions = isOwner ? `
             <button class="edit-btn" onclick="editService('${p.id}')">Edit</button>
             <button class="delete-btn" onclick="deleteService('${p.id}')">Delete</button>
@@ -93,28 +90,53 @@ function displayServices() {
             <div class="profile-card">
                 <h4 style="margin:0 0 5px;color:#2a5298;">${p.name} <span style="font-size:12px;color:#666;">(${p.category})</span></h4>
                 <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience}</p>
+                
+                <div id="average-rating-display-${p.id}" style="margin-bottom: 10px;">
+                    </div>
+
                 <div style="display:flex;justify-content:space-between;margin-top:10px; flex-wrap: wrap; gap: 8px;">
                     <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
                     <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                    <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                    <button class="review-btn" onclick="alert('Button Clicked!')">
-    TEST BUTTON
-</button>
-
+                    
+                    <button id="toggle-btn-${p.id}" class="review-btn" onclick="toggleReviewSection('${p.id}')">
+                         रिव्यू और रेटिंग देखें (0)
+                    </button>
+                    
                     ${isOwner ? '' : `<button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'${window.location.href}'})">Share</button>`}
                     
                     ${ownerActions}
                 </div>
+                
+                <div id="review-section-${p.id}" style="display:none; margin-top: 15px; padding: 10px; border-top: 1px solid #ddd;">
+                    <div style="margin-bottom: 15px;">
+                        <h5>अपनी रेटिंग दें:</h5>
+                        <div class="rating-stars rating-stars-${p.id}" style="font-size: 24px; cursor: pointer;">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                        <input type="hidden" id="selected-rating-${p.id}" value="0">
+                        <textarea id="review-text-${p.id}" placeholder="अपना रिव्यू यहाँ लिखें..." style="width: 95%; margin-top: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        <button class="submit-review-btn" onclick="submitReview('${p.id}')">रिव्यू सबमिट करें</button>
+                    </div>
+
+                    <div id="all-reviews-display-${p.id}">
+                        </div>
+                </div>
+
                 ${isOwner ? '<p style="color:green;font-size:10px;text-align:right;">(आपका डेटा)</p>' : ''}
             </div>
         `;
     }).join('');
-}
-    // लिस्ट में HTML जोड़ने के बाद, हर प्रोवाइडर के लिए रेटिंग लोड करें
+    
+    // यह फ़िक्स हर कार्ड के लिए रेटिंग लोड करेगा और बटन को सक्रिय करेगा
     filtered.forEach(p => {
-        loadAverageRating(p.id); // p.id का उपयोग करें
+        loadAverageRating(p.id); 
     });
-} // <--- displayServices फ़ंक्शन यहाँ बंद होता है
+}
+
 
 function loadPromotionAds() { 
     // This is often where special ad/promotion banners are loaded from DB.
