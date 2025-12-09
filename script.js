@@ -196,33 +196,27 @@ function loadJobs() {
         `;
         container.appendChild(card);
     });
-// 🔥 फुल-स्क्रीन स्पेशल प्रमोशन — बिना index.html छेड़े 🔥
+// फुल-स्क्रीन स्पेशल प्रमोशन — 100% काम करेगा
 const fullScreenPromo = {
-    enabled: true,                                           // false कर दोगे तो बंद
-    image: "https://i.imgur.com/Jh0nS0n.jpg",                // ← अपना बैनर यहाँ बदलना
-    text: "Johnson Square – 50% छूट आज ही!"                // ← अपना मैसेज यहाँ
+    enabled: true,
+    image: "https://i.imgur.com/Jh0nS0n.jpg",   // अपना बैनर यहाँ डालो
+    text: "Johnson Square – 50% छूट आज ही!"
 };
 
-// डायनामिक div बनाकर पेज में जोड़ दो
-function showFullScreenPromo() {
-    if (!fullScreenPromo.enabled) return;
-
-    const div = document.createElement('div');
-    div.id = 'myFullScreenPromo';
-    div.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.97); z-index:99999; justify-content:center; align-items:center; flex-direction:column; color:white; text-align:center;';
-    div.innerHTML = `
-        <button onclick="this.parentElement.remove()" style="position:absolute; top:15px; right:20px; background:red; color:white; border:none; padding:10px 18px; border-radius:50%; font-size:24px; cursor:pointer;">✕</button>
-        <img src="${fullScreenPromo.image}" style="max-width:92%; max-height:65%; border-radius:18px; box-shadow:0 0 30px gold;">
-        <h2 style="margin:20px; font-size:28px; color:gold;">${fullScreenPromo.text}</h2>
-        <p style="font-size:19px;">स्पेशल ऑफर सिर्फ आज के लिए!</p>
-    `;
-    document.body.appendChild(div);
-
-    // 2 सेकंड बाद दिखाओ
+document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
+        if (!fullScreenPromo.enabled) return;
+
+        const div = document.createElement('div');
+        div.id = 'myFullScreenPromo';
+        div.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.97); z-index:99999; justify-content:center; align-items:center; flex-direction:column; color:white; text-align:center;';
+        div.innerHTML = `
+            <button onclick="this.parentElement.remove()" style="position:absolute; top:15px; right:20px; background:red; color:white; border:none; padding:10px 18px; border-radius:50%; font-size:24px; cursor:pointer; z-index:999999;">✕</button>
+            <img src="${fullScreenPromo.image}" style="max-width:92%; max-height:65%; border-radius:18px; box-shadow:0 0 30px gold;">
+            <h2 style="margin:20px; font-size:28px; color:gold;">${fullScreenPromo.text}</h2>
+            <p style="font-size:19px;">स्पेशल ऑफर सिर्फ आज के लिए!</p>
+        `;
+        document.body.appendChild(div);
         div.style.display = 'flex';
     }, 2000);
-}
-
-// पेज लोड होते ही चलाओ
-showFullScreenPromo();
+});
