@@ -413,32 +413,25 @@ function startFirebaseListener() {
         return;
     }
 
-    window.onload = () => {
-    firebase.initializeApp(firebaseConfig);
+    // जैसे ही पेज लोड हो, डेटा सुनना शुरू करो
+function startFirebaseListener() {
+    if (!window.providersRef) {
+        console.log("Waiting for Firebase...");
+        setTimeout(startFirebaseListener, 500);
+        return;
+    }
 
-    const db = firebase.database();
-    window.providersRef = db.ref('serviceProviders');   // सही path
-    window.jobsRef     = db.ref('local_jobs');
+    console.log("Connected! Loading providers from serviceProviders...");
 
-    // ← ये 2 लाइनें बहुत जरूरी हैं (पहले नहीं थीं)
-    console.log("Firebase Ready – Starting listeners...");
-    startFirebaseListener();        // ← ये लाइन डालो!
-    
-    // बाकी तुम्हारा पुराना कोड
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible'
+    window.providersRef.on('value', snapshot => {
+        serviceProviders = [];
+        snapshot.forEach(child => {
+            serviceProviders.push({ key: child.key, ...child.val() });
+        });
+        console.log("Loaded", serviceProviders.length, "मिस्त्री");
+        displayServices();   // ← ये लाइन से कार्ड बनते हैं (रिव्यू बटन सहित)
     });
-    recaptchaVerifier.render();
+}
 
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('registrationScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            console.log("User logged in:", user.phoneNumber);
-            startFirebaseListener();    // ← लॉगिन होने पर भी शुरू करो
-        } else {
-            document.getElementById('registrationScreen').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
-        }
-    });
-};
+// तुरंत शुरू करो
+startFirebaseListener();
