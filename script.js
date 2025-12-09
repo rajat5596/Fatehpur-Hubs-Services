@@ -196,15 +196,11 @@ function loadJobs() {
         `;
         container.appendChild(card);
     });
-// 100% काम करने वाला फुल-स्क्रीन प्रमोशन — imgbb की इमेज से भी चलेगा
-setTimeout(() => {
-    const div = document.createElement('div');
-    div.innerHTML = `
-        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:99999;display:flex;justify-content:center;align-items:center;flex-direction:column;color:white;text-align:center;">
-            <button onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:15px;right:20px;background:red;color:white;border:none;padding:12px 20px;border-radius:50%;font-size:28px;cursor:pointer;">✕</button>
-            <img src="https://i.ibb.co/album/0b0b0b0b0b0b0b0b0b0b" style="max-width:92%;max-height:70%;border-radius:20px;box-shadow:0 0 40px gold;">
-            <h2 style="margin:20px 0;font-size:30px;color:gold;">Johnson Square – 50% छूट आज!</h2>
-            <p style="font-size:20px;">स्पेशल ऑफर सिर्फ आज के लिए!</p>
-        </div>`;
-    document.body.appendChild(div);
-}, 2000);
+const POPUP_HTML_STRUCTURE = `
+    <div id="fullScreenPromotionPopup" style="display:none;">
+        <button id="closePopupBtn">X</button>
+        <div id="popupBannerContent">
+            <img src="Https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=36476f75-f79f-4a8f-a03f-74d7d3eb8c9e" alt="Premium Promotion">
+        </div>
+    </div>
+`;
