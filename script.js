@@ -406,3 +406,24 @@ window.onload = function() {
         }
     }, 1000);
 };
+// जैसे ही Firebase तैयार हो, डेटा लोड करना शुरू करो
+function startFirebaseListener() {
+    if (!window.providersRef) {
+        console.error("providersRef not ready yet!");
+        return;
+    }
+
+    window.providersRef.on('value', snapshot => {
+        serviceProviders = [];
+        snapshot.forEach(child => {
+            serviceProviders.push({ key: child.key, ...child.val() });
+        });
+        console.log("Loaded", serviceProviders.length, "providers");
+        displayServices();        // ← ये लाइन बहुत जरूरी है!
+    });
+}
+
+// अगर user पहले से लॉगिन है तो तुरंत शुरू करो
+if (firebase.auth().currentUser) {
+    startFirebaseListener();
+}
