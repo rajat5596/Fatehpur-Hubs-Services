@@ -413,17 +413,32 @@ function startFirebaseListener() {
         return;
     }
 
-    window.providersRef.on('value', snapshot => {
-        serviceProviders = [];
-        snapshot.forEach(child => {
-            serviceProviders.push({ key: child.key, ...child.val() });
-        });
-        console.log("Loaded", serviceProviders.length, "providers");
-        displayServices();        // ← ये लाइन बहुत जरूरी है!
-    });
-}
+    window.onload = () => {
+    firebase.initializeApp(firebaseConfig);
 
-// अगर user पहले से लॉगिन है तो तुरंत शुरू करो
-if (firebase.auth().currentUser) {
-    startFirebaseListener();
-}
+    const db = firebase.database();
+    window.providersRef = db.ref('serviceProviders');   // सही path
+    window.jobsRef     = db.ref('local_jobs');
+
+    // ← ये 2 लाइनें बहुत जरूरी हैं (पहले नहीं थीं)
+    console.log("Firebase Ready – Starting listeners...");
+    startFirebaseListener();        // ← ये लाइन डालो!
+    
+    // बाकी तुम्हारा पुराना कोड
+    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        'size': 'invisible'
+    });
+    recaptchaVerifier.render();
+
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('registrationScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            console.log("User logged in:", user.phoneNumber);
+            startFirebaseListener();    // ← लॉगिन होने पर भी शुरू करो
+        } else {
+            document.getElementById('registrationScreen').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+    });
+};
