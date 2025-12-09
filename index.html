@@ -1088,7 +1088,7 @@ function registerJob() {
     window.onload = () => {
         firebase.initializeApp(firebaseConfig);
         window.database = firebase.database();
-        window.providersRef = database.ref('service_providers'); 
+        window.providersRef = database.ref('serviceProviders'); 
         window.jobsRef = database.ref('local_jobs'); 
 
         // 1. अदृश्य reCAPTCHA सेटअप
