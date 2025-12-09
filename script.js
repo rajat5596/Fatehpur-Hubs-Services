@@ -406,32 +406,15 @@ window.onload = function() {
         }
     }, 1000);
 };
-// जैसे ही Firebase तैयार हो, डेटा लोड करना शुरू करो
+
+    // बस ये 6 लाइनें script.js के सबसे नीचे डाल दो
 function startFirebaseListener() {
-    if (!window.providersRef) {
-        console.error("providersRef not ready yet!");
-        return;
-    }
-
-    // जैसे ही पेज लोड हो, डेटा सुनना शुरू करो
-function startFirebaseListener() {
-    if (!window.providersRef) {
-        console.log("Waiting for Firebase...");
-        setTimeout(startFirebaseListener, 500);
-        return;
-    }
-
-    console.log("Connected! Loading providers from serviceProviders...");
-
-    window.providersRef.on('value', snapshot => {
-        serviceProviders = [];
-        snapshot.forEach(child => {
-            serviceProviders.push({ key: child.key, ...child.val() });
+    if (window.providersRef) {
+        window.providersRef.on('value', snap => {
+            serviceProviders = [];
+            snap.forEach(child => serviceProviders.push({key: child.key, ...child.val()}));
+            displayServices();
         });
-        console.log("Loaded", serviceProviders.length, "मिस्त्री");
-        displayServices();   // ← ये लाइन से कार्ड बनते हैं (रिव्यू बटन सहित)
-    });
+    }
 }
-
-// तुरंत शुरू करो
-startFirebaseListener();
+startFirebaseListener();   // ← ये लाइन डालते ही सब आ जाएगा
