@@ -1,4 +1,4 @@
-let serviceProviders = [];
+Let serviceProviders = [];
 let currentFilter = '';
 
 // providersRef, jobsRef, और database variables index.html से window scope में सेट हैं।
@@ -93,53 +93,18 @@ function displayServices() {
             <div class="profile-card">
                 <h4 style="margin:0 0 5px;color:#2a5298;">${p.name} <span style="font-size:12px;color:#666;">(${p.category})</span></h4>
                 <p style="margin:5px 0;color:#666;">${p.area} | ${p.experience}</p>
-                
-                <div id="average-rating-display-${p.id}" style="margin-bottom: 10px;">
-                    </div>
-
                 <div style="display:flex;justify-content:space-between;margin-top:10px; flex-wrap: wrap; gap: 8px;">
                     <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
                     <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                    
-                    <button id="toggle-btn-${p.id}" class="share-btn-inline" onclick="toggleReviewSection('${p.id}')">
-                         रिव्यू और रेटिंग देखें
-                    </button>
                     
                     ${isOwner ? '' : `<button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'${window.location.href}'})">Share</button>`}
                     
                     ${ownerActions}
                 </div>
-                
-                <div id="review-section-${p.id}" style="display:none; margin-top: 15px; padding: 10px; border-top: 1px solid #ddd;">
-                    <div style="margin-bottom: 15px;">
-                        <h5>अपनी रेटिंग दें:</h5>
-                        <div class="rating-stars rating-stars-${p.id}" style="font-size: 24px; cursor: pointer;">
-                            <span class="star" data-rating="1">★</span>
-                            <span class="star" data-rating="2">★</span>
-                            <span class="star" data-rating="3">★</span>
-                            <span class="star" data-rating="4">★</span>
-                            <span class="star" data-rating="5">★</span>
-                        </div>
-                        <input type="hidden" id="selected-rating-${p.id}" value="0">
-                        <textarea id="review-text-${p.id}" placeholder="अपना रिव्यू यहाँ लिखें..." style="width: 95%; margin-top: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-                        <button class="submit-review-btn" onclick="submitReview('${p.id}')">रिव्यू सबमिट करें</button>
-                    </div>
-
-                    <div id="all-reviews-display-${p.id}">
-                        </div>
-                </div>
-
                 ${isOwner ? '<p style="color:green;font-size:10px;text-align:right;">(आपका डेटा)</p>' : ''}
             </div>
         `;
     }).join('');
-    
-    // *** यहाँ फाइनल फिक्स जोड़ा गया है ***
-    // हर कार्ड लोड होने के बाद उसकी रेटिंग को लोड करें
-    filtered.forEach(p => {
-        loadAverageRating(p.id); 
-    });
-    // *** फिक्स यहाँ समाप्त होता है ***
 }
 
 function loadPromotionAds() { 
@@ -148,8 +113,15 @@ function loadPromotionAds() {
 }
 
 
+
+function loadJobs() {
+    // This function can be called to explicitly reload jobs, though the listener is running.
+    console.log("Loading job list screen...");
+    if (!window.jobsRef) {
+        console.error("Jobs reference not initialized.");
+    }
+}
 // Function 1: HTML Card banane ke liye
-function displayJobs(jobs) {
     const container = document.getElementById('jobs-list');
     // वर्तमान लॉग-इन यूज़र की ID प्राप्त करें (Used for owner check)
     const currentUserId = firebase.auth().currentUser ? firebase.auth().currentUser.uid : null;
@@ -171,6 +143,7 @@ function displayJobs(jobs) {
         // Edit/Delete buttons for the owner
         const ownerActions = isOwner ? `
             <div style="margin-top:15px; text-align:right; display:flex; justify-content: flex-end; gap: 10px;">
+                <!-- These functions will be defined in index.html -->
                 <button class="edit-btn" onclick="editJob('${job.id}')">Edit</button>
                 <button class="delete-btn" onclick="deleteJob('${job.id}')">Delete</button>
             </div>
@@ -192,7 +165,6 @@ function displayJobs(jobs) {
         `;
         container.appendChild(card);
     });
-}
 
 
 // Function 2: Firebase se data fetch karne ke liye
@@ -211,7 +183,7 @@ function loadJobs() {
         snapshot.forEach((childSnapshot) => {
             const job = childSnapshot.val();
             // Job data ko array mein add karo
-            jobs.push({...job, id: childSnapshot.key}); // ID भी जोड़ें
+            jobs.push(job);
         });
 
         // Nayi jobs ko display karo
@@ -223,131 +195,9 @@ function loadJobs() {
         document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
     });
 } 
-
-
-// D. औसत रेटिंग लोड करने और डिस्प्ले करने का फ़ंक्शन
-function loadAverageRating(serviceId) {
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    
-    reviewsRef.once('value', function(snapshot) {
-        let totalRating = 0;
-        let reviewCount = 0;
-
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const review = childSnapshot.val();
-                if (review.rating) {
-                    totalRating += review.rating;
-                    reviewCount++;
-                }
-            });
-        }
-
-        const avgRating = reviewCount > 0 ? (totalRating / reviewCount).toFixed(1) : 0;
-        
-        // रेटिंग डिस्प्ले अपडेट करें
-        const displayElement = document.getElementById('average-rating-display-' + serviceId);
-        if (displayElement) {
-            displayElement.innerHTML = `
-                <h4 style="margin-bottom: 5px;">कुल रेटिंग: ${avgRating} / 5 (${reviewCount} रिव्यू)</h4>
-            `;
-        }
-
-        // रिव्यू बटन पर काउंट अपडेट करें
-        const toggleButton = document.getElementById('toggle-btn-' + serviceId);
-        if (toggleButton) {
-             if (reviewCount > 0) {
-                 toggleButton.innerHTML = `रिव्यू और रेटिंग देखें (${reviewCount}) ⭐ ${avgRating}`;
-             } else {
-                 toggleButton.innerHTML = `रिव्यू और रेटिंग दें (0)`;
-             }
-        }
-    });
-}
-
-
-// E. टेक्स्ट रिव्यू लोड करने और डिस्प्ले करने का फ़ंक्शन
-function loadAndDisplayReviews(serviceId) {
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    const displayContainer = document.getElementById('all-reviews-display-' + serviceId);
-    
-    if (!displayContainer) return;
-
-    reviewsRef.once('value', function(snapshot) {
-        let reviewsHtml = '<h4>यूज़र रिव्यू</h4>';
-        
-        if (snapshot.exists()) {
-            snapshot.forEach(childSnapshot => {
-                const review = childSnapshot.val();
-                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                // Date format: YYYY-MM-DD
-                const reviewDate = review.timestamp ? new Date(review.timestamp).toLocaleDateString() : 'Unknown Date'; 
-
-                reviewsHtml += `
-                    <div style="border: 1px solid #eee; padding: 10px; margin-top: 10px; border-radius: 5px; background-color: #f9f9f9;">
-                        <p style="margin: 0; font-size: 14px; color: #555;">
-                            ${stars} (${review.rating}/5)
-                        </p>
-                        <p style="margin-top: 5px; font-weight: bold;">"${review.text}"</p>
-                        <small style="color: #888;">- ${review.reviewer} | ${reviewDate}</small>
-                    </div>
-                `;
-            });
-        } else {
-             reviewsHtml += `<p style="color: #888;">अभी कोई रिव्यू उपलब्ध नहीं है।</p>`;
-        }
-        
-        displayContainer.innerHTML = reviewsHtml;
-    });
-}
-
-
-// C. रिव्यू सेक्शन को दिखाने/छिपाने का फ़ंक्शन
-function toggleReviewSection(serviceId) {
-    const section = document.getElementById('review-section-' + serviceId);
-    const button = document.getElementById('toggle-btn-' + serviceId);
-
-    if (section.style.display === 'none' || section.style.display === '') {
-        section.style.display = 'block';
-        button.textContent = 'रिव्यू और रेटिंग छुपाएँ';
-        initializeRatingHandlers(serviceId); // स्टार्स को एक्टिवेट करें
-        loadAndDisplayReviews(serviceId); // रिव्यू लोड करें
-    } else {
-        section.style.display = 'none';
-        // जब छिपता है, तब रेटिंग और रिव्यू काउंट वाला टेक्स्ट वापस आ जाता है
-        loadAverageRating(serviceId); 
-    }
-}
-
-
-// B. स्टार क्लिक को हैंडल करने का फ़ंक्शन
-function initializeRatingHandlers(serviceId) {
-    const container = document.querySelector('.rating-stars-' + serviceId);
-    if (!container) return; 
-
-    container.querySelectorAll('.star').forEach(star => {
-        // यह चेक करता है कि इवेंट हैंडलर पहले से जुड़ा है या नहीं।
-        if (star.getAttribute('data-handler') === 'true') return; 
-
-        star.addEventListener('click', function() {
-            const rating = parseInt(this.getAttribute('data-rating'));
-            document.getElementById('selected-rating-' + serviceId).value = rating; 
-            
-            container.querySelectorAll('.star').forEach(s => {
-                if (parseInt(s.getAttribute('data-rating')) <= rating) {
-                    s.classList.add('rated');
-                } else {
-                    s.classList.remove('rated');
-                }
-            });
-        });
-        star.setAttribute('data-handler', 'true'); // हैंडलर को मार्क करें
-    });
-}
-
-
 // A. रिव्यू सबमिट करने का फ़ंक्शन
 function submitReview(serviceId) {
+    // 1. वैल्यू प्राप्त करें
     const rating = document.getElementById('selected-rating-' + serviceId).value;
     const reviewText = document.getElementById('review-text-' + serviceId).value;
 
@@ -356,37 +206,50 @@ function submitReview(serviceId) {
         return;
     }
     
-    // यहाँ यूज़र का नाम/आईडी प्राप्त करने के लिए logic जोड़ा जा सकता है (जैसे firebase.auth().currentUser.displayName)
-    const reviewerName = firebase.auth().currentUser && firebase.auth().currentUser.displayName 
-                         ? firebase.auth().currentUser.displayName 
-                         : 'Guest User';
-
+    // 2. लॉग-इन चेक करें (क्योंकि आपने Firebase Rules में 'auth != null' सेट किया है)
+    const currentUser = firebase.auth().currentUser;
+    if (!currentUser) {
+        alert("रिव्यू सबमिट करने के लिए कृपया पहले लॉग-इन करें।");
+        return;
+    }
+    
+    // 3. रेफरेंस सेट करें
     const reviewsRef = firebase.database().ref('reviews/' + serviceId);
     
+    // 4. रिव्यूअर का नाम सेट करें
+    // अगर DisplayName है तो वह लें, वरना Guest/यूजर ID लें
+    const reviewerName = currentUser.displayName 
+                         ? currentUser.displayName 
+                         : currentUser.email || currentUser.uid;
+
     const newReview = {
         rating: parseInt(rating),
         text: reviewText,
-        reviewer: reviewerName, 
+        reviewer: reviewerName, // यहाँ सेट किया गया नाम
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
 
+    // 5. Firebase में पुश करें
     reviewsRef.push(newReview)
         .then(() => {
             alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
+            
+            // फॉर्म रीसेट करें
             document.getElementById('review-text-' + serviceId).value = ''; 
             document.getElementById('selected-rating-' + serviceId).value = '0';
             
-            // सक्सेस के बाद स्टार्स को रीसेट करें
+            // स्टार्स को रीसेट करें (रंग हटाएँ)
             document.querySelectorAll('.rating-stars-' + serviceId + ' .star').forEach(s => {
                 s.classList.remove('rated');
             });
             
-            // सक्सेस के बाद रेटिंग और रिव्यू को तुरंत अपडेट करें
+            // रेटिंग और रिव्यू को तुरंत अपडेट करें
             loadAverageRating(serviceId);
             loadAndDisplayReviews(serviceId);
         })
         .catch(error => {
             console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
-            alert("रिव्यू सबमिट नहीं हो सका।");
+            // Firebase Error 401 (Permission Denied) का मतलब है Rules की समस्या। 
+            alert("रिव्यू सबमिट नहीं हो सका। कृपया सुनिश्चित करें कि आप लॉग-इन हैं।");
         });
 }
