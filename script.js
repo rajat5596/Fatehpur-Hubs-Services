@@ -77,7 +77,15 @@ function displayServices() {
         list.innerHTML = '<h3>उपलब्ध सेवाएं</h3><p style="text-align:center;color:#999;">कोई सर्विस नहीं मिली</p>';
         return;
     }
-
+// यह सुनिश्चित करता है कि DOM पूरी तरह से लोड हो गया है
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. पॉपअप HTML को <body> के अंत में जोड़ें
+    document.body.insertAdjacentHTML('beforeend', POPUP_HTML_STRUCTURE);
+    
+    // 2. पॉपअप का लॉजिक शुरू करें (यह initializePopupAd() फ़ंक्शन है जो आपने अंत में पेस्ट किया है)
+    initializePopupAd(); 
+});
+    
     list.innerHTML = '<h3>उपलब्ध सेवाएं</h3>' + filtered.map(p => {
         const isOwner = currentUserId && p.userId === currentUserId;
 
