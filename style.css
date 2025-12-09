@@ -618,3 +618,6 @@ input[type="tel"]:focus, input[type="text"]:focus {
     transform: scale(0.85); /* Mobile adjustment */
     transform-origin: center;
 }
+.rating-stars .star { color: #ccc; cursor: pointer; }
+.rating-stars .star:hover { color: #f39c12; }
+.profile-card { border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 10px; background: white; }
