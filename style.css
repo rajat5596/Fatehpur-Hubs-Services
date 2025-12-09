@@ -618,3 +618,53 @@ input[type="tel"]:focus, input[type="text"]:focus {
     transform: scale(0.85); /* Mobile adjustment */
     transform-origin: center;
 }
+/* --- Full Screen Promotion Popup Styles --- */
+#fullScreenPromotionPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Dark overlay */
+    z-index: 10000; /* Ensure it is above all other elements */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+#popupBannerContent {
+    max-width: 90%;
+    max-height: 90%;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+#popupBannerContent img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#closePopupBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10001; /* Above the popup content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s;
+}
+
+#closePopupBtn:hover {
+    background: #cc0000;
+}
