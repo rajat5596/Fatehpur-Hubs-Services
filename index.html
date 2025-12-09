@@ -1086,34 +1086,10 @@ function registerJob() {
         }
         
     window.onload = () => {
-    firebase.initializeApp(firebaseConfig);
-
-    const db = firebase.database();
-    window.providersRef = db.ref('serviceProviders');   // सही path
-    window.jobsRef     = db.ref('local_jobs');
-
-    // ← ये 2 लाइनें बहुत जरूरी हैं (पहले नहीं थीं)
-    console.log("Firebase Ready – Starting listeners...");
-    startFirebaseListener();        // ← ये लाइन डालो!
-    
-    // बाकी तुम्हारा पुराना कोड
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible'
-    });
-    recaptchaVerifier.render();
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('registrationScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            console.log("User logged in:", user.phoneNumber);
-            startFirebaseListener();    // ← लॉगिन होने पर भी शुरू करो
-        } else {
-            document.getElementById('registrationScreen').style.display = 'block';
-            document.getElementById('mainApp').style.display = 'none';
-        }
-    });
-};
+        firebase.initializeApp(firebaseConfig);
+        window.database = firebase.database();
+        window.providersRef = database.ref('service_providers'); 
+        window.jobsRef = database.ref('local_jobs'); 
 
         // 1. अदृश्य reCAPTCHA सेटअप
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
