@@ -96,6 +96,11 @@ function displayServices() {
                 <div style="display:flex;justify-content:space-between;margin-top:10px; flex-wrap: wrap; gap: 8px;">
                     <button class="contact-btn" onclick="window.location.href='tel:${p.phone}'">Call</button>
                     <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                    <button class="whatsapp-btn" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+
+<button class="review-btn" onclick="toggleReviewSection('${p.id}', '${p.name}')">
+    <i class="fa fa-star"></i> Reviews (<span id="review-count-${p.id}">0</span>)
+</button>
                     
                     ${isOwner ? '' : `<button class="share-btn-inline" onclick="navigator.share({title:'${p.name}', text:'${p.category} in ${p.area}', url:'${window.location.href}'})">Share</button>`}
                     
