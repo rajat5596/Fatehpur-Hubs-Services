@@ -197,90 +197,99 @@ function loadJobs() {
         container.appendChild(card);
     });
 
-
-// Function 2: Firebase se data fetch karne ke liye
-function loadJobs() {
-    // Check if jobsRef is initialized (from index.html window.onload)
-    if (!window.jobsRef) {
-        console.error("jobsRef is not initialized. Firebase might not be fully loaded.");
-        // If not loaded, wait a moment and try again (Handles script timing)
-        setTimeout(loadJobs, 500); 
-        return;
-    }
-
-    // Data ko Realtime Database se fetch karo
-    window.jobsRef.on('value', (snapshot) => {
-        const jobs = [];
-        snapshot.forEach((childSnapshot) => {
-            const job = childSnapshot.val();
-            // Job data ko array mein add karo
-            jobs.push(job);
-        });
-
-        // Nayi jobs ko display karo
-        displayJobs(jobs.reverse()); // Jobs ko latest se pehle dikhane ke liye reverse()
-        
-        console.log(`Loaded ${jobs.length} jobs.`);
-    }, (error) => {
-        console.error("Firebase Jobs Load Error:", error);
-        document.getElementById('jobs-list').innerHTML = '<p style="color:red;">जॉब्स लोड करने में एरर आई।</p>';
-    });
-} 
-// A. रिव्यू सबमिट करने का फ़ंक्शन
-function submitReview(serviceId) {
-    // 1. वैल्यू प्राप्त करें
-    const rating = document.getElementById('selected-rating-' + serviceId).value;
-    const reviewText = document.getElementById('review-text-' + serviceId).value;
-
-    if (rating == 0 || reviewText.trim() === "") {
-        alert("कृपया स्टार रेटिंग दें और रिव्यू लिखें।");
-        return;
-    }
+function toggleReviewSection(serviceId) {
+    const section = document.getElementById('review-section-' + serviceId);
+    const btn = document.getElementById('toggle-btn-' + serviceId);
     
-    // 2. लॉग-इन चेक करें (क्योंकि आपने Firebase Rules में 'auth != null' सेट किया है)
-    const currentUser = firebase.auth().currentUser;
-    if (!currentUser) {
-        alert("रिव्यू सबमिट करने के लिए कृपया पहले लॉग-इन करें।");
-        return;
+    if (section.style.display === 'none' || section.style.display === '') {
+        section.style.display = 'block';
+        btn.innerHTML = 'रिव्यू और रेटिंग छुपाएं ↑';
+        loadAndDisplayReviews(serviceId); // रिव्यू लोड करो जब खोलें
+    } else {
+        section.style.display = 'none';
+        btn.innerHTML = 'रिव्यू और रेटिंग देखें (' + 
+            (document.querySelectorAll('#all-reviews-display-' + serviceId + ' .review-item').length || 0) + ')';
     }
-    
-    // 3. रेफरेंस सेट करें
-    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
-    
-    // 4. रिव्यूअर का नाम सेट करें
-    // अगर DisplayName है तो वह लें, वरना Guest/यूजर ID लें
-    const reviewerName = currentUser.displayName 
-                         ? currentUser.displayName 
-                         : currentUser.email || currentUser.uid;
-
-    const newReview = {
-        rating: parseInt(rating),
-        text: reviewText,
-        reviewer: reviewerName, // यहाँ सेट किया गया नाम
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // 5. Firebase में पुश करें
-    reviewsRef.push(newReview)
-        .then(() => {
-            alert("आपका रिव्यू सफलतापूर्वक सबमिट हो गया!");
-            
-            // फॉर्म रीसेट करें
-            document.getElementById('review-text-' + serviceId).value = ''; 
-            document.getElementById('selected-rating-' + serviceId).value = '0';
-            
-            // स्टार्स को रीसेट करें (रंग हटाएँ)
-            document.querySelectorAll('.rating-stars-' + serviceId + ' .star').forEach(s => {
-                s.classList.remove('rated');
-            });
-            
-            // रेटिंग और रिव्यू को तुरंत अपडेट करें
-            loadAverageRating(serviceId);
-            loadAndDisplayReviews(serviceId);
-        })
-        .catch(error => {
-            console.error("रिव्यू सबमिट करते समय त्रुटि:", error);
-            // Firebase Error 401 (Permission Denied) का मतलब है Rules की समस्या। 
-            alert("रिव्यू सबमिट नहीं हो सका। कृपया सुनिश्चित करें कि आप लॉग-इन हैं।");
-        });
 }
+function loadAndDisplayReviews(serviceId) {
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    const displayDiv = document.getElementById('all-reviews-display-' + serviceId);
+
+    reviewsRef.on('value', snapshot => {
+        displayDiv.innerHTML = '<h4>यूज़र रिव्यू</h4>';
+        if (!snapshot.exists()) {
+            displayDiv.innerHTML += '<p style="color:#999;">अभी कोई रिव्यू नहीं है।</p>';
+            return;
+        }
+
+        const reviews = [];
+        snapshot.forEach(child => {
+            reviews.push({ id: child.key, ...child.val() });
+        });
+
+        // लेटेस्ट रिव्यू सबसे ऊपर
+        reviews.reverse().forEach(r => {
+            const date = new Date(r.timestamp).toLocaleDateString('hi-IN');
+            displayDiv.innerHTML += `
+                <div class="review-item" style="border-bottom:1px solid #eee; padding:10px 0; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>${r.reviewer || 'Anonymous'}</strong>
+                        <span style="color:#f39c12;">\( {'★'.repeat(r.rating)} ( \){r.rating}/5)</span>
+                    </div>
+                    <p style="margin:8px 0; color:#333;">${r.text}</p>
+                    <small style="color:#888;">${date}</small>
+                </div>
+            `;
+        });
+    });
+}
+function loadAverageRating(serviceId) {
+    const reviewsRef = firebase.database().ref('reviews/' + serviceId);
+    const displayDiv = document.getElementById('average-rating-display-' + serviceId);
+
+    reviewsRef.on('value', snapshot => {
+        if (!snapshot.exists()) {
+            displayDiv.innerHTML = '<p style="color:#999;">अभी कोई रेटिंग नहीं</p>';
+            return;
+        }
+
+        let total = 0;
+        let count = 0;
+        snapshot.forEach(child => {
+            total += child.val().rating;
+            count++;
+        });
+
+        const avg = (total / count).toFixed(1);
+        displayDiv.innerHTML = `
+            <div style="background:#f0f8ff; padding:8px; border-radius:8px; text-align:center;">
+                <strong style="color:#2a5298; font-size:18px;">⭐ ${avg}/5</strong> 
+                <span style="color:#555;">(${count} रिव्यू)</span>
+            </div>
+        `;
+
+        // बटन पर भी काउंट अपडेट कर दो
+        const toggleBtn = document.getElementById('toggle-btn-' + serviceId);
+        if (toggleBtn) {
+            toggleBtn.innerHTML = `रिव्यू और रेटिंग देखें (${count})`;
+        }
+    });
+}
+// स्टार रेटिंग के लिए (हर कार्ड के लिए अलग से attach करना पड़ेगा)
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('star')) {
+        const rating = e.target.getAttribute('data-rating');
+        const serviceId = e.target.closest('.rating-stars').classList[1].split('-')[2]; // rating-stars-${id}
+
+        // सिलेक्टेड रेटिंग सेट करो
+        document.getElementById('selected-rating-' + serviceId).value = rating;
+
+        // सभी स्टार्स का कलर रीसेट करो
+        document.querySelectorAll(`.rating-stars-${serviceId} .star`).forEach(star => {
+            star.classList.remove('rated');
+            if (star.getAttribute('data-rating') <= rating) {
+                star.classList.add('rated');
+            }
+        });
+    }
+});
