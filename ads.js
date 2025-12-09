@@ -6,7 +6,7 @@
 // *************************************************************
 const promotionAds = [
     { name: "Rajat Enterprises", image: "https://i.ibb.co/MDcL6w49/IMG-20251029-120527.jpg", link: "https://wa.me/919889904191", endDate: "2025-12-15" },
-    { name: "Rajat Aluminium", image: "https://i.ibb.co/0y4K0cR/rajat-aluminium.jpg", link: "https://wa.me/919889904191", endDate: null },
+    { name: "Rajat Aluminium", image: "Https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=36476f75-f79f-4a8f-a03f-74d7d3eb8c9e", link: "https://wa.me/919889904191", endDate: null },
     { name: "ABC Hardware Store", image: "https://via.placeholder.com/350x100/333333/FFFFFF?text=ABC+Hardware", link: "https://wa.me/99999999999", endDate: "2025-11-26" },
     { name: "PQR Services", image: "https://via.placeholder.com/350x100/007bff/FFFFFF?text=PQR+Services", link: "tel:+918888888888", endDate: null },
     // Naye Ad ki expiry date yahan set karein
