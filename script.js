@@ -197,16 +197,13 @@ window.loadCategories = (loadMore = false) => {
         } else {
             loadMoreBtn.style.display = 'none';
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
-            // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
-    setTimeout(window.showPromoPopup, 5000);
+
         }
 
     }, (error) => {
         console.error("Error loading services:", error);
         document.getElementById('loading-more')?.remove();
         listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
-        // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
-    setTimeout(window.showPromoPopup, 5000);
     });
 }
 
@@ -676,108 +673,3 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-// --- FULL SCREEN PREMIUM PROMO POPUP FUNCTIONS ---
-
-// Function to find a random premium ad and render it
-window.renderRandomPromoAd = function() {
-    if (!window.promoAds || window.promoAds.length === 0) {
-        return false; // कोई विज्ञापन नहीं मिला
-    }
-
-    // ads.js से रैंडम प्रमोशन आइटम चुनें
-    const randomIndex = Math.floor(Math.random() * window.promoAds.length);
-    const promo = window.promoAds[randomIndex]; 
-    
-    const adPlaceholder = document.getElementById('promo-ad-placeholder');
-    
-    // केवल 10 अंक के फ़ोन नंबर के लिए WhatsApp URL तैयार करें
-    let whatsappUrl = '#';
-    if (promo.contactPhone && promo.contactPhone.length === 10) {
-        whatsappUrl = `https://wa.me/91${promo.contactPhone}`;
-    }
-
-    if (adPlaceholder) {
-        // रेंडरिंग: कंटेंट को clickable anchor tag के अंदर डालें
-        adPlaceholder.innerHTML = `
-            <a href="${whatsappUrl}" target="_blank" onclick="window.closePromoPopup();" style="text-decoration: none; color: inherit;">
-                <div style="
-                    background-color: ${promo.bgColor || '#1a1a1a'}; /* Fallback color */
-                    padding: 20px; 
-                    border-radius: 8px; 
-                    text-align: center;
-                    color: white;
-                    cursor: pointer;
-                    max-width: 320px; /* Mobile width */
-                    margin: auto;
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.5); /* Pop-up effect */
-                ">
-                    <img src="${promo.imageUrl}" alt="Promotion Image" style="
-                        width: 100%; 
-                        max-height: 250px; 
-                        object-fit: cover; 
-                        border-radius: 8px; 
-                        margin-bottom: 10px;
-                    ">
-                    <h3 style="margin: 0; font-size: 1.4rem;">${promo.title}</h3>
-                    <p style="margin: 5px 0 0;">${promo.description}</p>
-                    <p style="margin-top: 10px; font-weight: bold; background-color: #ffc107; color: #333; padding: 5px; border-radius: 5px;">
-                        📞 यहाँ क्लिक करें और WhatsApp पर बात करें!
-                    </p>
-                </div>
-            </a>
-        `;
-        return true; // रेंडरिंग सफल
-    }
-    return false; // रेंडरिंग विफल
-};
-
-
-// Function to show the popup
-window.showPromoPopup = function() {
-    const isRendered = window.renderRandomPromoAd();
-    
-    // केवल तभी दिखाएँ जब कोई विज्ञापन रैंडमली चुना और रेंडर किया गया हो
-    if (isRendered) {
-        const popup = document.getElementById('fullScreenPromoPopup');
-        if (popup) {
-            popup.style.display = 'flex';
-        }
-    }
-};
-
-// Function to close the popup
-window.closePromoPopup = function() {
-    const popup = document.getElementById('fullScreenPromoPopup');
-    if (popup) {
-        popup.style.display = 'none';
-    }
-};
-
-// ------------------------------------------
-// --- NEW: FORCING PROMO POPUP AFTER DATA IS AVAILABLE ---
-let promoInterval = null;
-const MAX_ATTEMPTS = 15; // 15 सेकंड तक कोशिश करें
-let attemptCount = 0;
-
-window.checkAndShowPromo = function() {
-    // 1. अगर promoAds लोड नहीं हुआ है या खाली है, और 15 बार कोशिश नहीं हुई है, तो वापस जाएँ
-    if (!window.promoAds || window.promoAds.length === 0) {
-        attemptCount++;
-        if (attemptCount >= MAX_ATTEMPTS) {
-            clearInterval(promoInterval); // 15 सेकंड बाद कोशिश करना बंद करें
-            console.log('Premium Ads not loaded after 15 attempts.');
-        }
-        return;
-    }
-
-    // 2. अगर डेटा मिल गया है, तो पॉपअप दिखाएँ
-    clearInterval(promoInterval); // लूप बंद करें
-    
-    // ऐप को स्टेबल होने के लिए 2 सेकंड का अंतिम विलंब दें
-    setTimeout(window.showPromoPopup, 2000);
-};
-
-// हर 1000ms (1 सेकंड) में डेटा जाँच शुरू करें
-// यह सुनिश्चित करता है कि ads.js के लोड होते ही हम कार्रवाई करें, चाहे वह धीमा ही क्यों न हो।
-promoInterval = setInterval(window.checkAndShowPromo, 1000);
-// ----------------------------------------------------------------
