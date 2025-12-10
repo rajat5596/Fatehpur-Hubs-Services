@@ -3,148 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fatehpur Hubs - Local Services & Jobs</title>
-    
+    <title>Fatehpur Hubs</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json?v=3.0">
-
-    <!-- Firebase SDK -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-    <!-- Agar script.js mein Firebase config nahi hai to ye daal do (warna hata dena) -->
     <script>
-        // Agar tumhara script.js mein config hai to ye block comment kar dena
+        // Apna Firebase Config yahan daal do (bahut zaroori!)
         const firebaseConfig = {
-            apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            apiKey: "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
             authDomain: "fatehpur-hubs.firebaseapp.com",
             databaseURL: "https://fatehpur-hubs-default-rtdb.firebaseio.com",
             projectId: "fatehpur-hubs",
             storageBucket: "fatehpur-hubs.appspot.com",
-            messagingSenderId: "XXXXXXXXXXXX",
-            appId: "1:XXXXXXXXXXXX:web:XXXXXXXXXXXXXXXX"
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef1234567890"
         };
         firebase.initializeApp(firebaseConfig);
     </script>
 
-    <script type="text/javascript" src="script.js"></script>
-    <script type="text/javascript" src="ads.js"></script>
-
+    <script src="script.js"></script>
+    
     <style>
-        body { margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        .screen { display: none; }
-        .screen.active { display: block; }
+        body { margin:0; padding:0; background:#f8f9fa; font-family:sans-serif; }
+        .screen { display:none; }
+        .active { display:block; }
     </style>
 </head>
-<body>
+<body class="min-h-screen pb-20">
 
-<div id="app-container">
+    <!-- MAIN APP (sab content yahan hai) -->
+    <div id="mainApp" class="p-4">
 
-    <!-- AUTH SCREEN -->
-    <div id="registrationScreen" style="display:none; padding:20px; text-align:center;">
-        <h2 class="text-2xl font-bold mb-4">Fatehpur Hubs</h2>
-        <div id="loginMsg" class="text-lg mb-4">कृपया लॉगिन करें</div>
-
-        <div class="space-y-3 max-w-sm mx-auto">
-            <input type="text" id="userName" placeholder="आपका नाम" class="w-full p-3 border rounded">
-            <input type="text" id="userArea" placeholder="आपका इलाका" class="w-full p-3 border rounded">
-            <input type="number" id="phoneInput" placeholder="10 अंक का मोबाइल नंबर" maxlength="10" class="w-full p-3 border rounded">
-            <button id="sendOtpBtn" class="w-full bg-blue-600 text-white py-3 rounded font-bold">OTP भेजें</button>
-        </div>
-
-        <div id="otpSection" class="mt-4" style="display:none;">
-            <input type="number" id="otpInput" placeholder="6 अंक का OTP" maxlength="6" class="w-full p-3 border rounded">
-            <button id="verifyOtpBtn" class="w-full bg-green-600 text-white py-3 rounded font-bold mt-2">लॉगिन करें</button>
-        </div>
-
-        <div id="recaptcha-container"></div>
-    </div>
-
-    <!-- MAIN APP -->
-    <div id="mainApp" style="display:none;">
-
-        <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
-            <div class="text-xl font-bold">Fatehpur Hubs</div>
-            <button onclick="window.logOut()" class="text-sm">Logout</button>
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-b-xl shadow-lg flex justify-between items-center mb-4">
+            <h1 class="text-xl font-bold">Fatehpur Hubs</h1>
+            <button onclick="logOut()" class="bg-red-500 px-4 py-2 rounded">Logout</button>
         </header>
 
-        <div class="pb-20"> <!-- bottom nav ke liye space -->
-
-            <!-- HOME SCREEN -->
-            <div id="home-screen" class="screen active p-4">
-                <!-- Top Ad -->
-                <div class="bg-gray-200 text-center py-2 my-2 rounded">Top Ad</div>
-
-                <input type="text" id="main-search-bar" placeholder="सेवा या इलाका खोजें..." class="w-full p-3 border rounded mb-4"
-                       onkeyup="searchServices()">
-
-                <div id="mistri-categories" class="grid grid-cols-3 gap-2 mb-4">
-                    <!-- Categories buttons yahan script.js se load honge ya manually daal sakte ho -->
+        <!-- HOME SCREEN -->
+        <div id="home-screen" class="screen active">
+            <div class="bg-white rounded-lg shadow p-4 mb-4">
+                <h2 class="text-2xl font-bold text-center text-blue-600 mb-4">सेवाएँ & जॉब्स</h2>
+                <input type="text" id="main-search-bar" placeholder="खोजें..." class="w-full p-3 border rounded-lg mb-4" onkeyup="searchServices()">
+                
+                <div class="grid grid-cols-3 gap-4 gap-3 mb-6" id="mistri-categories">
+                    <button class="cat-btn bg-blue-100 p-3 rounded-lg" onclick="filterByCategory('Plumber')">प्लम्बर</button>
+                    <button class="cat-btn bg-blue-100 p-3 rounded-lg" onclick="filterByCategory('Electrician')">इलेक्ट्रीशियन</button>
+                    <button class="cat-btn bg-blue-100 p-3 rounded-lg" onclick="filterByCategory('Carpenter')">बढ़ई</button>
+                    <button class="cat-btn bg-blue-100 p-3 rounded-lg" onclick="filterByCategory('DJ Service')">DJ</button>
+                    <!-- baaki categories apne script.js se load hongi -->
                 </div>
 
-                <div id="mistri-list"></div>
-
-                <!-- Middle Ad -->
-                <div class="my-6 text-center">
-                    <script type="text/javascript">
-                        atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
-                    </script>
-                </div>
+                <div id="mistri-list" class="space-y-3"></div>
             </div>
 
-            <!-- ADD SERVICE SCREEN -->
-            <div id="add-service-screen" class="screen p-4">
+            <!-- 300x250 Ad -->
+            <div class="my-6 text-center">
+                <script type="text/javascript">
+                    atOptions = { 'key' : 'd65603602583bbe6bc3308e8ee8ab792', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                    document.write('<script type="text/javascript" src="//www.highperformanceformat.com/d65603602583bbe6bc3308e8ee8ab792/invoke.js"><\/script>');
+                </script>
+            </div>
+        </div>
+
+        <!-- ADD SERVICE SCREEN (tumhara wahi form)
+        <div id="add-service-screen" class="screen">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
                 <h3 class="text-2xl font-bold text-center mb-6">सर्विस जोड़ें</h3>
-                <form id="serviceForm" onsubmit="event.preventDefault(); registerService();">
-                    <input type="text" id="providerName" placeholder="नाम" class="w-full p-3 border rounded mb-3" required>
-                    <input type="number" id="providerPhone" placeholder="10 अंक का फोन" maxlength="10" class="w-full p-3 border rounded mb-3" required>
-                    <select id="serviceCategory" class="w-full p-3 border rounded mb-3" required>
+                <form onsubmit="event.preventDefault(); registerService();">
+                    <input type="text" id="providerName" placeholder="नाम" class="w-full p-3 border mb-3 rounded" required>
+                    <input type="number" id="providerPhone" placeholder="मोबाइल" maxlength="10" class="w-full p-3 border mb-3 rounded" required>
+                    <select id="serviceCategory" class="w-full p-3 border mb-3 rounded" required>
                         <option value="">कैटेगरी चुनें</option>
-                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>Mason</option>
-                        <option>Painter</option><option>AC Mechanic</option><option>Tiler</option><option>Beautician</option>
-                        <option>DJ Service</option><option>Driver</option><option>Catering</option><option>Photographer</option>
-                        <option>Car Mechanic</option>
-                        <!-- baki options apne hisab se daal do -->
+                        <option>Plumber</option><option>Electrician</option><option>Carpenter</option><option>DJ Service</option><option>Driver</option>
+                        <!-- baaki daal do -->
                     </select>
-                    <input type="text" id="providerArea" placeholder="इलाका" class="w-full p-3 border rounded mb-3" required>
-                    <input type="number" id="providerExperience" placeholder="अनुभव (साल)" class="w-full p-3 border rounded mb-6" required>
-                    <button type="submit" class="w-full bg-green-600 text-white py-4 rounded font-bold">रजिस्टर करें</button>
+                    <input type="text" id="providerArea" placeholder="इलाका" class="w-full p-3 border mb-3 rounded" required>
+                    <input type="number" id="providerExperience" placeholder="अनुभव (साल)" class="w-full p-3 border mb-6 rounded" required>
+                    <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-lg font-bold">रजिस्टर करें</button>
                 </form>
             </div>
-
-            <!-- JOBS & SHARE SCREEN bhi yahin daal sakte ho (space ke liye chhoda hai) -->
-
         </div>
-    </div>
-</div>
 
-<!-- BOTTOM AD — AB HAMESHA DIKHEGA -->
-<div style="position:fixed; bottom:56px; left:0; right:0; z-index:10000; background:white; text-align:center; padding:8px 0; border-top:1px solid #ddd;">
-    <script type="text/javascript">
-        atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-        document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
-    </script>
-</div>
+    </div>
 
-<!-- BOTTOM NAVIGATION -->
-<div style="position:fixed; bottom:0; left:0; right:0; z-index:9999; background:white; display:flex; height:56px; border-top:1px solid #ccc;">
-    <div onclick="window.showScreen('home-screen')" class="flex-1 text-center pt-2 text-blue-600">
-        <i class="fas fa-home text-2xl"></i><br><span class="text-xs">Home</span>
+    <!-- BOTTOM AD (navigation ke upar) -->
+    <div style="position:fixed; bottom:60px; left:0; right:0; z-index:10000; background:white; padding:8px 0; text-align:center; border-top:1px solid #eee;">
+        <script type="text/javascript">
+            atOptions = { 'key' : '969a80a2e6bea9f00173f36024f32cb2', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            document.write('<script type="text/javascript" src="//www.highperformanceformat.com/969a80a2e6bea9f00173f36024f32cb2/invoke.js"><\/script>');
+        </script>
     </div>
-    <div onclick="window.showScreen('add-service-screen')" class="flex-1 text-center pt-2 text-blue-600">
-        <i class="fas fa-handshake text-2xl"></i><br><span class="text-xs">Service</span>
+
+    <!-- BOTTOM NAVIGATION (sabse neeche) -->
+    <div style="position:fixed; bottom:0; left:0; right:0; height:60px; background:white; border-top:2px solid #0066ff; display:flex; z-index:9999;">
+        <button onclick="showScreen('home-screen')" class="flex-1"><i class="fas fa-home text-2xl text-blue-600"></i><p class="text-xs">Home</p></button>
+        <button onclick="showScreen('add-service-screen')" class="flex-1"><i class="fas fa-handshake text-2xl text-blue-600"></i><p class="text-xs">Service</p></button>
+        <button onclick="showScreen('jobs-screen')" class="flex-1"><i class="fas fa-briefcase text-2xl text-blue-600"></i><p class="text-xs">Jobs</p></button>
+        <button onclick="shareApp()" class="flex-1"><i class="fas fa-share-alt text-2xl text-blue-600"></i><p class="text-xs">Share</p></button>
     </div>
-    <div onclick="window.showScreen('jobs-screen')" class="flex-1 text-center pt-2 text-blue-600">
-        <i class="fas fa-briefcase text-2xl"></i><br><span class="text-xs">Jobs</span>
-    </div>
-    <div onclick="window.shareApp()" class="flex-1 text-center pt-2 text-blue-600">
-        <i class="fas fa-share-alt text-2xl"></i><br><span class="text-xs">Share</span>
-    </div>
-</div>
 
 </body>
 </html>
