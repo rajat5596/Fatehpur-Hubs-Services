@@ -286,22 +286,111 @@ input[type="text"], input[type="number"] {
     font-size: 1rem;
     width: 100%;
     }
-// Wait for page load
-document.addEventListener('DOMContentLoaded', function() {
-  const popup = document.getElementById('specialPromoPopup');
-  const closeBtn = document.getElementById('closePromo');
+/* ===== FULL SCREEN POP-UP ===== */
+.popup-overlay {
+  /* शुरू में hidden */
+  display: none;
   
-  // Show after 10 seconds
-  setTimeout(() => {
-    popup.style.display = 'flex';
-    console.log('Popup shown after 10 sec');
-  }, 10000);
+  /* Full Screen Cover */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   
-  // Close button
-  closeBtn.addEventListener('click', () => {
-    popup.style.display = 'none';
-  });
+  /* Dark Background */
+  background-color: rgba(0, 0, 0, 0.85);
   
-  // Also show after every 5th mistri
-  // यहाँ तुम्हारा mistri counter logic लगाओ
-});
+  /* Center Content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  /* सबसे ऊपर */
+  z-index: 999999;
+  
+  /* Smooth Animation */
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Pop-up Content Box */
+.popup-content {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  max-width: 90%;
+  max-height: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Close Button */
+.popup-close-btn {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1000000;
+  transition: all 0.2s;
+}
+
+.popup-close-btn:hover {
+  background: #ff2e43;
+  transform: scale(1.1);
+}
+
+/* Promotion Banner Image */
+.promo-banner {
+  max-width: 100%;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.promo-banner:hover {
+  transform: scale(1.02);
+}
+
+/* Promotion Link */
+.promo-link {
+  display: block;
+  text-decoration: none;
+}
+
+/* Promotion Text */
+.promo-text {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+  .popup-content {
+    padding: 15px;
+    max-width: 95%;
+  }
+  
+  .popup-close-btn {
+    top: -10px;
+    right: -10px;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
