@@ -362,69 +362,86 @@ window.searchServices = () => {
 // ⭐ 4. REGISTRATION FUNCTIONS (सर्विस & जॉब पोस्ट) ⭐
 // =======================================================
 
-// 4.1 सर्विस रजिस्ट्रेशन (registerService())
+// 4.1 सर्विस रजिस्टर करें (बिल्कुल सेफ और वर्किंग वर्जन)
 function registerService() {
     try {
+        // लॉगिन चेक
         const user = firebase.auth().currentUser;
-
         if (!user) {
-            alert('कृपया पहले OTP से लॉग-इन करें। यह ज़रूरी है।'); 
+            alert("पहले लॉगिन करें भाई!");
+            window.showScreen('home-screen');
             return false;
         }
 
-        const userId = user.uid; 
-        
-        const name = document.getElementById('providerName').value;
-        const phone = document.getElementById('providerPhone').value;
-        const category = document.getElementById('serviceCategory').value;
-        const area = document.getElementById('providerArea').value;
-        const experience = document.getElementById('providerExperience').value;
-        
-        if (!name || !phone || !category || !area || !experience || phone.length !== 10 || isNaN(phone)) {
-            alert("कृपया सभी ज़रूरी फ़ील्ड भरें, और फ़ोन नंबर 10 अंकों का हो।");
+        // फॉर्म से डेटा लो
+        const name       = document.getElementById("providerName").value.trim();
+        const phone      = document.getElementById("providerPhone").value;
+        const category   = document.getElementById("serviceCategory").value;
+        const area       = document.getElementById("providerArea").value.trim();
+        const experience = document.getElementById("providerExperience").value;
+
+        // वैलिडेशन
+        if (!name || !phone || !category || !area || !experience) {
+            alert("सभी फील्ड भरें!");
+            return false;
+        }
+        if (phone.length !== 10) {
+            alert("फ़ोन नंबर 10 अंक का होना चाहिए");
             return false;
         }
 
-        window.providersRef.orderByChild('phone').equalTo(phone).once('value', snapshot => {
-            if (snapshot.exists()) {
-                alert('❌ यह फ़ोन नंबर पहले से ही रजिस्टर है! डुप्लीकेट एंट्री की अनुमति नहीं है।');
-                return; 
-            }
+        // डुप्लीकेट नंबर चेक (ऑप्शनल – चाहो तो हटा भी सकते हो)
+        firebase.database().ref('services')
+            .orderByChild('phone')
+            .equalTo(phone)
+            .once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    alert("ये नंबर पहले से रजिस्टर है! डुप्लीकेट की अनुमति नहीं है।");
+                    return;
+                }
 
-            const providerData = { 
-                name: name,
-                phone: phone,
-                category: category,
-                area: area,
-                experience: experience,
-                userId: userId, 
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            window.providersRef.push(providerData)
-            .then(() => {
-                alert('✅ सर्विस सफलतापूर्वक रजिस्टर हो गई है! धन्यवाद।'); 
+                // असली डेटा सेव करना
+                const newServiceRef = firebase.database().ref('services').push();
                 
-                const form = document.getElementById('serviceForm');
-                if (form) form.reset();
+                const serviceData = {
+                    name: name,
+                    phone: phone,
+                    category: category,
+                    area: area,
+                    experience: experience,
+                    userId: user.uid,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                newServiceRef.set(serviceData)
+                    .then(() => {
+                        alert("बधाई हो! आपकी सर्विस सफलतापूर्वक जोड़ दी गई");
+                        document.getElementById("serviceForm").reset();
+                        // होम स्क्रीन पर वापस भेज दो
+                        setTimeout(() => {
+                            window.showScreen('home-screen');
+                            loadCategories(); // तुरंत नई सर्विस दिखाने के लिए री-लोड
+                        }, 1200);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("सर्विस सेव करते समय गड़बड़: " + err.message);
+                    });
             })
-            .catch((error) => {
-                console.error("सर्विस रजिस्टर करने में त्रुटि (Firebase): ", error);
-                alert('त्रुटि: रजिस्ट्रेशन फ़ेल हो गया। ' + error.message); 
+            .catch(err => {
+                console.error(err);
+                alert("डुप्लीकेट चेक करते समय गड़बड़: " + err.message);
             });
 
-        })
-        .catch(error => {
-            console.error("Firebase Read Error during duplicate check:", error);
-            alert("माफ़ करें, डेटा चेक करने में कोई त्रुटि आई। कृपया फिर से कोशिश करें।");
-        });
+    });
 
     } catch (e) {
-        console.error("सर्विस रजिस्ट्रेशन क्रिटिकल फ़ेलियर: ", e);
-        alert("माफ़ करें, रजिस्ट्रेशन प्रक्रिया में कोई गंभीर आंतरिक त्रुटि आई।");
+        console.error(e);
+        alert("कुछ अनपेक्षित गड़बड़ हुई: " + e.message);
     }
 
-    return false;
+    return false; // form का डिफॉल्ट सबमिट रोकने के लिए
 }
 
 // 4.2 जॉब रजिस्ट्रेशन (registerJob())
