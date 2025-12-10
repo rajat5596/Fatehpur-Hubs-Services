@@ -174,9 +174,7 @@ window.loadCategories = (loadMore = false) => {
                     </div>
                 `);
             }
-        }
-            // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
-    setTimeout(window.showPromoPopup, 5000); 
+        } 
 
         // --- END AD INJECTION LOGIC ---
 
@@ -207,7 +205,8 @@ window.loadCategories = (loadMore = false) => {
         listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
     });
 }
-
+// लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
+    setTimeout(window.showPromoPopup, 5000);
 
 // 3.2 फ़िल्टर्ड लोकल ऐरे से पेज रेंडर करें (Ads injected)
 function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
