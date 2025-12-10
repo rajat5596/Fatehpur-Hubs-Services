@@ -175,6 +175,9 @@ window.loadCategories = (loadMore = false) => {
                 `);
             }
         }
+            // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
+    setTimeout(window.showPromoPopup, 5000); 
+
         // --- END AD INJECTION LOGIC ---
 
         const htmlContent = contentArray.join('');
@@ -748,13 +751,5 @@ window.closePromoPopup = function() {
         popup.style.display = 'none';
     }
 };
-
-// ⭐⭐ ऐप लोड होने के 2 सेकंड बाद दिखाओ (हर बार जब यूजर ऐप ओपन करे) ⭐⭐
-// यह सुनिश्चित करता है कि Adsterra और सामान्य कंटेंट लोड होने के बाद ही यह चले
-// ... (loadCategories का बाकी कोड) ...
-
-    // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
-    setTimeout(window.showPromoPopup, 5000); 
-}
 
 // ------------------------------------------
