@@ -286,3 +286,47 @@ input[type="text"], input[type="number"] {
     font-size: 1rem;
     width: 100%;
     }
+/* Full Screen Promotion Popup Styles */
+#fullScreenPromoPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000; /* Ensure it is above everything else */
+    background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+    display: flex; /* Centers the content */
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.popup-content {
+    position: relative;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.close-popup-btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background-color: #fff;
+    color: #333;
+    border: 2px solid #333;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+    z-index: 10001;
+}
+
+.close-popup-btn:hover {
+    background-color: #f44336;
+    color: white;
+    border-color: #f44336;
+}
