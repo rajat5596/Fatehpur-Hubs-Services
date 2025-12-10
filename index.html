@@ -291,25 +291,18 @@
         </div>
 
     </div>
-<div id="fullScreenPromoPopup" class="promo-popup" style="display: none;">
-    <div class="popup-overlay"></div>
-    <div class="popup-content">
-        
-        <button class="close-popup-btn" onclick="window.closePromoPopup()">X</button>
-        
-        <div id="popupBannerContent" class="ad-card" style="
-            text-align: center; 
-            padding: 0; 
-            background: none; 
-            max-width: 90%; 
-            margin: auto;
-        ">
-            <div id="promo-ad-placeholder" style="width: 100%; max-width: 320px; margin: 10px auto;">
-                </div>
-            </div>
-        
-    </div>
+<!-- Body के अंत में -->
+<div id="specialPromoPopup" class="promo-overlay">
+  <div class="promo-box">
+    <span class="promo-close" id="closePromo">&times;</span>
+    <a href="YOUR_LINK_HERE" target="_blank" class="promo-link">
+      <img src="promo-image.jpg" alt="Special Offer" class="promo-img">
+    </a>
+    <p class="promo-text">Special Promotion!</p>
+  </div>
 </div>
+
+<script src="promo.js"></script>
             
 </body>
         </html>
