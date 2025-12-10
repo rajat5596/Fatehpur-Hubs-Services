@@ -754,3 +754,30 @@ window.closePromoPopup = function() {
 };
 
 // ------------------------------------------
+// --- NEW: FORCING PROMO POPUP AFTER DATA IS AVAILABLE ---
+let promoInterval = null;
+const MAX_ATTEMPTS = 15; // 15 सेकंड तक कोशिश करें
+let attemptCount = 0;
+
+window.checkAndShowPromo = function() {
+    // 1. अगर promoAds लोड नहीं हुआ है या खाली है, और 15 बार कोशिश नहीं हुई है, तो वापस जाएँ
+    if (!window.promoAds || window.promoAds.length === 0) {
+        attemptCount++;
+        if (attemptCount >= MAX_ATTEMPTS) {
+            clearInterval(promoInterval); // 15 सेकंड बाद कोशिश करना बंद करें
+            console.log('Premium Ads not loaded after 15 attempts.');
+        }
+        return;
+    }
+
+    // 2. अगर डेटा मिल गया है, तो पॉपअप दिखाएँ
+    clearInterval(promoInterval); // लूप बंद करें
+    
+    // ऐप को स्टेबल होने के लिए 2 सेकंड का अंतिम विलंब दें
+    setTimeout(window.showPromoPopup, 2000);
+};
+
+// हर 1000ms (1 सेकंड) में डेटा जाँच शुरू करें
+// यह सुनिश्चित करता है कि ads.js के लोड होते ही हम कार्रवाई करें, चाहे वह धीमा ही क्यों न हो।
+promoInterval = setInterval(window.checkAndShowPromo, 1000);
+// ----------------------------------------------------------------
