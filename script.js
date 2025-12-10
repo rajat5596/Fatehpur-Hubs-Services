@@ -751,9 +751,10 @@ window.closePromoPopup = function() {
 
 // ⭐⭐ ऐप लोड होने के 2 सेकंड बाद दिखाओ (हर बार जब यूजर ऐप ओपन करे) ⭐⭐
 // यह सुनिश्चित करता है कि Adsterra और सामान्य कंटेंट लोड होने के बाद ही यह चले
-window.addEventListener('load', () => {
-    // 2 सेकंड का विलंब
-    setTimeout(window.showPromoPopup, 2000); 
-});
+// ... (loadCategories का बाकी कोड) ...
+
+    // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
+    setTimeout(window.showPromoPopup, 5000); 
+}
 
 // ------------------------------------------
