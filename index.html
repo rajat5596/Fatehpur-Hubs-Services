@@ -291,17 +291,23 @@
         </div>
 
     </div>
-<!-- Body के अंत में -->
-<div id="specialPromoPopup" class="promo-overlay">
-  <div class="promo-box">
-    <span class="promo-close" id="closePromo">&times;</span>
-    <a href="YOUR_LINK_HERE" target="_blank" class="promo-link">
-      <img src="promo-image.jpg" alt="Special Offer" class="promo-img">
+<!-- Body के सबसे END में, </body> से पहले -->
+<div id="promoPopup" class="popup-overlay">
+  <div class="popup-content">
+    <!-- Close Button -->
+    <button id="closePopupBtn" class="popup-close-btn">✕</button>
+    
+    <!-- Promotion Banner (Touch करने पर link खुलेगा) -->
+    <a href="https://wa.me/91XXXXXXXXXX" target="_blank" id="promoLink" class="promo-link">
+      <img src="https://example.com/your-promo-banner.jpg" alt="Special Promotion" class="promo-banner">
     </a>
-    <p class="promo-text">Special Promotion!</p>
+    
+    <!-- Optional Text -->
+    <p class="promo-text">🎉 Special Offer! Limited Time! 🎉</p>
   </div>
 </div>
 
+<!-- promo.js लिंक -->
 <script src="promo.js"></script>
             
 </body>
