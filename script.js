@@ -198,12 +198,13 @@ window.loadCategories = (loadMore = false) => {
             loadMoreBtn.style.display = 'none';
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
         }
-// लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
-    setTimeout(window.showPromoPopup, 5000);
+
     }, (error) => {
         console.error("Error loading services:", error);
         document.getElementById('loading-more')?.remove();
         listElement.innerHTML = '<h3>Available Services</h3><p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
+        // लोड होने के 5 सेकंड बाद, प्रीमियम पॉपअप दिखाओ (जब सब कुछ रेंडर हो जाए)
+    setTimeout(window.showPromoPopup, 5000);
     });
 }
 
