@@ -21,41 +21,6 @@ if (!firebase.apps.length) {
 
 const database = firebase.database();
 
-// Wait for page load
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Load ratings after mistris are loaded (5 seconds delay)
-    setTimeout(loadRatingsForAllMistris, 3000);
-    
-    // Add click event for review buttons
-    document.addEventListener('click', function(e) {
-        // Give Review button
-        if (e.target.classList.contains('give-review-btn')) {
-            const mistriCard = findMistriCard(e.target);
-            if (mistriCard) {
-                const mistriName = getMistriNameFromCard(mistriCard);
-                showReviewForm(mistriName, mistriCard);
-            }
-        }
-        
-        // View Reviews button
-        if (e.target.classList.contains('view-reviews-btn')) {
-            const mistriCard = findMistriCard(e.target);
-            if (mistriCard) {
-                const mistriName = getMistriNameFromCard(mistriCard);
-                showReviewsModal(mistriName, mistriCard);
-            }
-        }
-        
-        // Close modal
-        if (e.target.classList.contains('close-review-modal')) {
-            const modal = e.target.closest('.review-modal');
-            if (modal) modal.remove();
-        }
-    });
-    
-});
-
 // ===== FIND MISTRI CARD =====
 function findMistriCard(element) {
     // Navigate up to find the mistri card
