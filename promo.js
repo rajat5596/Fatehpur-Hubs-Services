@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // यहीं सब कुछ सेट करो - बस 3 चीज़ें बदलो!
   const MY_PROMOTION = {
     // 1. IMAGE LINK: यहाँ promotion image का link डालो
-    imageUrl: "gs://fatehpur-hubs-a3a9f.firebasestorage.app/imgandroid-chrome-512x512.png",
+    imageUrl: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
     
     // 2. CLICK LINK: User click करे तो कहाँ जाए?
     redirectTo: "https://wa.me/919889904191", // WhatsApp, Instagram, Website
