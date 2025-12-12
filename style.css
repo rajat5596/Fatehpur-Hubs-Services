@@ -393,4 +393,40 @@ input[type="text"], input[type="number"] {
     height: 35px;
     font-size: 20px;
   }
+}/* ===== REVIEWS & RATINGS STYLES ===== */
+
+.rating-container {
+    transition: all 0.3s ease;
+}
+
+.stars i {
+    margin-right: 2px;
+}
+
+.review-modal {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Star rating hover effects */
+.fa-star:hover {
+    transform: scale(1.2);
+    transition: transform 0.2s;
+}
+
+/* Review items */
+.review-item {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #3b82f6;
+}
+
+.review-item:last-child {
+    margin-bottom: 0;
 }
