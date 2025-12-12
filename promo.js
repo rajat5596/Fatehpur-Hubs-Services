@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // यहीं सब कुछ सेट करो - बस 3 चीज़ें बदलो!
   const MY_PROMOTION = {
     // 1. IMAGE LINK: यहाँ promotion image का link डालो
-    imageUrl: "https://i.imgur.com/YOUR_IMAGE_HERE.jpg",
+    imageUrl: "gs://fatehpur-hubs-a3a9f.firebasestorage.app/imgandroid-chrome-512x512.png",
     
     // 2. CLICK LINK: User click करे तो कहाँ जाए?
-    redirectTo: "https://wa.me/91XXXXXXXXXX", // WhatsApp, Instagram, Website
+    redirectTo: "https://wa.me/919889904191", // WhatsApp, Instagram, Website
     
     // 3. PROMOTION TEXT: नीचे दिखने वाला text
     text: "🎉 SPECIAL OFFER! CONTACT NOW! 🎉"
