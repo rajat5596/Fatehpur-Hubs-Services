@@ -1,57 +1,109 @@
-// Wait for page to fully load
+// ===================================
+// SIMPLE PROMOTION POPUP
+// ===================================
+
 document.addEventListener('DOMContentLoaded', function() {
   
-  // Get elements
-  const popup = document.getElementById('promoPopup');
-  const closeBtn = document.getElementById('closePopupBtn');
-  const promoLink = document.getElementById('promoLink');
-  
-  // Check if popup exists
-  if (!popup) {
-    console.error('Popup element not found!');
-    return;
-  }
-  
-  console.log('Promo popup script loaded successfully!');
-  
-  // ===== SHOW POPUP AFTER 10 SECONDS =====
-  setTimeout(function() {
-    console.log('10 seconds completed - showing popup');
-    popup.style.display = 'flex'; // Show popup
+  // ===== SET YOUR PROMOTION HERE =====
+  // यहीं सब कुछ सेट करो - बस 3 चीज़ें बदलो!
+  const MY_PROMOTION = {
+    // 1. IMAGE LINK: यहाँ promotion image का link डालो
+    imageUrl: "https://i.imgur.com/YOUR_IMAGE_HERE.jpg",
     
-    // Optional: Add blur effect to background
-    document.body.style.overflow = 'hidden'; // Prevent scrolling
-  }, 10000); // 10 seconds = 10000 milliseconds
+    // 2. CLICK LINK: User click करे तो कहाँ जाए?
+    redirectTo: "https://wa.me/91XXXXXXXXXX", // WhatsApp, Instagram, Website
+    
+    // 3. PROMOTION TEXT: नीचे दिखने वाला text
+    text: "🎉 SPECIAL OFFER! CONTACT NOW! 🎉"
+  };
+  // ===== END SETTINGS =====
   
-  // ===== CLOSE BUTTON FUNCTIONALITY =====
-  closeBtn.addEventListener('click', function() {
-    console.log('Close button clicked');
-    popup.style.display = 'none'; // Hide popup
-    document.body.style.overflow = 'auto'; // Allow scrolling again
-  });
+  // Wait for 10 seconds
+  setTimeout(function() {
+    createAndShowPopup(MY_PROMOTION);
+  }, 10000);
   
-  // ===== CLOSE POPUP WHEN CLICKING OUTSIDE =====
-  popup.addEventListener('click', function(event) {
-    // If clicked directly on overlay (not content)
-    if (event.target === popup) {
-      popup.style.display = 'none';
-      document.body.style.overflow = 'auto';
-    }
-  });
-  
-  // ===== PROMO LINK CLICK =====
-  // (Already works with <a href> but we can add tracking)
-  promoLink.addEventListener('click', function() {
-    console.log('Promo banner clicked - redirecting to link');
-    // Optional: Send analytics event here
-  });
-  
-  // ===== KEYBOARD SUPPORT (ESC to close) =====
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape' && popup.style.display === 'flex') {
-      popup.style.display = 'none';
-      document.body.style.overflow = 'auto';
-    }
-  });
+  function createAndShowPopup(promo) {
+    // Create HTML
+    const popupHTML = `
+      <div id="simplePromoPopup" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      ">
+        <div style="
+          background: white;
+          border-radius: 20px;
+          padding: 25px;
+          max-width: 90%;
+          max-height: 90%;
+          text-align: center;
+          position: relative;
+        ">
+          <!-- Close Button -->
+          <button id="closePopupBtn" style="
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 22px;
+            cursor: pointer;
+          ">×</button>
+          
+          <!-- Promotion Banner -->
+          <a href="${promo.redirectTo}" target="_blank" style="display: block; text-decoration: none;">
+            <img src="${promo.imageUrl}" alt="Promotion" style="
+              width: 100%;
+              max-width: 500px;
+              border-radius: 15px;
+              display: block;
+              margin: 0 auto;
+            ">
+          </a>
+          
+          <!-- Promotion Text -->
+          <p style="
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 10px;
+          ">${promo.text}</p>
+        </div>
+      </div>
+    `;
+    
+    // Add to page
+    document.body.insertAdjacentHTML('beforeend', popupHTML);
+    
+    // Close button functionality
+    document.getElementById('closePopupBtn').onclick = function() {
+      document.getElementById('simplePromoPopup').remove();
+    };
+    
+    // Close when clicking outside (optional)
+    document.getElementById('simplePromoPopup').onclick = function(e) {
+      if (e.target.id === 'simplePromoPopup') {
+        this.remove();
+      }
+    };
+    
+    console.log('Promotion popup shown!');
+  }
   
 });
