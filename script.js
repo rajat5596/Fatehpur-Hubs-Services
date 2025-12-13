@@ -66,9 +66,13 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
-    return `<div class="profile-card">
-    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+    return `<div class="profile-card mistri-card bg-white shadow-md rounded-lg p-4 mb-4">
+            
+            <h3 style="color: #2a5298; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px;">${p.name}</h3>
+            
+            <p class="text-xs service-title">Category: ${p.category}</p> 
+
+    <p style="font-size:12px;color:#555; margin-top: 5px;">📍 ${p.area} | Experience: ${p.experience} Years</p>
 
     <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
         <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
@@ -77,6 +81,7 @@ function renderProviderCard(p) {
     </div>
 </div>`;
 }
+
         
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
