@@ -1,49 +1,4 @@
-// ⭐⭐ EMERGENCY TEST CODE - सबसे ऊपर डालो ⭐⭐
-console.log("🔥 REVIEWS.JS STARTING...");
 
-// Force show a test button
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM loaded - adding test button...");
-    
-    const testBtn = document.createElement('div');
-    testBtn.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 50px;
-            right: 20px;
-            background: #FF0000;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            z-index: 99999;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 0 20px red;
-            cursor: pointer;
-        ">
-            🔥 REVIEWS.JS LOADED!
-        </div>
-    `;
-    
-    document.body.appendChild(testBtn);
-    
-    testBtn.onclick = function() {
-        alert("✅ Reviews.js is WORKING!\n\nNow loading ratings...");
-        
-        // Try to load ratings
-        if (typeof loadRatingsForAllMistris === 'function') {
-            loadRatingsForAllMistris();
-        }
-    };
-    
-    console.log("Test button added successfully!");
-});
-
-// ⭐⭐ END TEST CODE ⭐⭐
-
-// ===================================
-// बाकी का सारा reviews.js code यहाँ...
-// ===================================
 // ===================================
 // REVIEWS & RATINGS SYSTEM v1.0
 // ===================================
