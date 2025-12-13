@@ -206,10 +206,20 @@ window.loadCategories = (loadMore = false) => {
 
         }
         
-        // ⭐ [रिव्यू सिस्टम फिक्स] - 1. सामान्य लोड होने के बाद कॉल करें
+        // ⭐ यह सबसे महत्वपूर्ण कॉल है: इसे तुरंत कॉल करें, और फिर 1 सेकंड बाद भी ⭐
+        // 1. तुरंत कॉल करें
+        if (typeof window.loadRatingsForAllMistris === 'function') {
+            window.loadRatingsForAllMistris();
+        }
+        // 2. 1 सेकंड बाद दोबारा कॉल करें (Android/TWA में सुनिश्चित करने के लिए)
         if (typeof window.loadRatingsForAllMistris === 'function') {
             setTimeout(window.loadRatingsForAllMistris, 1000); 
         }
+
+    }, (error) => {
+        // ... error block ...
+    });
+} // <-- loadCategories फ़ंक्शन यहाँ समाप्त होता है
 
 
     }, (error) => {
