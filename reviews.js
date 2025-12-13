@@ -5,14 +5,13 @@
 
 // Firebase Configuration (तुम्हारा)
 const firebaseConfig = {
-    apiKey: "AIzaSyBMJEeMJsy40OsNimdTSu3D0vfRx8FJ-2c",
+    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
     authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.firebaseio.com",
+    databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-    messagingSenderId: "1051032210694",
-    appId: "1:1051032210694:web:0facd40dd3de925ec6d204",
-    measurementId: "G-P2SDX7W0V7"
+    storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+    messagingSenderId: "294360741451",
+    appId: "1:294360741451:web:3bc85078805750b9fabfce"
 };
 
 // Initialize Firebase
