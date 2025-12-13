@@ -3,15 +3,15 @@
 // REVIEWS & RATINGS SYSTEM v1.0
 // ===================================
 
-// Firebase Configuration (तुम्हारा)
+// Firebase Configuration (सटीक और सही ID)
 const firebaseConfig = {
     apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
     authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
     databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
     messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    appId: "1:294360741451:web:3bc85078805750b9fabfce",
 };
 
 // Initialize Firebase
@@ -21,40 +21,37 @@ if (!firebase.apps.length) {
 
 const database = firebase.database();
 
-// ===== FIND MISTRI CARD =====
+// ===== FIND MISTRI CARD (मज़बूत फ़ाइनल वर्जन) =====
 function findMistriCard(element) {
-    // Navigate up to find the mistri card
     let currentElement = element;
-    while (currentElement) {
-        // चेक करें: क्या यह एक div है और इसमें h3 (Mistri Name) मौजूद है?
-        // यह सबसे मज़बूत और सार्वभौमिक चेक है।
-        if (currentElement.tagName === 'DIV' && currentElement.querySelector && currentElement.querySelector('h3')) {
+    let count = 0;
+    while (currentElement && currentElement.tagName !== 'BODY' && count < 5) {
+        // यह 'mistri-card' क्लास चेक करेगा, जिसे हमने script.js में जोड़ दिया है।
+        if (currentElement.classList && currentElement.classList.contains('mistri-card')) {
             return currentElement;
         }
         currentElement = currentElement.parentElement;
-        
-        // एक सुरक्षा उपाय के रूप में, अगर यह body तक पहुँच जाता है, तो रुक जाएँ।
-        if (currentElement && currentElement.tagName === 'BODY') return null;
+        count++;
     }
     return null;
 }
 
-
 // ===== GET MISTRI NAME FROM CARD =====
 function getMistriNameFromCard(card) {
-    // Try different selectors for mistri name
+    // h3 को पहले चेक करें क्योंकि हमने script.js में h3 का उपयोग किया है।
     const selectors = ['h3', '.text-lg.font-bold', 'h4', '.service-title'];
     
     for (const selector of selectors) {
         const element = card.querySelector(selector);
         if (element && element.textContent) {
-            return element.textContent.trim();
+            // Mistri Name से अतिरिक्त टेक्स्ट जैसे 'Category: ' को हटा दें
+            return element.textContent.replace('Category:', '').trim();
         }
     }
     
     // Fallback: get first h* element
     const heading = card.querySelector('h1, h2, h3, h4, h5, h6');
-    return heading ? heading.textContent.trim() : 'Unknown Mistri';
+    return heading ? heading.textContent.replace('Category:', '').trim() : 'Unknown Mistri';
 }
 
 // ===== LOAD RATINGS FOR ALL MISTRIS =====
@@ -93,8 +90,8 @@ function loadRatingsForAllMistris() {
 
 // ===== UPDATE ALL MISTRI RATINGS IN UI =====
 function updateAllMistriRatings(mistriRatings) {
-    // Get all mistri cards
-    const mistriCards = document.querySelectorAll('.mistri-card, .service-item, .bg-white.shadow-md');
+    // Get all mistri cards (using the new 'mistri-card' class)
+    const mistriCards = document.querySelectorAll('.mistri-card');
     
     mistriCards.forEach(card => {
         const mistriName = getMistriNameFromCard(card);
@@ -139,13 +136,18 @@ function addRatingToCard(card, mistriName, avgRating, reviewCount) {
         </div>
     `;
     
-    // Insert after the mistri name/title
-    const title = card.querySelector('h3, .text-lg.font-bold, h4');
+    // Insert after the Mistri Name (H3)
+    const title = card.querySelector('h3'); // H3 को टारगेट करें क्योंकि हमने script.js में h3 का उपयोग किया है
     if (title) {
         title.insertAdjacentHTML('afterend', ratingHTML);
     } else {
-        // Insert at beginning of card
-        card.insertAdjacentHTML('afterbegin', ratingHTML);
+        // Fallback: Insert after the first element (p.service-title)
+        const category = card.querySelector('.service-title');
+        if (category) {
+            category.insertAdjacentHTML('afterend', ratingHTML);
+        } else {
+             card.insertAdjacentHTML('afterbegin', ratingHTML);
+        }
     }
 }
 
@@ -256,8 +258,6 @@ function showReviewForm(mistriName, mistriCard) {
     
     // Initialize star rating
     initStarRating();
-    
-    // Note: The submit event is now handled by the global document listener below
 }
 
 // ===== INITIALIZE STAR RATING =====
@@ -291,7 +291,7 @@ function initStarRating() {
     }
 }
 
-// ===== SAVE REVIEW TO FIREBASE (Updated to be called from event listener) =====
+// ===== SAVE REVIEW TO FIREBASE =====
 function saveReviewToFirebase(mistriName, rating, reviewText, reviewerName) {
     
     if (!rating || rating < 1) {
@@ -452,7 +452,7 @@ function getUserProfile() {
 }
 
 // ===================================
-// GLOBAL EVENT LISTENERS (REQUIRED FIX)
+// GLOBAL EVENT LISTENERS 
 // ===================================
 
 // Handles all button clicks (View Reviews, Add Review, Close Modal)
@@ -463,7 +463,6 @@ document.addEventListener('click', function(e) {
         const mistriCard = findMistriCard(e.target);
         if (mistriCard) {
             const mistriName = getMistriNameFromCard(mistriCard);
-            // showReviewForm फ़ंक्शन को कॉल करें
             window.showReviewForm(mistriName, mistriCard); 
         }
     }
@@ -473,7 +472,6 @@ document.addEventListener('click', function(e) {
         const mistriCard = findMistriCard(e.target);
         if (mistriCard) {
             const mistriName = getMistriNameFromCard(mistriCard);
-            // showReviewsModal फ़ंक्शन को कॉल करें
             window.showReviewsModal(mistriName, mistriCard);
         }
     }
@@ -488,18 +486,17 @@ document.addEventListener('click', function(e) {
 // Handles the Review Form submission
 document.addEventListener('submit', function(e) {
     if (e.target.id === 'review-form') {
-        e.preventDefault(); // फॉर्म सबमिशन रोकें
+        e.preventDefault(); 
         
         const form = e.target;
         const mistriName = form.dataset.mistriName;
-        // फॉर्म के name एट्रीब्यूट से वैल्यू प्राप्त करें
         const rating = form.rating.value; 
         const reviewText = form.reviewText.value.trim();
         const reviewerName = form.reviewerName.value.trim();
         
-        // फ़ंक्शन्स को window के ज़रिए कॉल करें
         if (typeof window.saveReviewToFirebase === 'function') {
             window.saveReviewToFirebase(mistriName, rating, reviewText, reviewerName);
         }
     }
 });
+        
