@@ -205,21 +205,6 @@ window.loadCategories = (loadMore = false) => {
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
 
         }
-        
-        // ⭐ यह सबसे महत्वपूर्ण कॉल है: इसे तुरंत कॉल करें, और फिर 1 सेकंड बाद भी ⭐
-        // 1. तुरंत कॉल करें
-        if (typeof window.loadRatingsForAllMistris === 'function') {
-            window.loadRatingsForAllMistris();
-        }
-        // 2. 1 सेकंड बाद दोबारा कॉल करें (Android/TWA में सुनिश्चित करने के लिए)
-        if (typeof window.loadRatingsForAllMistris === 'function') {
-            setTimeout(window.loadRatingsForAllMistris, 1000); 
-        }
-
-    }, (error) => {
-        // ... error block ...
-    });
-} // <-- loadCategories फ़ंक्शन यहाँ समाप्त होता है
 
 
     }, (error) => {
