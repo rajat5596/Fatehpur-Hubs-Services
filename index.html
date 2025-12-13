@@ -293,16 +293,15 @@
 
 <!-- promo.js लिंक -->
 <script src="promo.js"></script>
-            <script type="text/javascript" src="reviews.js"></script>
-            <script>
-    // सर्विस लोड होने के बाद रेटिंग भी लोड हो
+<script src="reviews.js"></script>
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
-        // थोड़ा वेट करो क्योंकि कार्ड्स script.js से लोड होते हैं
         setTimeout(function() {
             if (typeof loadRatingsForAllMistris === 'function') {
                 loadRatingsForAllMistris();
             }
-        }, 2000); // 2 सेकंड वेट (सर्विस लोड होने के लिए)
+        }, 3000);
     });
 </script>
             
