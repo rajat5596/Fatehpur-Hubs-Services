@@ -294,6 +294,14 @@
 <!-- promo.js लिंक -->
 <script src="promo.js"></script>
             <script type="text/javascript" src="reviews.js"></script>
+            <script>
+    // पेज पूरी तरह लोड होने के बाद रेटिंग लोड करो
+    window.addEventListener('load', function() {
+        if (typeof loadRatingsForAllMistris === 'function') {
+            loadRatingsForAllMistris();
+        }
+    });
+            </script>
             
 </body>
         </html>
