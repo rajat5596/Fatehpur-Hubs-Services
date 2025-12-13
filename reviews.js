@@ -26,17 +26,19 @@ function findMistriCard(element) {
     // Navigate up to find the mistri card
     let currentElement = element;
     while (currentElement) {
-        if (currentElement.classList && 
-            (currentElement.classList.contains('mistri-card') || 
-             currentElement.classList.contains('service-item') ||
-             currentElement.classList.contains('bg-white') ||
-             currentElement.classList.contains('shadow-md'))) {
+        // चेक करें: क्या यह एक div है और इसमें h3 (Mistri Name) मौजूद है?
+        // यह सबसे मज़बूत और सार्वभौमिक चेक है।
+        if (currentElement.tagName === 'DIV' && currentElement.querySelector && currentElement.querySelector('h3')) {
             return currentElement;
         }
         currentElement = currentElement.parentElement;
+        
+        // एक सुरक्षा उपाय के रूप में, अगर यह body तक पहुँच जाता है, तो रुक जाएँ।
+        if (currentElement && currentElement.tagName === 'BODY') return null;
     }
     return null;
 }
+
 
 // ===== GET MISTRI NAME FROM CARD =====
 function getMistriNameFromCard(card) {
