@@ -592,12 +592,6 @@ window.onload = () => {
     window.providersRef = database.ref('service_providers'); 
     window.jobsRef = database.ref('local_jobs'); 
 
-    // ⭐ यहाँ जोड़ें ⭐
-    // TWA एनवायरनमेंट में सुनिश्चित करने के लिए 1.5 सेकंड का विलंब (Delay)
-    if (typeof window.loadRatingsForAllMistris === 'function') {
-        setTimeout(window.loadRatingsForAllMistris, 1500); 
-    }
-    // ⭐ यहाँ जोड़ना समाप्त ⭐
 
     // 1. अदृश्य reCAPTCHA सेटअप
     recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
