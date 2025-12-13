@@ -66,6 +66,7 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
+    // Note: 'mistri-card' class added to enable reviews.js to find the card
     return `<div class="profile-card mistri-card bg-white shadow-md rounded-lg p-4 mb-4">
             
             <h3 style="color: #2a5298; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px;">${p.name}</h3>
@@ -81,6 +82,7 @@ function renderProviderCard(p) {
     </div>
 </div>`;
 }
+
 
         
 // जॉब कार्ड रेंडर करें
