@@ -92,7 +92,6 @@ function renderJobCard(job) {
 // ⭐ 3. DATA LOADING / FILTERING FUNCTIONS (लिस्टिंग) ⭐
 // =======================================================
 
-
 // ⭐ 3.1 loadCategories - सामान्य लिस्ट पैजिनेशन (Ads injected)
 window.loadCategories = (loadMore = false) => {
     const listElement = document.getElementById('mistri-list');
@@ -199,6 +198,12 @@ window.loadCategories = (loadMore = false) => {
             listElement.insertAdjacentHTML('beforeend', '<p style="text-align:center;color:green;font-weight:bold;">✅ लिस्ट समाप्त। अब और कोई नया डेटा नहीं है!</p>');
 
         }
+        
+        // ⭐ [रिव्यू सिस्टम फिक्स] - 1. सामान्य लोड होने के बाद कॉल करें
+        if (typeof window.loadRatingsForAllMistris === 'function') {
+            setTimeout(window.loadRatingsForAllMistris, 1000); 
+        }
+
 
     }, (error) => {
         console.error("Error loading services:", error);
@@ -248,6 +253,12 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         }
 
         filteredPageIndex++; 
+        
+        // ⭐ [रिव्यू सिस्टम फिक्स] - 2. फ़िल्टर्ड लोकल ऐरे रेंडर होने के बाद कॉल करें
+        if (typeof window.loadRatingsForAllMistris === 'function') {
+            window.loadRatingsForAllMistris(); 
+        }
+
     } else if (!isLoadMore) {
          listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
     }
@@ -309,6 +320,13 @@ window.filterByCategory = (category, loadMore = false) => {
             renderFilteredPage(listElement, loadMoreBtn, true);
         }, 100);
     }
+    
+    // ⭐ [रिव्यू सिस्टम फिक्स] - 3. कैटेगरी फ़िल्टरिंग के बाद कॉल करें (क्योंकि यह renderFilteredPage को कॉल करता है)
+    // यहाँ इसे सीधे कॉल करने की आवश्यकता नहीं है, क्योंकि यह फ़ंक्शन अंत में renderFilteredPage को कॉल करता है, और renderFilteredPage में हमने पहले ही कॉल जोड़ दिया है।
+    // अगर आप यहां कुछ और जोड़ना चाहते हैं, तो:
+    // if (typeof window.loadRatingsForAllMistris === 'function' && !loadMore) {
+    //     window.loadRatingsForAllMistris(); 
+    // }
 };
 
 
@@ -355,8 +373,15 @@ window.searchServices = () => {
             html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
         }
         listElement.innerHTML = html;
+        
+        // ⭐ [रिव्यू सिस्टम फिक्स] - 4. सर्च रिजल्ट रेंडर होने के बाद कॉल करें
+        if (typeof window.loadRatingsForAllMistris === 'function') {
+            window.loadRatingsForAllMistris(); 
+        }
+
     });
 };
+
 
 
 // =======================================================
