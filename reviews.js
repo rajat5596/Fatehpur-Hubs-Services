@@ -1,3 +1,4 @@
+
 // ===================================
 // REVIEWS & RATINGS SYSTEM v1.0
 // ===================================
@@ -118,23 +119,18 @@ function addRatingToCard(card, mistriName, avgRating, reviewCount) {
     const ratingHTML = `
         <div class="rating-container mt-2 mb-2">
             <div class="flex items-center">
-                <!-- Stars -->
                 <div class="stars inline-flex text-yellow-400 text-lg">
                     ${getStarsHTML(avgRating)}
                 </div>
                 
-                <!-- Rating Number -->
                 <span class="ml-2 font-bold text-gray-700">${avgRating.toFixed(1)}</span>
                 
-                <!-- Review Count -->
                 <span class="ml-2 text-sm text-gray-500">(${reviewCount} reviews)</span>
                 
-                <!-- View Reviews Button -->
                 <button class="view-reviews-btn ml-3 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
                     View Reviews
                 </button>
                 
-                <!-- Give Review Button -->
                 <button class="give-review-btn ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200">
                     Add Review
                 </button>
@@ -187,7 +183,6 @@ function showReviewForm(mistriName, mistriCard) {
     const modalHTML = `
         <div class="review-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-                <!-- Header -->
                 <div class="p-4 border-b">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold">Rate ${mistriName}</h3>
@@ -197,58 +192,59 @@ function showReviewForm(mistriName, mistriCard) {
                     </div>
                 </div>
                 
-                <!-- Content -->
                 <div class="p-4">
-                    <!-- Star Rating -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
-                        <div class="star-rating flex space-x-1 text-2xl">
-                            <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="1"></i>
-                            <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="2"></i>
-                            <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="3"></i>
-                            <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="4"></i>
-                            <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="5"></i>
+                    <form id="review-form" data-mistri-name="${mistriName}">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                            <div class="star-rating flex space-x-1 text-2xl">
+                                <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="1"></i>
+                                <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="2"></i>
+                                <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="3"></i>
+                                <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="4"></i>
+                                <i class="far fa-star text-yellow-400 cursor-pointer hover:text-yellow-500" data-rating="5"></i>
+                                <input type="hidden" name="rating" id="hidden-rating-input" required>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1" id="rating-text">Tap stars to rate</div>
                         </div>
-                        <div class="text-sm text-gray-500 mt-1" id="rating-text">Tap stars to rate</div>
-                    </div>
-                    
-                    <!-- Review Text -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Review (optional)</label>
-                        <textarea 
-                            id="review-text" 
-                            class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            rows="3" 
-                            placeholder="Share your experience..."
-                        ></textarea>
-                    </div>
-                    
-                    <!-- User Name -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Your Name (optional)</label>
-                        <input 
-                            type="text" 
-                            id="user-name" 
-                            class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter your name"
-                        >
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <div class="flex space-x-2">
-                        <button 
-                            id="submit-review" 
-                            class="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-                            data-mistri-name="${mistriName}"
-                        >
-                            <i class="fas fa-paper-plane mr-2"></i>Submit Review
-                        </button>
-                        <button 
-                            class="close-review-modal bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
-                        >
-                            Cancel
-                        </button>
-                    </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Your Review (optional)</label>
+                            <textarea 
+                                id="review-text" 
+                                name="reviewText"
+                                class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                rows="3" 
+                                placeholder="Share your experience..."
+                            ></textarea>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Your Name (optional)</label>
+                            <input 
+                                type="text" 
+                                id="user-name" 
+                                name="reviewerName"
+                                class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter your name"
+                            >
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <button 
+                                type="submit"
+                                id="submit-review" 
+                                class="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                            >
+                                <i class="fas fa-paper-plane mr-2"></i>Submit Review
+                            </button>
+                            <button 
+                                type="button"
+                                class="close-review-modal bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -260,13 +256,13 @@ function showReviewForm(mistriName, mistriCard) {
     // Initialize star rating
     initStarRating();
     
-    // Add submit event
-    document.getElementById('submit-review').addEventListener('click', submitReview);
+    // Note: The submit event is now handled by the global document listener below
 }
 
 // ===== INITIALIZE STAR RATING =====
 function initStarRating() {
     const stars = document.querySelectorAll('.star-rating i');
+    const hiddenInput = document.getElementById('hidden-rating-input');
     let selectedRating = 0;
     
     stars.forEach(star => {
@@ -279,6 +275,7 @@ function initStarRating() {
             selectedRating = parseInt(this.dataset.rating);
             highlightStars(selectedRating);
             document.getElementById('rating-text').textContent = `${selectedRating}/5 stars`;
+            hiddenInput.value = selectedRating; // Update hidden input value
         });
     });
     
@@ -293,28 +290,20 @@ function initStarRating() {
     }
 }
 
-// ===== SUBMIT REVIEW =====
-function submitReview() {
-    const button = document.getElementById('submit-review');
-    const mistriName = button.dataset.mistriName;
+// ===== SAVE REVIEW TO FIREBASE (Updated to be called from event listener) =====
+function saveReviewToFirebase(mistriName, rating, reviewText, reviewerName) {
     
-    // Get selected stars
-    const filledStars = document.querySelectorAll('.star-rating .fa-star.fas');
-    if (filledStars.length === 0) {
-        alert('Please select a rating');
+    if (!rating || rating < 1) {
+        alert('कृपया रेटिंग चुनें।');
         return;
     }
-    
-    const rating = filledStars.length;
-    const reviewText = document.getElementById('review-text').value.trim();
-    const userName = document.getElementById('user-name').value.trim() || 'Anonymous';
     
     // Create review object
     const review = {
         mistriName: mistriName,
-        rating: rating,
+        rating: parseInt(rating),
         comment: reviewText,
-        userName: userName,
+        userName: reviewerName || 'Anonymous',
         timestamp: Date.now(),
         date: new Date().toLocaleDateString('hi-IN')
     };
@@ -325,17 +314,17 @@ function submitReview() {
     // Save to Firebase
     database.ref('reviews/' + reviewId).set(review)
         .then(() => {
-            alert('Thank you for your review!');
+            alert('समीक्षा के लिए धन्यवाद! (Thank you for your review!)');
             
             // Close modal
-            document.querySelector('.review-modal').remove();
+            document.querySelector('.review-modal')?.remove();
             
-            // Reload ratings
+            // Reload ratings after a short delay
             setTimeout(loadRatingsForAllMistris, 1000);
         })
         .catch(error => {
             console.error('Error saving review:', error);
-            alert('Error submitting review. Please try again.');
+            alert('समीक्षा सबमिट करने में एरर आई। (Error submitting review. Please try again.)');
         });
 }
 
@@ -349,7 +338,6 @@ function showReviewsModal(mistriName, mistriCard) {
     const modalHTML = `
         <div class="review-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-                <!-- Header -->
                 <div class="p-4 border-b">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold">Reviews for ${mistriName}</h3>
@@ -359,7 +347,6 @@ function showReviewsModal(mistriName, mistriCard) {
                     </div>
                 </div>
                 
-                <!-- Reviews List -->
                 <div class="p-4">
                     <div id="reviews-list">
                         <div class="text-center py-8">
@@ -368,7 +355,6 @@ function showReviewsModal(mistriName, mistriCard) {
                         </div>
                     </div>
                     
-                    <!-- Add Review Button -->
                     <button 
                         id="add-review-from-list" 
                         class="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
@@ -462,4 +448,57 @@ function getUserProfile() {
         };
     }
     return null;
-                          }
+}
+
+// ===================================
+// GLOBAL EVENT LISTENERS (REQUIRED FIX)
+// ===================================
+
+// Handles all button clicks (View Reviews, Add Review, Close Modal)
+document.addEventListener('click', function(e) {
+    
+    // Give Review button (on mistri card)
+    if (e.target.classList.contains('give-review-btn')) {
+        const mistriCard = findMistriCard(e.target);
+        if (mistriCard) {
+            const mistriName = getMistriNameFromCard(mistriCard);
+            // showReviewForm फ़ंक्शन को कॉल करें
+            window.showReviewForm(mistriName, mistriCard); 
+        }
+    }
+    
+    // View Reviews button (on mistri card)
+    if (e.target.classList.contains('view-reviews-btn')) {
+        const mistriCard = findMistriCard(e.target);
+        if (mistriCard) {
+            const mistriName = getMistriNameFromCard(mistriCard);
+            // showReviewsModal फ़ंक्शन को कॉल करें
+            window.showReviewsModal(mistriName, mistriCard);
+        }
+    }
+    
+    // Close modal
+    if (e.target.classList.contains('close-review-modal')) {
+        const modal = e.target.closest('.review-modal');
+        if (modal) modal.remove();
+    }
+});
+
+// Handles the Review Form submission
+document.addEventListener('submit', function(e) {
+    if (e.target.id === 'review-form') {
+        e.preventDefault(); // फॉर्म सबमिशन रोकें
+        
+        const form = e.target;
+        const mistriName = form.dataset.mistriName;
+        // फॉर्म के name एट्रीब्यूट से वैल्यू प्राप्त करें
+        const rating = form.rating.value; 
+        const reviewText = form.reviewText.value.trim();
+        const reviewerName = form.reviewerName.value.trim();
+        
+        // फ़ंक्शन्स को window के ज़रिए कॉल करें
+        if (typeof window.saveReviewToFirebase === 'function') {
+            window.saveReviewToFirebase(mistriName, rating, reviewText, reviewerName);
+        }
+    }
+});
