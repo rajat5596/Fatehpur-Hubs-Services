@@ -106,14 +106,14 @@ function updateAllMistriRatings(mistriRatings) {
     });
 }
 
-// ===== ADD RATING DISPLAY TO CARD =====
+// ===== ADD RATING DISPLAY TO CARD (FINAL FIX) =====
 function addRatingToCard(card, mistriName, avgRating, reviewCount) {
     // Check if rating already exists
     if (card.querySelector('.rating-container')) {
         return;
     }
     
-    // Create rating HTML
+    // Create rating HTML (यह भाग वही है, लेकिन हमने इसे आसान बना दिया)
     const ratingHTML = `
         <div class="rating-container mt-2 mb-2">
             <div class="flex items-center">
@@ -135,6 +135,21 @@ function addRatingToCard(card, mistriName, avgRating, reviewCount) {
             </div>
         </div>
     `;
+    
+    // ⭐⭐ यह है सबसे महत्वपूर्ण बदलाव ⭐⭐
+    // H3 (Mistri Name) या .service-title (Category) को ढूंढें।
+    // .service-title को ढूँढने से यह सुनिश्चित होता है कि H3 के ठीक बाद इन्सर्ट हो।
+    const insertionPoint = card.querySelector('h3') || card.querySelector('.service-title');
+    
+    if (insertionPoint) {
+        // H3 या Category के बाद इन्सर्ट करें
+        insertionPoint.insertAdjacentHTML('afterend', ratingHTML);
+    } else {
+        // अगर कुछ नहीं मिला, तो कार्ड के अंदर सबसे ऊपर डालें
+        card.insertAdjacentHTML('afterbegin', ratingHTML);
+    }
+}
+
     
     // Insert after the Mistri Name (H3)
     const title = card.querySelector('h3'); // H3 को टारगेट करें क्योंकि हमने script.js में h3 का उपयोग किया है
