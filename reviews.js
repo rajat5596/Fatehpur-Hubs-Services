@@ -20,7 +20,7 @@ if (!firebase.apps.length) {
 }
 
 const database = firebase.database();
-
+console.log("reviews.js लोड हो गई!");
 // ===== FIND MISTRI CARD (मज़बूत फ़ाइनल वर्जन) =====
 function findMistriCard(element) {
     let currentElement = element;
