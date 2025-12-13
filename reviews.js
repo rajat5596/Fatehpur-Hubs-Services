@@ -21,12 +21,12 @@ if (!firebase.apps.length) {
 
 const database = firebase.database();
 console.log("reviews.js लोड हो गई!");
-// ===== FIND MISTRI CARD (मज़बूत फ़ाइनल वर्जन) =====
+
+// ===== FIND MISTRI CARD =====
 function findMistriCard(element) {
     let currentElement = element;
     let count = 0;
     while (currentElement && currentElement.tagName !== 'BODY' && count < 5) {
-        // यह 'mistri-card' क्लास चेक करेगा, जिसे हमने script.js में जोड़ दिया है।
         if (currentElement.classList && currentElement.classList.contains('mistri-card')) {
             return currentElement;
         }
@@ -38,18 +38,15 @@ function findMistriCard(element) {
 
 // ===== GET MISTRI NAME FROM CARD =====
 function getMistriNameFromCard(card) {
-    // h3 को पहले चेक करें क्योंकि हमने script.js में h3 का उपयोग किया है।
     const selectors = ['h3', '.text-lg.font-bold', 'h4', '.service-title'];
     
     for (const selector of selectors) {
         const element = card.querySelector(selector);
         if (element && element.textContent) {
-            // Mistri Name से अतिरिक्त टेक्स्ट जैसे 'Category: ' को हटा दें
             return element.textContent.replace('Category:', '').trim();
         }
     }
     
-    // Fallback: get first h* element
     const heading = card.querySelector('h1, h2, h3, h4, h5, h6');
     return heading ? heading.textContent.replace('Category:', '').trim() : 'Unknown Mistri';
 }
@@ -60,7 +57,6 @@ function loadRatingsForAllMistris() {
         const reviewsData = snapshot.val();
         if (!reviewsData) return;
         
-        // Calculate average ratings for each mistri
         const mistriRatings = {};
         
         for (const reviewId in reviewsData) {
@@ -80,7 +76,6 @@ function loadRatingsForAllMistris() {
             mistriRatings[mistriName].reviews.push(review);
         }
         
-        // Update UI for each mistri
         updateAllMistriRatings(mistriRatings);
         
     }).catch(error => {
@@ -90,7 +85,6 @@ function loadRatingsForAllMistris() {
 
 // ===== UPDATE ALL MISTRI RATINGS IN UI =====
 function updateAllMistriRatings(mistriRatings) {
-    // Get all mistri cards (using the new 'mistri-card' class)
     const mistriCards = document.querySelectorAll('.mistri-card');
     
     mistriCards.forEach(card => {
@@ -101,19 +95,17 @@ function updateAllMistriRatings(mistriRatings) {
             const avgRating = ratingData.totalRating / ratingData.count;
             addRatingToCard(card, mistriName, avgRating, ratingData.count);
         } else {
-            addRatingToCard(card, mistriName, 0, 0); // No reviews yet
+            addRatingToCard(card, mistriName, 0, 0);
         }
     });
 }
 
-// ===== ADD RATING DISPLAY TO CARD (FINAL FIX) =====
+// ===== ADD RATING DISPLAY TO CARD =====
 function addRatingToCard(card, mistriName, avgRating, reviewCount) {
-    // Check if rating already exists
     if (card.querySelector('.rating-container')) {
         return;
     }
     
-    // Create rating HTML (यह भाग वही है, लेकिन हमने इसे आसान बना दिया)
     const ratingHTML = `
         <div class="rating-container mt-2 mb-2">
             <div class="flex items-center">
@@ -136,33 +128,12 @@ function addRatingToCard(card, mistriName, avgRating, reviewCount) {
         </div>
     `;
     
-    // ⭐⭐ यह है सबसे महत्वपूर्ण बदलाव ⭐⭐
-    // H3 (Mistri Name) या .service-title (Category) को ढूंढें।
-    // .service-title को ढूँढने से यह सुनिश्चित होता है कि H3 के ठीक बाद इन्सर्ट हो।
     const insertionPoint = card.querySelector('h3') || card.querySelector('.service-title');
     
     if (insertionPoint) {
-        // H3 या Category के बाद इन्सर्ट करें
         insertionPoint.insertAdjacentHTML('afterend', ratingHTML);
     } else {
-        // अगर कुछ नहीं मिला, तो कार्ड के अंदर सबसे ऊपर डालें
         card.insertAdjacentHTML('afterbegin', ratingHTML);
-    }
-}
-
-    
-    // Insert after the Mistri Name (H3)
-    const title = card.querySelector('h3'); // H3 को टारगेट करें क्योंकि हमने script.js में h3 का उपयोग किया है
-    if (title) {
-        title.insertAdjacentHTML('afterend', ratingHTML);
-    } else {
-        // Fallback: Insert after the first element (p.service-title)
-        const category = card.querySelector('.service-title');
-        if (category) {
-            category.insertAdjacentHTML('afterend', ratingHTML);
-        } else {
-             card.insertAdjacentHTML('afterbegin', ratingHTML);
-        }
     }
 }
 
@@ -172,17 +143,14 @@ function getStarsHTML(rating) {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     
-    // Full stars
     for (let i = 0; i < fullStars; i++) {
         starsHTML += '<i class="fas fa-star"></i>';
     }
     
-    // Half star
     if (hasHalfStar) {
         starsHTML += '<i class="fas fa-star-half-alt"></i>';
     }
     
-    // Empty stars
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
     for (let i = 0; i < emptyStars; i++) {
         starsHTML += '<i class="far fa-star"></i>';
@@ -193,11 +161,9 @@ function getStarsHTML(rating) {
 
 // ===== SHOW REVIEW FORM =====
 function showReviewForm(mistriName, mistriCard) {
-    // Remove existing modal
     const existingModal = document.querySelector('.review-modal');
     if (existingModal) existingModal.remove();
     
-    // Create modal HTML
     const modalHTML = `
         <div class="review-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -268,10 +234,7 @@ function showReviewForm(mistriName, mistriCard) {
         </div>
     `;
     
-    // Add to body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Initialize star rating
     initStarRating();
 }
 
@@ -291,7 +254,7 @@ function initStarRating() {
             selectedRating = parseInt(this.dataset.rating);
             highlightStars(selectedRating);
             document.getElementById('rating-text').textContent = `${selectedRating}/5 stars`;
-            hiddenInput.value = selectedRating; // Update hidden input value
+            hiddenInput.value = selectedRating;
         });
     });
     
@@ -314,7 +277,6 @@ function saveReviewToFirebase(mistriName, rating, reviewText, reviewerName) {
         return;
     }
     
-    // Create review object
     const review = {
         mistriName: mistriName,
         rating: parseInt(rating),
@@ -324,33 +286,25 @@ function saveReviewToFirebase(mistriName, rating, reviewText, reviewerName) {
         date: new Date().toLocaleDateString('hi-IN')
     };
     
-    // Generate unique ID
     const reviewId = 'review_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
-    // Save to Firebase
     database.ref('reviews/' + reviewId).set(review)
         .then(() => {
-            alert('समीक्षा के लिए धन्यवाद! (Thank you for your review!)');
-            
-            // Close modal
+            alert('समीक्षा के लिए धन्यवाद!');
             document.querySelector('.review-modal')?.remove();
-            
-            // Reload ratings after a short delay
             setTimeout(loadRatingsForAllMistris, 1000);
         })
         .catch(error => {
             console.error('Error saving review:', error);
-            alert('समीक्षा सबमिट करने में एरर आई। (Error submitting review. Please try again.)');
+            alert('समीक्षा सबमिट करने में एरर आई।');
         });
 }
 
 // ===== SHOW REVIEWS MODAL =====
 function showReviewsModal(mistriName, mistriCard) {
-    // Remove existing modal
     const existingModal = document.querySelector('.review-modal');
     if (existingModal) existingModal.remove();
     
-    // Create modal HTML
     const modalHTML = `
         <div class="review-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
@@ -383,13 +337,9 @@ function showReviewsModal(mistriName, mistriCard) {
         </div>
     `;
     
-    // Add to body
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Load reviews
     loadReviewsForMistri(mistriName);
     
-    // Add event for Add Review button
     document.getElementById('add-review-from-list').addEventListener('click', function() {
         document.querySelector('.review-modal').remove();
         showReviewForm(mistriName, mistriCard);
@@ -417,7 +367,6 @@ function loadReviewsForMistri(mistriName) {
             let reviewsHTML = '';
             const reviewsArray = Object.values(reviews);
             
-            // Sort by timestamp (newest first)
             reviewsArray.sort((a, b) => b.timestamp - a.timestamp);
             
             reviewsArray.forEach(review => {
@@ -453,65 +402,46 @@ function loadReviewsForMistri(mistriName) {
         });
 }
 
-// ===== FIREBASE AUTH (Optional) =====
-function getUserProfile() {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        return {
-            uid: user.uid,
-            name: user.displayName,
-            email: user.email
-        };
-    }
-    return null;
-}
-
-// ===================================
-// GLOBAL EVENT LISTENERS 
-// ===================================
-
-// Handles all button clicks (View Reviews, Add Review, Close Modal)
+// ===== GLOBAL EVENT LISTENERS =====
 document.addEventListener('click', function(e) {
     
-    // Give Review button (on mistri card)
     if (e.target.classList.contains('give-review-btn')) {
         const mistriCard = findMistriCard(e.target);
         if (mistriCard) {
             const mistriName = getMistriNameFromCard(mistriCard);
-            window.showReviewForm(mistriName, mistriCard); 
+            showReviewForm(mistriName, mistriCard);
         }
     }
     
-    // View Reviews button (on mistri card)
     if (e.target.classList.contains('view-reviews-btn')) {
         const mistriCard = findMistriCard(e.target);
         if (mistriCard) {
             const mistriName = getMistriNameFromCard(mistriCard);
-            window.showReviewsModal(mistriName, mistriCard);
+            showReviewsModal(mistriName, mistriCard);
         }
     }
     
-    // Close modal
     if (e.target.classList.contains('close-review-modal')) {
         const modal = e.target.closest('.review-modal');
         if (modal) modal.remove();
     }
 });
 
-// Handles the Review Form submission
 document.addEventListener('submit', function(e) {
     if (e.target.id === 'review-form') {
-        e.preventDefault(); 
+        e.preventDefault();
         
         const form = e.target;
         const mistriName = form.dataset.mistriName;
-        const rating = form.rating.value; 
+        const rating = form.rating.value;
         const reviewText = form.reviewText.value.trim();
         const reviewerName = form.reviewerName.value.trim();
         
-        if (typeof window.saveReviewToFirebase === 'function') {
-            window.saveReviewToFirebase(mistriName, rating, reviewText, reviewerName);
-        }
+        saveReviewToFirebase(mistriName, rating, reviewText, reviewerName);
     }
 });
-        
+
+// ===== AUTO START RATINGS =====
+setTimeout(() => {
+    loadRatingsForAllMistris();
+}, 5000);
