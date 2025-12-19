@@ -12,6 +12,7 @@
   "lang": "hi",
   "dir": "ltr",
   "display_override": ["standalone", "window-controls-overlay"],
+  "iarc_rating_id": "e578c779-7973-40f3-858a-64157d643598",
   "categories": ["business", "shopping", "social"],
   "icons": [
     {
