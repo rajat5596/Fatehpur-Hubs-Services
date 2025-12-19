@@ -11,6 +11,32 @@
   "id": "/",
   "lang": "hi",
   "categories": ["business", "shopping", "social"],
+  "icons": [
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/icon192.jpg?alt=media&token=565e571d-1f41-40a7-8db5-d0f615d1c19b",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/icon192.jpg?alt=media&token=565e571d-1f41-40a7-8db5-d0f615d1c19b",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ],
   "screenshots": [
     {
       "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/home-screen.png?alt=media&token=4339d774-2d7a-42bf-adb9-916d0b6151e6",
@@ -48,19 +74,12 @@
       "label": "Local Job Listings"
     }
   ],
-  "icons": [
+  "related_applications": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/icon192.jpg?alt=media&token=565e571d-1f41-40a7-8db5-d0f615d1c19b",
-      "sizes": "192x192",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "platform": "play",
+      "id": "com.fatehpurhubs.app"
     }
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": true
 }
+
