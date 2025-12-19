@@ -2,7 +2,7 @@
   "name": "Fatehpur Hubs - Local Services & Jobs",
   "short_name": "Hubs Services",
   "description": "Find trusted plumbers, electricians, carpenters, painters and job opportunities in Fatehpur. 15+ service categories with direct contact.",
-  "start_url": "/index.html?v=7.0",
+  "start_url": "/index.html?v=8.0",
   "display": "standalone",
   "background_color": "#2a5298",
   "theme_color": "#2a5298",
@@ -10,6 +10,8 @@
   "scope": "/",
   "id": "/",
   "lang": "hi",
+  "dir": "ltr",
+  "display_override": ["standalone", "window-controls-overlay"],
   "categories": ["business", "shopping", "social"],
   "icons": [
     {
@@ -43,35 +45,28 @@
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Home - Services"
+      "label": "Home Screen"
+    },
+    {
+      "src": "img/home-screen.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop View"
     },
     {
       "src": "img/service-providers.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Providers"
+      "label": "Services"
     },
     {
-      "src": "img/add-service.png",
+      "src": "img/service-providers.png",
       "sizes": "1080x1920",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Register"
-    },
-    {
-      "src": "img/post-job.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Post Job"
-    },
-    {
-      "src": "img/local-jobs.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Jobs"
+      "form_factor": "wide",
+      "label": "Services Wide"
     }
   ],
   "related_applications": [
