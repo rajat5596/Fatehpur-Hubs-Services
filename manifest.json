@@ -2,7 +2,7 @@
   "name": "Fatehpur Hubs - Local Services & Jobs",
   "short_name": "Hubs Services",
   "description": "Find trusted plumbers, electricians, carpenters, painters and job opportunities in Fatehpur. 15+ service categories with direct contact.",
-  "start_url": "/index.html?v=3.3",
+  "start_url": "/index.html?v=11",
   "display": "standalone",
   "background_color": "#2a5298",
   "theme_color": "#2a5298",
@@ -13,25 +13,25 @@
   "categories": ["business", "shopping", "social"],
   "icons": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
+      "src": "imgandroid-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d",
+      "src": "imgandroid-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/icon192.jpg?alt=media&token=565e571d-1f41-40a7-8db5-d0f615d1c19b",
+      "src": "icon192.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/icon192.jpg?alt=media&token=565e571d-1f41-40a7-8db5-d0f615d1c19b",
+      "src": "icon192.jpg",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "maskable"
@@ -39,42 +39,42 @@
   ],
   "screenshots": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/home-screen.png?alt=media&token=4339d774-2d7a-42bf-adb9-916d0b6151e6",
+      "src": "img/home-screen.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Home - Services & Search"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/service-providers.png?alt=media&token=0fb831f7-a913-4f1c-aefb-811119805ae8",
+      "src": "img/service-providers.png",
       "sizes": "1080x1920",
       "type": "image/png", 
       "form_factor": "narrow",
       "label": "Local Service Providers"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/add-service.png?alt=media&token=a789c148-c295-4bb7-a33b-78d78a802ea4",
+      "src": "img/add-service.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Register Service Provider"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/post-job.png?alt=media&token=10035fa3-a5f1-46ef-afe4-c13d94e7ad4c",
+      "src": "img/post-job.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Post Job Opportunity"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/local-jobs.png?alt=media&token=3c7d2a62-0fd2-442c-8491-cf67209e025f",
+      "src": "img/local-jobs.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Local Job Listings"
     }
   ],
-    "related_applications": [
+  "related_applications": [
     {
       "platform": "play",
       "url": "https://play.google.com/store/apps/details?id=in.co.fatehpurhubs",
@@ -82,5 +82,5 @@
     }
   ],
   "prefer_related_applications": true
-  
+}
 
