@@ -690,36 +690,12 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// --- NOTIFICATION SYSTEM START ---
+// script.js ke sabse niche purana hata kar ye daalein
 const messaging = firebase.messaging();
-
-// 1. Permission aur Token lena
 messaging.requestPermission()
-  .then(function() {
-    return messaging.getToken({ 
-        vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
-    });
+  .then(() => messaging.getToken({ vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' }))
+  .then((token) => {
+      console.log("Token mil gaya");
+      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({token: token});
   })
-  .then(function(token) {
-    if (token) {
-      // Token ko database mein save karna taaki hum bhej sakein
-      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
-        token: token,
-        last_updated: new Date().toString()
-      });
-      console.log("Token Saved Successfully");
-    }
-  })
-  .catch(function(err) {
-    console.log('Notification Error:', err);
-  });
-
-// 2. Notification bhejne wala function (Ise button click par chalayenge)
-function sendGlobalNotification(title, body) {
-    // Note: Bina server ya Cloud Functions ke direct JS se bhejoge toh 
-    // Security rules allow nahi karenge. Isliye abhi hum bas Token save kar rahe hain.
-    // Testing ke liye aap Firebase Console se "Messaging" mein jaakar 
-    // khud message bhej kar check kar sakte hain.
-}
-// --- NOTIFICATION SYSTEM END ---
-
+  .catch((err) => alert("Permission Error: " + err));
