@@ -690,14 +690,38 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
+// 1. Service Worker ko register karna (Taki Notification mil sake)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(function(reg) {
-      alert("Service Worker Register Ho Gaya!"); // Agar ye dikha toh setup sahi hai
+      console.log("Service Worker Active Hai");
     }).catch(function(err) {
-      alert("Service Worker Fail Ho Gaya: " + err); // Agar ye dikha toh file path galat hai
+      console.log("Registration Fail:", err);
     });
-} else {
-  alert("Aapka Browser Notification Support Nahi Karta");
 }
+
+// 2. Firebase Messaging Setup
+const messaging = firebase.messaging();
+
+// 3. User se Permission maangna aur Token save karna
+// Isse user ka phone aapke database se jud jayega
+messaging.requestPermission()
+  .then(function() {
+    return messaging.getToken({ 
+      vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
+    });
+  })
+  .then(function(token) {
+    if (token) {
+      // Token ko database mein save karna (Agar pehle se hai to update ho jayega)
+      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
+        token: token,
+        last_updated: new Date().toString()
+      });
+    }
+  })
+  .catch(function(err) {
+    console.log('Permission Denied/Error:', err);
+  });
+
 
