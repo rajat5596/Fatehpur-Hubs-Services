@@ -690,57 +690,36 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// --- NOTIFICATION MASTER CODE START ---
-
+// --- NOTIFICATION SYSTEM START ---
 const messaging = firebase.messaging();
 
-// 1. Permission maangna aur Token save karna
+// 1. Permission aur Token lena
 messaging.requestPermission()
   .then(function() {
-    return messaging.getToken({ vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' });
+    return messaging.getToken({ 
+        vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
+    });
   })
   .then(function(token) {
     if (token) {
-      // Token ko database mein save karna
+      // Token ko database mein save karna taaki hum bhej sakein
       firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
         token: token,
         last_updated: new Date().toString()
       });
+      console.log("Token Saved Successfully");
     }
   })
   .catch(function(err) {
-    console.log('Notification error:', err);
+    console.log('Notification Error:', err);
   });
 
-// 2. Sabko notification bhejne wala function
-function sendGlobalNotification(title, message) {
-    // Yahan aapko apni Legacy Server Key daalni hai
-    const serverKey = 'YAHAN_APNI_SERVER_KEY_DAALEIN'; 
-
-    firebase.database().ref('users_tokens').once('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-            const userToken = childSnapshot.val().token;
-
-            const notificationData = {
-                'to': userToken,
-                'notification': {
-                    'title': title,
-                    'body': message,
-                    'icon': './img/icon.png',
-                    'click_action': 'https://fatehpurhubs.vercel.app'
-                }
-            };
-
-            fetch('https://fcm.googleapis.com/fcm/send', {
-                'method': 'POST',
-                'headers': {
-                    'Authorization': 'key=' + serverKey,
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify(notificationData)
-            });
-        });
-    });
+// 2. Notification bhejne wala function (Ise button click par chalayenge)
+function sendGlobalNotification(title, body) {
+    // Note: Bina server ya Cloud Functions ke direct JS se bhejoge toh 
+    // Security rules allow nahi karenge. Isliye abhi hum bas Token save kar rahe hain.
+    // Testing ke liye aap Firebase Console se "Messaging" mein jaakar 
+    // khud message bhej kar check kar sakte hain.
 }
-// --- NOTIFICATION MASTER CODE END ---
+// --- NOTIFICATION SYSTEM END ---
 
