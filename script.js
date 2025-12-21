@@ -690,12 +690,14 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// script.js ke sabse niche purana hata kar ye daalein
-const messaging = firebase.messaging();
-messaging.requestPermission()
-  .then(() => messaging.getToken({ vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' }))
-  .then((token) => {
-      console.log("Token mil gaya");
-      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({token: token});
-  })
-  .catch((err) => alert("Permission Error: " + err));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(function(reg) {
+      alert("Service Worker Register Ho Gaya!"); // Agar ye dikha toh setup sahi hai
+    }).catch(function(err) {
+      alert("Service Worker Fail Ho Gaya: " + err); // Agar ye dikha toh file path galat hai
+    });
+} else {
+  alert("Aapka Browser Notification Support Nahi Karta");
+}
+
