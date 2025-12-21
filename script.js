@@ -690,20 +690,18 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// Firebase Messaging setup
+// --- NOTIFICATION MASTER CODE START ---
+
 const messaging = firebase.messaging();
 
-// 1. Permission maangna aur Token lena
+// 1. Permission maangna aur Token save karna
 messaging.requestPermission()
   .then(function() {
-    console.log('Notification permission mil gayi!');
-    // Yahan aapki wahi VAPID key hai jo aapke Firebase settings mein thi
     return messaging.getToken({ vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' });
   })
   .then(function(token) {
     if (token) {
-      console.log('User Token:', token);
-      // 2. Token ko database mein "users_tokens" folder mein save karna
+      // Token ko database mein save karna
       firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
         token: token,
         last_updated: new Date().toString()
@@ -711,6 +709,38 @@ messaging.requestPermission()
     }
   })
   .catch(function(err) {
-    console.log('Permission nahi mili ya error aaya:', err);
+    console.log('Notification error:', err);
   });
+
+// 2. Sabko notification bhejne wala function
+function sendGlobalNotification(title, message) {
+    // Yahan aapko apni Legacy Server Key daalni hai
+    const serverKey = 'YAHAN_APNI_SERVER_KEY_DAALEIN'; 
+
+    firebase.database().ref('users_tokens').once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            const userToken = childSnapshot.val().token;
+
+            const notificationData = {
+                'to': userToken,
+                'notification': {
+                    'title': title,
+                    'body': message,
+                    'icon': './img/icon.png',
+                    'click_action': 'https://fatehpurhubs.vercel.app'
+                }
+            };
+
+            fetch('https://fcm.googleapis.com/fcm/send', {
+                'method': 'POST',
+                'headers': {
+                    'Authorization': 'key=' + serverKey,
+                    'Content-Type': 'application/json'
+                },
+                'body': JSON.stringify(notificationData)
+            });
+        });
+    });
+}
+// --- NOTIFICATION MASTER CODE END ---
 
