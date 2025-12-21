@@ -690,18 +690,27 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
+// Firebase Messaging setup
 const messaging = firebase.messaging();
 
-// Permission maangne ke liye
+// 1. Permission maangna aur Token lena
 messaging.requestPermission()
   .then(function() {
     console.log('Notification permission mil gayi!');
-    return messaging.getToken();
+    // Yahan aapki wahi VAPID key hai jo aapke Firebase settings mein thi
+    return messaging.getToken({ vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' });
   })
   .then(function(token) {
-    console.log('User Token: ', token);
-    // Is token ko hum database mein save karenge baad mein
+    if (token) {
+      console.log('User Token:', token);
+      // 2. Token ko database mein "users_tokens" folder mein save karna
+      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
+        token: token,
+        last_updated: new Date().toString()
+      });
+    }
   })
   .catch(function(err) {
-    console.log('Permission nahi mili', err);
+    console.log('Permission nahi mili ya error aaya:', err);
   });
+
