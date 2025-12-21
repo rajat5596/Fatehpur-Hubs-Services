@@ -690,3 +690,18 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
+const messaging = firebase.messaging();
+
+// Permission maangne ke liye
+messaging.requestPermission()
+  .then(function() {
+    console.log('Notification permission mil gayi!');
+    return messaging.getToken();
+  })
+  .then(function(token) {
+    console.log('User Token: ', token);
+    // Is token ko hum database mein save karenge baad mein
+  })
+  .catch(function(err) {
+    console.log('Permission nahi mili', err);
+  });
