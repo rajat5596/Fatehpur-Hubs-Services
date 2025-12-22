@@ -690,38 +690,54 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// 1. Service Worker ko register karna (Taki Notification mil sake)
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(function(reg) {
-      console.log("Service Worker Active Hai");
-    }).catch(function(err) {
-      console.log("Registration Fail:", err);
-    });
+// 1. Firebase Config (Ise check kar lein ki aapki hi hai)
+const firebaseConfig = {
+  apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+  authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
+  databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "fatehpur-hubs-a3a9f",
+  storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
+  messagingSenderId: "294360741451",
+  appId: "1:294360741451:web:3bc85078805750b9fabfce"
+};
+
+// Initialize Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
 }
 
-// 2. Firebase Messaging Setup
 const messaging = firebase.messaging();
+const database = firebase.database();
 
-// 3. User se Permission maangna aur Token save karna
-// Isse user ka phone aapke database se jud jayega
-messaging.requestPermission()
-  .then(function() {
-    return messaging.getToken({ 
-      vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
-    });
-  })
-  .then(function(token) {
-    if (token) {
-      // Token ko database mein save karna (Agar pehle se hai to update ho jayega)
-      firebase.database().ref('users_tokens/' + token.replace(/\./g, '_')).set({
-        token: token,
-        last_updated: new Date().toString()
+// 2. Service Worker Register aur Token Setup
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(function(registration) {
+      console.log("SW Registered!");
+      
+      // Naya Tarika: Notification Permission maangna
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          // Token nikalna
+          messaging.getToken({ 
+            serviceWorkerRegistration: registration,
+            vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
+          })
+          .then((currentToken) => {
+            if (currentToken) {
+              console.log("Token mil gaya: ", currentToken);
+              // Database mein save karna
+              database.ref('users_tokens/' + currentToken.replace(/\./g, '_')).set({
+                token: currentToken,
+                last_active: new Date().toString()
+              }).then(() => {
+                console.log("Database mein token save ho gaya!");
+              });
+            }
+          })
+          .catch((err) => console.log('Token error:', err));
+        }
       });
-    }
-  })
-  .catch(function(err) {
-    console.log('Permission Denied/Error:', err);
-  });
-
+    });
+}
 
