@@ -251,3 +251,114 @@ window.showNotification = showNotification;
 window.initNotificationSystem = initNotificationSystem;
 
 console.log("✅ Notification system code loaded successfully!");
+// ================= FIREBASE CLOUD MESSAGING SETUP =================
+// Add this to your existing notification.js file
+
+function initializeFirebaseMessaging() {
+    console.log("Initializing Firebase Messaging...");
+    
+    // Check if Firebase is loaded
+    if (typeof firebase === 'undefined' || !firebase.messaging) {
+        console.error("Firebase messaging not available");
+        return;
+    }
+    
+    try {
+        const messaging = firebase.messaging();
+        const vapidKey = "BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ";
+        
+        // Get FCM token
+        messaging.getToken({ vapidKey: vapidKey }).then((currentToken) => {
+            if (currentToken) {
+                console.log('FCM Token obtained:', currentToken.substring(0, 20) + '...');
+                
+                // Save token to Firebase database
+                saveFCMTokenToDatabase(currentToken);
+                
+                localStorage.setItem('fcm_token', currentToken);
+                console.log('✅ FCM Token saved');
+            } else {
+                console.log('No FCM token available');
+            }
+        }).catch((err) => {
+            console.error('Error getting FCM token:', err);
+        });
+        
+        // Handle foreground messages
+        messaging.onMessage((payload) => {
+            console.log('Foreground message:', payload);
+            showNotification(
+                payload.notification?.title || 'Fatehpur Hubs',
+                payload.notification?.body || 'New update'
+            );
+        });
+        
+    } catch (error) {
+        console.error('Error in initializeFirebaseMessaging:', error);
+    }
+}
+
+function saveFCMTokenToDatabase(token) {
+    try {
+        const userId = localStorage.getItem('user_uid') || 'anonymous_' + Date.now();
+        const db = firebase.database();
+        const tokenRef = db.ref('fcm_tokens/' + userId);
+        
+        const tokenData = {
+            token: token,
+            userId: userId,
+            timestamp: Date.now()
+        };
+        
+        tokenRef.set(tokenData);
+        console.log('Token saved to Firebase');
+    } catch (error) {
+        console.error('Error saving token:', error);
+    }
+}
+
+// Send notification to all users
+function sendServiceNotificationToAll(serviceData) {
+    try {
+        const db = firebase.database();
+        const notificationRef = db.ref('notifications').push();
+        
+        const notificationData = {
+            title: '🛠️ नई सेवा उपलब्ध',
+            body: `${serviceData.category} - ${serviceData.area} में`,
+            type: 'new_service',
+            timestamp: Date.now()
+        };
+        
+        notificationRef.set(notificationData);
+        console.log('Service notification saved to DB');
+    } catch (error) {
+        console.error('Error sending notification:', error);
+    }
+}
+
+function sendJobNotificationToAll(jobData) {
+    try {
+        const db = firebase.database();
+        const notificationRef = db.ref('notifications').push();
+        
+        const notificationData = {
+            title: '💼 नई जॉब उपलब्ध',
+            body: `${jobData.title} - ${jobData.shopName} (${jobData.salary})`,
+            type: 'new_job',
+            timestamp: Date.now()
+        };
+        
+        notificationRef.set(notificationData);
+        console.log('Job notification saved to DB');
+    } catch (error) {
+        console.error('Error sending notification:', error);
+    }
+}
+
+// Initialize when Firebase is ready
+setTimeout(() => {
+    if (typeof firebase !== 'undefined' && firebase.messaging) {
+        initializeFirebaseMessaging();
+    }
+}, 5000);
