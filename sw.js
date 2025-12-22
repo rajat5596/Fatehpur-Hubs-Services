@@ -1,59 +1,45 @@
-// sw.js - Service Worker for Fatehpur Hubs
+// sw.js - SIMPLE Service Worker
+console.log('✅ Service Worker installed');
 
-// ============== FIREBASE CLOUD MESSAGING SETUP ==============
-importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
+// Listen for install event
+self.addEventListener('install', function(event) {
+  console.log('✅ Service Worker installing...');
+  self.skipWaiting(); // Force activation
+});
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-  authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-  databaseURL: "https://fatehpurhubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "fatehpur-hubs-a3a9f",
-  storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-  messagingSenderId: "294360741451",
-  appId: "1:294360741451:web:3bc85078805750b9fabfce"
-};
+// Listen for activate event
+self.addEventListener('activate', function(event) {
+  console.log('✅ Service Worker activated');
+  event.waitUntil(self.clients.claim()); // Take control immediately
+});
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-// Initialize Firebase Cloud Messaging
-const messaging = firebase.messaging();
-
-// Background message handler
-messaging.onBackgroundMessage(function(payload) {
-  console.log('[sw.js] Background message received:', payload);
-
-  const notificationTitle = payload.notification?.title || 'Fatehpur Hubs';
-  const notificationOptions = {
-    body: payload.notification?.body || 'New update available',
-    icon: 'https://www.fatehpurhubs.co.in/icons/icon-192x192.png',
-    badge: 'https://www.fatehpurhubs.co.in/icons/badge.png',
-    data: payload.data || {}
-  };
-
-  return self.registration.showNotification(notificationTitle, notificationOptions);
+// Basic fetch handler (required for PWA)
+self.addEventListener('fetch', function(event) {
+  // Let browser handle normally
+  return;
 });
 
 // Notification click handler
 self.addEventListener('notificationclick', function(event) {
+  console.log('Notification clicked');
   event.notification.close();
   
   event.waitUntil(
     clients.matchAll({type: 'window', includeUncontrolled: true})
-      .then(function(clientList) {
-        for (var i = 0; i < clientList.length; i++) {
-          var client = clientList[i];
-          if (client.url === '/' && 'focus' in client) {
-            return client.focus();
-          }
+    .then(function(clientList) {
+      // Focus existing app window
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
+        if (client.url.includes('fatehpurhubs') && 'focus' in client) {
+          return client.focus();
         }
-        if (clients.openWindow) {
-          return clients.openWindow('/');
-        }
-      })
+      }
+      // Open new window
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
   );
 });
 
-console.log('[sw.js] Service Worker loaded successfully');
+console.log('✅ Service Worker code loaded');
