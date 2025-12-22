@@ -690,7 +690,7 @@ window.onload = () => {
 }; // window.onload का क्लोजिंग ब्रैकेट
 
 
-// 1. Firebase Config (Ise check kar lein ki aapki hi hai)
+// 1. Firebase Configuration (Pura Setup)
 const firebaseConfig = {
   apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
   authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -701,7 +701,7 @@ const firebaseConfig = {
   appId: "1:294360741451:web:3bc85078805750b9fabfce"
 };
 
-// Initialize Firebase
+// Initialize Firebase agar pehle se nahi hai
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
@@ -713,31 +713,34 @@ const database = firebase.database();
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(function(registration) {
-      console.log("SW Registered!");
+      console.log("Service Worker Registered!");
       
-      // Naya Tarika: Notification Permission maangna
+      // Notification Permission maangna
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-          // Token nikalna
+          // Token nikalna aur Database mein save karna
           messaging.getToken({ 
             serviceWorkerRegistration: registration,
             vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
           })
           .then((currentToken) => {
             if (currentToken) {
-              console.log("Token mil gaya: ", currentToken);
-              // Database mein save karna
+              // Token ko Database (users_tokens) mein bhejenge
               database.ref('users_tokens/' + currentToken.replace(/\./g, '_')).set({
                 token: currentToken,
                 last_active: new Date().toString()
               }).then(() => {
-                console.log("Database mein token save ho gaya!");
+                console.log("Token Database mein save ho gaya!");
               });
             }
           })
-          .catch((err) => console.log('Token error:', err));
+          .catch((err) => {
+            console.log('Token nikalne mein galti:', err);
+          });
         }
       });
+    }).catch(function(err) {
+      console.log("SW Registration fail:", err);
     });
 }
 
