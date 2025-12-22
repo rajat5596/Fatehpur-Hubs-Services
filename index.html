@@ -303,16 +303,91 @@
 <script src="promo.js"></script>
             <!-- notification.js include karo -->
 <script src="notification.js?v=1"></script>
+<!-- Service Worker Registration FIX -->
 <script>
+// Fix for Service Worker registration
+document.addEventListener('DOMContentLoaded', function() {
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js').then(function(registration) {
-        console.log('SW registered with scope:', registration.scope);
-      }, function(err) {
-        console.log('SW registration failed:', err);
-      });
-    });
+    // Wait 2 seconds for page to load completely
+    setTimeout(function() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(function(registration) {
+          console.log('✅ Service Worker registered with scope:', registration.scope);
+          console.log('✅ Service Worker state:', registration.active ? 'Active' : 'Installing');
+          
+          // Force update
+          registration.update();
+          
+          // Show notification button after SW is registered
+          setTimeout(showNotificationButton, 1000);
+        })
+        .catch(function(error) {
+          console.log('❌ Service Worker registration failed:', error);
+          
+          // Try alternative path
+          navigator.serviceWorker.register('/sw.js', { scope: './' })
+            .then(function(reg) {
+              console.log('✅ Service Worker registered with ./ scope');
+            })
+            .catch(function(err) {
+              console.log('❌ Alternative registration also failed:', err);
+            });
+        });
+    }, 2000);
+  } else {
+    console.log('❌ Service Worker not supported in this browser');
   }
+});
+
+// Function to show notification button
+function showNotificationButton() {
+  console.log('Showing notification button...');
+  
+  // If notifications already allowed, don't show button
+  if (Notification.permission === "granted") {
+    console.log('✅ Notifications already enabled');
+    return;
+  }
+  
+  // Create button if not exists
+  if (!document.getElementById('notif-btn') && Notification.permission === "default") {
+    const button = document.createElement('button');
+    button.id = 'notif-btn';
+    button.innerHTML = '🔔 नोटिफिकेशन चालू करें';
+    button.style.cssText = `
+      position: fixed;
+      top: 70px;
+      right: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 99999;
+      font-weight: bold;
+      font-size: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    `;
+    
+    button.onclick = function() {
+      Notification.requestPermission().then(function(permission) {
+        if (permission === "granted") {
+          alert('✅ Notifications enabled!');
+          button.style.display = 'none';
+          // Send test notification
+          new Notification('Fatehpur Hubs', {
+            body: 'अब आपको नई सेवाओं और नौकरियों के अपडेट मिलेंगे!',
+            icon: '/icons/icon-192x192.png'
+          });
+        }
+      });
+    };
+    
+    document.body.appendChild(button);
+    console.log('✅ Notification button created');
+  }
+}
 </script>
             
 </body>
