@@ -1,10 +1,10 @@
-// ============== FIREBASE CLOUD MESSAGING SETUP ==============
-// Add this code to your existing sw.js file
+// sw.js - Service Worker for Fatehpur Hubs
 
+// ============== FIREBASE CLOUD MESSAGING SETUP ==============
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
 
-// Firebase configuration (SAME as your index.html)
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
   authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
@@ -25,7 +25,6 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload) {
   console.log('[sw.js] Background message received:', payload);
 
-  // Customize notification here
   const notificationTitle = payload.notification?.title || 'Fatehpur Hubs';
   const notificationOptions = {
     body: payload.notification?.body || 'New update available',
@@ -34,28 +33,22 @@ messaging.onBackgroundMessage(function(payload) {
     data: payload.data || {}
   };
 
-  // Show notification
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Notification click handler
 self.addEventListener('notificationclick', function(event) {
-  console.log('[sw.js] Notification clicked:', event);
-  
   event.notification.close();
   
-  // Open the app when notification is clicked
   event.waitUntil(
     clients.matchAll({type: 'window', includeUncontrolled: true})
       .then(function(clientList) {
-        // If app is already open, focus it
         for (var i = 0; i < clientList.length; i++) {
           var client = clientList[i];
           if (client.url === '/' && 'focus' in client) {
             return client.focus();
           }
         }
-        // Otherwise open new window
         if (clients.openWindow) {
           return clients.openWindow('/');
         }
@@ -63,4 +56,4 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
-console.log('[sw.js] Firebase Cloud Messaging loaded successfully');
+console.log('[sw.js] Service Worker loaded successfully');
