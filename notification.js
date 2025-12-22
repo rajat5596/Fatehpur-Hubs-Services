@@ -1,9 +1,2 @@
-// notification.js - SIRF YEH 5 LINE DAALO
-alert("Notification system testing...");
-
-function enableNotifications() {
-    alert("Enable button clicked!");
-    Notification.requestPermission();
-}
-
-enableNotifications();
+// notification.js - SIRF YEH 1 LINE
+alert("HELLO FROM NOTIFICATION.JS!");.
