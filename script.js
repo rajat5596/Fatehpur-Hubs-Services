@@ -701,19 +701,3 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-console.log("Script file load ho gayi hai!");
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-  authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-  databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "fatehpur-hubs-a3a9f",
-  storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-  messagingSenderId: "294360741451",
-  appId: "1:294360741451:web:3bc85078805750b9fabfce"
-};
-
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-console.log("Firebase initialize ho gaya!");
