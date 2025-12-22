@@ -689,58 +689,15 @@ window.onload = () => {
     };
 }; // window.onload का क्लोजिंग ब्रैकेट
 
-
-// 1. Firebase Configuration (Pura Setup)
-const firebaseConfig = {
-  apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
-  authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
-  databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "fatehpur-hubs-a3a9f",
-  storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
-  messagingSenderId: "294360741451",
-  appId: "1:294360741451:web:3bc85078805750b9fabfce"
-};
-
-// Initialize Firebase agar pehle se nahi hai
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-const messaging = firebase.messaging();
-const database = firebase.database();
-
-// 2. Service Worker Register aur Token Setup
+// 5.4 Service Worker Registration (PWA)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(function(registration) {
-      console.log("Service Worker Registered!");
-      
-      // Notification Permission maangna
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          // Token nikalna aur Database mein save karna
-          messaging.getToken({ 
-            serviceWorkerRegistration: registration,
-            vapidKey: 'BEYn-5jHBhRiQBVY1ODA3f-xkWY1uJGGIf9tkehiu9kR3l8O86SmA-BqSTDcsaN5RjKUtbpu5u4-UYUHYTbjDQ' 
-          })
-          .then((currentToken) => {
-            if (currentToken) {
-              // Token ko Database (users_tokens) mein bhejenge
-              database.ref('users_tokens/' + currentToken.replace(/\./g, '_')).set({
-                token: currentToken,
-                last_active: new Date().toString()
-              }).then(() => {
-                console.log("Token Database mein save ho gaya!");
-              });
-            }
-          })
-          .catch((err) => {
-            console.log('Token nikalne mein galti:', err);
-          });
-        }
-      });
-    }).catch(function(err) {
-      console.log("SW Registration fail:", err);
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
     });
 }
-
