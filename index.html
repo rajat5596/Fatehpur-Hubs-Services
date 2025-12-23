@@ -254,22 +254,56 @@
                         </button>
                     </div>
                 </div>
-<!-- 5. DAILY DEALS SCREEN -->
+<!-- 5. DAILY DEALS SCREEN (COMPLETE SECTION) -->
 <div id="deals-screen" class="screen" style="display: none;">
     <div class="form-container">
-        <h3>🔥 Daily Deals & Offers in Fatehpur</h3>
-        <p style="text-align: center; color: #555; margin: 20px 0;">Shops, restaurants, salons aur tiffin walon ke naye offers yahan dekho! Coupon copy karo aur use karo.</p>
+        <h3 style="text-align: center; color: #2a5298; margin-bottom: 10px;">🔥 Daily Deals & Offers in Fatehpur</h3>
+        <p style="text-align: center; color: #555; margin: 10px 0;">Shops, restaurants, salons, tiffin walon ke naye offers yahan dekho! Coupon copy karo aur use karo.</p>
 
-        <!-- Deals list yahan load hogi -->
-        <div id="deals-list">
-            <p style="text-align: center; color: #777;">Abhi koi offers nahi hain. Shops apne offers jaldi daal denge!</p>
+        <!-- Deals List (Yahan se deals load honge) -->
+        <div id="deals-list" style="margin: 20px 0;">
+            <p style="text-align: center; color: #777; font-size: 1.1rem;">Abhi koi offers nahi hain. Shops apne offers jaldi daal denge!</p>
         </div>
 
-        <!-- Add Deal Button (baad mein active karenge) -->
-        <button class="main-btn" style="margin: 20px auto; display: block; background-color: #ff5722;" onclick="alert('Offers daalne ka form jaldi aayega!')">
-            Apna Offer Daalo (Coming Soon)
-        </button>
+        <!-- Add Offer Form -->
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <h4 style="text-align: center; color: #ff5722;">Apna Offer Daalo (Free)</h4>
+            <form id="dealForm" onsubmit="event.preventDefault(); registerDeal();">
+                <div class="form-field">
+                    <label for="shopName">Shop / Vendor Ka Naam</label>
+                    <input type="text" id="shopName" placeholder="Jaise: Sharma Salon" required>
+                </div>
+                <div class="form-field">
+                    <label for="dealTitle">Offer Title</label>
+                    <input type="text" id="dealTitle" placeholder="Jaise: 50% Off Haircut" required>
+                </div>
+                <div class="form-field">
+                    <label for="dealDescription">Details / Valid Till</label>
+                    <textarea id="dealDescription" rows="4" placeholder="Kya offer hai, kab tak chalega..." required></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="dealCategory">Category</label>
+                    <select id="dealCategory" required>
+                        <option value="">-- Select --</option>
+                        <option value="Food/Tiffin">Food & Tiffin</option>
+                        <option value="Salon/Beauty">Salon & Beauty</option>
+                        <option value="Restaurant">Restaurant</option>
+                        <option value="Recharge/Bill">Recharge & Bill Pay</option>
+                        <option value="Clothing">Clothing & Shopping</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label for="dealPhone">WhatsApp Number</label>
+                    <input type="number" id="dealPhone" maxlength="10" placeholder="10 digit number" required>
+                </div>
+                <button type="submit" class="submit-btn" style="background-color: #4CAF50; width: 100%; margin-top: 15px;">
+                    Offer Daalo (Free)
+                </button>
+            </form>
+        </div>
     </div>
+</div>
 </div>
             </div>
         
