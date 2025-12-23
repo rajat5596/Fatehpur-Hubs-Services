@@ -741,3 +741,56 @@ function registerDeal() {
         console.error("Save error:", error);
     });
     }
+// Daily Deals List Load Karne Ka Function
+function loadDeals() {
+    const dealsList = document.getElementById('deals-list');
+    if (!dealsList) return; // Agar screen nahi khula toh skip
+
+    const db = firebase.database();
+    const dealsRef = db.ref('deals');
+
+    dealsRef.orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
+        dealsList.innerHTML = ''; // Purana content clear kar do
+
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const deal = childSnapshot.val();
+
+                const dealCard = document.createElement('div');
+                dealCard.style.cssText = 'background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
+
+                dealCard.innerHTML = `
+                    <h4 style="margin: 0; color: #2a5298;">${deal.title}</h4>
+                    <p style="margin: 5px 0; color: #555;"><strong>Shop:</strong> ${deal.shopName}</p>
+                    <p style="margin: 5px 0; color: #555;"><strong>Details:</strong> ${deal.description}</p>
+                    <p style="margin: 5px 0; color: #777;"><strong>Category:</strong> ${deal.category}</p>
+                    <p style="margin: 10px 0; color: #4CAF50; font-weight: bold;">Contact: <a href="https://wa.me/91${deal.phone}" target="_blank" style="color: #25D366;">WhatsApp pe baat karo</a></p>
+                `;
+
+                dealsList.appendChild(dealCard);
+            });
+        } else {
+            dealsList.innerHTML = '<p style="text-align: center; color: #777;">Abhi koi offers nahi hain. Apna offer daal do!</p>';
+        }
+    });
+}
+
+// Deals screen khulte hi load karo
+window.addEventListener('load', () => {
+    // Agar deals-screen active hai toh load karo
+    const dealsScreen = document.getElementById('deals-screen');
+    if (dealsScreen && dealsScreen.style.display !== 'none') {
+        loadDeals();
+    }
+});
+
+// Screen change hone par bhi load karo (tera showScreen function mein call karna)
+function showScreen(screenId) {
+    // Tera purana showScreen code yahan rahega
+    // ... (tera existing code)
+
+    // Extra: Agar deals screen khula toh load kar do
+    if (screenId === 'deals-screen') {
+        loadDeals();
+    }
+}
