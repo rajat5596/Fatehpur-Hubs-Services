@@ -856,3 +856,16 @@ setTimeout(function() {
     window.registerDeal = registerDeal;
     window.loadDeals = loadDeals;
 }, 2000);
+// ============ DAILY DEALS SIMPLE FIX ============
+
+// Fix for Daily Deals screen
+window.showDealsScreen = function() {
+    showScreen('deals-screen');
+    document.getElementById('deals-list').innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Daily Deals coming soon!</p>';
+};
+
+// Simple register deal function
+window.registerDeal = function() {
+    alert("Daily Deals feature coming soon!");
+    return false;
+};
