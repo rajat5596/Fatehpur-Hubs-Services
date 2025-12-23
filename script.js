@@ -553,12 +553,13 @@ window.startFirebaseListener = () => {
 window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
 window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
 
-window.showScreen = (id) => {
+function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if(id === 'jobs-screen') loadJobs();
-    if(id === 'home-screen') loadCategories(); 
-};
+    if (id === 'jobs-screen') loadJobs();
+    if (id === 'home-screen') loadCategories();
+    if (id === 'deals-screen') loadDeals();  // ← Yeh line add kar dena
+}
 
 window.logOut = () => {
     firebase.auth().signOut().then(() => {
@@ -784,13 +785,4 @@ window.addEventListener('load', () => {
     }
 });
 
-// Screen change hone par bhi load karo (tera showScreen function mein call karna)
-function showScreen(screenId) {
-    // Tera purana showScreen code yahan rahega
-    // ... (tera existing code)
 
-    // Extra: Agar deals screen khula toh load kar do
-    if (screenId === 'deals-screen') {
-        loadDeals();
-    }
-}
