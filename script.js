@@ -701,3 +701,43 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+// Daily Deals - Offer Daalne Ka Function
+function registerDeal() {
+    // Form se data le lo
+    const shopName = document.getElementById('shopName').value.trim();
+    const dealTitle = document.getElementById('dealTitle').value.trim();
+    const dealDescription = document.getElementById('dealDescription').value.trim();
+    const dealCategory = document.getElementById('dealCategory').value;
+    const dealPhone = document.getElementById('dealPhone').value.trim();
+
+    // Check karo sab filled hai
+    if (!shopName || !dealTitle || !dealDescription || !dealCategory || !dealPhone) {
+        alert("Sab fields bharo bhai!");
+        return;
+    }
+
+    if (dealPhone.length !== 10) {
+        alert("10 digit phone number daalo!");
+        return;
+    }
+
+    // Firebase mein save karo
+    const db = firebase.database();
+    const dealsRef = db.ref('deals').push(); // Naya unique key bana dega
+
+    dealsRef.set({
+        shopName: shopName,
+        title: dealTitle,
+        description: dealDescription,
+        category: dealCategory,
+        phone: dealPhone,
+        timestamp: Date.now(),
+        validTill: new Date(Date.now() + 7*24*60*60*1000).toISOString() // Default 7 din valid
+    }).then(() => {
+        alert("Offer successfully daal diya! Jaldi live ho jayega.");
+        document.getElementById('dealForm').reset(); // Form clear kar do
+    }).catch((error) => {
+        alert("Error: " + error.message);
+        console.error("Save error:", error);
+    });
+    }
