@@ -156,20 +156,27 @@ function initializeFirebaseMessaging() {
 
 function saveFCMTokenToDatabase(token) {
     try {
-        const userId = localStorage.getItem('user_uid') || 'anonymous_' + Date.now();
         const db = firebase.database();
+        // Anonymous user ID banayenge
+        let userId = localStorage.getItem('fcm_user_id');
+        if (!userId) {
+            userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('fcm_user_id', userId);
+        }
+
         const tokenRef = db.ref('fcm_tokens/' + userId);
-        
-        const tokenData = {
+
+        tokenRef.set({
             token: token,
-            userId: userId,
-            timestamp: Date.now()
-        };
-        
-        tokenRef.set(tokenData);
-        console.log('✅ Token saved to Firebase');
-    } catch (error) {
-        console.error('Error saving token:', error);
+            device: navigator.userAgent, // device info
+            lastSeen: Date.now()
+        }).then(() => {
+            console.log('✅ Token successfully saved to Firebase!');
+        }).catch((error) => {
+            console.error('❌ Token save failed:', error);
+        });
+    } catch (err) {
+        console.error('Error in save function:', err);
     }
 }
 
