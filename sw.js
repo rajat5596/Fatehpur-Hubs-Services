@@ -1,45 +1,48 @@
-// sw.js - SIMPLE Service Worker
-console.log('✅ Service Worker installed');
+// sw.js - Fatehpur Hubs Push Notification Support
 
-// Listen for install event
-self.addEventListener('install', function(event) {
-  console.log('✅ Service Worker installing...');
-  self.skipWaiting(); // Force activation
+console.log('✅ Service Worker started');
+
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+
+// 🔥 Yahan apni Firebase config paste kar do (script.js ya notification.js se copy kar lo)
+firebase.initializeApp({
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 });
 
-// Listen for activate event
-self.addEventListener('activate', function(event) {
-  console.log('✅ Service Worker activated');
-  event.waitUntil(self.clients.claim()); // Take control immediately
+const messaging = firebase.messaging();
+
+// Yeh background mein notification dikha dega
+messaging.onBackgroundMessage((payload) => {
+  console.log('Background notification mila:', payload);
+
+  const title = payload.notification?.title || 'Fatehpur Hubs';
+  const options = {
+    body: payload.notification?.body || 'Naya update aaya!',
+    icon: 'https://www.fatehpurhubs.co.in/icons/icon-192x192.png'
+  };
+
+  return self.registration.showNotification(title, options);
 });
 
-// Basic fetch handler (required for PWA)
-self.addEventListener('fetch', function(event) {
-  // Let browser handle normally
-  return;
+// Tumhara purana code yahan se
+self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
+  self.skipWaiting();
 });
 
-// Notification click handler
-self.addEventListener('notificationclick', function(event) {
-  console.log('Notification clicked');
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activated');
+  event.waitUntil(self.clients.claim());
+});
+
+self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
-  event.waitUntil(
-    clients.matchAll({type: 'window', includeUncontrolled: true})
-    .then(function(clientList) {
-      // Focus existing app window
-      for (var i = 0; i < clientList.length; i++) {
-        var client = clientList[i];
-        if (client.url.includes('fatehpurhubs') && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // Open new window
-      if (clients.openWindow) {
-        return clients.openWindow('/');
-      }
-    })
-  );
+  event.waitUntil(clients.openWindow('/'));
 });
-
-console.log('✅ Service Worker code loaded');
