@@ -558,7 +558,9 @@ function showScreen(id) {
     document.getElementById(id).classList.add('active');
     if (id === 'jobs-screen') loadJobs();
     if (id === 'home-screen') loadCategories();
-    if (id === 'deals-screen') loadDeals();  // ← Yeh line add kar dena
+    if (id === 'deals-screen') {
+        setTimeout(loadDeals, 500);  // Yeh line add kar do
+    }
 }
 
 window.logOut = () => {
@@ -742,47 +744,60 @@ function registerDeal() {
         console.error("Save error:", error);
     });
     }
-// Daily Deals List Load Karne Ka Function
+// Daily Deals List Load Karne Ka Function (Improved)
 function loadDeals() {
     const dealsList = document.getElementById('deals-list');
-    if (!dealsList) return; // Agar screen nahi khula toh skip
+    if (!dealsList) {
+        console.log("Deals list element nahi mila");
+        return;
+    }
+
+    dealsList.innerHTML = '<p style="text-align: center; color: #777;">Loading offers...</p>'; // Loading message
 
     const db = firebase.database();
     const dealsRef = db.ref('deals');
 
-    dealsRef.orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
-        dealsList.innerHTML = ''; // Purana content clear kar do
+    dealsRef.orderByChild('timestamp').limitToLast(50).once('value', (snapshot) => {
+        dealsList.innerHTML = ''; // Clear
 
-        if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-                const deal = childSnapshot.val();
-
-                const dealCard = document.createElement('div');
-                dealCard.style.cssText = 'background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
-
-                dealCard.innerHTML = `
-                    <h4 style="margin: 0; color: #2a5298;">${deal.title}</h4>
-                    <p style="margin: 5px 0; color: #555;"><strong>Shop:</strong> ${deal.shopName}</p>
-                    <p style="margin: 5px 0; color: #555;"><strong>Details:</strong> ${deal.description}</p>
-                    <p style="margin: 5px 0; color: #777;"><strong>Category:</strong> ${deal.category}</p>
-                    <p style="margin: 10px 0; color: #4CAF50; font-weight: bold;">Contact: <a href="https://wa.me/91${deal.phone}" target="_blank" style="color: #25D366;">WhatsApp pe baat karo</a></p>
-                `;
-
-                dealsList.appendChild(dealCard);
-            });
-        } else {
-            dealsList.innerHTML = '<p style="text-align: center; color: #777;">Abhi koi offers nahi hain. Apna offer daal do!</p>';
+        if (!snapshot.exists()) {
+            dealsList.innerHTML = '<p style="text-align: center; color: #777; font-size: 1.1rem;">Abhi koi offers nahi hain. Apna offer daal do!</p>';
+            return;
         }
+
+        const deals = [];
+        snapshot.forEach((child) => {
+            const deal = child.val();
+            if (deal && deal.title) {
+                deals.push(deal);
+            }
+        });
+
+        if (deals.length === 0) {
+            dealsList.innerHTML = '<p style="text-align: center; color: #777;">No valid offers found.</p>';
+            return;
+        }
+
+        deals.reverse(); // Latest first
+
+        deals.forEach((deal) => {
+            const dealCard = document.createElement('div');
+            dealCard.style.cssText = 'background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
+
+            dealCard.innerHTML = `
+                <h4 style="margin: 0; color: #2a5298;">${deal.title}</h4>
+                <p style="margin: 5px 0; color: #555;"><strong>Shop:</strong> ${deal.shopName || 'Unknown'}</p>
+                <p style="margin: 5px 0; color: #555;"><strong>Details:</strong> ${deal.description || ''}</p>
+                <p style="margin: 5px 0; color: #777;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
+                <p style="margin: 10px 0; color: #4CAF50; font-weight: bold;">
+                    Contact: <a href="https://wa.me/91${deal.phone}" target="_blank" style="color: #25D366;">WhatsApp pe baat karo</a>
+                </p>
+            `;
+
+            dealsList.appendChild(dealCard);
+        });
+    }).catch((error) => {
+        dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading offers: ' + error.message + '</p>';
+        console.error("Deals load error:", error);
     });
 }
-
-// Deals screen khulte hi load karo
-window.addEventListener('load', () => {
-    // Agar deals-screen active hai toh load karo
-    const dealsScreen = document.getElementById('deals-screen');
-    if (dealsScreen && dealsScreen.style.display !== 'none') {
-        loadDeals();
-    }
-});
-
-
