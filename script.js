@@ -744,60 +744,59 @@ function registerDeal() {
         console.error("Save error:", error);
     });
     }
-// Daily Deals List Load Karne Ka Function (Improved)
+// Final loadDeals - White screen fix + better error handling
 function loadDeals() {
     const dealsList = document.getElementById('deals-list');
     if (!dealsList) {
-        console.log("Deals list element nahi mila");
+        console.log('Deals list element nahi mila');
         return;
     }
 
-    dealsList.innerHTML = '<p style="text-align: center; color: #777;">Loading offers...</p>'; // Loading message
+    dealsList.innerHTML = '<p style="text-align: center; color: #777;">Loading offers, please wait...</p>';
 
     const db = firebase.database();
     const dealsRef = db.ref('deals');
 
-    dealsRef.orderByChild('timestamp').limitToLast(50).once('value', (snapshot) => {
-        dealsList.innerHTML = ''; // Clear
+    dealsRef.once('value').then((snapshot) => {
+        dealsList.innerHTML = '';
 
-        if (!snapshot.exists()) {
+        if (!snapshot.exists() || !snapshot.hasChildren()) {
             dealsList.innerHTML = '<p style="text-align: center; color: #777; font-size: 1.1rem;">Abhi koi offers nahi hain. Apna offer daal do!</p>';
             return;
         }
 
-        const deals = [];
+        const dealsArray = [];
         snapshot.forEach((child) => {
             const deal = child.val();
-            if (deal && deal.title) {
-                deals.push(deal);
+            if (deal && deal.title && deal.shopName) {
+                dealsArray.push(deal);
             }
         });
 
-        if (deals.length === 0) {
+        if (dealsArray.length === 0) {
             dealsList.innerHTML = '<p style="text-align: center; color: #777;">No valid offers found.</p>';
             return;
         }
 
-        deals.reverse(); // Latest first
+        // Latest first
+        dealsArray.sort((a, b) => b.timestamp - a.timestamp);
 
-        deals.forEach((deal) => {
-            const dealCard = document.createElement('div');
-            dealCard.style.cssText = 'background: white; border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
+        dealsArray.forEach((deal) => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
 
-            dealCard.innerHTML = `
-                <h4 style="margin: 0; color: #2a5298;">${deal.title}</h4>
-                <p style="margin: 5px 0; color: #555;"><strong>Shop:</strong> ${deal.shopName || 'Unknown'}</p>
-                <p style="margin: 5px 0; color: #555;"><strong>Details:</strong> ${deal.description || ''}</p>
-                <p style="margin: 5px 0; color: #777;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
-                <p style="margin: 10px 0; color: #4CAF50; font-weight: bold;">
-                    Contact: <a href="https://wa.me/91${deal.phone}" target="_blank" style="color: #25D366;">WhatsApp pe baat karo</a>
-                </p>
+            card.innerHTML = `
+                <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
+                <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName}</p>
+                <p style="margin: 5px 0; color: #444;"><strong>Details:</strong> ${deal.description || ''}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
+                <a href="https://wa.me/91${deal.phone}" style="color: #25D366; font-weight: bold; text-decoration: none;">WhatsApp pe contact karo</a>
             `;
 
-            dealsList.appendChild(dealCard);
+            dealsList.appendChild(card);
         });
     }).catch((error) => {
-        dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading offers: ' + error.message + '</p>';
-        console.error("Deals load error:", error);
+        dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading: ' + error.message + '</p>';
+        console.error('Deals load error:', error);
     });
 }
