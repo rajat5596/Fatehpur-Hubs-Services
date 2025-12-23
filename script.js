@@ -704,103 +704,8 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-// Daily Deals - Offer Daalne Ka Function
-function registerDeal() {
-    // Form se data le lo
-    const shopName = document.getElementById('shopName').value.trim();
-    const dealTitle = document.getElementById('dealTitle').value.trim();
-    const dealDescription = document.getElementById('dealDescription').value.trim();
-    const dealCategory = document.getElementById('dealCategory').value;
-    const dealPhone = document.getElementById('dealPhone').value.trim();
 
-    // Check karo sab filled hai
-    if (!shopName || !dealTitle || !dealDescription || !dealCategory || !dealPhone) {
-        alert("Sab fields bharo bhai!");
-        return;
-    }
-
-    if (dealPhone.length !== 10) {
-        alert("10 digit phone number daalo!");
-        return;
-    }
-
-    // Firebase mein save karo
-    const db = firebase.database();
-    const dealsRef = db.ref('deals').push(); // Naya unique key bana dega
-
-    dealsRef.set({
-        shopName: shopName,
-        title: dealTitle,
-        description: dealDescription,
-        category: dealCategory,
-        phone: dealPhone,
-        timestamp: Date.now(),
-        validTill: new Date(Date.now() + 7*24*60*60*1000).toISOString() // Default 7 din valid
-    }).then(() => {
-        alert("Offer successfully daal diya! Jaldi live ho jayega.");
-        document.getElementById('dealForm').reset(); // Form clear kar do
-    }).catch((error) => {
-        alert("Error: " + error.message);
-        console.error("Save error:", error);
-    });
-    }
-// Final loadDeals - White screen fix + better error handling
-function loadDeals() {
-    const dealsList = document.getElementById('deals-list');
-    if (!dealsList) {
-        console.log('Deals list element nahi mila');
-        return;
-    }
-
-    dealsList.innerHTML = '<p style="text-align: center; color: #777;">Loading offers, please wait...</p>';
-
-    const db = firebase.database();
-    const dealsRef = db.ref('deals');
-
-    dealsRef.once('value').then((snapshot) => {
-        dealsList.innerHTML = '';
-
-        if (!snapshot.exists() || !snapshot.hasChildren()) {
-            dealsList.innerHTML = '<p style="text-align: center; color: #777; font-size: 1.1rem;">Abhi koi offers nahi hain. Apna offer daal do!</p>';
-            return;
-        }
-
-        const dealsArray = [];
-        snapshot.forEach((child) => {
-            const deal = child.val();
-            if (deal && deal.title && deal.shopName) {
-                dealsArray.push(deal);
-            }
-        });
-
-        if (dealsArray.length === 0) {
-            dealsList.innerHTML = '<p style="text-align: center; color: #777;">No valid offers found.</p>';
-            return;
-        }
-
-        // Latest first
-        dealsArray.sort((a, b) => b.timestamp - a.timestamp);
-
-        dealsArray.forEach((deal) => {
-            const card = document.createElement('div');
-            card.style.cssText = 'background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
-
-            card.innerHTML = `
-                <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
-                <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName}</p>
-                <p style="margin: 5px 0; color: #444;"><strong>Details:</strong> ${deal.description || ''}</p>
-                <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
-                <a href="https://wa.me/91${deal.phone}" style="color: #25D366; font-weight: bold; text-decoration: none;">WhatsApp pe contact karo</a>
-            `;
-
-            dealsList.appendChild(card);
-        });
-    }).catch((error) => {
-        dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading: ' + error.message + '</p>';
-        console.error('Deals load error:', error);
-    });
-}
-// ============ DAILY DEALS - FIREBASE READY CHECK ============
+// ============ DAILY DEALS - COMPLETE CODE ============
 
 // Function ko globally register karne se pehle Firebase check karo
 function initializeDealsFunctions() {
@@ -1044,7 +949,7 @@ function registerDeal() {
                 setTimeout(loadDeals, 1000);
             }
             
-        }).catch((error) => {
+        }).catch((error) {
             alert("❌ Error saving: " + error.message);
             console.error("Save error:", error);
             
@@ -1061,4 +966,4 @@ function registerDeal() {
     }
     
     return true;
-}
+                                                           }
