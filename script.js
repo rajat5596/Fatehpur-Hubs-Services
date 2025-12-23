@@ -704,4 +704,155 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+// ============ FIXED DAILY DEALS CODE ============
 
+// Auto-load deals when deals screen opens
+window.showDealsScreen = function() {
+    console.log("showDealsScreen called");
+    showScreen('deals-screen');
+    
+    // Wait for screen to load then load deals
+    setTimeout(function() {
+        if (document.getElementById('deals-list')) {
+            console.log("Loading deals now...");
+            loadDeals();
+        } else {
+            console.error("deals-list element not found");
+        }
+    }, 300);
+};
+
+// Load deals from Firebase
+function loadDeals() {
+    console.log("loadDeals function called");
+    
+    const dealsList = document.getElementById('deals-list');
+    if (!dealsList) {
+        console.error("deals-list element not found");
+        return;
+    }
+    
+    dealsList.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">Loading offers...</p>';
+    
+    // Check Firebase
+    if (typeof firebase === 'undefined' || !firebase.database) {
+        console.error("Firebase not available");
+        dealsList.innerHTML = '<p style="text-align: center; color: red;">Firebase not loaded</p>';
+        return;
+    }
+    
+    try {
+        const db = firebase.database();
+        const dealsRef = db.ref('deals');
+        
+        dealsRef.once('value').then((snapshot) => {
+            console.log("Firebase data received:", snapshot.exists());
+            
+            dealsList.innerHTML = '';
+            
+            if (!snapshot.exists()) {
+                dealsList.innerHTML = '<p style="text-align: center; color: #777; padding: 40px;">Abhi koi offers nahi hain</p>';
+                return;
+            }
+            
+            snapshot.forEach((child) => {
+                const deal = child.val();
+                if (deal && deal.title) {
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: white;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin: 10px 0;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                    `;
+                    
+                    card.innerHTML = `
+                        <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
+                        <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName || 'Unknown'}</p>
+                        <p style="margin: 5px 0; color: #444;">${deal.description || ''}</p>
+                        <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
+                        <a href="https://wa.me/91${deal.phone}" 
+                           style="color: #25D366; font-weight: bold; text-decoration: none;">
+                            WhatsApp Contact
+                        </a>
+                    `;
+                    
+                    dealsList.appendChild(card);
+                }
+            });
+            
+        }).catch((error) => {
+            console.error("Error loading deals:", error);
+            dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading offers</p>';
+        });
+        
+    } catch (error) {
+        console.error("Exception in loadDeals:", error);
+        dealsList.innerHTML = '<p style="text-align: center; color: red;">System error</p>';
+    }
+}
+
+// Register deal function
+function registerDeal() {
+    console.log("registerDeal called");
+    
+    // Get form values
+    const shopName = document.getElementById('shopName')?.value.trim() || '';
+    const dealTitle = document.getElementById('dealTitle')?.value.trim() || '';
+    const dealDescription = document.getElementById('dealDescription')?.value.trim() || '';
+    const dealCategory = document.getElementById('dealCategory')?.value || '';
+    const dealPhone = document.getElementById('dealPhone')?.value.trim() || '';
+    
+    // Validation
+    if (!shopName || !dealTitle || !dealDescription || !dealCategory || !dealPhone) {
+        alert("Sab fields bharo!");
+        return false;
+    }
+    
+    if (dealPhone.length !== 10) {
+        alert("10 digit phone number daalo!");
+        return false;
+    }
+    
+    try {
+        const db = firebase.database();
+        const dealsRef = db.ref('deals').push();
+        
+        const dealData = {
+            shopName: shopName,
+            title: dealTitle,
+            description: dealDescription,
+            category: dealCategory,
+            phone: dealPhone,
+            timestamp: Date.now()
+        };
+        
+        dealsRef.set(dealData).then(() => {
+            alert("Offer added successfully!");
+            document.getElementById('dealForm')?.reset();
+            
+            // Reload deals if on deals screen
+            if (document.getElementById('deals-screen')?.style.display !== 'none') {
+                setTimeout(loadDeals, 1000);
+            }
+            
+        }).catch((error) => {
+            alert("Error: " + error.message);
+        });
+        
+    } catch (error) {
+        alert("System error");
+        console.error(error);
+    }
+    
+    return false; // Prevent form submission
+}
+
+// Initialize when page loads
+setTimeout(function() {
+    console.log("Daily Deals system ready");
+    window.registerDeal = registerDeal;
+    window.loadDeals = loadDeals;
+}, 2000);
