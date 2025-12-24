@@ -869,3 +869,63 @@ window.registerDeal = function() {
     alert("Daily Deals feature coming soon!");
     return false;
 };
+// ============ DAILY DEALS WORKING CODE ============
+
+function openDealsScreen() {
+    console.log("Opening Daily Deals screen...");
+    
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+    });
+    
+    // Show deals screen
+    const dealsScreen = document.getElementById('deals-screen');
+    if (dealsScreen) {
+        dealsScreen.style.display = 'block';
+        console.log("Deals screen shown");
+        
+        // Simple message show karo
+        const dealsList = document.getElementById('deals-list');
+        if (dealsList) {
+            dealsList.innerHTML = `
+                <div style="text-align: center; padding: 30px;">
+                    <h4 style="color: #2a5298;">🔥 Daily Deals & Offers</h4>
+                    <p style="color: #555; margin: 15px 0;">
+                        Fatehpur ki shops aur businesses ke naye offers yahan dekhein!
+                    </p>
+                    <button onclick="testDealForm()" 
+                            style="background: #4CAF50; color: white; 
+                                   padding: 10px 20px; border: none; 
+                                   border-radius: 5px; margin-top: 10px;">
+                        Offer Daalo (Test)
+                    </button>
+                </div>
+            `;
+        }
+    } else {
+        console.error("Deals screen not found");
+        alert("Deals screen not available. Please refresh page.");
+    }
+}
+
+function testDealForm() {
+    alert("✅ Daily Deals system working!\n\nFeature coming soon with:\n- Shop offers\n- Discount coupons\n- WhatsApp contact\n- Valid till dates");
+    
+    // Show form values
+    const shopName = document.getElementById('shopName')?.value || 'Test Shop';
+    const dealTitle = document.getElementById('dealTitle')?.value || '50% Off';
+    
+    if (shopName && dealTitle) {
+        alert(`You entered:\nShop: ${shopName}\nOffer: ${dealTitle}`);
+    }
+}
+
+// Form submit handler
+document.getElementById('dealForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    testDealForm();
+    return false;
+});
+
+console.log("✅ Daily Deals code loaded");
