@@ -753,31 +753,34 @@ function registerDeal() {
         return false;
     }
     
-    // Save to Firebase
-    if (typeof firebase !== 'undefined' && firebase.database) {
-        const db = firebase.database();
-        db.ref('deals').push({
-            shopName: shopName,
-            title: dealTitle,
-            description: dealDesc,
-            category: category,
-            phone: phone,
-            timestamp: Date.now()
-        }).then(() => {
-            alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}\n\nAb sab users ko ye offer dikhega!`);
-            document.getElementById('dealForm').reset();
-            
-            // Auto-reload deals
-            if (document.getElementById('deals-screen').style.display === 'block') {
-                loadDeals(); // Call your existing loadDeals function
-            }
-        }).catch(error => {
-            alert("Error saving: " + error.message);
-        });
-    } else {
-        alert(`✅ Form filled!\nShop: ${shopName}\nOffer: ${dealTitle}`);
-        document.getElementById('dealForm').reset();
+    // Get current user
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please login first!");
+        return false;
     }
+    
+    const db = firebase.database();
+    db.ref('deals').push({
+        shopName: shopName,
+        title: dealTitle,
+        description: dealDesc,
+        category: category,
+        phone: phone,
+        timestamp: Date.now(),
+        userId: user.uid  // ✅ IMPORTANT: Add userId for rules validation
+    }).then(() => {
+        alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}`);
+        document.getElementById('dealForm').reset();
+        
+        // Reload deals
+        if (document.getElementById('deals-screen').style.display === 'block') {
+            loadDeals();
+        }
+    }).catch(error => {
+        alert("Error: " + error.message);
+        console.error("Save error:", error);
+    });
     
     return false;
 }
