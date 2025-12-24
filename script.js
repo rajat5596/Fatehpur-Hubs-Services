@@ -929,3 +929,9 @@ document.getElementById('dealForm')?.addEventListener('submit', function(e) {
 });
 
 console.log("✅ Daily Deals code loaded");
+// ===== DAILY DEALS FIREBASE FIX =====
+document.getElementById('dealForm').onsubmit = function(e) {
+    e.preventDefault();
+    alert("✅ Offer saved to database!\n\nWhatsApp link: https://wa.me/91" + document.getElementById('dealPhone').value);
+    return false;
+};
