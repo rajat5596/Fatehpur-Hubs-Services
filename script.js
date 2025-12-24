@@ -797,47 +797,89 @@ function loadDeals() {
         return;
     }
     
+    // Check if user is logged in
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Please login to see deals</p>';
+        return;
+    }
+    
     const db = firebase.database();
-    db.ref('deals').once('value').then(snapshot => {
-        dealsList.innerHTML = '';
-        
-        if (!snapshot.exists()) {
-            dealsList.innerHTML = '<p style="text-align:center;color:#777;">Abhi koi offers nahi hain</p>';
-            return;
-        }
-        
-        snapshot.forEach(child => {
-            const deal = child.val();
-            const card = document.createElement('div');
-            card.style.cssText = `
-                background: white;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                padding: 15px;
-                margin: 10px 0;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            `;
+    
+    // ✅ FIXED: Remove userId filter, get ALL deals
+    db.ref('deals').orderByChild('timestamp').limitToLast(20).once('value')
+        .then(snapshot => {
+            dealsList.innerHTML = '';
             
-            card.innerHTML = `
-                <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
-                <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName}</p>
-                <p style="margin: 5px 0; color: #444;">${deal.description}</p>
-                <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category}</p>
-                <a href="https://wa.me/91${deal.phone}" 
-                   target="_blank"
-                   style="color: #25D366; font-weight: bold; text-decoration: none;">
-                    WhatsApp Contact
-                </a>
-            `;
+            if (!snapshot.exists()) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;">Abhi koi offers nahi hain</p>';
+                return;
+            }
             
-            dealsList.appendChild(card);
+            const dealsArray = [];
+            
+            // Collect all deals
+            snapshot.forEach(child => {
+                const deal = child.val();
+                if (deal && deal.title) {
+                    dealsArray.push({
+                        ...deal,
+                        id: child.key
+                    });
+                }
+            });
+            
+            // Sort by latest first
+            dealsArray.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Display deals
+            if (dealsArray.length === 0) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;">No deals found</p>';
+                return;
+            }
+            
+            dealsArray.forEach(deal => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                `;
+                
+                // Format date
+                const date = new Date(deal.timestamp);
+                const dateStr = date.toLocaleDateString('hi-IN');
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
+                        <span style="color:#666; font-size:0.8rem;">${dateStr}</span>
+                    </div>
+                    <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName}</p>
+                    <p style="margin: 5px 0; color: #444;">${deal.description}</p>
+                    <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category}</p>
+                    <a href="https://wa.me/91${deal.phone}" 
+                       target="_blank"
+                       style="color: #25D366; font-weight: bold; text-decoration: none;">
+                        WhatsApp Contact
+                    </a>
+                    ${deal.userId === user.uid ? '<span style="float:right;color:#2196F3;font-size:0.8rem;">(Your Offer)</span>' : ''}
+                `;
+                
+                dealsList.appendChild(card);
+            });
+            
+            // Add deal count
+            const countDiv = document.createElement('div');
+            countDiv.innerHTML = `<p style="text-align:center;color:#666;margin-top:10px;">${dealsArray.length} offers available</p>`;
+            dealsList.appendChild(countDiv);
+            
+        })
+        .catch(error => {
+            console.error("Error loading deals:", error);
+            dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
         });
-    });
 }
-
-// Make functions available globally
-window.openDealsNow = openDealsNow;
-window.registerDeal = registerDeal;
-window.loadDeals = loadDeals;
-
-console.log("✅ Daily Deals system fixed");
