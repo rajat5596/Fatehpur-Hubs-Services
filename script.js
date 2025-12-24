@@ -704,234 +704,77 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-// ============ FIXED DAILY DEALS CODE ============
 
-// Auto-load deals when deals screen opens
+// ============ DAILY DEALS - WORKING CODE ============
+
+// Show deals screen
 window.showDealsScreen = function() {
-    console.log("showDealsScreen called");
     showScreen('deals-screen');
-    
-    // Wait for screen to load then load deals
-    setTimeout(function() {
-        if (document.getElementById('deals-list')) {
-            console.log("Loading deals now...");
-            loadDeals();
-        } else {
-            console.error("deals-list element not found");
-        }
-    }, 300);
+    loadDeals();
 };
 
 // Load deals from Firebase
 function loadDeals() {
-    console.log("loadDeals function called");
-    
     const dealsList = document.getElementById('deals-list');
-    if (!dealsList) {
-        console.error("deals-list element not found");
+    if (!dealsList) return;
+    
+    dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Loading offers...</p>';
+    
+    if (typeof firebase === 'undefined') {
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
         return;
     }
     
-    dealsList.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">Loading offers...</p>';
-    
-    // Check Firebase
-    if (typeof firebase === 'undefined' || !firebase.database) {
-        console.error("Firebase not available");
-        dealsList.innerHTML = '<p style="text-align: center; color: red;">Firebase not loaded</p>';
-        return;
-    }
-    
-    try {
-        const db = firebase.database();
-        const dealsRef = db.ref('deals');
+    const db = firebase.database();
+    db.ref('deals').once('value').then(snapshot => {
+        dealsList.innerHTML = '';
         
-        dealsRef.once('value').then((snapshot) => {
-            console.log("Firebase data received:", snapshot.exists());
-            
-            dealsList.innerHTML = '';
-            
-            if (!snapshot.exists()) {
-                dealsList.innerHTML = '<p style="text-align: center; color: #777; padding: 40px;">Abhi koi offers nahi hain</p>';
-                return;
-            }
-            
-            snapshot.forEach((child) => {
-                const deal = child.val();
-                if (deal && deal.title) {
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: white;
-                        border: 1px solid #ddd;
-                        border-radius: 8px;
-                        padding: 15px;
-                        margin: 10px 0;
-                        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-                    `;
-                    
-                    card.innerHTML = `
-                        <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
-                        <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName || 'Unknown'}</p>
-                        <p style="margin: 5px 0; color: #444;">${deal.description || ''}</p>
-                        <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category || 'Other'}</p>
-                        <a href="https://wa.me/91${deal.phone}" 
-                           style="color: #25D366; font-weight: bold; text-decoration: none;">
-                            WhatsApp Contact
-                        </a>
-                    `;
-                    
-                    dealsList.appendChild(card);
-                }
-            });
-            
-        }).catch((error) => {
-            console.error("Error loading deals:", error);
-            dealsList.innerHTML = '<p style="text-align: center; color: red;">Error loading offers</p>';
+        if (!snapshot.exists()) {
+            dealsList.innerHTML = '<p style="text-align:center;color:#777;">Abhi koi offers nahi hain</p>';
+            return;
+        }
+        
+        snapshot.forEach(child => {
+            const deal = child.val();
+            const card = document.createElement('div');
+            card.innerHTML = `
+                <h4>${deal.title}</h4>
+                <p>Shop: ${deal.shopName}</p>
+                <p>${deal.description}</p>
+                <a href="https://wa.me/91${deal.phone}">WhatsApp</a>
+            `;
+            dealsList.appendChild(card);
         });
-        
-    } catch (error) {
-        console.error("Exception in loadDeals:", error);
-        dealsList.innerHTML = '<p style="text-align: center; color: red;">System error</p>';
-    }
+    });
 }
 
-// Register deal function
-function registerDeal() {
-    console.log("registerDeal called");
+// Submit deal to Firebase
+window.registerDeal = function() {
+    const shopName = document.getElementById('shopName').value;
+    const dealTitle = document.getElementById('dealTitle').value;
+    const phone = document.getElementById('dealPhone').value;
     
-    // Get form values
-    const shopName = document.getElementById('shopName')?.value.trim() || '';
-    const dealTitle = document.getElementById('dealTitle')?.value.trim() || '';
-    const dealDescription = document.getElementById('dealDescription')?.value.trim() || '';
-    const dealCategory = document.getElementById('dealCategory')?.value || '';
-    const dealPhone = document.getElementById('dealPhone')?.value.trim() || '';
-    
-    // Validation
-    if (!shopName || !dealTitle || !dealDescription || !dealCategory || !dealPhone) {
+    if (!shopName || !dealTitle || !phone) {
         alert("Sab fields bharo!");
         return false;
     }
     
-    if (dealPhone.length !== 10) {
-        alert("10 digit phone number daalo!");
+    if (typeof firebase === 'undefined') {
+        alert("Firebase loading...");
         return false;
     }
     
-    try {
-        const db = firebase.database();
-        const dealsRef = db.ref('deals').push();
-        
-        const dealData = {
-            shopName: shopName,
-            title: dealTitle,
-            description: dealDescription,
-            category: dealCategory,
-            phone: dealPhone,
-            timestamp: Date.now()
-        };
-        
-        dealsRef.set(dealData).then(() => {
-            alert("Offer added successfully!");
-            document.getElementById('dealForm')?.reset();
-            
-            // Reload deals if on deals screen
-            if (document.getElementById('deals-screen')?.style.display !== 'none') {
-                setTimeout(loadDeals, 1000);
-            }
-            
-        }).catch((error) => {
-            alert("Error: " + error.message);
-        });
-        
-    } catch (error) {
-        alert("System error");
-        console.error(error);
-    }
-    
-    return false; // Prevent form submission
-}
-
-// Initialize when page loads
-setTimeout(function() {
-    console.log("Daily Deals system ready");
-    window.registerDeal = registerDeal;
-    window.loadDeals = loadDeals;
-}, 2000);
-// ============ DAILY DEALS SIMPLE FIX ============
-
-// Fix for Daily Deals screen
-window.showDealsScreen = function() {
-    showScreen('deals-screen');
-    document.getElementById('deals-list').innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Daily Deals coming soon!</p>';
-};
-
-// Simple register deal function
-window.registerDeal = function() {
-    alert("Daily Deals feature coming soon!");
-    return false;
-};
-// ============ DAILY DEALS WORKING CODE ============
-
-function openDealsScreen() {
-    console.log("Opening Daily Deals screen...");
-    
-    // Hide all screens
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.style.display = 'none';
+    const db = firebase.database();
+    db.ref('deals').push({
+        shopName: shopName,
+        title: dealTitle,
+        phone: phone,
+        timestamp: Date.now()
+    }).then(() => {
+        alert("✅ Offer saved! WhatsApp: https://wa.me/91" + phone);
+        document.getElementById('dealForm').reset();
+        loadDeals();
     });
     
-    // Show deals screen
-    const dealsScreen = document.getElementById('deals-screen');
-    if (dealsScreen) {
-        dealsScreen.style.display = 'block';
-        console.log("Deals screen shown");
-        
-        // Simple message show karo
-        const dealsList = document.getElementById('deals-list');
-        if (dealsList) {
-            dealsList.innerHTML = `
-                <div style="text-align: center; padding: 30px;">
-                    <h4 style="color: #2a5298;">🔥 Daily Deals & Offers</h4>
-                    <p style="color: #555; margin: 15px 0;">
-                        Fatehpur ki shops aur businesses ke naye offers yahan dekhein!
-                    </p>
-                    <button onclick="testDealForm()" 
-                            style="background: #4CAF50; color: white; 
-                                   padding: 10px 20px; border: none; 
-                                   border-radius: 5px; margin-top: 10px;">
-                        Offer Daalo (Test)
-                    </button>
-                </div>
-            `;
-        }
-    } else {
-        console.error("Deals screen not found");
-        alert("Deals screen not available. Please refresh page.");
-    }
-}
-
-function testDealForm() {
-    alert("✅ Daily Deals system working!\n\nFeature coming soon with:\n- Shop offers\n- Discount coupons\n- WhatsApp contact\n- Valid till dates");
-    
-    // Show form values
-    const shopName = document.getElementById('shopName')?.value || 'Test Shop';
-    const dealTitle = document.getElementById('dealTitle')?.value || '50% Off';
-    
-    if (shopName && dealTitle) {
-        alert(`You entered:\nShop: ${shopName}\nOffer: ${dealTitle}`);
-    }
-}
-
-// Form submit handler
-document.getElementById('dealForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    testDealForm();
-    return false;
-});
-
-console.log("✅ Daily Deals code loaded");
-// ===== DAILY DEALS FIREBASE FIX =====
-document.getElementById('dealForm').onsubmit = function(e) {
-    e.preventDefault();
-    alert("✅ Offer saved to database!\n\nWhatsApp link: https://wa.me/91" + document.getElementById('dealPhone').value);
     return false;
 };
