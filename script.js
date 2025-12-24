@@ -705,45 +705,136 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// ============ DAILY DEALS FIX ============
+// ============ FIX FOOTER BUTTONS FOR DAILY DEALS ============
 
-function openDealsNow() {
-    console.log("openDealsNow function called");
+// Override existing showScreen function
+const originalShowScreen = window.showScreen;
+
+window.showScreen = function(screenId) {
+    console.log("showScreen called for:", screenId);
     
-    // Hide all screens
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
+    // First hide ALL screens including deals-screen
+    const allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(screen => {
         screen.style.display = 'none';
     });
     
-    // Show deals screen
-    const dealsScreen = document.getElementById('deals-screen');
-    if (dealsScreen) {
-        dealsScreen.style.display = 'block';
-        console.log("✅ Daily Deals screen opened");
+    // Then show the requested screen
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.style.display = 'block';
+        console.log("✅ Screen shown:", screenId);
     } else {
-        console.error("❌ Deals screen not found");
-        alert("Daily Deals screen not found. Please refresh page.");
+        console.error("❌ Screen not found:", screenId);
     }
+};
+
+// Update openDealsNow to use showScreen
+function openDealsNow() {
+    console.log("openDealsNow calling showScreen...");
+    window.showScreen('deals-screen');
 }
 
-// Form submit function
+// Form submit function - Firebase save
 function registerDeal() {
     const shopName = document.getElementById('shopName').value;
     const dealTitle = document.getElementById('dealTitle').value;
+    const dealDesc = document.getElementById('dealDescription').value;
+    const category = document.getElementById('dealCategory').value;
+    const phone = document.getElementById('dealPhone').value;
     
-    if (!shopName || !dealTitle) {
-        alert("Shop name aur offer title daalo!");
+    if (!shopName || !dealTitle || !phone) {
+        alert("Shop name, offer title aur phone number daalo!");
         return false;
     }
     
-    alert(`✅ Offer submitted!\n\nShop: ${shopName}\nOffer: ${dealTitle}\n\nForm working perfectly!`);
-    document.getElementById('dealForm').reset();
+    if (phone.length !== 10) {
+        alert("10 digit phone number daalo!");
+        return false;
+    }
+    
+    // Save to Firebase
+    if (typeof firebase !== 'undefined' && firebase.database) {
+        const db = firebase.database();
+        db.ref('deals').push({
+            shopName: shopName,
+            title: dealTitle,
+            description: dealDesc,
+            category: category,
+            phone: phone,
+            timestamp: Date.now()
+        }).then(() => {
+            alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}\n\nAb sab users ko ye offer dikhega!`);
+            document.getElementById('dealForm').reset();
+            
+            // Auto-reload deals
+            if (document.getElementById('deals-screen').style.display === 'block') {
+                loadDeals(); // Call your existing loadDeals function
+            }
+        }).catch(error => {
+            alert("Error saving: " + error.message);
+        });
+    } else {
+        alert(`✅ Form filled!\nShop: ${shopName}\nOffer: ${dealTitle}`);
+        document.getElementById('dealForm').reset();
+    }
+    
     return false;
+}
+
+// Function to load and display deals
+function loadDeals() {
+    const dealsList = document.getElementById('deals-list');
+    if (!dealsList) return;
+    
+    dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Loading offers...</p>';
+    
+    if (typeof firebase === 'undefined' || !firebase.database) {
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
+        return;
+    }
+    
+    const db = firebase.database();
+    db.ref('deals').once('value').then(snapshot => {
+        dealsList.innerHTML = '';
+        
+        if (!snapshot.exists()) {
+            dealsList.innerHTML = '<p style="text-align:center;color:#777;">Abhi koi offers nahi hain</p>';
+            return;
+        }
+        
+        snapshot.forEach(child => {
+            const deal = child.val();
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 10px 0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            `;
+            
+            card.innerHTML = `
+                <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title}</h4>
+                <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName}</p>
+                <p style="margin: 5px 0; color: #444;">${deal.description}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Category:</strong> ${deal.category}</p>
+                <a href="https://wa.me/91${deal.phone}" 
+                   target="_blank"
+                   style="color: #25D366; font-weight: bold; text-decoration: none;">
+                    WhatsApp Contact
+                </a>
+            `;
+            
+            dealsList.appendChild(card);
+        });
+    });
 }
 
 // Make functions available globally
 window.openDealsNow = openDealsNow;
 window.registerDeal = registerDeal;
+window.loadDeals = loadDeals;
 
-console.log("✅ Daily Deals functions loaded");
+console.log("✅ Daily Deals system fixed");
