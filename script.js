@@ -770,23 +770,16 @@ function openDealsNow() {
 
 // Fix for loadDeals - SIMPLE VERSION
 function loadDeals() {
-    console.log("loadDeals called");
-    
     const dealsList = document.getElementById('deals-list');
-    if (!dealsList) {
-        console.error("deals-list not found");
-        return;
-    }
+    if (!dealsList) return;
     
     dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Loading offers...</p>';
     
-    // Check Firebase
     if (typeof firebase === 'undefined' || !firebase.database) {
         dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
         return;
     }
     
-    // Check user login
     const user = firebase.auth().currentUser;
     if (!user) {
         dealsList.innerHTML = '<p style="text-align:center;color:red;">Please login to see deals</p>';
@@ -794,6 +787,212 @@ function loadDeals() {
     }
     
     const db = firebase.database();
+    const now = Date.now();
+    
+    db.ref('deals').once('value')
+        .then(snapshot => {
+            console.log("Total deals in DB:", snapshot.numChildren());
+            
+            dealsList.innerHTML = '';
+            
+            if (!snapshot.exists() || snapshot.numChildren() === 0) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi offers nahi hain</p>';
+                return;
+            }
+            
+            let activeDeals = 0;
+            let expiredDeals = 0;
+            
+            // First, check for expired deals and update status
+            const updatePromises = [];
+            snapshot.forEach(child => {
+                const deal = child.val();
+                const dealId = child.key;
+                
+                // Check if deal is expired
+                if (deal.validTill && deal.validTill < now && deal.status !== 'expired') {
+                    // Auto-mark as expired in Firebase
+                    updatePromises.push(
+                        db.ref('deals/' + dealId + '/status').set('expired')
+                    );
+                }
+            });
+            
+            // Wait for all updates, then load deals
+            Promise.all(updatePromises).then(() => {
+                // Reload data after updates
+                db.ref('deals').once('value').then(updatedSnapshot => {
+                    dealsList.innerHTML = '';
+                    
+                    updatedSnapshot.forEach(child => {
+                        const deal = child.val();
+                        const dealId = child.key;
+                        const isExpired = deal.validTill && deal.validTill < now;
+                        const status = deal.status || (isExpired ? 'expired' : 'active');
+                        
+                        if (status === 'active') {
+                            activeDeals++;
+                            displayDealCard(deal, dealId, false);
+                        } else {
+                            expiredDeals++;
+                            // Optional: Show expired deals with different style
+                            // displayDealCard(deal, dealId, true);
+                        }
+                    });
+                    
+                    // Show counts
+                    const summary = document.createElement('div');
+                    summary.style.cssText = 'text-align:center; margin:20px 0; padding:10px; background:#f5f5f5; border-radius:8px;';
+                    summary.innerHTML = `
+                        <p style="margin:5px 0;">
+                            <span style="color:#4CAF50;">✅ ${activeDeals} Active Offers</span>
+                            ${expiredDeals > 0 ? `<span style="color:#f44336; margin-left:15px;">❌ ${expiredDeals} Expired Offers</span>` : ''}
+                        </p>
+                        <button onclick="showExpiredDeals()" style="background:#FF9800; color:white; border:none; padding:5px 10px; border-radius:4px; margin-top:5px;">
+                            Show Expired Offers
+                        </button>
+                    `;
+                    dealsList.appendChild(summary);
+                    
+                    if (activeDeals === 0) {
+                        dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi active offers nahi hain</p>';
+                    }
+                    
+                });
+            });
+            
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
+        });
+}
+
+// Function to display deal card
+function displayDealCard(deal, dealId, isExpired) {
+    const dealsList = document.getElementById('deals-list');
+    if (!dealsList) return;
+    
+    const now = Date.now();
+    const createdDate = new Date(deal.timestamp);
+    const expiryDate = new Date(deal.validTill || (deal.timestamp + 7*24*60*60*1000));
+    
+    // Calculate days left
+    const daysLeft = Math.ceil((expiryDate - now) / (24 * 60 * 60 * 1000));
+    
+    const card = document.createElement('div');
+    card.style.cssText = `
+        background: ${isExpired ? '#fff8f8' : 'white'};
+        border: 1px solid ${isExpired ? '#ffcdd2' : '#ddd'};
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        ${isExpired ? 'opacity: 0.7;' : ''}
+    `;
+    
+    // Status badge
+    let statusBadge = '';
+    if (isExpired || daysLeft < 0) {
+        statusBadge = '<span style="background:#f44336; color:white; padding:2px 8px; border-radius:3px; font-size:0.8rem; float:right;">EXPIRED</span>';
+    } else if (daysLeft <= 3) {
+        statusBadge = `<span style="background:#FF9800; color:white; padding:2px 8px; border-radius:3px; font-size:0.8rem; float:right;">${daysLeft} DAYS LEFT</span>`;
+    } else if (daysLeft <= 7) {
+        statusBadge = `<span style="background:#4CAF50; color:white; padding:2px 8px; border-radius:3px; font-size:0.8rem; float:right;">${daysLeft} days left</span>`;
+    }
+    
+    card.innerHTML = `
+        ${statusBadge}
+        
+        <div style="display:flex; justify-content:space-between; align-items:start;">
+            <h4 style="margin:0 0 5px; color:#2a5298;">${deal.title || ''}</h4>
+            <small style="color:#666;">${createdDate.toLocaleDateString('hi-IN')}</small>
+        </div>
+        
+        <p style="margin:5px 0; color:#444;">
+            <strong>🏪 Shop:</strong> ${deal.shopName || ''}
+        </p>
+        
+        <p style="margin:5px 0; color:#444; background:#f9f9f9; padding:8px; border-radius:5px;">
+            ${deal.description || ''}
+        </p>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <span style="color:#666; background:#f0f0f0; padding:3px 8px; border-radius:3px; font-size:0.9rem;">
+                ${deal.category || 'Other'}
+            </span>
+            
+            <div>
+                <small style="color:#666;">
+                    ⏳ Valid till: ${expiryDate.toLocaleDateString('hi-IN')}
+                </small>
+                <a href="https://wa.me/91${deal.phone}" target="_blank"
+                   style="color:#25D366; font-weight:bold; text-decoration:none; margin-left:10px;">
+                    📱 WhatsApp
+                </a>
+            </div>
+        </div>
+        
+        ${deal.userId === firebase.auth().currentUser?.uid ? 
+            '<div style="text-align:right; margin-top:5px;">' +
+            '<button onclick="extendDeal(\'' + dealId + '\')" style="background:#2196F3; color:white; border:none; padding:3px 8px; border-radius:3px; font-size:0.8rem; margin-right:5px;">Extend</button>' +
+            '<button onclick="deleteDeal(\'' + dealId + '\')" style="background:#f44336; color:white; border:none; padding:3px 8px; border-radius:3px; font-size:0.8rem;">Delete</button>' +
+            '</div>' : ''}
+    `;
+    
+    dealsList.appendChild(card);
+}
+
+// Show expired deals
+function showExpiredDeals() {
+    const db = firebase.database();
+    db.ref('deals').once('value').then(snapshot => {
+        const dealsList = document.getElementById('deals-list');
+        dealsList.innerHTML = '<h4 style="color:#f44336;">Expired Offers</h4>';
+        
+        snapshot.forEach(child => {
+            const deal = child.val();
+            const dealId = child.key;
+            const isExpired = deal.validTill && deal.validTill < Date.now();
+            
+            if (isExpired) {
+                displayDealCard(deal, dealId, true);
+            }
+        });
+    });
+}
+
+// Extend deal validity
+function extendDeal(dealId) {
+    const days = prompt("Kitne din aur extend karna hai?", "7");
+    if (!days) return;
+    
+    const db = firebase.database();
+    db.ref('deals/' + dealId).once('value').then(snapshot => {
+        const deal = snapshot.val();
+        const currentValidTill = deal.validTill || Date.now();
+        const newValidTill = currentValidTill + (parseInt(days) * 24 * 60 * 60 * 1000);
+        
+        db.ref('deals/' + dealId).update({
+            validTill: newValidTill,
+            status: 'active'
+        }).then(() => {
+            alert(`✅ Offer extended by ${days} days!`);
+            loadDeals();
+        });
+    });
+}
+
+// Delete deal
+function deleteDeal(dealId) {
+    if (confirm("Kya aap is offer ko delete karna chahte hain?")) {
+        const db = firebase.database();
+        db.ref('deals/' + dealId).remove().then(() => {
+            alert("✅ Offer deleted!");
+            loadDeals();
+        });
+    }
+}
     
     // ✅ GET ALL DEALS (no user filter)
     db.ref('deals').once('value')
@@ -870,12 +1069,57 @@ function loadDeals() {
 
 // Keep registerDeal function as is
 function registerDeal() {
-    // ... your existing registerDeal code (no changes needed) ...
+    const shopName = document.getElementById('shopName').value;
+    const dealTitle = document.getElementById('dealTitle').value;
+    const dealDesc = document.getElementById('dealDescription').value;
+    const category = document.getElementById('dealCategory').value;
+    const phone = document.getElementById('dealPhone').value;
+    
+    if (!shopName || !dealTitle || !phone) {
+        alert("Shop name, offer title aur phone number daalo!");
+        return false;
+    }
+    
+    if (phone.length !== 10) {
+        alert("10 digit phone number daalo!");
+        return false;
+    }
+    
+    // Deal validity input - Optional
+    const validDays = prompt("Offer kitne din tak valid rahega?\n(Default: 7 din)\n\nEnter days:", "7");
+    const days = parseInt(validDays) || 7;
+    
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Please login first!");
+        return false;
+    }
+    
+    const db = firebase.database();
+    const timestamp = Date.now();
+    const validTill = timestamp + (days * 24 * 60 * 60 * 1000);
+    
+    db.ref('deals').push({
+        shopName: shopName,
+        title: dealTitle,
+        description: dealDesc,
+        category: category,
+        phone: phone,
+        timestamp: timestamp,
+        userId: user.uid,
+        validTill: validTill,  // ✅ Expiry timestamp
+        validDays: days,       // ✅ Days valid
+        status: 'active'       // ✅ Deal status
+    }).then(() => {
+        alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}\n⏰ Valid for ${days} days`);
+        document.getElementById('dealForm').reset();
+        
+        if (document.getElementById('deals-screen').style.display === 'block') {
+            loadDeals();
+        }
+    }).catch(error => {
+        alert("Error: " + error.message);
+    });
+    
+    return false;
 }
-
-// Make functions available
-window.openDealsNow = openDealsNow;
-window.loadDeals = loadDeals;
-window.registerDeal = registerDeal;
-
-console.log("✅ Fixed: Deals & Jobs loading system ready");
