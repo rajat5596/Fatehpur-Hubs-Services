@@ -715,3 +715,9 @@ if ('serviceWorker' in navigator) {
         });
                     }
 
+function registerDeal() {
+    alert("✅ Form working! Firebase integration coming soon.");
+    document.getElementById('dealForm').reset();
+    return false;
+}
+console.log("Daily Deals system loaded");
