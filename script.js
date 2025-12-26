@@ -791,82 +791,81 @@ function loadDeals() {
     
     db.ref('deals').once('value')
         .then(snapshot => {
-            console.log("Total deals in DB:", snapshot.numChildren());
-            
             dealsList.innerHTML = '';
             
-            if (!snapshot.exists() || snapshot.numChildren() === 0) {
-                dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi offers nahi hain</p>';
+            if (!snapshot.exists()) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;">Abhi koi offers nahi hain</p>';
                 return;
             }
             
-            let activeDeals = 0;
-            let expiredDeals = 0;
+            let activeCount = 0;
             
-            // First, check for expired deals and update status
-            const updatePromises = [];
             snapshot.forEach(child => {
                 const deal = child.val();
-                const dealId = child.key;
                 
-                // Check if deal is expired
-                if (deal.validTill && deal.validTill < now && deal.status !== 'expired') {
-                    // Auto-mark as expired in Firebase
-                    updatePromises.push(
-                        db.ref('deals/' + dealId + '/status').set('expired')
-                    );
+                // ✅ EXPIRY CHECK - Simple version
+                const validTill = deal.validTill || (deal.timestamp + 7*24*60*60*1000);
+                const isExpired = validTill < now;
+                
+                // Skip expired deals
+                if (isExpired) {
+                    return; // Skip this deal
                 }
+                
+                activeCount++;
+                
+                // Calculate days left
+                const daysLeft = Math.ceil((validTill - now) / (24*60*60*1000));
+                
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    padding: 15px;
+                    margin: 10px 0;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                `;
+                
+                // Days left badge
+                let daysBadge = '';
+                if (daysLeft <= 3) {
+                    daysBadge = `<span style="background:#FF5722; color:white; padding:2px 8px; border-radius:3px; font-size:0.8rem; float:right;">${daysLeft} din bache</span>`;
+                } else if (daysLeft <= 7) {
+                    daysBadge = `<span style="background:#FF9800; color:white; padding:2px 8px; border-radius:3px; font-size:0.8rem; float:right;">${daysLeft} days left</span>`;
+                }
+                
+                const date = new Date(deal.timestamp);
+                const expiryDate = new Date(validTill);
+                
+                card.innerHTML = `
+                    ${daysBadge}
+                    <h4 style="margin:0 0 5px; color:#2a5298;">${deal.title}</h4>
+                    <p style="margin:5px 0; color:#444;"><strong>Shop:</strong> ${deal.shopName}</p>
+                    <p style="margin:5px 0; color:#444;">${deal.description}</p>
+                    <p style="margin:5px 0; color:#666;"><strong>Category:</strong> ${deal.category}</p>
+                    <div style="color:#777; font-size:0.8rem;">
+                        ⏳ Valid till: ${expiryDate.toLocaleDateString('hi-IN')}
+                    </div>
+                    <a href="https://wa.me/91${deal.phone}" target="_blank"
+                       style="color:#25D366; font-weight:bold; text-decoration:none;">
+                        WhatsApp Contact
+                    </a>
+                `;
+                
+                dealsList.appendChild(card);
             });
             
-            // Wait for all updates, then load deals
-            Promise.all(updatePromises).then(() => {
-                // Reload data after updates
-                db.ref('deals').once('value').then(updatedSnapshot => {
-                    dealsList.innerHTML = '';
-                    
-                    updatedSnapshot.forEach(child => {
-                        const deal = child.val();
-                        const dealId = child.key;
-                        const isExpired = deal.validTill && deal.validTill < now;
-                        const status = deal.status || (isExpired ? 'expired' : 'active');
-                        
-                        if (status === 'active') {
-                            activeDeals++;
-                            displayDealCard(deal, dealId, false);
-                        } else {
-                            expiredDeals++;
-                            // Optional: Show expired deals with different style
-                            // displayDealCard(deal, dealId, true);
-                        }
-                    });
-                    
-                    // Show counts
-                    const summary = document.createElement('div');
-                    summary.style.cssText = 'text-align:center; margin:20px 0; padding:10px; background:#f5f5f5; border-radius:8px;';
-                    summary.innerHTML = `
-                        <p style="margin:5px 0;">
-                            <span style="color:#4CAF50;">✅ ${activeDeals} Active Offers</span>
-                            ${expiredDeals > 0 ? `<span style="color:#f44336; margin-left:15px;">❌ ${expiredDeals} Expired Offers</span>` : ''}
-                        </p>
-                        <button onclick="showExpiredDeals()" style="background:#FF9800; color:white; border:none; padding:5px 10px; border-radius:4px; margin-top:5px;">
-                            Show Expired Offers
-                        </button>
-                    `;
-                    dealsList.appendChild(summary);
-                    
-                    if (activeDeals === 0) {
-                        dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi active offers nahi hain</p>';
-                    }
-                    
-                });
-            });
+            if (activeCount === 0) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi active offers nahi hain</p>';
+            }
             
         })
         .catch(error => {
             console.error("Error:", error);
             dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
         });
-}
+                    }
 
 // Function to display deal card
 function displayDealCard(deal, dealId, isExpired) {
@@ -1085,9 +1084,10 @@ function registerDeal() {
         return false;
     }
     
-    // Deal validity input - Optional
-    const validDays = prompt("Offer kitne din tak valid rahega?\n(Default: 7 din)\n\nEnter days:", "7");
-    const days = parseInt(validDays) || 7;
+    // ✅ Simple expiry - Default 7 days
+    const days = 7; // Default 7 days
+    const timestamp = Date.now();
+    const validTill = timestamp + (days * 24 * 60 * 60 * 1000);
     
     const user = firebase.auth().currentUser;
     if (!user) {
@@ -1096,8 +1096,6 @@ function registerDeal() {
     }
     
     const db = firebase.database();
-    const timestamp = Date.now();
-    const validTill = timestamp + (days * 24 * 60 * 60 * 1000);
     
     db.ref('deals').push({
         shopName: shopName,
@@ -1107,11 +1105,9 @@ function registerDeal() {
         phone: phone,
         timestamp: timestamp,
         userId: user.uid,
-        validTill: validTill,  // ✅ Expiry timestamp
-        validDays: days,       // ✅ Days valid
-        status: 'active'       // ✅ Deal status
+        validTill: validTill  // ✅ Simple expiry added
     }).then(() => {
-        alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}\n⏰ Valid for ${days} days`);
+        alert(`✅ Offer saved!\nValid for ${days} days`);
         document.getElementById('dealForm').reset();
         
         if (document.getElementById('deals-screen').style.display === 'block') {
