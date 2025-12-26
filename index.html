@@ -2,11 +2,8 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#004aad"> <title>Fatehpur Hubs - Local Services & Jobs</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatehpur Hubs - Local Services & Jobs</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -14,15 +11,13 @@
     
     <link rel="stylesheet" href="style.css">
     
-    <link rel="manifest" href="manifest.json?v=10.0">
+    <link rel="manifest" href="manifest.json?v=8.0">
 
     
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
-    
-    <script src="script.js?v=2"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script type="text/javascript" src="script.js"></script>
     <script type="text/javascript" src="ads.js"></script>
     </head>
 <body> 
@@ -254,57 +249,7 @@
                         </button>
                     </div>
                 </div>
-<!-- 5. DAILY DEALS SCREEN (COMPLETE SECTION) -->
-<div id="deals-screen" class="screen" style="display: none;">
-    <div class="form-container">
-        <h3 style="text-align: center; color: #2a5298; margin-bottom: 10px;">🔥 Daily Deals & Offers in Fatehpur</h3>
-        <p style="text-align: center; color: #555; margin: 10px 0;">Shops, restaurants, salons, tiffin walon ke naye offers yahan dekho! Coupon copy karo aur use karo.</p>
 
-        <!-- Deals List (Yahan se deals load honge) -->
-        <div id="deals-list" style="margin: 20px 0;">
-            <p style="text-align: center; color: #777; font-size: 1.1rem;">Abhi koi offers nahi hain. Shops apne offers jaldi daal denge!</p>
-        </div>
-
-        <!-- Add Offer Form -->
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-            <h4 style="text-align: center; color: #ff5722;">Apna Offer Daalo (Free)</h4>
-            <form id="dealForm" onsubmit="event.preventDefault(); registerDeal();">
-                <div class="form-field">
-                    <label for="shopName">Shop / Vendor Ka Naam</label>
-                    <input type="text" id="shopName" placeholder="Jaise: Sharma Salon" required>
-                </div>
-                <div class="form-field">
-                    <label for="dealTitle">Offer Title</label>
-                    <input type="text" id="dealTitle" placeholder="Jaise: 50% Off Haircut" required>
-                </div>
-                <div class="form-field">
-                    <label for="dealDescription">Details / Valid Till</label>
-                    <textarea id="dealDescription" rows="4" placeholder="Kya offer hai, kab tak chalega..." required></textarea>
-                </div>
-                <div class="form-field">
-                    <label for="dealCategory">Category</label>
-                    <select id="dealCategory" required>
-                        <option value="">-- Select --</option>
-                        <option value="Food/Tiffin">Food & Tiffin</option>
-                        <option value="Salon/Beauty">Salon & Beauty</option>
-                        <option value="Restaurant">Restaurant</option>
-                        <option value="Recharge/Bill">Recharge & Bill Pay</option>
-                        <option value="Clothing">Clothing & Shopping</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="dealPhone">WhatsApp Number</label>
-                    <input type="number" id="dealPhone" maxlength="10" placeholder="10 digit number" required>
-                </div>
-                <button type="submit" class="submit-btn" style="background-color: #4CAF50; width: 100%; margin-top: 15px;">
-                    Offer Daalo (Free)
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-</div>
             </div>
         
                         <div style="position:fixed; bottom:55px; left:0; width:100%; z-index:9998; display:flex; justify-content:center; pointer-events:none;">
@@ -345,101 +290,22 @@
             <i class="fas fa-share-alt" style="font-size: 18px; margin-bottom: 2px;"></i>
             <p style="margin: 0; font-size: 10px;">Share</p>
         </div>
-<div onclick="document.getElementById('deals-screen').style.display='block'; 
-              document.getElementById('home-screen').style.display='none';
-              document.querySelectorAll('.screen').forEach(s=>{if(s.id!='deals-screen')s.style.display='none'});">
+
     </div>
 
 
 <!-- promo.js लिंक -->
 <script src="promo.js"></script>
-            <!-- notification.js include karo -->
-<script src="notification.js?v=1"></script>
-<!-- Service Worker Registration FIX -->
 <script>
-// Fix for Service Worker registration
-document.addEventListener('DOMContentLoaded', function() {
   if ('serviceWorker' in navigator) {
-    // Wait 2 seconds for page to load completely
-    setTimeout(function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function(registration) {
-          console.log('✅ Service Worker registered with scope:', registration.scope);
-          console.log('✅ Service Worker state:', registration.active ? 'Active' : 'Installing');
-          
-          // Force update
-          registration.update();
-          
-          // Show notification button after SW is registered
-          setTimeout(showNotificationButton, 1000);
-        })
-        .catch(function(error) {
-          console.log('❌ Service Worker registration failed:', error);
-          
-          // Try alternative path
-          navigator.serviceWorker.register('/sw.js', { scope: './' })
-            .then(function(reg) {
-              console.log('✅ Service Worker registered with ./ scope');
-            })
-            .catch(function(err) {
-              console.log('❌ Alternative registration also failed:', err);
-            });
-        });
-    }, 2000);
-  } else {
-    console.log('❌ Service Worker not supported in this browser');
-  }
-});
-
-// Function to show notification button
-function showNotificationButton() {
-  console.log('Showing notification button...');
-  
-  // If notifications already allowed, don't show button
-  if (Notification.permission === "granted") {
-    console.log('✅ Notifications already enabled');
-    return;
-  }
-  
-  // Create button if not exists
-  if (!document.getElementById('notif-btn') && Notification.permission === "default") {
-    const button = document.createElement('button');
-    button.id = 'notif-btn';
-    button.innerHTML = '🔔 नोटिफिकेशन चालू करें';
-    button.style.cssText = `
-      position: fixed;
-      top: 70px;
-      right: 10px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 99999;
-      font-weight: bold;
-      font-size: 14px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    `;
-    
-    button.onclick = function() {
-      Notification.requestPermission().then(function(permission) {
-        if (permission === "granted") {
-          alert('✅ Notifications enabled!');
-          button.style.display = 'none';
-          // Send test notification
-          new Notification('Fatehpur Hubs', {
-            body: 'अब आपको नई सेवाओं और नौकरियों के अपडेट मिलेंगे!',
-            icon: '/icons/icon-192x192.png'
-          });
-        }
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('SW registered with scope:', registration.scope);
+      }, function(err) {
+        console.log('SW registration failed:', err);
       });
-    };
-    
-    document.body.appendChild(button);
-    console.log('✅ Notification button created');
+    });
   }
-}
 </script>
             
 </body>
