@@ -1,3 +1,4 @@
+
 // =======================================================
 // ⭐ 1. GLOBAL VARIABLES & CONFIGURATION (सबसे ऊपर रखें) ⭐
 // =======================================================
@@ -66,14 +67,9 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
-    // Note: 'mistri-card' class added to enable reviews.js to find the card
-    return `<div class="profile-card mistri-card bg-white shadow-md rounded-lg p-4 mb-4">
-            
-            <h3 style="color: #2a5298; font-size: 1.1rem; font-weight: bold; margin-bottom: 5px;">${p.name}</h3>
-            
-            <p class="text-xs service-title">Category: ${p.category}</p> 
-
-    <p style="font-size:12px;color:#555; margin-top: 5px;">📍 ${p.area} | Experience: ${p.experience} Years</p>
+    return `<div class="profile-card">
+    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
 
     <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
         <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
@@ -82,8 +78,6 @@ function renderProviderCard(p) {
     </div>
 </div>`;
 }
-
-
         
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
@@ -98,6 +92,7 @@ function renderJobCard(job) {
 // =======================================================
 // ⭐ 3. DATA LOADING / FILTERING FUNCTIONS (लिस्टिंग) ⭐
 // =======================================================
+
 
 // ⭐ 3.1 loadCategories - सामान्य लिस्ट पैजिनेशन (Ads injected)
 window.loadCategories = (loadMore = false) => {
@@ -206,7 +201,6 @@ window.loadCategories = (loadMore = false) => {
 
         }
 
-
     }, (error) => {
         console.error("Error loading services:", error);
         document.getElementById('loading-more')?.remove();
@@ -255,12 +249,6 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
         }
 
         filteredPageIndex++; 
-        
-        // ⭐ [रिव्यू सिस्टम फिक्स] - 2. फ़िल्टर्ड लोकल ऐरे रेंडर होने के बाद कॉल करें
-        if (typeof window.loadRatingsForAllMistris === 'function') {
-            window.loadRatingsForAllMistris(); 
-        }
-
     } else if (!isLoadMore) {
          listElement.innerHTML = `<h3>Available Services (${currentCategory})</h3><p style="text-align:center;color:#ff6666;">अभी कोई सर्विस उपलब्ध नहीं है!</p>`;
     }
@@ -322,13 +310,6 @@ window.filterByCategory = (category, loadMore = false) => {
             renderFilteredPage(listElement, loadMoreBtn, true);
         }, 100);
     }
-    
-    // ⭐ [रिव्यू सिस्टम फिक्स] - 3. कैटेगरी फ़िल्टरिंग के बाद कॉल करें (क्योंकि यह renderFilteredPage को कॉल करता है)
-    // यहाँ इसे सीधे कॉल करने की आवश्यकता नहीं है, क्योंकि यह फ़ंक्शन अंत में renderFilteredPage को कॉल करता है, और renderFilteredPage में हमने पहले ही कॉल जोड़ दिया है।
-    // अगर आप यहां कुछ और जोड़ना चाहते हैं, तो:
-    // if (typeof window.loadRatingsForAllMistris === 'function' && !loadMore) {
-    //     window.loadRatingsForAllMistris(); 
-    // }
 };
 
 
@@ -375,15 +356,8 @@ window.searchServices = () => {
             html += '<p style="text-align:center;color:#ff6666;">आपकी खोज से मेल खाने वाली कोई सर्विस नहीं मिली।</p>';
         }
         listElement.innerHTML = html;
-        
-        // ⭐ [रिव्यू सिस्टम फिक्स] - 4. सर्च रिजल्ट रेंडर होने के बाद कॉल करें
-        if (typeof window.loadRatingsForAllMistris === 'function') {
-            window.loadRatingsForAllMistris(); 
-        }
-
     });
 };
-
 
 
 // =======================================================
@@ -553,15 +527,12 @@ window.startFirebaseListener = () => {
 window.contactForAds = () => window.open('https://wa.me/919889904191?text=Hello! Main apne business ka ad lagwana chahta hoon Fatehpur Hubs pe', '_blank');
 window.shareApp = () => navigator.share ? navigator.share({title: 'Fatehpur Hubs', text: 'Best local services app', url: 'https://www.fatehpurhubs.co.in'}) : alert('Share link: https://www.fatehpurhubs.co.in');
 
-function showScreen(id) {
+window.showScreen = (id) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if (id === 'jobs-screen') loadJobs();
-    if (id === 'home-screen') loadCategories();
-    if (id === 'deals-screen') {
-        setTimeout(loadDeals, 500);  // Yeh line add kar do
-    }
-}
+    if(id === 'jobs-screen') loadJobs();
+    if(id === 'home-screen') loadCategories(); 
+};
 
 window.logOut = () => {
     firebase.auth().signOut().then(() => {
@@ -579,7 +550,6 @@ window.onload = () => {
     window.database = firebase.database();
     window.providersRef = database.ref('service_providers'); 
     window.jobsRef = database.ref('local_jobs'); 
-
 
     // 1. अदृश्य reCAPTCHA सेटअप
     recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -704,20 +674,3 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
-
-//                 dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi active offers nahi hain</p>';
-            }
-            
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
-        });
-                    }
-
-function registerDeal() {
-    alert("✅ Form working! Firebase integration coming soon.");
-    document.getElementById('dealForm').reset();
-    return false;
-}
-console.log("Daily Deals system loaded");
