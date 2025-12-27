@@ -239,98 +239,110 @@
                 </div>
 
                  <!-- 4. SHARE SCREEN -->
-                <div id="share-screen" class="screen">
-                    <div class="ad-card" style="margin-top: 30px; padding: 40px;">
-                        <i class="fas fa-share-alt" style="font-size: 3rem; color: #2a5298; margin-bottom: 15px;"></i>
-                        <h3 style="color: #2a5298; margin-bottom: 10px;">Fatehpur Hubs को शेयर करें!</h3>
-                        <p>यह ऐप फतेहपुर के लोगों के लिए है। कृपया इसे अपने दोस्तों और परिवार के साथ शेयर करें।</p>
-                        <button onclick="window.shareApp()" class="main-btn" style="background-color: #00bcd4;">
-                            <i class="fas fa-paper-plane"></i> अभी शेयर करें
-                        </button>
+<div id="share-screen" class="screen">
+    <div class="ad-card" style="margin-top: 30px; padding: 40px;">
+        <i class="fas fa-share-alt" style="font-size: 3rem; color: #2a5298; margin-bottom: 15px;"></i>
+        <h3 style="color: #2a5298; margin-bottom: 10px;">Fatehpur Hubs को शेयर करें!</h3>
+        <p>यह ऐप फतेहपुर के लोगों के लिए है। कृपया इसे अपने दोस्तों और परिवार के साथ शेयर करें।</p>
+        <button onclick="window.shareApp()" class="main-btn" style="background-color: #00bcd4;">
+            <i class="fas fa-paper-plane"></i> अभी शेयर करें
+        </button>
+    </div>
+</div>
+
+<!-- 5. DAILY DEALS SCREEN -->
+<div id="deals-screen" class="screen" style="display: none;">
+    <div class="form-container">
+        <h3 style="text-align: center; color: #2a5298; margin-bottom: 10px;">🔥 Daily Deals & Offers in Fatehpur</h3>
+        <p style="text-align: center; color: #555; margin: 10px 0;">Shops, restaurants, salons ke naye offers yahan dekho!</p>
+
+        <!-- Deals List -->
+        <div id="deals-list" style="margin: 20px 0;">
+            <p style="text-align: center; color: #777; font-size: 1.1rem;">Loading offers...</p>
+        </div>
+
+        <!-- Add Offer Form -->
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <h4 style="text-align: center; color: #ff5722;">Apna Offer Daalo (Free)</h4>
+            <form id="dealForm">
+                
+                <!-- Shop Name -->
+                <div class="form-field">
+                    <label for="shopName">🏪 Shop / Vendor Ka Naam *</label>
+                    <input type="text" id="shopName" placeholder="Example: Sharma Salon, Gupta Kirana Store" required>
+                </div>
+                
+                <!-- Offer Title -->
+                <div class="form-field">
+                    <label for="dealTitle">🎯 Offer Title *</label>
+                    <input type="text" id="dealTitle" placeholder="Example: 50% Off on Haircut, Buy 1 Get 1 Free" required>
+                </div>
+                
+                <!-- Offer Details -->
+                <div class="form-field">
+                    <label for="dealDescription">📝 Offer Details *</label>
+                    <textarea id="dealDescription" rows="3" 
+                              placeholder="What is the offer? Any conditions? Example: 50% discount on all services, minimum bill ₹500, excludes weekends" 
+                              required></textarea>
+                </div>
+                
+                <!-- Dates in one row -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div class="form-field" style="flex: 1;">
+                        <label for="startDate">📅 Start Date *</label>
+                        <input type="date" id="startDate" required>
+                    </div>
+                    
+                    <div class="form-field" style="flex: 1;">
+                        <label for="endDate">📅 End Date *</label>
+                        <input type="date" id="endDate" required>
                     </div>
                 </div>
-<!-- Add Offer Form -->
-<div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-    <h4 style="text-align: center; color: #ff5722;">Apna Offer Daalo (Free)</h4>
-    <form id="dealForm">
-        
-        <!-- Shop Name -->
-        <div class="form-field">
-            <label for="shopName">🏪 Shop / Vendor Ka Naam *</label>
-            <input type="text" id="shopName" placeholder="Example: Sharma Salon, Gupta Kirana Store" required>
-        </div>
-        
-        <!-- Offer Title -->
-        <div class="form-field">
-            <label for="dealTitle">🎯 Offer Title *</label>
-            <input type="text" id="dealTitle" placeholder="Example: 50% Off on Haircut, Buy 1 Get 1 Free" required>
-        </div>
-        
-        <!-- Offer Details -->
-        <div class="form-field">
-            <label for="dealDescription">📝 Offer Details *</label>
-            <textarea id="dealDescription" rows="3" 
-                      placeholder="What is the offer? Any conditions? Example: 50% discount on all services, minimum bill ₹500, excludes weekends" 
-                      required></textarea>
-        </div>
-        
-        <!-- Dates in one row -->
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <div class="form-field" style="flex: 1;">
-                <label for="startDate">📅 Start Date *</label>
-                <input type="date" id="startDate" required>
-            </div>
-            
-            <div class="form-field" style="flex: 1;">
-                <label for="endDate">📅 End Date *</label>
-                <input type="date" id="endDate" required>
-            </div>
-        </div>
-        
-        <!-- Category -->
-        <div class="form-field">
-            <label for="dealCategory">📂 Category *</label>
-            <select id="dealCategory" required>
-                <option value="">-- Select Category --</option>
-                <option value="Food & Tiffin">🍜 Food & Tiffin</option>
-                <option value="Salon & Beauty">💇 Salon & Beauty</option>
-                <option value="Restaurant">🍽️ Restaurant</option>
-                <option value="Clothing & Shopping">👕 Clothing & Shopping</option>
-                <option value="Grocery & Kirana">🛒 Grocery & Kirana</option>
-                <option value="Electronics & Repair">📱 Electronics & Repair</option>
-                <option value="Medical & Pharmacy">🏥 Medical & Pharmacy</option>
-                <option value="Education & Coaching">📚 Education & Coaching</option>
-                <option value="Travel & Transport">🚗 Travel & Transport</option>
-                <option value="Other">📦 Other</option>
-            </select>
-        </div>
-        
-        <!-- WhatsApp Number -->
-        <div class="form-field">
-            <label for="dealPhone">📱 WhatsApp Number *</label>
-            <input type="number" id="dealPhone" maxlength="10" 
-                   placeholder="10 digit number for customers to contact" required>
-            <small style="color: #666; display: block; margin-top: 5px;">
-                Customers will contact you on this WhatsApp number
-            </small>
-        </div>
-        
-        <!-- Submit Button -->
-        <button type="button" onclick="saveDailyDeal()" class="submit-btn" 
-                style="background: linear-gradient(135deg, #4CAF50, #2E7D32); 
-                       color: white; width: 100%; margin-top: 15px; padding: 12px;
-                       font-size: 1.1rem; font-weight: bold; border-radius: 8px;">
-            ✅ Submit Offer (Free)
-        </button>
-        
-        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 10px;">
-            Offer will be visible to all Fatehpur Hubs users
-        </p>
-    </form>
+                
+                <!-- Category -->
+                <div class="form-field">
+                    <label for="dealCategory">📂 Category *</label>
+                    <select id="dealCategory" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="Food & Tiffin">🍜 Food & Tiffin</option>
+                        <option value="Salon & Beauty">💇 Salon & Beauty</option>
+                        <option value="Restaurant">🍽️ Restaurant</option>
+                        <option value="Clothing & Shopping">👕 Clothing & Shopping</option>
+                        <option value="Grocery & Kirana">🛒 Grocery & Kirana</option>
+                        <option value="Electronics & Repair">📱 Electronics & Repair</option>
+                        <option value="Medical & Pharmacy">🏥 Medical & Pharmacy</option>
+                        <option value="Education & Coaching">📚 Education & Coaching</option>
+                        <option value="Travel & Transport">🚗 Travel & Transport</option>
+                        <option value="Other">📦 Other</option>
+                    </select>
+                </div>
+                
+                <!-- WhatsApp Number -->
+                <div class="form-field">
+                    <label for="dealPhone">📱 WhatsApp Number *</label>
+                    <input type="number" id="dealPhone" maxlength="10" 
+                           placeholder="10 digit number for customers to contact" required>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Customers will contact you on this WhatsApp number
+                    </small>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="button" onclick="saveDailyDeal()" class="submit-btn" 
+                        style="background: linear-gradient(135deg, #4CAF50, #2E7D32); 
+                               color: white; width: 100%; margin-top: 15px; padding: 12px;
+                               font-size: 1.1rem; font-weight: bold; border-radius: 8px;">
+                    ✅ Submit Offer (Free)
+                </button>
+                
+                <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 10px;">
+                    Offer will be visible to all Fatehpur Hubs users
+                </p>
+            </form>
         </div>
     </div>
 </div>
-    </div>
+            </div>
         
                         <div style="position:fixed; bottom:55px; left:0; width:100%; z-index:9998; display:flex; justify-content:center; pointer-events:none;">
     
