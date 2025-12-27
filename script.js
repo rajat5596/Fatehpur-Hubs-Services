@@ -678,32 +678,28 @@ if ('serviceWorker' in navigator) {
 
 // Function to open deals screen
 function openDealsNow() {
-    console.log("openDealsNow - Opening Daily Deals screen");
+    console.log("openDealsNow function called");
     
-    // Use the existing showScreen function to handle everything
-    if (typeof window.showScreen === 'function') {
-        window.showScreen('deals-screen');
+    // First hide all screens
+    const screens = ['home-screen', 'add-service-screen', 'jobs-screen', 'share-screen'];
+    screens.forEach(id => {
+        const screen = document.getElementById(id);
+        if (screen) screen.style.display = 'none';
+    });
+    
+    // Show deals screen
+    const dealsScreen = document.getElementById('deals-screen');
+    if (dealsScreen) {
+        dealsScreen.style.display = 'block';
+        console.log("✅ Deals screen shown");
+        
+        // Load deals after showing screen
+        setTimeout(function() {
+            loadDailyDeals();
+        }, 300);
     } else {
-        // Fallback if showScreen doesn't exist
-        console.log("showScreen not found, using fallback");
-        
-        // Hide all screens
-        const screens = document.querySelectorAll('.screen');
-        screens.forEach(screen => {
-            screen.style.display = 'none';
-        });
-        
-        // Show deals screen
-        const dealsScreen = document.getElementById('deals-screen');
-        if (dealsScreen) {
-            dealsScreen.style.display = 'block';
-            console.log("✅ Deals screen shown");
-            
-            // Load deals
-            setTimeout(function() {
-                loadDailyDeals();
-            }, 300);
-        }
+        console.error("❌ Deals screen not found");
+        alert("Daily Deals screen not available. Please refresh page.");
     }
 }
 
