@@ -745,6 +745,9 @@ function loadDailyDeals() {
             
             snapshot.forEach((child) => {
                 const deal = child.val();
+                const now = Date.now();
+    const isExpired = deal.validTill && deal.validTill < now;
+    if (isExpired) return;
                 dealCount++;
                 
                 // Simple card - NO EXPIRY LOGIC FOR NOW
@@ -802,6 +805,7 @@ function saveDailyDeal() {
     const dealDesc = document.getElementById('dealDescription').value || '';
     const category = document.getElementById('dealCategory').value || '';
     const phone = document.getElementById('dealPhone').value || '';
+    const validTill = Date.now() + (7 * 24 * 60 * 60 * 1000);
     
     // Simple validation
     if (!shopName || !dealTitle || !phone) {
