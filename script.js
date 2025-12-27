@@ -1045,3 +1045,34 @@ function saveDailyDeal() {
         console.error("Save error:", error);
     });
           }
+// ============ SCREEN SWITCHING FUNCTION ============
+
+function showScreen(screenId) {
+    console.log("Changing screen to:", screenId);
+    
+    // 1. Sab screens hide karo
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none'; 
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    document.getElementById('deals-screen').style.display = 'none';
+    
+    // 2. Jo screen chahiye wo show karo
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+        targetScreen.style.display = 'block';
+        console.log("✅ Screen shown:", screenId);
+    }
+    
+    // 3. Agar deals screen hai to deals load karo
+    if (screenId === 'deals-screen') {
+        setTimeout(function() {
+            loadDailyDeals();
+        }, 300);
+    }
+}
+
+// Function ko globally available karo
+window.showScreen = showScreen;
+
+console.log("✅ Screen switching function loaded");
