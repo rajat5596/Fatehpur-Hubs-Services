@@ -812,28 +812,102 @@ function loadDailyDeals() {
             dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
         });
 }
+// In card creation code:
+const startDate = new Date(deal.startDate || deal.timestamp);
+const endDate = new Date(deal.endDate || (deal.timestamp + 7*24*60*60*1000));
+const startStr = startDate.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' });
+const endStr = endDate.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' });
 
+// Calculate days left from today
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const daysLeft = Math.ceil((endDate - today) / (24 * 60 * 60 * 1000));
+
+card.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: start;">
+        <h4 style="margin: 0 0 8px; color: #2a5298; font-size: 1.1rem;">
+            ${deal.title}
+        </h4>
+        ${daysLeft <= 3 ? `<span style="background:#f44336;color:white;padding:3px 8px;border-radius:3px;font-size:0.8rem;">
+                            ${daysLeft} days left</span>` : 
+          daysLeft <= 7 ? `<span style="background:#FF9800;color:white;padding:3px 8px;border-radius:3px;font-size:0.8rem;">
+                            ${daysLeft} days left</span>` : ''}
+    </div>
+    
+    <p style="margin: 5px 0; color: #444;">
+        <strong>🏪 Shop:</strong> ${deal.shopName}
+    </p>
+    
+    <p style="margin: 8px 0; color: #444; background: #f9f9f9; padding: 8px; border-radius: 5px;">
+        ${deal.description}
+    </p>
+    
+    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+        <span style="color: #666; background: #f0f0f0; padding: 4px 10px; border-radius: 3px;">
+            ${deal.category}
+        </span>
+        <span style="color: #2196F3; font-weight: bold;">
+            📅 ${startStr} - ${endStr}
+        </span>
+    </div>
+    
+    <div style="text-align: right; margin-top: 10px;">
+        <a href="https://wa.me/91${deal.phone}" 
+           target="_blank"
+           style="background: #25D366; color: white; padding: 8px 15px; 
+                  border-radius: 5px; text-decoration: none; font-weight: bold;">
+            📱 Contact on WhatsApp
+        </a>
+    </div>
+`;
 // Simple save function
 function saveDailyDeal() {
     console.log("saveDailyDeal called");
     
     // Get form values
-    const shopName = document.getElementById('shopName').value || '';
-    const dealTitle = document.getElementById('dealTitle').value || '';
-    const dealDesc = document.getElementById('dealDescription').value || '';
-    const category = document.getElementById('dealCategory').value || '';
-    const phone = document.getElementById('dealPhone').value || '';
-    const validTill = Date.now() + (7 * 24 * 60 * 60 * 1000);
+    const shopName = document.getElementById('shopName').value.trim();
+    const dealTitle = document.getElementById('dealTitle').value.trim();
+    const dealDesc = document.getElementById('dealDescription').value.trim();
+    const category = document.getElementById('dealCategory').value;
+    const phone = document.getElementById('dealPhone').value.trim();
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
     
-    // Simple validation
-    if (!shopName || !dealTitle || !phone) {
-        alert("❌ Shop name, offer title aur phone number daalo!");
+    // Validation
+    if (!shopName || !dealTitle || !dealDesc || !category || !phone || !startDate || !endDate) {
+        alert("❌ Please fill all required fields!");
         return;
     }
     
     if (phone.length !== 10) {
-        alert("❌ 10 digit phone number daalo!");
+        alert("❌ Please enter valid 10 digit phone number!");
         return;
+    }
+    
+    // Date validation
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Remove time part
+    
+    if (start < today) {
+        alert("❌ Start date cannot be in the past!");
+        return;
+    }
+    
+    if (end <= start) {
+        alert("❌ End date must be after start date!");
+        return;
+    }
+    
+    // Calculate days difference
+    const timeDiff = end.getTime() - start.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both days
+    
+    if (daysDiff > 365) {
+        if (!confirm(`⚠️ Your offer is for ${daysDiff} days (more than 1 year). Are you sure?`)) {
+            return;
+        }
     }
     
     // Check Firebase
@@ -849,26 +923,50 @@ function saveDailyDeal() {
     }
     
     const db = firebase.database();
+    const timestamp = Date.now();
     
-    // Simple save - NO EXPIRY FOR NOW
+    // Convert dates to timestamps
+    const startTimestamp = start.getTime();
+    const endTimestamp = end.getTime();
+    
+    // Save to Firebase
     db.ref('deals').push({
         shopName: shopName,
         title: dealTitle,
         description: dealDesc,
         category: category,
         phone: phone,
-        timestamp: Date.now(),
-        userId: user.uid
+        timestamp: timestamp,
+        userId: user.uid,
+        userName: localStorage.getItem('user_name') || 'Anonymous',
+        startDate: startTimestamp,
+        endDate: endTimestamp,
+        daysValid: daysDiff,
+        status: 'active'
     })
     .then(() => {
-        alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}`);
+        // Format dates for display
+        const startStr = start.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+        const endStr = end.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+        
+        alert(`✅ Offer Submitted Successfully!\n\n` +
+              `🏪 Shop: ${shopName}\n` +
+              `🎯 Offer: ${dealTitle}\n` +
+              `📅 Validity: ${startStr} to ${endStr} (${daysDiff} days)\n` +
+              `📱 WhatsApp: ${phone}\n\n` +
+              `Your offer is now live for all users!`);
         
         // Reset form
-        document.getElementById('shopName').value = '';
-        document.getElementById('dealTitle').value = '';
-        document.getElementById('dealDescription').value = '';
-        document.getElementById('dealCategory').value = '';
-        document.getElementById('dealPhone').value = '';
+        document.getElementById('dealForm').reset();
+        
+        // Set default dates (tomorrow to 7 days later)
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        
+        document.getElementById('startDate').value = tomorrow.toISOString().split('T')[0];
+        document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
         
         // Reload deals
         if (document.getElementById('deals-screen').style.display === 'block') {
@@ -877,12 +975,6 @@ function saveDailyDeal() {
     })
     .catch((error) => {
         alert("❌ Error: " + error.message);
+        console.error("Save error:", error);
     });
-}
-
-// Make functions available globally
-window.openDealsNow = openDealsNow;
-window.loadDailyDeals = loadDailyDeals;
-window.saveDailyDeal = saveDailyDeal;
-
-console.log("✅ Daily Deals system loaded (Simple Version)");
+          }
