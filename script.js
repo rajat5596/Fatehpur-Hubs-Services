@@ -729,7 +729,6 @@ function loadDailyDeals() {
     
     const db = firebase.database();
     
-    // Simple Firebase query - NO COMPLEX FILTERS
     db.ref('deals').once('value')
         .then((snapshot) => {
             console.log("Firebase data received");
@@ -742,15 +741,25 @@ function loadDailyDeals() {
             }
             
             let dealCount = 0;
+            const now = Date.now(); // ✅ CORRECT PLACEMENT
             
             snapshot.forEach((child) => {
                 const deal = child.val();
-                const now = Date.now();
-    const isExpired = deal.validTill && deal.validTill < now;
-    if (isExpired) return;
+                
+                // ✅ EXPIRY CHECK - FIXED
+                const isExpired = deal.validTill && deal.validTill < now;
+                if (isExpired) {
+                    console.log("Expired deal skipped:", deal.title);
+                    return;
+                }
+                
                 dealCount++;
                 
-                // Simple card - NO EXPIRY LOGIC FOR NOW
+                // Calculate days left
+                const expiryDate = deal.validTill || (deal.timestamp + (7*24*60*60*1000));
+                const daysLeft = Math.ceil((expiryDate - now) / (24*60*60*1000));
+                
+                // Simple card
                 const card = document.createElement('div');
                 card.style.cssText = `
                     background: white;
@@ -764,7 +773,16 @@ function loadDailyDeals() {
                 const date = new Date(deal.timestamp || Date.now());
                 const dateStr = date.toLocaleDateString('hi-IN');
                 
+                // Days left badge
+                let daysBadge = '';
+                if (daysLeft <= 3) {
+                    daysBadge = `<span style="color:red; float:right; font-size:0.8rem;">${daysLeft} days left</span>`;
+                } else if (daysLeft <= 7) {
+                    daysBadge = `<span style="color:orange; float:right; font-size:0.8rem;">${daysLeft} days left</span>`;
+                }
+                
                 card.innerHTML = `
+                    ${daysBadge}
                     <h4 style="margin: 0 0 5px; color: #2a5298;">${deal.title || 'No Title'}</h4>
                     <p style="margin: 5px 0; color: #444;"><strong>Shop:</strong> ${deal.shopName || 'Unknown'}</p>
                     <p style="margin: 5px 0; color: #444;">${deal.description || ''}</p>
@@ -785,7 +803,7 @@ function loadDailyDeals() {
             count.style.textAlign = 'center';
             count.style.color = '#666';
             count.style.marginTop = '15px';
-            count.textContent = `Total ${dealCount} offers`;
+            count.textContent = `Total ${dealCount} active offers`;
             dealsList.appendChild(count);
             
         })
