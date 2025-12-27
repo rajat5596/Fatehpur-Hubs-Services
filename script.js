@@ -674,3 +674,232 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+// ================= DAILY DEALS SYSTEM =================
+// Simple function to save deal
+function saveDailyDeal() {
+    console.log("Saving Daily Deal...");
+    
+    // Get form values
+    const shopName = document.getElementById('shopName').value.trim();
+    const dealTitle = document.getElementById('dealTitle').value.trim();
+    const dealDesc = document.getElementById('dealDescription').value.trim();
+    const category = document.getElementById('dealCategory').value;
+    const phone = document.getElementById('dealPhone').value.trim();
+    
+    // Validation
+    if (!shopName || !dealTitle || !dealDesc || !category || !phone) {
+        alert("❌ Sab fields bharo!");
+        return;
+    }
+    
+    if (phone.length !== 10) {
+        alert("❌ 10 digit phone number daalo!");
+        return;
+    }
+    
+    // Check if Firebase is available
+    if (typeof firebase === 'undefined' || !firebase.database) {
+        alert("⚠️ Firebase loading... Please wait.");
+        return;
+    }
+    
+    // Get current user
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("❌ Please login first!");
+        return;
+    }
+    
+    const db = firebase.database();
+    const dealsRef = db.ref('deals').push();
+    
+    // Deal data with expiry (7 days default)
+    const dealData = {
+        shopName: shopName,
+        title: dealTitle,
+        description: dealDesc,
+        category: category,
+        phone: phone,
+        timestamp: Date.now(),
+        userId: user.uid,
+        userName: localStorage.getItem('user_name') || 'Anonymous',
+        validTill: Date.now() + (7 * 24 * 60 * 60 * 1000), // 7 days
+        status: 'active'
+    };
+    
+    // Save to Firebase
+    dealsRef.set(dealData)
+        .then(() => {
+            alert(`✅ Offer saved!\n\n🏪 ${shopName}\n🎯 ${dealTitle}\n📱 WhatsApp: ${phone}\n⏰ Valid for 7 days`);
+            
+            // Reset form
+            document.getElementById('shopName').value = '';
+            document.getElementById('dealTitle').value = '';
+            document.getElementById('dealDescription').value = '';
+            document.getElementById('dealCategory').value = '';
+            document.getElementById('dealPhone').value = '';
+            
+            // Reload deals list
+            if (document.getElementById('deals-screen').style.display === 'block') {
+                loadDailyDeals();
+            }
+        })
+        .catch((error) => {
+            alert("❌ Error saving: " + error.message);
+            console.error("Save error:", error);
+        });
+}
+
+// Function to load deals from Firebase
+function loadDailyDeals() {
+    const dealsList = document.getElementById('deals-list');
+    if (!dealsList) return;
+    
+    dealsList.innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Loading offers...</p>';
+    
+    if (typeof firebase === 'undefined' || !firebase.database) {
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
+        return;
+    }
+    
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Please login to see deals</p>';
+        return;
+    }
+    
+    const db = firebase.database();
+    const now = Date.now();
+    
+    // Get deals from Firebase
+    db.ref('deals').orderByChild('timestamp').limitToLast(20).once('value')
+        .then((snapshot) => {
+            dealsList.innerHTML = '';
+            
+            if (!snapshot.exists()) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi offers nahi hain</p>';
+                return;
+            }
+            
+            let activeDeals = 0;
+            const dealsArray = [];
+            
+            // Process each deal
+            snapshot.forEach((child) => {
+                const deal = child.val();
+                const dealId = child.key;
+                
+                // Check if deal is expired
+                const isExpired = deal.validTill && deal.validTill < now;
+                
+                if (!isExpired && deal.status !== 'expired') {
+                    activeDeals++;
+                    dealsArray.push({
+                        id: dealId,
+                        ...deal,
+                        isExpired: false,
+                        daysLeft: deal.validTill ? 
+                                 Math.ceil((deal.validTill - now) / (24 * 60 * 60 * 1000)) : 7
+                    });
+                }
+            });
+            
+            // Sort by latest first
+            dealsArray.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Display deals
+            if (dealsArray.length === 0) {
+                dealsList.innerHTML = '<p style="text-align:center;color:#777;padding:40px;">Abhi koi active offers nahi hain</p>';
+                return;
+            }
+            
+            dealsArray.forEach((deal) => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: white;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 15px 0;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                `;
+                
+                // Format dates
+                const postDate = new Date(deal.timestamp).toLocaleDateString('hi-IN');
+                const expiryDate = new Date(deal.validTill).toLocaleDateString('hi-IN');
+                
+                // Days left badge
+                let daysBadge = '';
+                if (deal.daysLeft <= 3) {
+                    daysBadge = `<span style="background:#f44336;color:white;padding:3px 8px;border-radius:3px;font-size:0.8rem;float:right;">
+                                    ${deal.daysLeft} days left
+                                </span>`;
+                } else if (deal.daysLeft <= 7) {
+                    daysBadge = `<span style="background:#FF9800;color:white;padding:3px 8px;border-radius:3px;font-size:0.8rem;float:right;">
+                                    ${deal.daysLeft} days left
+                                </span>`;
+                }
+                
+                card.innerHTML = `
+                    ${daysBadge}
+                    <h4 style="margin:0 0 8px; color:#2a5298; font-size:1.1rem;">
+                        ${deal.title}
+                    </h4>
+                    <p style="margin:5px 0; color:#444;">
+                        <strong>🏪 Shop:</strong> ${deal.shopName}
+                    </p>
+                    <p style="margin:8px 0; color:#444; background:#f9f9f9; padding:8px; border-radius:5px;">
+                        ${deal.description}
+                    </p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span style="color:#666; background:#f0f0f0; padding:4px 10px; border-radius:3px;">
+                            ${deal.category}
+                        </span>
+                        <div>
+                            <small style="color:#666;">⏳ Till: ${expiryDate}</small>
+                            <a href="https://wa.me/91${deal.phone}" 
+                               target="_blank"
+                               style="background:#25D366; color:white; padding:6px 12px; border-radius:5px; 
+                                      text-decoration:none; font-weight:bold; margin-left:10px;">
+                                📱 WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px; color:#777; font-size:0.8rem; text-align:right;">
+                        Posted: ${postDate}
+                    </div>
+                `;
+                
+                dealsList.appendChild(card);
+            });
+            
+            // Show count
+            const countDiv = document.createElement('div');
+            countDiv.style.cssText = 'text-align:center; margin-top:20px; color:#666;';
+            countDiv.innerHTML = `<p>${activeDeals} active offers available</p>`;
+            dealsList.appendChild(countDiv);
+            
+        })
+        .catch((error) => {
+            console.error("Error loading deals:", error);
+            dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
+        });
+}
+
+// Auto-load deals when deals screen is opened
+const originalShowScreen = window.showScreen || function(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+    const screen = document.getElementById(screenId);
+    if (screen) screen.style.display = 'block';
+};
+
+window.showScreen = function(screenId) {
+    originalShowScreen(screenId);
+    
+    // If deals screen is opened, load deals
+    if (screenId === 'deals-screen') {
+        setTimeout(loadDailyDeals, 300);
+    }
+};
+
+console.log("✅ Daily Deals system loaded");
