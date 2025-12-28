@@ -1050,14 +1050,23 @@ function saveDailyDeal() {
 function showScreen(screenId) {
     console.log("Changing screen to:", screenId);
     
-    // 1. Sab screens hide karo
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('add-service-screen').style.display = 'none'; 
-    document.getElementById('jobs-screen').style.display = 'none';
-    document.getElementById('share-screen').style.display = 'none';
-    document.getElementById('deals-screen').style.display = 'none';
+    // 1. Sab screens HIDE karo INCLUDING deals-screen
+    const allScreens = [
+        'home-screen',
+        'add-service-screen', 
+        'jobs-screen',
+        'share-screen',
+        'deals-screen'  // ✅ YEH LINE ADD KARNA HAI
+    ];
     
-    // 2. Jo screen chahiye wo show karo
+    allScreens.forEach(id => {
+        const screen = document.getElementById(id);
+        if (screen) {
+            screen.style.display = 'none';
+        }
+    });
+    
+    // 2. Jo screen chahiye wo SHOW karo
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
         targetScreen.style.display = 'block';
@@ -1070,9 +1079,23 @@ function showScreen(screenId) {
             loadDailyDeals();
         }, 300);
     }
+    
+    // 4. Agar home screen hai to services load karo
+    if (screenId === 'home-screen') {
+        // Agar aapka loadCategories function hai to
+        if (typeof window.loadCategories === 'function') {
+            setTimeout(window.loadCategories, 300);
+        }
+    }
+    
+    // 5. Agar jobs screen hai to jobs load karo
+    if (screenId === 'jobs-screen') {
+        // Agar aapka loadJobs function hai to
+        if (typeof window.loadJobs === 'function') {
+            setTimeout(window.loadJobs, 300);
+        }
+    }
 }
 
 // Function ko globally available karo
 window.showScreen = showScreen;
-
-console.log("✅ Screen switching function loaded");
