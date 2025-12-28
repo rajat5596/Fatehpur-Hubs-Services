@@ -678,14 +678,31 @@ if ('serviceWorker' in navigator) {
 
 // Function to open deals screen
 function openDealsNow() {
-    console.log("openDealsNow function called");
+    console.log("openDealsNow - Simple version");
     
-    // First hide all screens
-    const screens = ['home-screen', 'add-service-screen', 'jobs-screen', 'share-screen'];
-    screens.forEach(id => {
-        const screen = document.getElementById(id);
-        if (screen) screen.style.display = 'none';
-    });
+    // 1. Hide all other screens
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    
+    // 2. Show deals screen
+    const dealsScreen = document.getElementById('deals-screen');
+    if (dealsScreen) {
+        dealsScreen.style.display = 'block';
+        console.log("✅ Deals screen shown");
+        
+        // Load deals
+        setTimeout(function() {
+            if (typeof loadDailyDeals === 'function') {
+                loadDailyDeals();
+            }
+        }, 300);
+    } else {
+        console.error("❌ deals-screen element not found");
+        alert("Please refresh the app. Deals screen not found.");
+    }
+}
     
     // Show deals screen
     const dealsScreen = document.getElementById('deals-screen');
