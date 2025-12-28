@@ -678,9 +678,14 @@ if ('serviceWorker' in navigator) {
 
 // Function to open deals screen
 function openDealsNow() {
-    console.log("openDealsNow - Calling showScreen('deals-screen')");
-    showScreen('deals-screen');
-}
+    console.log("openDealsNow function called");
+    
+    // First hide all screens
+    const screens = ['home-screen', 'add-service-screen', 'jobs-screen', 'share-screen'];
+    screens.forEach(id => {
+        const screen = document.getElementById(id);
+        if (screen) screen.style.display = 'none';
+    });
     
     // Show deals screen
     const dealsScreen = document.getElementById('deals-screen');
