@@ -451,6 +451,14 @@ function registerJob() {
     
     const title = document.getElementById('jobTitle').value;
     const shopName = document.getElementById('jobShopName').value;
+    const jobDuration = document.getElementById('jobDuration').value;
+if (!jobDuration) {
+    alert("Duration select karo!");
+    return;
+}
+
+// End time calculate karo (din ko milliseconds mein)
+const endTime = Date.now() + parseInt(jobDuration) * 24 * 60 * 60 * 1000;
     const location = document.getElementById('jobLocation').value;
     const salary = document.getElementById('jobSalary').value;
     const phone = document.getElementById('jobPhone').value;
@@ -468,6 +476,8 @@ function registerJob() {
         salary: salary,
         phone: phone,
         description: description,
+        duration: jobDuration,
+endTime: endTime,
         posterId: posterId,
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
@@ -498,7 +508,13 @@ function loadJobs() {
         }
         
         let allJobs = [];
-        snapshot.forEach(childSnapshot => {
+        snapshot.forEach((childSnapshot) => {
+    const job = childSnapshot.val();
+    const currentTime = Date.now();
+    if (job.endTime && currentTime > job.endTime) {
+        childSnapshot.ref.remove();
+        return;
+    }
             allJobs.push(childSnapshot.val());
         });
 
