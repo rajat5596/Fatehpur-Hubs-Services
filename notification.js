@@ -156,3 +156,73 @@ window.sendServiceNotification = sendServiceNotification;
 window.sendJobNotification = sendJobNotification;
 
 console.log("✅ Simple notification system loaded");
+// ================= PROCESS PENDING NOTIFICATIONS =================
+
+// After system loads, process any pending notifications
+function processPendingNotifications() {
+    console.log("Processing pending notifications...");
+    
+    if (window.pendingNotifications && window.pendingNotifications.length > 0) {
+        console.log(`Found ${window.pendingNotifications.length} pending notifications`);
+        
+        window.pendingNotifications.forEach((item, index) => {
+            if (item.type === 'deal') {
+                // Use the actual sendDealNotification function
+                setTimeout(() => {
+                    console.log("Sending queued deal notification:", item.data);
+                    
+                    // Your actual notification sending code
+                    if (Notification.permission === "granted") {
+                        try {
+                            new Notification("🏪 नया डील ऑफर", {
+                                body: `${item.data.title || 'Offer'} - ${item.data.shopName || 'Shop'}`,
+                                icon: "https://www.fatehpurhubs.co.in/icons/icon-192x192.png"
+                            });
+                            console.log("✅ Queued notification sent");
+                        } catch (error) {
+                            console.error("Error sending queued notification:", error);
+                        }
+                    }
+                }, index * 1000); // Stagger them
+            }
+        });
+        
+        // Clear pending
+        window.pendingNotifications = [];
+    }
+}
+
+// Override the temporary sendDealNotification with real one
+window.sendDealNotification = function(dealData) {
+    console.log("sendDealNotification (real) called:", dealData);
+    
+    if (!("Notification" in window)) {
+        console.log("Notifications not supported");
+        return;
+    }
+    
+    if (Notification.permission !== "granted") {
+        console.log("Notification permission not granted");
+        return;
+    }
+    
+    try {
+        const notification = new Notification("🏪 नया डील ऑफर", {
+            body: `${dealData.title || 'Offer'} - ${dealData.shopName || 'Shop'} (${dealData.category || ''})`,
+            icon: "https://www.fatehpurhubs.co.in/icons/icon-192x192.png"
+        });
+        
+        console.log("✅ Deal notification sent successfully");
+        return notification;
+    } catch (error) {
+        console.error("Error sending notification:", error);
+    }
+};
+
+// Process any pending notifications after 3 seconds
+setTimeout(processPendingNotifications, 3000);
+
+// ================= DEBUGGING =================
+console.log("✅ Notification system fully loaded!");
+console.log("window.sendDealNotification:", typeof window.sendDealNotification);
+console.log("Firebase messaging available:", typeof firebase !== 'undefined' && firebase.messaging ? 'Yes' : 'No');
