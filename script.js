@@ -1045,123 +1045,81 @@ function saveDailyDeal() {
         console.error("Save error:", error);
     });
           }
-// ============ SCREEN SWITCHING FUNCTION ============
+// ============ SIMPLE FOOTER FUNCTIONS - ADD THIS AT THE END ============
 
-function showScreen(screenId) {
-    console.log("Changing screen to:", screenId);
-    
-    // 1. Sab screens HIDE karo INCLUDING deals-screen
-    const allScreens = [
-        'home-screen',
-        'add-service-screen', 
-        'jobs-screen',
-        'share-screen',
-        'deals-screen'
-    ];
-    
-    allScreens.forEach(id => {
-        const screen = document.getElementById(id);
-        if (screen) {
-            screen.style.display = 'none';
-        }
-    });
-    
-    // 2. Jo screen chahiye wo SHOW karo
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-        targetScreen.style.display = 'block';
-        console.log("✅ Screen shown:", screenId);
-    }
-    
-    // 3. IMPORTANT: HAR SCREEN KE LIYE ALAG LOAD FUNCTION CALL KARO
-    if (screenId === 'deals-screen') {
-        console.log("Loading daily deals...");
-        // Thoda delay dekar load karo
-        setTimeout(function() {
-            if (typeof loadDailyDeals === 'function') {
-                loadDailyDeals();
-            } else {
-                console.error("loadDailyDeals function not found!");
-                // Emergency reload
-                location.reload();
-            }
-        }, 100);
-    }
-    
-    if (screenId === 'home-screen') {
-        // Agar aapka loadCategories function hai to
-        if (typeof window.loadCategories === 'function') {
-            setTimeout(window.loadCategories, 100);
-        }
-    }
-    
-    if (screenId === 'jobs-screen') {
-        // Agar aapka loadJobs function hai to
-        if (typeof window.loadJobs === 'function') {
-            setTimeout(window.loadJobs, 100);
-        }
-    }
-    
-    if (screenId === 'share-screen') {
-        // Agar aapka loadShareContent function hai to
-        if (typeof window.loadShareContent === 'function') {
-            setTimeout(window.loadShareContent, 100);
-        }
-    }
+function goHome() {
+    console.log("Going to Home");
+    // Sab screens hide
+    document.getElementById('deals-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    // Home show
+    document.getElementById('home-screen').style.display = 'block';
 }
-// ============ SPECIAL FIX FOR DEALS SCREEN ============
 
-function openDealsWithFix() {
-    console.log("openDealsWithFix called");
-    
-    // 1. Sab screens hide karo
-    const screens = ['home-screen', 'add-service-screen', 'jobs-screen', 'share-screen', 'deals-screen'];
-    screens.forEach(id => {
-        const screen = document.getElementById(id);
-        if (screen) screen.style.display = 'none';
-    });
-    
-    // 2. Deals screen show karo
+function goService() {
+    console.log("Going to Services");
+    // Sab screens hide
+    document.getElementById('deals-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    // Services show
+    document.getElementById('add-service-screen').style.display = 'block';
+}
+
+function goJobs() {
+    console.log("Going to Jobs");
+    // Sab screens hide
+    document.getElementById('deals-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    // Jobs show
+    document.getElementById('jobs-screen').style.display = 'block';
+}
+
+function goShare() {
+    console.log("Going to Share");
+    // Sab screens hide
+    document.getElementById('deals-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    // Share show
+    document.getElementById('share-screen').style.display = 'block';
+}
+
+function goDeals() {
+    console.log("Going to Deals");
+    // Sab screens hide
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('add-service-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    // Deals show
     const dealsScreen = document.getElementById('deals-screen');
-    if (dealsScreen) {
-        dealsScreen.style.display = 'block';
-        console.log("✅ Deals screen shown");
-        
-        // 3. Load deals IMMEDIATELY
-        setTimeout(function() {
-            if (typeof loadDailyDeals === 'function') {
-                loadDailyDeals();
-                console.log("✅ Deals loaded successfully");
-            } else {
-                console.error("❌ loadDailyDeals function missing!");
-                // Emergency content show karo
-                const dealsList = document.getElementById('deals-list');
-                if (dealsList) {
-                    dealsList.innerHTML = `
-                        <div style="text-align:center; padding:40px;">
-                            <h3 style="color:#2a5298;">Daily Offers</h3>
-                            <p style="color:#666;">Loading offers...</p>
-                            <button onclick="location.reload()" 
-                                    style="background:#2a5298; color:white; padding:10px 20px; border:none; border-radius:5px; margin-top:20px;">
-                                Refresh Page
-                            </button>
-                        </div>
-                    `;
-                }
-            }
-        }, 50);
-    } else {
-        console.error("❌ Deals screen not found");
-        alert("Please refresh the app");
-    }
+    dealsScreen.style.display = 'block';
+    
+    // Deals load karo
+    setTimeout(function() {
+        if (typeof loadDailyDeals === 'function') {
+            loadDailyDeals();
+        }
+    }, 100);
 }
 
-// Function globally available karo
-window.openDealsWithFix = openDealsWithFix;
-window.openDealsNow = openDealsWithFix; // Backup
+// Functions globally available karo
+window.goHome = goHome;
+window.goService = goService;
+window.goJobs = goJobs;
+window.goShare = goShare;
+window.goDeals = goDeals;
 
-// ============ DEBUGGING HELPER ============
-console.log("=== APP FUNCTIONS CHECK ===");
-console.log("1. showScreen exists:", typeof showScreen);
-console.log("2. loadDailyDeals exists:", typeof loadDailyDeals);
-console.log("3. openDealsWithFix exists:", typeof openDealsWithFix);
+// Auto show home screen on load
+setTimeout(function() {
+    goHome();
+}, 500);
+
+console.log("✅ Simple footer functions loaded");
