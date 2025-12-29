@@ -1056,7 +1056,7 @@ function showScreen(screenId) {
         'add-service-screen', 
         'jobs-screen',
         'share-screen',
-        'deals-screen'  // ✅ YEH LINE ADD KARNA HAI
+        'deals-screen'
     ];
     
     allScreens.forEach(id => {
@@ -1073,30 +1073,95 @@ function showScreen(screenId) {
         console.log("✅ Screen shown:", screenId);
     }
     
-    // 3. Agar deals screen hai to deals load karo
+    // 3. IMPORTANT: HAR SCREEN KE LIYE ALAG LOAD FUNCTION CALL KARO
     if (screenId === 'deals-screen') {
+        console.log("Loading daily deals...");
+        // Thoda delay dekar load karo
         setTimeout(function() {
-            loadDailyDeals();
-        }, 300);
+            if (typeof loadDailyDeals === 'function') {
+                loadDailyDeals();
+            } else {
+                console.error("loadDailyDeals function not found!");
+                // Emergency reload
+                location.reload();
+            }
+        }, 100);
     }
     
-    // 4. Agar home screen hai to services load karo
     if (screenId === 'home-screen') {
         // Agar aapka loadCategories function hai to
         if (typeof window.loadCategories === 'function') {
-            setTimeout(window.loadCategories, 300);
+            setTimeout(window.loadCategories, 100);
         }
     }
     
-    // 5. Agar jobs screen hai to jobs load karo
     if (screenId === 'jobs-screen') {
         // Agar aapka loadJobs function hai to
         if (typeof window.loadJobs === 'function') {
-            setTimeout(window.loadJobs, 300);
+            setTimeout(window.loadJobs, 100);
+        }
+    }
+    
+    if (screenId === 'share-screen') {
+        // Agar aapka loadShareContent function hai to
+        if (typeof window.loadShareContent === 'function') {
+            setTimeout(window.loadShareContent, 100);
         }
     }
 }
+// ============ SPECIAL FIX FOR DEALS SCREEN ============
 
-// Function ko globally available karo
-window.showScreen = showScreen;
+function openDealsWithFix() {
+    console.log("openDealsWithFix called");
+    
+    // 1. Sab screens hide karo
+    const screens = ['home-screen', 'add-service-screen', 'jobs-screen', 'share-screen', 'deals-screen'];
+    screens.forEach(id => {
+        const screen = document.getElementById(id);
+        if (screen) screen.style.display = 'none';
+    });
+    
+    // 2. Deals screen show karo
+    const dealsScreen = document.getElementById('deals-screen');
+    if (dealsScreen) {
+        dealsScreen.style.display = 'block';
+        console.log("✅ Deals screen shown");
+        
+        // 3. Load deals IMMEDIATELY
+        setTimeout(function() {
+            if (typeof loadDailyDeals === 'function') {
+                loadDailyDeals();
+                console.log("✅ Deals loaded successfully");
+            } else {
+                console.error("❌ loadDailyDeals function missing!");
+                // Emergency content show karo
+                const dealsList = document.getElementById('deals-list');
+                if (dealsList) {
+                    dealsList.innerHTML = `
+                        <div style="text-align:center; padding:40px;">
+                            <h3 style="color:#2a5298;">Daily Offers</h3>
+                            <p style="color:#666;">Loading offers...</p>
+                            <button onclick="location.reload()" 
+                                    style="background:#2a5298; color:white; padding:10px 20px; border:none; border-radius:5px; margin-top:20px;">
+                                Refresh Page
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }, 50);
+    } else {
+        console.error("❌ Deals screen not found");
+        alert("Please refresh the app");
+    }
+}
 
+// Function globally available karo
+window.openDealsWithFix = openDealsWithFix;
+window.openDealsNow = openDealsWithFix; // Backup
+
+// ============ DEBUGGING HELPER ============
+console.log("=== APP FUNCTIONS CHECK ===");
+console.log("1. showScreen exists:", typeof showScreen);
+console.log("2. loadDailyDeals exists:", typeof loadDailyDeals);
+console.log("3. openDealsWithFix exists:", typeof openDealsWithFix);
