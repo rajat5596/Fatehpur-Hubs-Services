@@ -506,7 +506,20 @@ function loadJobs() {
             listElement.innerHTML = '<p style="text-align:center;color:#ff6666;">अभी कोई नौकरी उपलब्ध नहीं है।</p>';
             return;
         }
-        
+        // Days Left Badge Calculate Karo
+            let daysBadge = '';
+            if (job.endTime) {
+                const daysLeft = Math.ceil((job.endTime - currentTime) / (24 * 60 * 60 * 1000));
+                if (daysLeft <= 0) {
+                    daysBadge = '<span style="background:#f44336;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">EXPIRED</span>';
+                } else if (daysLeft === 1) {
+                    daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">1 DAY LEFT</span>';
+                } else if (daysLeft <= 7) {
+                    daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' DAYS LEFT</span>';
+                } else {
+                    daysBadge = '<span style="background:#4CAF50;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' days left</span>';
+                }
+            }
         let allJobs = [];
         snapshot.forEach((childSnapshot) => {
     const job = childSnapshot.val();
