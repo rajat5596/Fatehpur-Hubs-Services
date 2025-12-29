@@ -1,3 +1,27 @@
+// notification.js - COMPLETE NOTIFICATION SYSTEM FOR FATEHPUR HUBS
+console.log("=== Fatehpur Hubs Notification System LOADING ===");
+
+// IMMEDIATELY make functions available for script.js
+window.sendDealNotification = function(dealData) {
+    console.log("sendDealNotification called (early)", dealData);
+    
+    // Store data to send later when full system loads
+    if (!window.pendingNotifications) window.pendingNotifications = [];
+    window.pendingNotifications.push({
+        type: 'deal',
+        data: dealData,
+        time: Date.now()
+    });
+    
+    console.log("Deal notification queued, will send when system ready");
+};
+
+// Rest of your ORIGINAL code continues from here...
+// VAPID Key
+const vapidKey = "BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ";
+
+// ================= BASIC NOTIFICATION FUNCTIONS =================
+// ... rest of your original code ...
 // notification.js - SIMPLE VERSION (NO ERRORS)
 console.log("=== Simple Notification System ===");
 
