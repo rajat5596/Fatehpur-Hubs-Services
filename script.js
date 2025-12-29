@@ -81,7 +81,7 @@ function renderProviderCard(p) {
         
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
-    // Days Left Badge Calculate Karo
+    // Days Left Badge
     let daysBadge = '';
     if (job.endTime) {
         const currentTime = Date.now();
@@ -100,9 +100,9 @@ function renderJobCard(job) {
 
     return `<div class="profile-card" style="border-left: 5px solid #ff9800; position:relative;">
         ${daysBadge}
-        <h4 style="color:#ff9800; margin-top:0;">\( {job.title} ( \){job.shopName})</h4>
+        <h4 style="color:#ff9800; margin-top:0;">\( {job.title} ( \){job.shopName || 'Unknown'})</h4>
         <p style="font-size:12px;color:#555;margin-bottom:5px;">💰 Salary: ₹${job.salary} | 📍 ${job.location}</p>
-        <p style="font-size:14px;margin-bottom:10px;">${job.description.substring(0, 100)}...</p>
+        <p style="font-size:14px;margin-bottom:10px;">${job.description ? job.description.substring(0, 100) + '...' : 'No description'}</p>
         <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone}')">Apply/WhatsApp</button>
     </div>`;
 }
