@@ -1012,6 +1012,17 @@ function saveDailyDeal() {
         status: 'active'
     })
     .then(() => {
+        setTimeout(() => {
+        if (typeof sendDealNotification === 'function') {
+            sendDealNotification({
+                title: dealTitle,
+                shopName: shopName,
+                category: category
+            });
+        }
+    }, 1500);
+    
+})
         // Format dates for display
         const startStr = start.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
         const endStr = end.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
