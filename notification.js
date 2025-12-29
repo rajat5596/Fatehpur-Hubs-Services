@@ -1,8 +1,6 @@
-// notification.js - COMPLETE NOTIFICATION SYSTEM FOR FATEHPUR HUBS
-console.log("=== Fatehpur Hubs Notification System ===");
 
-// VAPID Key
-const vapidKey = "BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ";
+// notification.js - COMPLETE NOTIFICATION SYSTEM FOR FATEHPUR HUBS (v8.10.1)
+console.log("=== Fatehpur Hubs Notification System ===");
 
 // ================= BASIC NOTIFICATION FUNCTIONS =================
 function enableNotifications() {
@@ -115,17 +113,26 @@ function initNotificationSystem() {
 function initializeFirebaseMessaging() {
     console.log("Initializing Firebase Messaging...");
     
-    // Check if Firebase is loaded
-    if (typeof firebase === 'undefined' || !firebase.messaging) {
-        console.error("Firebase messaging not available");
+    // Check if Firebase is loaded and messaging available
+    if (typeof firebase === 'undefined') {
+        console.error("Firebase not loaded");
+        return;
+    }
+    
+    if (!firebase.messaging || typeof firebase.messaging !== 'function') {
+        console.error("Firebase messaging not available in v8.10.1");
+        
+        // Still show basic notifications
+        showNotification("Fatehpur Hubs", "Basic notifications enabled!");
         return;
     }
     
     try {
+        // For Firebase v8.10.1
         const messaging = firebase.messaging();
         
         // Get FCM token
-        messaging.getToken({ vapidKey: vapidKey }).then((currentToken) => {
+        messaging.getToken().then((currentToken) => {
             if (currentToken) {
                 console.log('✅ FCM Token obtained:', currentToken.substring(0, 20) + '...');
                 
@@ -168,7 +175,7 @@ function saveFCMTokenToDatabase(token) {
 
         tokenRef.set({
             token: token,
-            device: navigator.userAgent, // device info
+            device: navigator.userAgent.substring(0, 100), // device info
             lastSeen: Date.now()
         }).then(() => {
             console.log('✅ Token successfully saved to Firebase!');
@@ -188,7 +195,7 @@ function sendServiceNotificationToAll(serviceData) {
         
         const notificationData = {
             title: '🛠️ नई सेवा उपलब्ध',
-            body: `${serviceData.category} - ${serviceData.area} में`,
+            body: `${serviceData.category || 'Service'} - ${serviceData.area || 'Fatehpur'} में`,
             type: 'new_service',
             timestamp: Date.now()
         };
@@ -212,7 +219,7 @@ function sendJobNotificationToAll(jobData) {
         
         const notificationData = {
             title: '💼 नई जॉब उपलब्ध',
-            body: `${jobData.title} - ${jobData.shopName} (${jobData.salary})`,
+            body: `${jobData.title || 'Job'} - ${jobData.shopName || 'Company'} (${jobData.salary || 'Negotiable'})`,
             type: 'new_job',
             timestamp: Date.now()
         };
@@ -228,67 +235,46 @@ function sendJobNotificationToAll(jobData) {
     }
 }
 
-// ================= INTEGRATION WITH EXISTING FUNCTIONS =================
-// Override existing registerService function to send notifications
-if (typeof window.registerService === 'function') {
-    const originalRegisterService = window.registerService;
-    window.registerService = function() {
-        const result = originalRegisterService.apply(this, arguments);
-        
-        // Send notification after 1 second
-        setTimeout(() => {
-            const serviceData = {
-                category: document.getElementById('serviceCategory')?.value,
-                area: document.getElementById('providerArea')?.value
-            };
-            sendServiceNotificationToAll(serviceData);
-        }, 1000);
-        
-        return result;
-    };
-    console.log("✅ registerService function overridden for notifications");
-}
+// ================= BASIC NOTIFICATIONS FOR EXISTING FUNCTIONS =================
+// Add notification to your existing save functions
 
-// Override existing registerJob function to send notifications
-if (typeof window.registerJob === 'function') {
-    const originalRegisterJob = window.registerJob;
-    window.registerJob = function() {
-        const result = originalRegisterJob.apply(this, arguments);
+// For Daily Deals
+function sendDealNotification(dealData) {
+    try {
+        const db = firebase.database();
+        const notificationRef = db.ref('notifications').push();
         
-        // Send notification after 1 second
-        setTimeout(() => {
-            const jobData = {
-                title: document.getElementById('jobTitle')?.value,
-                shopName: document.getElementById('jobShopName')?.value,
-                salary: document.getElementById('jobSalary')?.value
-            };
-            sendJobNotificationToAll(jobData);
-        }, 1000);
+        const notificationData = {
+            title: '🏪 नया डील ऑफर',
+            body: `${dealData.title || 'Special Offer'} - ${dealData.shopName || 'Shop'}`,
+            type: 'new_deal',
+            timestamp: Date.now()
+        };
         
-        return result;
-    };
-    console.log("✅ registerJob function overridden for notifications");
+        notificationRef.set(notificationData);
+        console.log('✅ Deal notification saved to DB');
+        
+        // Also show local notification
+        showNotification(notificationData.title, notificationData.body);
+        
+    } catch (error) {
+        console.error('Error sending deal notification:', error);
+    }
 }
 
 // ================= INITIALIZE EVERYTHING =================
-// Wait for DOM and Firebase to load
-window.addEventListener('load', function() {
-    console.log("Page fully loaded, starting notification system...");
-    
-    // Initialize basic notification system
+// Wait for DOM to load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNotificationSystem);
+} else {
     setTimeout(initNotificationSystem, 1000);
-    
-    // Initialize Firebase messaging after 3 seconds
-    setTimeout(() => {
-        if (typeof firebase !== 'undefined') {
-            initializeFirebaseMessaging();
-        }
-    }, 3000);
-});
+}
 
 // Make functions available globally
 window.enableNotifications = enableNotifications;
 window.showNotification = showNotification;
-window.initNotificationSystem = initNotificationSystem;
+window.sendServiceNotificationToAll = sendServiceNotificationToAll;
+window.sendJobNotificationToAll = sendJobNotificationToAll;
+window.sendDealNotification = sendDealNotification;
 
-console.log("✅ Notification system code loaded successfully!");
+console.log("✅ Notification system loaded successfully (v8.10.1 compatible)");
