@@ -1094,6 +1094,11 @@ function goJobs() {
     document.getElementById('share-screen').style.display = 'none';
     // Jobs show
     document.getElementById('jobs-screen').style.display = 'block';
+    
+    // Jobs load karo
+    if (typeof loadJobs === 'function') {
+        setTimeout(loadJobs, 300);
+    }
 }
 
 function goShare() {
