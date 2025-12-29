@@ -1099,3 +1099,30 @@ function showScreen(screenId) {
 
 // Function ko globally available karo
 window.showScreen = showScreen;
+// ============ FIX FOR EXISTING FUNCTIONS ============
+
+// Agar shareApp() function exist nahi karta to banaye
+if (typeof window.shareApp === 'undefined') {
+    window.shareApp = function() {
+        console.log("Opening Share screen...");
+        showScreen('share-screen');
+    };
+}
+
+// Agar openDealsNow() mein koi issue ho to backup function
+window.openDealsNow = function() {
+    console.log("Opening Daily Deals...");
+    showScreen('deals-screen');
+    // 300ms baad deals load karo
+    setTimeout(function() {
+        if (typeof loadDailyDeals === 'function') {
+            loadDailyDeals();
+        }
+    }, 300);
+};
+
+// ============ CONSOLE DEBUGGING ============
+console.log("Footer functions loaded:");
+console.log("1. showScreen function:", typeof showScreen);
+console.log("2. shareApp function:", typeof window.shareApp);
+console.log("3. openDealsNow function:", typeof window.openDealsNow);
