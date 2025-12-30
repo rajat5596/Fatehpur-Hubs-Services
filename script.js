@@ -1232,3 +1232,36 @@ if ('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in
 }
 
 console.log("Notification system code loaded");
+// FCM Token Get & Save (Client Side)
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.ready.then(reg => {
+        const messaging = firebase.messaging();
+
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                messaging.getToken({ vapidKey: 'BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ', serviceWorkerRegistration: reg })
+                    .then((token) => {
+                        console.log('FCM Token:', token);
+
+                        // Token Firebase mein save karo
+                        const db = firebase.database();
+                        const userId = localStorage.getItem('user_uid') || 'anonymous_' + Date.now();
+                        db.ref('fcm_tokens/' + userId).set({
+                            token: token,
+                            timestamp: Date.now()
+                        });
+                    })
+                    .catch(err => console.error('Token error:', err));
+            }
+        });
+    });
+}
+
+// Foreground notification (app open hone par)
+firebase.messaging().onMessage((payload) => {
+    console.log('Foreground notification:', payload);
+    new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: '/icons/icon-192x192.png'
+    });
+});
