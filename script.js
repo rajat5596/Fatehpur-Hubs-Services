@@ -1093,6 +1093,10 @@ function goHome() {
     document.getElementById('share-screen').style.display = 'none';
     // Home show
     document.getElementById('home-screen').style.display = 'block';
+    // Services load karo
+    if (typeof loadCategories === 'function') {
+        setTimeout(loadCategories, 300);
+    }
 }
 
 function goService() {
