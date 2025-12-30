@@ -81,6 +81,7 @@ function renderProviderCard(p) {
         
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
+    // Days Left Badge
     let daysBadge = job.daysBadge || '';
 
     return `<div class="profile-card" style="border-left: 5px solid #ff9800; position:relative;">
