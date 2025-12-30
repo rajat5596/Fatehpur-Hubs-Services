@@ -1172,3 +1172,55 @@ setTimeout(function() {
 }, 500);
 
 console.log("✅ Simple footer functions loaded");
+// FCM Notification System - Token Save & Permission
+
+// Firebase Messaging Object
+const messaging = firebase.messaging();
+
+// Token save karne ka function
+function saveFCMToken(token) {
+    const db = firebase.database();
+    const userId = localStorage.getItem('user_uid') || 'anonymous_' + Date.now();
+    db.ref('fcm_tokens/' + userId).set({
+        token: token,
+        timestamp: Date.now(),
+        userId: userId
+    }).then(() => {
+        console.log("FCM Token saved");
+    }).catch(err => {
+        console.error("Token save error:", err);
+    });
+}
+
+// Permission maang aur token le
+function requestNotificationPermission() {
+    Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+            messaging.getToken({ vapidKey: 'BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ' })
+                .then((currentToken) => {
+                    if (currentToken) {
+                        saveFCMToken(currentToken);
+                        console.log("FCM Token:", currentToken);
+                    }
+                }).catch(err => {
+                    console.error("Token error:", err);
+                });
+        }
+    });
+}
+
+// App load hone par permission maang lo
+window.addEventListener('load', () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(requestNotificationPermission, 5000); // 5 second baad maangega
+    }
+});
+
+// Foreground notification handle
+messaging.onMessage((payload) => {
+    console.log('Foreground notification:', payload);
+    new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: '/icons/icon-192x192.png'
+    });
+});
