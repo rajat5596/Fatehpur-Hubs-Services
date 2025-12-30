@@ -82,6 +82,8 @@ function renderProviderCard(p) {
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
     return `<div class="profile-card" style="border-left: 5px solid #ff9800;">
+    ${job.daysBadge || ''}
+        <h4 style="color:#ff9800; margin-top:0;">\( {job.title} ( \){job.shopName || 'Unknown'})</h4>
         <h4 style="color:#ff9800;">${job.title} (${job.shopName})</h4>
         <p style="font-size:12px;color:#555;margin-bottom:5px;">💰 Salary: ₹${job.salary} | 📍 ${job.location}</p>
         <p style="font-size:14px;margin-bottom:10px;">${job.description.substring(0, 100)}...</p>
@@ -508,6 +510,23 @@ function loadJobs() {
         }
         let allJobs = [];
         snapshot.forEach((childSnapshot) => {
+            // Days Left Badge
+    let daysBadge = '';
+    if (job.endTime) {
+        const daysLeft = Math.ceil((job.endTime - currentTime) / (24 * 60 * 60 * 1000));
+        if (daysLeft <= 0) {
+            daysBadge = '<span style="background:#f44336;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">EXPIRED</span>';
+        } else if (daysLeft === 1) {
+            daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">1 DAY LEFT</span>';
+        } else if (daysLeft <= 7) {
+            daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' DAYS LEFT</span>';
+        } else {
+            daysBadge = '<span style="background:#4CAF50;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' days left</span>';
+        }
+    }
+
+    job.daysBadge = daysBadge;  // ← Yeh line add kar de
+    allJobs.push(job);          // ← Yeh line pehle se hai
     const job = childSnapshot.val();
     const currentTime = Date.now();
     if (job.endTime && currentTime > job.endTime) {
