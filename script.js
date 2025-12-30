@@ -1227,3 +1227,16 @@ messaging.onMessage((payload) => {
         icon: '/icons/icon-192x192.png'
     });
 });
+// App load hone par notification button show karo agar permission default hai
+window.addEventListener('load', () => {
+    if ('Notification' in window) {
+        if (Notification.permission === 'default') {
+            const btn = document.getElementById('notification-permission-btn');
+            if (btn) btn.style.display = 'block';
+        } else if (Notification.permission === 'granted') {
+            // Already allowed, hide button
+            const btn = document.getElementById('notification-permission-btn');
+            if (btn) btn.style.display = 'none';
+        }
+    }
+});
