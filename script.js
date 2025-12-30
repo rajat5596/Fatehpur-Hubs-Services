@@ -86,7 +86,7 @@ function renderJobCard(job) {
 
     return `<div class="profile-card" style="border-left: 5px solid #ff9800; position:relative;">
         ${daysBadge}
-        <h4 style="color:#ff9800; margin-top:0;">\( {job.title || 'No Title'} ( \){job.shopName || 'Unknown'})</h4>
+        <h4 style="color:#ff9800; margin-top:0;">${job.title || 'No Title'} (${job.shopName || 'Unknown'})</h4>
         <p style="font-size:12px;color:#555;margin-bottom:5px;">Salary: ₹${job.salary || 'N/A'} | Location: ${job.location || 'Fatehpur'}</p>
         <p style="font-size:14px;margin-bottom:10px;">${(job.description || 'No description').substring(0, 100)}...</p>
         <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone || ''}')">Apply/WhatsApp</button>
