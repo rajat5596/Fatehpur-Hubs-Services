@@ -1193,20 +1193,23 @@ function saveFCMToken(token) {
 }
 
 // Permission maang aur token le
-function requestNotificationPermission() {
-    Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-            messaging.getToken({ vapidKey: 'BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ' })
-                .then((currentToken) => {
-                    if (currentToken) {
-                        saveFCMToken(currentToken);
-                        console.log("FCM Token:", currentToken);
-                    }
-                }).catch(err => {
-                    console.error("Token error:", err);
-                });
-        }
-    });
+Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+        messaging.getToken({ vapidKey: 'BEyN-5jhBHRlQBVYIODA3i7xIkWY1uJGGifqtkahlu9kR3I8O865mA-BqSTDcsaN5RjKUt6pu5u4-UYUHYTbjDQ' })
+            .then((currentToken) => {
+                if (currentToken) {
+                    saveFCMToken(currentToken);
+                    console.log("FCM Token:", currentToken);
+                    
+                    // Button hide kar do
+                    const notifBtn = document.getElementById('notification-permission-btn');
+                    if (notifBtn) notifBtn.style.display = 'none';
+                }
+            }).catch(err => {
+                console.error("Token error:", err);
+            });
+    }
+});
 }
 
 // App load hone par permission maang lo
