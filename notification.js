@@ -25,15 +25,22 @@ function requestPermission() {
             if (btn) btn.remove();
             alert('✅ नोटिफिकेशन चालू हो गया!');
 
-            const messaging = firebase.messaging();
-            messaging.getToken({ vapidKey: vapidKey })
-                .then((token) => {
+            navigator.serviceWorker.ready.then(registration => {
+                const messaging = firebase.messaging();
+                messaging.getToken({
+                    vapidKey: vapidKey,
+                    serviceWorkerRegistration: registration
+                }).then((token) => {
                     if (token) {
                         saveToken(token);
+                        console.log("Token:", token);
+                    } else {
+                        console.log("No token");
                     }
                 }).catch(err => {
-                    console.error("Token error:", err);
+                    console.error("getToken error:", err);
                 });
+            });
         }
     });
 }
