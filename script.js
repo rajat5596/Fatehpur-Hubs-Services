@@ -66,17 +66,16 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p) {
-    return `<div class="profile-card">
-    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+function renderJobCard(job) {
+    let daysBadge = job.daysBadge || '';
 
-    <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-        <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-        <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-        <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-    </div>
-</div>`;
+    return `<div class="profile-card" style="border-left: 5px solid #ff9800; position:relative;">
+        ${daysBadge}
+        <h4 style="color:#ff9800; margin-top:0;">\( {job.title || 'No Title'} ( \){job.shopName || 'Unknown'})</h4>
+        <p style="font-size:12px;color:#555;margin-bottom:5px;">Salary: ₹${job.salary || 'N/A'} | Location: ${job.location || 'Fatehpur'}</p>
+        <p style="font-size:14px;margin-bottom:10px;">${(job.description || 'No description').substring(0, 100)}...</p>
+        <button class="whatsapp-btn" onclick="openWhatsApp('${job.phone || ''}')">Apply/WhatsApp</button>
+    </div>`;
 }
         
 // जॉब कार्ड रेंडर करें
@@ -508,35 +507,39 @@ function loadJobs() {
             listElement.innerHTML = '<p style="text-align:center;color:#ff6666;">अभी कोई नौकरी उपलब्ध नहीं है।</p>';
             return;
         }
+        
         let allJobs = [];
-        snapshot.forEach((childSnapshot) => {
-            // Days Left Badge
-    let daysBadge = '';
-    if (job.endTime) {
-        const daysLeft = Math.ceil((job.endTime - currentTime) / (24 * 60 * 60 * 1000));
-        if (daysLeft <= 0) {
-            daysBadge = '<span style="background:#f44336;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">EXPIRED</span>';
-        } else if (daysLeft === 1) {
-            daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">1 DAY LEFT</span>';
-        } else if (daysLeft <= 7) {
-            daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' DAYS LEFT</span>';
-        } else {
-            daysBadge = '<span style="background:#4CAF50;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' days left</span>';
-        }
-    }
+        const currentTime = Date.now();
 
-    job.daysBadge = daysBadge;  // ← Yeh line add kar de
-    allJobs.push(job);          // ← Yeh line pehle se hai
-    const job = childSnapshot.val();
-    const currentTime = Date.now();
-    if (job.endTime && currentTime > job.endTime) {
-        childSnapshot.ref.remove();
-        return;
-    }
-            allJobs.push(childSnapshot.val());
+        snapshot.forEach((childSnapshot) => {
+            const job = childSnapshot.val();
+
+            // Expired job delete
+            if (job.endTime && currentTime > job.endTime) {
+                childSnapshot.ref.remove();
+                return; // Skip
+            }
+
+            // Days Left Badge
+            let daysBadge = '';
+            if (job.endTime) {
+                const daysLeft = Math.ceil((job.endTime - currentTime) / (24 * 60 * 60 * 1000));
+                if (daysLeft <= 0) {
+                    daysBadge = '<span style="background:#f44336;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">EXPIRED</span>';
+                } else if (daysLeft === 1) {
+                    daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">1 DAY LEFT</span>';
+                } else if (daysLeft <= 7) {
+                    daysBadge = '<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' DAYS LEFT</span>';
+                } else {
+                    daysBadge = '<span style="background:#4CAF50;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">' + daysLeft + ' days left</span>';
+                }
+            }
+
+            job.daysBadge = daysBadge;
+            allJobs.push(job);
         });
 
-        allJobs.reverse(); 
+        allJobs.reverse();
         
         const htmlContent = allJobs.map(job => renderJobCard(job)).join('');
         listElement.innerHTML = htmlContent;
