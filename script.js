@@ -1081,21 +1081,21 @@ window.backToGuestMode = function() {
     document.getElementById('mainApp').style.display = 'block';
 };
 // Auth listener: Button switch karne ke liye
+// 1. Auth Change Listener (Login/Logout button badalne ke liye)
 firebase.auth().onAuthStateChanged(user => {
-    // Purana header wala button dhoondhein (Jo aapke screenshot mein tha)
     const logoutBtn = document.querySelector('.logout-btn');
 
     if (logoutBtn) {
         if (user) {
-            // LOGIN HAI: Jaisa pehle tha waisa hi rehne do
-            logoutBtn.style.display = 'block';
-            logoutBtn.style.backgroundColor = '#ff4d4f'; // Red
+            // LOGIN HAI: Red Logout Button
+            logoutBtn.style.setProperty('display', 'block', 'important');
+            logoutBtn.style.backgroundColor = '#ff4d4f'; 
             logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
             logoutBtn.onclick = () => window.logOut(); 
         } else {
-            // GUEST HAI: Button ko mat chhupao, bas uska roop badal do
-            logoutBtn.style.display = 'block'; 
-            logoutBtn.style.backgroundColor = '#28a745'; // Green
+            // GUEST HAI: Green Login Button
+            logoutBtn.style.setProperty('display', 'block', 'important'); 
+            logoutBtn.style.backgroundColor = '#28a745'; 
             logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
             logoutBtn.onclick = () => {
                 document.getElementById('mainApp').style.display = 'none';
@@ -1104,4 +1104,14 @@ firebase.auth().onAuthStateChanged(user => {
         }
     }
 });
+
+// 2. Logout Function (Ye zaroori hai varna button kaam nahi karega)
+window.logOut = function() {
+    firebase.auth().signOut().then(() => {
+        alert("सफलतापूर्वक लॉगआउट हो गया!");
+        location.reload(); // Page refresh karke guest mode mein laane ke liye
+    }).catch((error) => {
+        console.error("Logout Error:", error);
+    });
+};
 
