@@ -61,13 +61,8 @@
             <!-- Header with Logout Button -->
             <header id="app-header">
     <div class="logo">Fatehpur Hubs</div>
-    
-    <button id="loginNavBtn" class="logout-btn" onclick="window.goToLogin()" style="display:none; background-color: #28a745 !important;">
-        <i class="fas fa-sign-in-alt"></i> Login
-    </button>
-
-    <button id="logoutNavBtn" class="logout-btn" onclick="window.logOut()" style="display:none; background-color: #f44336 !important;">
-        <i class="fas fa-sign-out-alt"></i> Logout
+    <button id="authBtn" class="logout-btn" onclick="handleAuthClick()">
+        <i id="authIcon" class="fas fa-sign-out-alt"></i> <span id="authText">Logout</span>
     </button>
 </header>
 
