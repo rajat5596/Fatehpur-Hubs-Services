@@ -978,6 +978,20 @@ function loadDailyDeals() {
         });
 }
 // Simple save function
+window.saveDailyDeal = function() {
+    const user = firebase.auth().currentUser;
+    
+    if (!user) {
+        alert("अपना ऑफर डालने के लिए कृपया पहले लॉगिन करें।");
+        // App chhupao aur login dikhao
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
+        return; // Function ko yahi rok do
+    }
+    
+    // ... aapka purana offer save karne wala code yahan rahega ...
+    console.log("Saving deal for logged in user");
+};
 function saveDailyDeal() {
     console.log("saveDailyDeal called");
     
@@ -1158,24 +1172,17 @@ function goShare() {
     document.getElementById('share-screen').style.display = 'block';
 }
 
-function goDeals() {
-    console.log("Going to Deals");
-    // Sab screens hide
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('add-service-screen').style.display = 'none';
-    document.getElementById('jobs-screen').style.display = 'none';
-    document.getElementById('share-screen').style.display = 'none';
-    // Deals show
-    const dealsScreen = document.getElementById('deals-screen');
-    dealsScreen.style.display = 'block';
+window.goDeals = function() {
+    console.log("Going to Deals - Guest Friendly Mode");
+    // Sab screens hide karein
+    showScreen('deals-screen');
     
-    // Deals load karo
-    setTimeout(function() {
-        if (typeof loadDailyDeals === 'function') {
-            loadDailyDeals();
-        }
-    }, 100);
-}
+    // Deals load karne wala function call karein (Bina login check ke)
+    if (typeof loadDailyDeals === 'function') {
+        loadDailyDeals();
+    }
+};
+
 
 // Functions globally available karo
 window.goHome = goHome;
