@@ -754,126 +754,59 @@ function openDealsNow() {
 
 // Simple function to load deals
 function loadDailyDeals() {
-    console.log("loadDailyDeals - Loading with auto-delete (Guest Friendly)");
-    
     const dealsList = document.getElementById('deals-list');
-    if (!dealsList) {
-        console.error("deals-list element not found");
-        return;
-    }
+    if (!dealsList) return;
     
-    dealsList.innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Loading offers...</p>';
+    dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Loading offers...</p>';
     
-    // Check Firebase
-    if (typeof firebase === 'undefined' || !firebase.database) {
-        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
-        return;
-    }
-    
-    // LOGIN CHECK REMOVED FROM HERE - Guest can now proceed
-    const db = firebase.database();
-    const now = Date.now();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    db.ref('deals').once('value')
-        .then((snapshot) => {
-            console.log("Firebase data received, checking for expired deals...");
-            
-            const expiredDeals = [];
-            const activeDeals = [];
-            
-            snapshot.forEach((child) => {
-                const deal = child.val();
-                const dealId = child.key;
-                const expiryDate = deal.endDate || deal.validTill;
-                
-                if (!expiryDate) {
-                    activeDeals.push({ id: dealId, ...deal });
-                    return;
-                }
-                
-                if (expiryDate < now) {
-                    expiredDeals.push(dealId);
-                } else {
-                    activeDeals.push({ id: dealId, ...deal, expiryDate: expiryDate });
-                }
-            });
+    firebase.database().ref('deals').once('value').then((snapshot) => {
+        const data = snapshot.val();
+        dealsList.innerHTML = ''; // Loading saaf karo
 
-            // ✅ AUTO-DELETE: Sirf tab chale jab USER login ho (Guest delete nahi kar sakta)
-            const user = firebase.auth().currentUser;
-            if (user && expiredDeals.length > 0) {
-                console.log(`Deleting ${expiredDeals.length} expired deals`);
-                const updates = {};
-                expiredDeals.forEach(dealId => {
-                    updates[`deals/${dealId}`] = null;
-                });
-                db.ref().update(updates).catch(e => console.log("Delete error:", e));
+        if (!data) {
+            dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Abhi koi offers nahi hain.</p>';
+            return;
+        }
+
+        const now = Date.now();
+        const expiredDeals = [];
+
+        Object.keys(data).reverse().forEach(id => {
+            const deal = data[id];
+            const expiry = deal.endDate || deal.validTill || 0;
+
+            // Expired check
+            if (expiry > 0 && expiry < now) {
+                expiredDeals.push(id);
+                return; 
             }
-            
-            // Now display active deals
-            dealsList.innerHTML = '';
-            
-            if (activeDeals.length === 0) {
-                dealsList.innerHTML = `
-                    <div style="text-align:center;padding:40px;">
-                        <p style="color:#777;font-size:1.2rem;">📭 Abhi koi active offers nahi hain</p>
+
+            // Deal Card HTML
+            const card = `
+                <div style="background:white; border:1px solid #ddd; border-radius:10px; padding:15px; margin-bottom:15px; text-align:left; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                    <h4 style="margin:0; color:#2a5298;">${deal.title || 'Offer'}</h4>
+                    <p style="margin:5px 0; font-size:0.9rem;"><strong>🏪 Shop:</strong> ${deal.shopName || 'Local Shop'}</p>
+                    <p style="font-size:0.85rem; color:#444; background:#f9f9f9; padding:8px; border-radius:5px;">${deal.description || ''}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <span style="color:#2196F3; font-size:0.8rem; font-weight:bold;">📅 Valid Till: ${deal.endDate ? new Date(deal.endDate).toLocaleDateString() : 'Soon'}</span>
+                        <a href="https://wa.me/91${deal.phone}" target="_blank" style="background:#25D366; color:white; padding:6px 12px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:0.8rem;">WhatsApp</a>
                     </div>
-                `;
-                return;
-            }
-            
-            activeDeals.sort((a, b) => (b.startDate || b.timestamp) - (a.startDate || a.timestamp));
-            
-            let displayedCount = 0;
-            activeDeals.forEach((deal) => {
-                const expiry = new Date(deal.expiryDate || deal.endDate || deal.validTill);
-                expiry.setHours(0, 0, 0, 0);
-                const daysLeft = Math.ceil((expiry - today) / (24 * 60 * 60 * 1000));
-                
-                if (daysLeft < 0) return;
-                displayedCount++;
-                
-                const startDate = deal.startDate ? new Date(deal.startDate).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' }) : 'Today';
-                const endDate = new Date(deal.expiryDate || deal.endDate || deal.validTill).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                
-                // Days left badge logic (Keep your original)
-                let daysBadge = '';
-                if (daysLeft === 0) daysBadge = `<span style="background:#f44336;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">LAST DAY TODAY</span>`;
-                else if (daysLeft <= 3) daysBadge = `<span style="background:#FF9800;color:white;padding:4px 10px;border-radius:4px;font-size:0.8rem;float:right;">${daysLeft} DAYS LEFT</span>`;
-                
-                const card = document.createElement('div');
-                card.className = 'deal-card'; // Added class for easier styling
-                card.style.cssText = `background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; margin: 15px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: left;`;
-                
-                card.innerHTML = `
-                    ${daysBadge}
-                    <h4 style="margin: 0 0 8px; color: #2a5298; font-size: 1.1rem;">${deal.title || 'No Title'}</h4>
-                    <p style="margin: 5px 0; color: #444;"><strong>🏪 Shop:</strong> ${deal.shopName || 'Unknown'}</p>
-                    <div style="background: #f9f9f9; padding: 10px; border-radius: 5px; margin: 8px 0;"><p style="margin: 0; color: #444;">${deal.description || 'No details'}</p></div>
-                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
-                        <span style="color: #666; background: #f0f0f0; padding: 4px 10px; border-radius: 3px;">${deal.category || 'Other'}</span>
-                        <span style="color: #2196F3; font-weight: bold;">📅 ${startDate} - ${endDate}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                        <small style="color: #777;">Posted: ${new Date(deal.timestamp).toLocaleDateString('hi-IN')}</small>
-                        <a href="https://wa.me/91${deal.phone}" target="_blank" style="background: #25D366; color: white; padding: 6px 15px; border-radius: 5px; text-decoration: none; font-weight: bold;">📱 WhatsApp</a>
-                    </div>`;
-                dealsList.appendChild(card);
-            });
-            
-            // Summary (Only show auto-deleted count if user is logged in)
-            const summary = document.createElement('div');
-            summary.style.cssText = 'text-align:center; margin:20px 0; padding:10px; background:#f5f5f5; border-radius:8px;';
-            summary.innerHTML = `<p style="margin:5px 0; color:#666;">✅ ${displayedCount} active offers available</p>`;
-            dealsList.appendChild(summary);
-            
-        })
-        .catch((error) => {
-            console.error("Error loading deals:", error);
-            dealsList.innerHTML = '<p style="text-align:center;color:red;">Error loading offers</p>';
+                </div>`;
+            dealsList.innerHTML += card;
         });
+
+        // Auto-Delete logic (Sirf login user ke liye)
+        const user = firebase.auth().currentUser;
+        if (user && expiredDeals.length > 0) {
+            expiredDeals.forEach(id => firebase.database().ref('deals/' + id).remove());
+        }
+
+    }).catch((err) => {
+        console.error(err);
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Loading failed. Refresh karein.</p>';
+    });
 }
+
 
 // Simple save function
 window.saveDailyDeal = function() {
