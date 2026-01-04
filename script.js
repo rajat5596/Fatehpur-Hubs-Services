@@ -597,20 +597,29 @@ window.onload = () => {
     });
     recaptchaVerifier.render();
 
-    // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('registrationScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            console.log("Auto-Login Successful:", user.phoneNumber);
+    // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर (GUEST MODE UPDATED)
+firebase.auth().onAuthStateChanged(user => {
+    // Guest ho ya Login, ab hamesha Main App dikhega
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('registrationScreen').style.display = 'none';
 
-            startFirebaseListener();
-            
-        } else {
-            document.getElementById('registrationScreen').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-        }
-    });
+    if (user) {
+        console.log("Logged In User:", user.phoneNumber);
+        // Agar user login hai, toh data load karo
+        startFirebaseListener();
+        
+        // Header mein Logout button dikhao (Agar aapne logout button ki ID 'logout-nav-btn' rakhi hai)
+        if(document.querySelector('.logout-btn')) document.querySelector('.logout-btn').style.display = 'block';
+    } else {
+        console.log("Guest Mode Active");
+        // Guest ke liye bhi data load hona chahiye taaki wo services dekh sake
+        startFirebaseListener();
+
+        // Header mein Logout button chhupa do kyunki guest logout nahi kar sakta
+        if(document.querySelector('.logout-btn')) document.querySelector('.logout-btn').style.display = 'none';
+    }
+});
+
 
 
     // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1)
