@@ -972,24 +972,28 @@ function goShare() {
 }
 
 window.goDeals = function() {
-    console.log("Going to Deals Screen");
+    console.log("Navigating to Deals Screen...");
     
-    // Sabse pehle purani sari screens hide karo (Jo aapka generic function hai)
-    if (typeof showScreen === 'function') {
-        showScreen('deals-screen');
-    } else {
-        // Agar showScreen nahi hai toh manually hide/show
-        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-        document.getElementById('deals-screen').style.display = 'block';
+    // 1. Pehle screens ko handle karein (Safety ke saath)
+    const dealsScreen = document.getElementById('deals-screen');
+    if (!dealsScreen) {
+        console.error("deals-screen element nahi mila!");
+        return;
     }
-    
-    // Deals load karne se pehle check karo ki kya function crash toh nahi karega
+
+    // Saari screens ko hide karke deals dikhao
+    document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+    dealsScreen.style.display = 'block';
+
+    // 2. Ab Deals load karne ka function call karein
     try {
         if (typeof loadDailyDeals === 'function') {
             loadDailyDeals();
+        } else {
+            console.error("loadDailyDeals function define nahi hai!");
         }
-    } catch (e) {
-        console.error("Deals load nahi ho payi:", e);
+    } catch (error) {
+        console.error("Deals load karne mein error:", error);
     }
 };
 
