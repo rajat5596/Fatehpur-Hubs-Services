@@ -59,18 +59,19 @@
         <div id="mainApp" style="display: none;">
 
             <!-- Header with Logout Button -->
-            <header id="app-header">
-    <div class="logo">Fatehpur Hubs</div>
+            <header id="app-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #2a5298; color: white;">
+    <div class="logo" style="font-weight: bold; font-size: 1.2rem;">Fatehpur Hubs</div>
     
-    <button id="loginNavBtn" class="logout-btn" onclick="window.goToLogin()" style="display:none; background-color: #28a745;">
-        <i class="fas fa-sign-in-alt"></i> Login
-    </button>
+    <div id="auth-buttons">
+        <button id="loginNavBtn" onclick="window.goToLogin()" style="display: none; background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
 
-    <button id="logoutNavBtn" class="logout-btn" onclick="window.logOut()" style="display:none;">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
+        <button id="logoutNavBtn" onclick="window.logOut()" style="display: none; background: #f44336; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
 </header>
-
 
             <!-- Main Content Screens -->
             <div id="mainAppContent">
