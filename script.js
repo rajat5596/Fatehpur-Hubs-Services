@@ -824,7 +824,6 @@ function loadDailyDeals() {
             console.error("Error loading deals:", err);
             dealsList.innerHTML = '<p style="text-align:center;color:red;">Server error! Kripya refresh karein.</p>';
         });
-}
 
             
             // ✅ AUTO-DELETE EXPIRED DEALS FROM FIREBASE
