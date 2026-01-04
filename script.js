@@ -1080,38 +1080,44 @@ window.backToGuestMode = function() {
     document.getElementById('registrationScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
 };
-// Auth listener: Button switch karne ke liye
 // 1. Auth Change Listener (Login/Logout button badalne ke liye)
 firebase.auth().onAuthStateChanged(user => {
-    const logoutBtn = document.querySelector('.logout-btn');
+    const authBtn = document.getElementById('authBtn');
+    const authText = document.getElementById('authText');
+    const authIcon = document.getElementById('authIcon');
 
-    if (logoutBtn) {
+    if (authBtn) {
+        // Sabse pehle button ko force show karo
+        authBtn.setAttribute('style', 'display: block !important; padding: 5px 10px; border-radius: 8px; color: white; border: none; font-weight: 600; cursor: pointer;');
+
         if (user) {
-            // LOGIN HAI: Red Logout Button
-            logoutBtn.style.setProperty('display', 'block', 'important');
-            logoutBtn.style.backgroundColor = '#ff4d4f'; 
-            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-            logoutBtn.onclick = () => window.logOut(); 
+            // LOGIN USER: Red color (Jo aapki CSS mein hai)
+            authBtn.style.backgroundColor = '#ff4d4f'; 
+            if(authText) authText.innerText = "Logout";
+            if(authIcon) authIcon.className = "fas fa-sign-out-alt";
+            console.log("Button Status: Red Logout Shown");
         } else {
-            // GUEST HAI: Green Login Button
-            logoutBtn.style.setProperty('display', 'block', 'important'); 
-            logoutBtn.style.backgroundColor = '#28a745'; 
-            logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-            logoutBtn.onclick = () => {
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('registrationScreen').style.display = 'block';
-            };
+            // GUEST USER: Green color
+            authBtn.style.backgroundColor = '#28a745'; 
+            if(authText) authText.innerText = "Login";
+            if(authIcon) authIcon.className = "fas fa-sign-in-alt";
+            console.log("Button Status: Green Login Shown");
         }
     }
 });
 
-// 2. Logout Function (Ye zaroori hai varna button kaam nahi karega)
-window.logOut = function() {
-    firebase.auth().signOut().then(() => {
-        alert("सफलतापूर्वक लॉगआउट हो गया!");
-        location.reload(); // Page refresh karke guest mode mein laane ke liye
-    }).catch((error) => {
-        console.error("Logout Error:", error);
-    });
+// Click hone par function
+window.handleAuthClick = function() {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        // Logout logic
+        firebase.auth().signOut().then(() => {
+            location.reload(); 
+        });
+    } else {
+        // Guest ke liye login screen dikhao
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
+    }
 };
 
