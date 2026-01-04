@@ -754,70 +754,79 @@ function openDealsNow() {
 
 // Simple function to load deals
 function loadDailyDeals() {
-    console.log("loadDailyDeals - Loading with auto-delete");
+    console.log("loadDailyDeals - Loading for Guest & Users");
     
     const dealsList = document.getElementById('deals-list');
-    if (!dealsList) {
-        console.error("deals-list element not found");
-        return;
-    }
+    if (!dealsList) return;
     
     dealsList.innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Loading offers...</p>';
     
-    // Check Firebase
     if (typeof firebase === 'undefined' || !firebase.database) {
         dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
         return;
     }
     
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        dealsList.innerHTML = '<p style="text-align:center;color:red;">Please login to see deals</p>';
-        return;
-    }
-    
+    // YAHAN SE CHANGES HAIN:
+    // Humne login check (if !user) hata diya hai taaki Guest dekh sakein.
+
     const db = firebase.database();
     const now = Date.now();
     
-    // Get today's date (without time) for calculation
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
     db.ref('deals').once('value')
         .then((snapshot) => {
-            console.log("Firebase data received, checking for expired deals...");
-            
-            // First, collect expired deals to delete
             const expiredDeals = [];
             const activeDeals = [];
             
             snapshot.forEach((child) => {
                 const deal = child.val();
                 const dealId = child.key;
-                
-                // Get expiry date (use endDate if available, otherwise validTill)
                 const expiryDate = deal.endDate || deal.validTill;
                 
-                if (!expiryDate) {
-                    // If no expiry date, keep it (old format)
-                    activeDeals.push({ id: dealId, ...deal });
-                    return;
-                }
-                
-                // Check if deal is expired
-                if (expiryDate < now) {
-                    // Add to expired list for deletion
+                // 1. Expire check logic (Sabke liye chalega)
+                if (expiryDate && expiryDate < now) {
                     expiredDeals.push(dealId);
-                    console.log("Marking for deletion - Expired deal:", deal.title);
                 } else {
-                    // Add to active list for display
-                    activeDeals.push({ 
-                        id: dealId, 
-                        ...deal,
-                        expiryDate: expiryDate 
-                    });
+                    activeDeals.push({ id: dealId, ...deal });
                 }
             });
+
+            // 2. Auto-Delete logic: Sirf tab chale jab user LOGIN ho
+            // Kyunki Guest ke paas delete karne ki permission nahi hogi (Rules ke hisab se)
+            const currentUser = firebase.auth().currentUser;
+            if (currentUser && expiredDeals.length > 0) {
+                expiredDeals.forEach(id => {
+                    db.ref('deals/' + id).remove();
+                });
+            }
+
+            // 3. Display Logic
+            if (activeDeals.length === 0) {
+                dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Abhi koi naya offer nahi hai.</p>';
+                return;
+            }
+
+            dealsList.innerHTML = ''; 
+            activeDeals.reverse().forEach(deal => {
+                // Aapka deal card banane ka HTML code yahan aayega
+                const card = `
+                    <div class="ad-card" style="border-left: 4px solid #ff5722; margin-bottom:15px; text-align:left;">
+                        <h4 style="color:#2a5298; margin-bottom:5px;">${deal.title}</h4>
+                        <p style="font-weight:bold; font-size:0.9rem;">🏪 ${deal.shopName}</p>
+                        <p style="font-size:0.85rem; color:#444;">${deal.description}</p>
+                        <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:#2e7d32; font-weight:bold;">📱 ${deal.phone}</span>
+                            <a href="https://wa.me/91${deal.phone}" style="background:#25D366; color:white; padding:5px 10px; border-radius:5px; text-decoration:none; font-size:0.8rem;">WhatsApp</a>
+                        </div>
+                    </div>`;
+                dealsList.innerHTML += card;
+            });
+        })
+        .catch(err => {
+            console.error("Error loading deals:", err);
+            dealsList.innerHTML = '<p style="text-align:center;color:red;">Data load nahi ho paya.</p>';
+        });
+}
+
             
             // ✅ AUTO-DELETE EXPIRED DEALS FROM FIREBASE
             if (expiredDeals.length > 0) {
