@@ -1082,35 +1082,43 @@ window.backToGuestMode = function() {
 };
 // Auth listener: Button switch karne ke liye
 firebase.auth().onAuthStateChanged(user => {
-    const loginBtn = document.getElementById('loginNavBtn');
-    const logoutBtn = document.getElementById('logoutNavBtn');
+    const authBtn = document.getElementById('authBtn');
+    const authText = document.getElementById('authText');
+    const authIcon = document.getElementById('authIcon');
 
-    if (user) {
-        // User login hai -> Logout dikhao (Red)
-        if(loginBtn) loginBtn.style.display = 'none';
-        if(logoutBtn) logoutBtn.style.display = 'block';
-    } else {
-        // Guest hai -> Login dikhao (Green)
-        if(loginBtn) loginBtn.style.display = 'block';
-        if(logoutBtn) logoutBtn.style.display = 'none';
+    if (authBtn) {
+        if (user) {
+            // LOGIN HAI: Logout dikhao (Red - Jo aapki CSS mein hai)
+            authBtn.style.backgroundColor = "#ff4d4f"; 
+            authText.innerText = "Logout";
+            authIcon.className = "fas fa-sign-out-alt";
+            console.log("Header: Logout Mode");
+        } else {
+            // GUEST HAI: Login dikhao (Green)
+            authBtn.style.backgroundColor = "#28a745"; 
+            authText.innerText = "Login";
+            authIcon.className = "fas fa-sign-in-alt";
+            console.log("Header: Login Mode");
+        }
     }
 });
 
-// Login Screen par bhejne wala function
-window.goToLogin = function() {
-    // App chhupao aur login screen dikhao
-    const mainApp = document.getElementById('mainApp');
-    const regScreen = document.getElementById('registrationScreen');
-    
-    if(mainApp && regScreen) {
-        mainApp.style.display = 'none';
-        regScreen.style.display = 'block';
+// Button click hone par kya hoga
+window.handleAuthClick = function() {
+    const user = firebase.auth().currentUser;
+    if (user) {
+        // Agar user login hai toh purana logout function chalao
+        if(typeof window.logOut === 'function') {
+            window.logOut();
+        } else {
+            firebase.auth().signOut().then(() => {
+                location.reload(); // Logout ke baad refresh
+            });
+        }
+    } else {
+        // Guest hai toh seedha Login Screen
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
     }
-    
-    // Form reset (Phone input dikhane ke liye)
-    const profSec = document.getElementById('profileInputSection');
-    const otpSec = document.getElementById('otpSection');
-    if(profSec) profSec.style.display = 'block';
-    if(otpSec) otpSec.style.display = 'none';
 };
 
