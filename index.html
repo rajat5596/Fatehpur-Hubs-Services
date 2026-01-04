@@ -211,51 +211,65 @@
 
                 <!-- 3. JOB SCREEN (Pending implementation details for loadJobs) -->
                 <div id="jobs-screen" class="screen">
-                    <div class="form-container">
-                        <h3>💼 जॉब पोस्ट करें</h3>
-                        <form id="jobForm" onsubmit="event.preventDefault(); return registerJob();">
-                            <div class="form-field">
-                                <label for="jobTitle">जॉब टाइटल (जैसे: सेल्समैन)</label>
-                                <input type="text" id="jobTitle" required>
-                            </div>
-                            <div class="form-field">
-                                <label for="jobShopName">दुकान/कंपनी का नाम</label>
-                                <input type="text" id="jobShopName" required>
-                            </div>
-                            <div class="form-field">
-                                <label for="jobLocation">जॉब लोकेशन</label>
-                                <input type="text" id="jobLocation" required>
-                            </div>
-                            <div class="form-field">
-                                <label for="jobSalary">सैलरी/वेतन</label>
-                                <input type="number" id="jobSalary" required min="1000">
-                            </div>
-                             <div class="form-field">
-                                <label for="jobPhone">संपर्क फ़ोन नंबर (10 अंक)</label>
-                                <input type="number" id="jobPhone" maxlength="10" required>
-                            </div>
-                            <div class="form-field">
-                                <label for="jobDescription">जॉब का विवरण (Details)</label>
-                                <textarea id="jobDescription" rows="3" required></textarea>
-                                <div class="form-field">
-    <label for="jobDuration">Job Kitne Din Dikhegi?</label>
-    <select id="jobDuration" required>
-        <option value="">-- Select --</option>
-        <option value="15">15 Din</option>
-        <option value="25">25 Din</option>
-        <option value="45">45 Din</option>
-    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="submit-btn" style="background-color: #ff9800;">जॉब पोस्ट करें</button>
-                        </form>
-                    </div>
+    <div class="form-container">
+        <h3 style="color: #2a5298;">💼 जॉब्स सेक्शन</h3>
+        
+        <button id="showFormBtn" onclick="toggleJobForm()" style="width: 100%; padding: 12px; background-color: #2a5298; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer;">
+            ➕ नई जॉब पोस्ट करें
+        </button>
 
-                    <h3 style="color: #2a5298;">🌟 उपलब्ध नौकरियाँ</h3>
-                    <div id="job-list">
-                         <p style="text-align:center; color:#555;">जॉब यहाँ लोड होंगी। (Job loading function is currently mock/needs full implementation)</p>
-                    </div>
+        <div id="jobFormWrapper" style="display: none;">
+            <h3 style="margin-bottom: 10px;">✍️ जॉब की जानकारी भरें</h3>
+            <form id="jobForm" onsubmit="event.preventDefault(); return registerJob();">
+                <div class="form-field">
+                    <label for="jobTitle">जॉब टाइटल (जैसे: सेल्समैन)</label>
+                    <input type="text" id="jobTitle" required>
                 </div>
+                <div class="form-field">
+                    <label for="jobShopName">दुकान/कंपनी का नाम</label>
+                    <input type="text" id="jobShopName" required>
+                </div>
+                <div class="form-field">
+                    <label for="jobLocation">जॉब लोकेशन</label>
+                    <input type="text" id="jobLocation" required>
+                </div>
+                <div class="form-field">
+                    <label for="jobSalary">सैलरी/वेतन</label>
+                    <input type="number" id="jobSalary" required min="1000">
+                </div>
+                <div class="form-field">
+                    <label for="jobPhone">संपर्क फ़ोन नंबर (10 अंक)</label>
+                    <input type="number" id="jobPhone" maxlength="10" required>
+                </div>
+                <div class="form-field">
+                    <label for="jobDescription">जॉब का विवरण (Details)</label>
+                    <textarea id="jobDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-field">
+                    <label for="jobDuration">Job Kitne Din Dikhegi?</label>
+                    <select id="jobDuration" required>
+                        <option value="">-- Select --</option>
+                        <option value="15">15 Din</option>
+                        <option value="25">25 Din</option>
+                        <option value="45">45 Din</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn" style="background-color: #ff9800; width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    ✅ जॉब पोस्ट करें
+                </button>
+                <button type="button" onclick="document.getElementById('jobFormWrapper').style.display='none'; document.getElementById('showFormBtn').style.display='block';" style="width: 100%; margin-top: 10px; background: none; border: 1px solid #ccc; padding: 8px; border-radius: 8px;">
+                    रद्द करें (Cancel)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <h3 style="color: #2a5298; margin-top: 20px;">🌟 उपलब्ध नौकरियाँ</h3>
+    <div id="job-list">
+         <p style="text-align:center; color:#555;">जॉब यहाँ लोड होंगी...</p>
+    </div>
+</div>
+
 
                  <!-- 4. SHARE SCREEN -->
 <div id="share-screen" class="screen">
