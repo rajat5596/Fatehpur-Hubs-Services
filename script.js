@@ -978,6 +978,37 @@ window.goJobs = function() {
     }
 };
 
+// Job Form dikhane ya chhupane wala function (Login check ke sath)
+window.toggleJobForm = function() {
+    console.log("Checking login for Job Form...");
+    const user = firebase.auth().currentUser;
+
+    if (!user) {
+        // Agar guest hai toh login screen par bhejo
+        alert("जॉब पोस्ट करने के लिए कृपया पहले लॉगिन करें।");
+        
+        // App chhupao aur login dikhao
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
+        
+        // Reset login inputs
+        if(document.getElementById('profileInputSection')) {
+            document.getElementById('profileInputSection').style.display = 'block';
+            document.getElementById('otpSection').style.display = 'none';
+        }
+        return;
+    }
+
+    // Agar login hai, toh button chhupao aur form dikhao
+    const wrapper = document.getElementById('jobFormWrapper');
+    const btn = document.getElementById('showFormBtn');
+    
+    if (wrapper && btn) {
+        wrapper.style.display = 'block';
+        btn.style.display = 'none';
+        console.log("User logged in, showing form");
+    }
+};
 
 
 function goShare() {
