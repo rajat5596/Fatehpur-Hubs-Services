@@ -1080,30 +1080,37 @@ window.backToGuestMode = function() {
     document.getElementById('registrationScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
 };
-// Auth State logic ko manage karne ke liye
-function manageHeaderButtons() {
-    firebase.auth().onAuthStateChanged(user => {
-        const loginBtn = document.getElementById('loginNavBtn');
-        const logoutBtn = document.getElementById('logoutNavBtn');
+// Auth listener: Button switch karne ke liye
+firebase.auth().onAuthStateChanged(user => {
+    const loginBtn = document.getElementById('loginNavBtn');
+    const logoutBtn = document.getElementById('logoutNavBtn');
 
-        if (user) {
-            console.log("Status: User Logged In");
-            if(loginBtn) loginBtn.style.setProperty('display', 'none', 'important');
-            if(logoutBtn) logoutBtn.style.setProperty('display', 'inline-block', 'important');
-        } else {
-            console.log("Status: Guest Mode");
-            if(loginBtn) loginBtn.style.setProperty('display', 'inline-block', 'important');
-            if(logoutBtn) logoutBtn.style.setProperty('display', 'none', 'important');
-        }
-    });
-}
+    if (user) {
+        // User login hai -> Logout dikhao (Red)
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(logoutBtn) logoutBtn.style.display = 'block';
+    } else {
+        // Guest hai -> Login dikhao (Green)
+        if(loginBtn) loginBtn.style.display = 'block';
+        if(logoutBtn) logoutBtn.style.display = 'none';
+    }
+});
 
-// Function call
-manageHeaderButtons();
-
-// Login Screen par bhejne ka function
+// Login Screen par bhejne wala function
 window.goToLogin = function() {
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('registrationScreen').style.display = 'block';
+    // App chhupao aur login screen dikhao
+    const mainApp = document.getElementById('mainApp');
+    const regScreen = document.getElementById('registrationScreen');
+    
+    if(mainApp && regScreen) {
+        mainApp.style.display = 'none';
+        regScreen.style.display = 'block';
+    }
+    
+    // Form reset (Phone input dikhane ke liye)
+    const profSec = document.getElementById('profileInputSection');
+    const otpSec = document.getElementById('otpSection');
+    if(profSec) profSec.style.display = 'block';
+    if(otpSec) otpSec.style.display = 'none';
 };
 
