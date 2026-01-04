@@ -1195,3 +1195,7 @@ window.showLoginScreen = function() {
     
     console.log("Redirected to Login Screen");
 };
+window.backToGuestMode = function() {
+    document.getElementById('registrationScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+};
