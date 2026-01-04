@@ -1125,21 +1125,27 @@ window.goService = function() {
 };
 
 
-function goJobs() {
-    console.log("Going to Jobs");
-    // Sab screens hide
-    document.getElementById('deals-screen').style.display = 'none';
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('add-service-screen').style.display = 'none';
-    document.getElementById('share-screen').style.display = 'none';
-    // Jobs show
-    document.getElementById('jobs-screen').style.display = 'block';
-    
-    // Jobs load karo
-    if (typeof loadJobs === 'function') {
-        setTimeout(loadJobs, 300);
+window.goJobs = function() {
+    console.log("Going to Jobs Section");
+    const user = firebase.auth().currentUser;
+
+    if (user) {
+        // Agar user login hai, toh seedha Jobs Screen par le jao
+        showScreen('jobs-screen');
+    } else {
+        // Agar guest hai, toh alert dikhao aur login screen par bhej do
+        alert("जॉब पोस्ट करने के लिए कृपया पहले लॉगिन करें।");
+        
+        // App chhupao aur login dikhao
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
+        
+        // Reset login screens
+        document.getElementById('profileInputSection').style.display = 'block';
+        document.getElementById('otpSection').style.display = 'none';
     }
-}
+};
+
 
 function goShare() {
     console.log("Going to Share");
