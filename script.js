@@ -441,33 +441,46 @@ function registerService() {
     }
 
 // 4.2 जॉब रजिस्ट्रेशन (registerJob())
-function registerJob() {
-    event.preventDefault();
+window.registerJob = function(event) {
+    if(event) event.preventDefault();
     
     const user = firebase.auth().currentUser;
 
+    // --- GUEST CHECK: Agar login nahi hai toh Login Screen par bhejo ---
     if (!user) {
         alert('जॉब पोस्ट करने से पहले आपको लॉग-इन करना होगा।'); 
+        
+        // App chhupao aur login dikhao
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('registrationScreen').style.display = 'block';
+        
+        // Login UI ko reset karo (Phone input wala section dikhao)
+        document.getElementById('profileInputSection').style.display = 'block';
+        document.getElementById('otpSection').style.display = 'none';
+        
         return false; 
     }
 
+    // --- LOGGED IN USER CODE: Agar login hai toh ye niche wala chalega ---
     const posterId = user.uid; 
     
     const title = document.getElementById('jobTitle').value;
     const shopName = document.getElementById('jobShopName').value;
     const jobDuration = document.getElementById('jobDuration').value;
+
     if (!jobDuration) {
         alert("Job duration select karo bhai!");
         return false;
     }
 
-    // End time calculate karo (din ko milliseconds mein)
+    // End time calculate karo
     const endTime = Date.now() + (parseInt(jobDuration) * 24 * 60 * 60 * 1000);
     const location = document.getElementById('jobLocation').value;
     const salary = document.getElementById('jobSalary').value;
     const phone = document.getElementById('jobPhone').value;
     const description = document.getElementById('jobDescription').value;
 
+    // Validation
     if (!title || !shopName || !location || !salary || !phone || !description || phone.length !== 10 || isNaN(phone)) {
         alert("कृपया सभी ज़रूरी फ़ील्ड भरें और फ़ोन नंबर 10 अंकों का हो।");
         return false;
@@ -481,24 +494,31 @@ function registerJob() {
         phone: phone,
         description: description,
         duration: jobDuration,
-endTime: endTime,
+        endTime: endTime,
         posterId: posterId,
         timestamp: firebase.database.ServerValue.TIMESTAMP
     };
 
-    window.jobsRef.push(jobData)
-    .then(() => {
-        alert('✅ जॉब सफलतापूर्वक पोस्ट हो गई!'); 
-        
-        document.getElementById('jobForm').reset();
-    })
-    .catch((error) => {
-        console.error("Job Error:", error);
-        alert('❌ जॉब पोस्ट करने में त्रुटि आई।');
-    });
+    // Firebase database update
+    if (window.jobsRef) {
+        window.jobsRef.push(jobData)
+        .then(() => {
+            alert('✅ जॉब सफलतापूर्वक पोस्ट हो गई!'); 
+            document.getElementById('jobForm').reset();
+            // Wapas job list dikhao
+            if(typeof goJobs === 'function') goJobs();
+        })
+        .catch((error) => {
+            console.error("Job Error:", error);
+            alert('❌ जॉब पोस्ट करने में त्रुटि आई।');
+        });
+    } else {
+        alert("Database connection error. Refresh karein.");
+    }
 
     return false;
-}
+};
+
 
 // --- 4.3 MOCK JOB LOAD FUNCTION ---
 function loadJobs() {
@@ -939,25 +959,25 @@ window.goService = function() {
 
 
 window.goJobs = function() {
-    console.log("Going to Jobs Section");
-    const user = firebase.auth().currentUser;
+    console.log("Navigating to Jobs - Guest Mode enabled");
+    
+    // Sabse pehle screen dikhao (Bina login check ke)
+    const jobsScreen = document.getElementById('jobs-screen');
+    if (jobsScreen) {
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        jobsScreen.style.display = 'block';
+    }
 
-    if (user) {
-        // Agar user login hai, toh seedha Jobs Screen par le jao
-        showScreen('jobs-screen');
-    } else {
-        // Agar guest hai, toh alert dikhao aur login screen par bhej do
-        alert("जॉब पोस्ट करने के लिए कृपया पहले लॉगिन करें।");
-        
-        // App chhupao aur login dikhao
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('registrationScreen').style.display = 'block';
-        
-        // Reset login screens
-        document.getElementById('profileInputSection').style.display = 'block';
-        document.getElementById('otpSection').style.display = 'none';
+    // Jobs load karne wala function call karein
+    try {
+        if (typeof loadJobs === 'function') {
+            loadJobs();
+        }
+    } catch (e) {
+        console.error("Jobs load error:", e);
     }
 };
+
 
 
 function goShare() {
