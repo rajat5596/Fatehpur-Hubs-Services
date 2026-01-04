@@ -979,23 +979,23 @@ function loadDailyDeals() {
 }
 // Simple save function
 window.saveDailyDeal = function() {
-    const user = firebase.auth().currentUser;
+    console.log("saveDailyDeal called");
     
+    // 1. SABSE PEHLE LOGIN CHECK (GUEST USERS KE LIYE)
+    const user = firebase.auth().currentUser;
     if (!user) {
         alert("अपना ऑफर डालने के लिए कृपया पहले लॉगिन करें।");
         // App chhupao aur login dikhao
         document.getElementById('mainApp').style.display = 'none';
         document.getElementById('registrationScreen').style.display = 'block';
-        return; // Function ko yahi rok do
+        
+        // Reset login screen view
+        document.getElementById('profileInputSection').style.display = 'block';
+        document.getElementById('otpSection').style.display = 'none';
+        return; // Function ko yahan rok do
     }
     
-    // ... aapka purana offer save karne wala code yahan rahega ...
-    console.log("Saving deal for logged in user");
-};
-function saveDailyDeal() {
-    console.log("saveDailyDeal called");
-    
-    // Get form values
+    // 2. FORM VALUES NIKALNA
     const shopName = document.getElementById('shopName').value.trim();
     const dealTitle = document.getElementById('dealTitle').value.trim();
     const dealDesc = document.getElementById('dealDescription').value.trim();
@@ -1004,7 +1004,7 @@ function saveDailyDeal() {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     
-    // Validation
+    // 3. VALIDATION
     if (!shopName || !dealTitle || !dealDesc || !category || !phone || !startDate || !endDate) {
         alert("❌ Please fill all required fields!");
         return;
@@ -1015,11 +1015,11 @@ function saveDailyDeal() {
         return;
     }
     
-    // Date validation
+    // 4. DATE VALIDATION
     const start = new Date(startDate);
     const end = new Date(endDate);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Remove time part
+    today.setHours(0, 0, 0, 0);
     
     if (start < today) {
         alert("❌ Start date cannot be in the past!");
@@ -1031,36 +1031,19 @@ function saveDailyDeal() {
         return;
     }
     
-    // Calculate days difference
-    const timeDiff = end.getTime() - start.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both days
-    
-    if (daysDiff > 365) {
-        if (!confirm(`⚠️ Your offer is for ${daysDiff} days (more than 1 year). Are you sure?`)) {
-            return;
-        }
-    }
-    
-    // Check Firebase
+    // 5. FIREBASE CHECK
     if (typeof firebase === 'undefined' || !firebase.database) {
         alert("⚠️ Firebase loading... Please wait.");
         return;
     }
     
-    const user = firebase.auth().currentUser;
-    if (!user) {
-        alert("❌ Please login first!");
-        return;
-    }
-    
     const db = firebase.database();
     const timestamp = Date.now();
-    
-    // Convert dates to timestamps
     const startTimestamp = start.getTime();
     const endTimestamp = end.getTime();
+    const daysDiff = Math.ceil((endTimestamp - startTimestamp) / (1000 * 3600 * 24)) + 1;
     
-    // Save to Firebase
+    // 6. SAVE TO FIREBASE
     db.ref('deals').push({
         shopName: shopName,
         title: dealTitle,
@@ -1076,39 +1059,24 @@ function saveDailyDeal() {
         status: 'active'
     })
     .then(() => {
-        // Format dates for display
         const startStr = start.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
         const endStr = end.toLocaleDateString('hi-IN', { weekday: 'short', day: 'numeric', month: 'short' });
         
-        alert(`✅ Offer Submitted Successfully!\n\n` +
-              `🏪 Shop: ${shopName}\n` +
-              `🎯 Offer: ${dealTitle}\n` +
-              `📅 Validity: ${startStr} to ${endStr} (${daysDiff} days)\n` +
-              `📱 WhatsApp: ${phone}\n\n` +
-              `Your offer is now live for all users!`);
+        alert(`✅ Offer Submitted Successfully!\n\n🏪 Shop: ${shopName}\n📅 Validity: ${startStr} to ${endStr}\nYour offer is now live!`);
         
         // Reset form
         document.getElementById('dealForm').reset();
         
-        // Set default dates (tomorrow to 7 days later)
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const nextWeek = new Date();
-        nextWeek.setDate(nextWeek.getDate() + 7);
-        
-        document.getElementById('startDate').value = tomorrow.toISOString().split('T')[0];
-        document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
-        
         // Reload deals
-        if (document.getElementById('deals-screen').style.display === 'block') {
+        if (typeof loadDailyDeals === 'function') {
             setTimeout(loadDailyDeals, 1000);
         }
     })
     .catch((error) => {
         alert("❌ Error: " + error.message);
-        console.error("Save error:", error);
     });
-          }
+};
+
 // ============ SIMPLE FOOTER FUNCTIONS - ADD THIS AT THE END ============
 
 function goHome() {
