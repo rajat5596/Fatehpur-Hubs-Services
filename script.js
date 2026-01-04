@@ -1182,3 +1182,16 @@ setTimeout(function() {
 }, 500);
 
 console.log("✅ Simple footer functions loaded");
+window.showLoginScreen = function() {
+    // Main App ko chhupao
+    document.getElementById('mainApp').style.display = 'none';
+    
+    // Registration/Login Screen ko dikhao
+    document.getElementById('registrationScreen').style.display = 'flex';
+    
+    // Reset karo taaki Phone number wala hissa hi dikhe, OTP wala nahi
+    document.getElementById('profileInputSection').style.display = 'block';
+    document.getElementById('otpSection').style.display = 'none';
+    
+    console.log("Redirected to Login Screen");
+};
