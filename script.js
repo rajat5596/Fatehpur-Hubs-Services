@@ -1141,15 +1141,27 @@ function goShare() {
 }
 
 window.goDeals = function() {
-    console.log("Going to Deals - Guest Friendly Mode");
-    // Sab screens hide karein
-    showScreen('deals-screen');
+    console.log("Going to Deals Screen");
     
-    // Deals load karne wala function call karein (Bina login check ke)
-    if (typeof loadDailyDeals === 'function') {
-        loadDailyDeals();
+    // Sabse pehle purani sari screens hide karo (Jo aapka generic function hai)
+    if (typeof showScreen === 'function') {
+        showScreen('deals-screen');
+    } else {
+        // Agar showScreen nahi hai toh manually hide/show
+        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        document.getElementById('deals-screen').style.display = 'block';
+    }
+    
+    // Deals load karne se pehle check karo ki kya function crash toh nahi karega
+    try {
+        if (typeof loadDailyDeals === 'function') {
+            loadDailyDeals();
+        }
+    } catch (e) {
+        console.error("Deals load nahi ho payi:", e);
     }
 };
+
 
 
 // Functions globally available karo
