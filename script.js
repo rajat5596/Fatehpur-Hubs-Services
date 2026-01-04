@@ -1082,43 +1082,26 @@ window.backToGuestMode = function() {
 };
 // Auth listener: Button switch karne ke liye
 firebase.auth().onAuthStateChanged(user => {
-    const authBtn = document.getElementById('authBtn');
-    const authText = document.getElementById('authText');
-    const authIcon = document.getElementById('authIcon');
+    // Purana header wala button dhoondhein (Jo aapke screenshot mein tha)
+    const logoutBtn = document.querySelector('.logout-btn');
 
-    if (authBtn) {
+    if (logoutBtn) {
         if (user) {
-            // LOGIN HAI: Logout dikhao (Red - Jo aapki CSS mein hai)
-            authBtn.style.backgroundColor = "#ff4d4f"; 
-            authText.innerText = "Logout";
-            authIcon.className = "fas fa-sign-out-alt";
-            console.log("Header: Logout Mode");
+            // LOGIN HAI: Jaisa pehle tha waisa hi rehne do
+            logoutBtn.style.display = 'block';
+            logoutBtn.style.backgroundColor = '#ff4d4f'; // Red
+            logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            logoutBtn.onclick = () => window.logOut(); 
         } else {
-            // GUEST HAI: Login dikhao (Green)
-            authBtn.style.backgroundColor = "#28a745"; 
-            authText.innerText = "Login";
-            authIcon.className = "fas fa-sign-in-alt";
-            console.log("Header: Login Mode");
+            // GUEST HAI: Button ko mat chhupao, bas uska roop badal do
+            logoutBtn.style.display = 'block'; 
+            logoutBtn.style.backgroundColor = '#28a745'; // Green
+            logoutBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            logoutBtn.onclick = () => {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('registrationScreen').style.display = 'block';
+            };
         }
     }
 });
-
-// Button click hone par kya hoga
-window.handleAuthClick = function() {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        // Agar user login hai toh purana logout function chalao
-        if(typeof window.logOut === 'function') {
-            window.logOut();
-        } else {
-            firebase.auth().signOut().then(() => {
-                location.reload(); // Logout ke baad refresh
-            });
-        }
-    } else {
-        // Guest hai toh seedha Login Screen
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('registrationScreen').style.display = 'block';
-    }
-};
 
