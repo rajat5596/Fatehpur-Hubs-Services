@@ -60,11 +60,17 @@
 
             <!-- Header with Logout Button -->
             <header id="app-header">
-                <div class="logo">Fatehpur Hubs</div>
-                <button class="logout-btn" onclick="window.logOut()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </header>
+    <div class="logo">Fatehpur Hubs</div>
+    
+    <button id="loginNavBtn" class="logout-btn" onclick="window.goToLogin()" style="display:none; background-color: #28a745;">
+        <i class="fas fa-sign-in-alt"></i> Login
+    </button>
+
+    <button id="logoutNavBtn" class="logout-btn" onclick="window.logOut()" style="display:none;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+</header>
+
 
             <!-- Main Content Screens -->
             <div id="mainAppContent">
