@@ -1080,30 +1080,30 @@ window.backToGuestMode = function() {
     document.getElementById('registrationScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
 };
-// Auth change detector: Button hide/show karne ke liye
-firebase.auth().onAuthStateChanged(user => {
-    const loginBtn = document.getElementById('loginNavBtn');
-    const logoutBtn = document.getElementById('logoutNavBtn');
+// Auth State logic ko manage karne ke liye
+function manageHeaderButtons() {
+    firebase.auth().onAuthStateChanged(user => {
+        const loginBtn = document.getElementById('loginNavBtn');
+        const logoutBtn = document.getElementById('logoutNavBtn');
 
-    if (user) {
-        // User login hai toh Logout dikhao
-        if(loginBtn) loginBtn.style.display = 'none';
-        if(logoutBtn) logoutBtn.style.display = 'block';
-    } else {
-        // Guest hai toh Login dikhao
-        if(loginBtn) loginBtn.style.display = 'block';
-        if(logoutBtn) logoutBtn.style.display = 'none';
-    }
-});
+        if (user) {
+            console.log("Status: User Logged In");
+            if(loginBtn) loginBtn.style.setProperty('display', 'none', 'important');
+            if(logoutBtn) logoutBtn.style.setProperty('display', 'inline-block', 'important');
+        } else {
+            console.log("Status: Guest Mode");
+            if(loginBtn) loginBtn.style.setProperty('display', 'inline-block', 'important');
+            if(logoutBtn) logoutBtn.style.setProperty('display', 'none', 'important');
+        }
+    });
+}
 
-// Login screen par bhejne ka function
+// Function call
+manageHeaderButtons();
+
+// Login Screen par bhejne ka function
 window.goToLogin = function() {
     document.getElementById('mainApp').style.display = 'none';
     document.getElementById('registrationScreen').style.display = 'block';
-    
-    // UI reset taaki phone number wala section dikhe
-    if(document.getElementById('profileInputSection')) {
-        document.getElementById('profileInputSection').style.display = 'block';
-        document.getElementById('otpSection').style.display = 'none';
-    }
 };
+
