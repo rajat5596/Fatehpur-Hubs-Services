@@ -754,21 +754,18 @@ function openDealsNow() {
 
 // Simple function to load deals
 function loadDailyDeals() {
-    console.log("loadDailyDeals - Loading for Guest & Users");
+    console.log("loadDailyDeals - Guest Mode Active");
     
     const dealsList = document.getElementById('deals-list');
     if (!dealsList) return;
     
-    dealsList.innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Loading offers...</p>';
+    dealsList.innerHTML = '<p style="text-align:center;padding:20px;color:#555;">Offers load ho rahe hain...</p>';
     
     if (typeof firebase === 'undefined' || !firebase.database) {
-        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase loading...</p>';
+        dealsList.innerHTML = '<p style="text-align:center;color:red;">Firebase Connect Nahi Hai.</p>';
         return;
     }
     
-    // YAHAN SE CHANGES HAIN:
-    // Humne login check (if !user) hata diya hai taaki Guest dekh sakein.
-
     const db = firebase.database();
     const now = Date.now();
     
@@ -780,9 +777,10 @@ function loadDailyDeals() {
             snapshot.forEach((child) => {
                 const deal = child.val();
                 const dealId = child.key;
+                
+                // Expiry date check (endDate ya validTill dono check karega)
                 const expiryDate = deal.endDate || deal.validTill;
                 
-                // 1. Expire check logic (Sabke liye chalega)
                 if (expiryDate && expiryDate < now) {
                     expiredDeals.push(dealId);
                 } else {
@@ -790,8 +788,7 @@ function loadDailyDeals() {
                 }
             });
 
-            // 2. Auto-Delete logic: Sirf tab chale jab user LOGIN ho
-            // Kyunki Guest ke paas delete karne ki permission nahi hogi (Rules ke hisab se)
+            // Auto-Delete: Sirf tab jab koi login user app khole
             const currentUser = firebase.auth().currentUser;
             if (currentUser && expiredDeals.length > 0) {
                 expiredDeals.forEach(id => {
@@ -799,23 +796,25 @@ function loadDailyDeals() {
                 });
             }
 
-            // 3. Display Logic
+            // Display Logic
             if (activeDeals.length === 0) {
                 dealsList.innerHTML = '<p style="text-align:center;padding:20px;">Abhi koi naya offer nahi hai.</p>';
                 return;
             }
 
             dealsList.innerHTML = ''; 
+            // Naye offers upar dikhane ke liye reverse kiya
             activeDeals.reverse().forEach(deal => {
-                // Aapka deal card banane ka HTML code yahan aayega
                 const card = `
-                    <div class="ad-card" style="border-left: 4px solid #ff5722; margin-bottom:15px; text-align:left;">
-                        <h4 style="color:#2a5298; margin-bottom:5px;">${deal.title}</h4>
-                        <p style="font-weight:bold; font-size:0.9rem;">🏪 ${deal.shopName}</p>
-                        <p style="font-size:0.85rem; color:#444;">${deal.description}</p>
+                    <div class="ad-card" style="border-left: 4px solid #ff5722; margin-bottom:15px; text-align:left; padding:15px; background:#fff; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+                        <h4 style="color:#2a5298; margin-bottom:5px; font-size:1.1rem;">${deal.title || deal.dealTitle}</h4>
+                        <p style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">🏪 ${deal.shopName}</p>
+                        <p style="font-size:0.85rem; color:#444; margin-bottom:10px;">${deal.description || deal.dealDescription}</p>
                         <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                            <span style="color:#2e7d32; font-weight:bold;">📱 ${deal.phone}</span>
-                            <a href="https://wa.me/91${deal.phone}" style="background:#25D366; color:white; padding:5px 10px; border-radius:5px; text-decoration:none; font-size:0.8rem;">WhatsApp</a>
+                            <span style="color:#2e7d32; font-weight:bold; font-size:0.9rem;">📱 ${deal.phone || deal.dealPhone}</span>
+                            <a href="https://wa.me/91${deal.phone || deal.dealPhone}" target="_blank" style="background:#25D366; color:white; padding:6px 12px; border-radius:5px; text-decoration:none; font-size:0.8rem; font-weight:bold;">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
                         </div>
                     </div>`;
                 dealsList.innerHTML += card;
@@ -823,7 +822,7 @@ function loadDailyDeals() {
         })
         .catch(err => {
             console.error("Error loading deals:", err);
-            dealsList.innerHTML = '<p style="text-align:center;color:red;">Data load nahi ho paya.</p>';
+            dealsList.innerHTML = '<p style="text-align:center;color:red;">Server error! Kripya refresh karein.</p>';
         });
 }
 
