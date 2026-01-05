@@ -594,15 +594,6 @@ window.showScreen = (id) => {
     if(id === 'home-screen') loadCategories(); 
 };
 
-window.logOut = () => {
-    firebase.auth().signOut().then(() => {
-        console.log("User signed out successfully.");
-        location.reload(); 
-    }).catch((error) => {
-        console.error("Sign Out Error:", error);
-        alert("Sign Out में एरर आई। कृपया दोबारा कोशिश करें।");
-    });
-}
 
 // 5.3 यह फ़ंक्शन पूरे ऐप को initialize करता है
 window.onload = () => {
@@ -1063,70 +1054,103 @@ setTimeout(function() {
 }, 500);
 
 console.log("✅ Simple footer functions loaded");
+
+// ============ SINGLE AUTH SYSTEM ============
+
+// 1. Login Screen dikhane ka function
 window.showLoginScreen = function() {
-    // Main App ko chhupao
     document.getElementById('mainApp').style.display = 'none';
-    
-    // Registration/Login Screen ko dikhao
     document.getElementById('registrationScreen').style.display = 'flex';
-    
-    // Reset karo taaki Phone number wala hissa hi dikhe, OTP wala nahi
     document.getElementById('profileInputSection').style.display = 'block';
     document.getElementById('otpSection').style.display = 'none';
-    
-    console.log("Redirected to Login Screen");
+    console.log("Login Screen shown");
 };
+
+// 2. Guest mode mein wapas aane ka function
 window.backToGuestMode = function() {
     document.getElementById('registrationScreen').style.display = 'none';
     document.getElementById('mainApp').style.display = 'block';
+    console.log("Back to Guest Mode");
 };
-// Universal Auth Controller
-firebase.auth().onAuthStateChanged(user => {
+
+// 3. EK HI AUTH CLICK HANDLER (Login/Logout dono ke liye)
+window.handleAuthClick = function() {
+    const user = firebase.auth().currentUser;
+    
+    if (user) {
+        // Log Out Logic - Confirm karo
+        if(confirm('Kya aap logout karna chahte hain?')) {
+            firebase.auth().signOut().then(() => {
+                console.log("Logged out successfully");
+                // IMPORTANT: Reload nahi, bas UI update karo
+                updateAuthUI();
+                // Guest ko home screen par le jao
+                goHome();
+                alert("✅ Logout ho gaya. Ab aap guest mode mein hain.");
+            }).catch(err => {
+                console.error("Logout error:", err);
+                alert("❌ Logout mein error aayi. Please try again.");
+            });
+        }
+    } else {
+        // Login Screen dikhao
+        showLoginScreen();
+    }
+};
+
+// 4. SINGLE UI UPDATE FUNCTION - Yeh har state change par chalega
+function updateAuthUI() {
     const authBtn = document.getElementById('authBtn');
     const authText = document.getElementById('authText');
     const authIcon = document.getElementById('authIcon');
-    const mainApp = document.getElementById('mainApp');
-
-    // FORCE: Agar guest hai toh bhi mainApp ko dikhao taaki header dikhe
-    if(mainApp) {
-        mainApp.style.setProperty('display', 'block', 'important');
+    
+    if (!authBtn) {
+        console.error("Auth button not found in HTML!");
+        return;
     }
-
-    if (authBtn) {
-        authBtn.style.setProperty('display', 'block', 'important');
-        
-        if (user) {
-            // LOGIN STATE
-            authBtn.style.backgroundColor = '#ff4d4f'; 
-            if(authText) authText.innerText = "Logout";
-            if(authIcon) authIcon.className = "fas fa-sign-out-alt";
-        } else {
-            // GUEST STATE
-            authBtn.style.backgroundColor = '#28a745'; 
-            if(authText) authText.innerText = "Login";
-            if(authIcon) authIcon.className = "fas fa-sign-in-alt";
-        }
+    
+    const user = firebase.auth().currentUser;
+    
+    if (user) {
+        // LOGGED IN STATE - Red Logout Button
+        authBtn.style.backgroundColor = '#ff4d4f'; 
+        authBtn.style.color = 'white';
+        if(authText) authText.innerText = "Logout";
+        if(authIcon) authIcon.className = "fas fa-sign-out-alt";
+        authBtn.title = "Click to Logout";
+        console.log("UI Updated: Logout Button");
+    } else {
+        // GUEST STATE - Green Login Button
+        authBtn.style.backgroundColor = '#28a745'; 
+        authBtn.style.color = 'white';
+        if(authText) authText.innerText = "Login";
+        if(authIcon) authIcon.className = "fas fa-sign-in-alt";
+        authBtn.title = "Click to Login/Signup";
+        console.log("UI Updated: Login Button");
     }
+}
+
+// 5. Ek hi Auth State Listener (Line 620 wale ko UPDATE karo)
+// Purane onAuthStateChanged listener (line 620-641) ko REPLACE karein:
+firebase.auth().onAuthStateChanged(user => {
+    console.log("Auth State Changed:", user ? "Logged In" : "Guest");
+    
+    // Always show main app
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('registrationScreen').style.display = 'none';
+    
+    // Always load data (for both guest and logged in)
+    if(typeof startFirebaseListener === 'function') {
+        startFirebaseListener();
+    }
+    
+    // Update the header button (MOST IMPORTANT)
+    updateAuthUI();
 });
 
-// Logout aur Login dono ka akela function
-window.handleAuthClick = function() {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        // Log Out Logic
-        firebase.auth().signOut().then(() => {
-            alert("Logged Out!");
-            window.location.reload(); 
-        }).catch(err => alert("Error: " + err.message));
-    } else {
-        // Go to Login Logic
-        const regScreen = document.getElementById('registrationScreen');
-        const mainApp = document.getElementById('mainApp');
-        if(regScreen) regScreen.style.display = 'block';
-        if(mainApp) mainApp.style.display = 'none';
-    }
-};
+// 6. Page load par UI update karo
+window.addEventListener('load', function() {
+    setTimeout(updateAuthUI, 1000);
+});
 
-// Purane kisi bhi logout function ko bypass karne ke liye
-window.logOut = window.handleAuthClick;
-
+console.log("✅ Single Auth System Loaded");
