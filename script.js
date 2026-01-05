@@ -1081,43 +1081,46 @@ window.backToGuestMode = function() {
     document.getElementById('mainApp').style.display = 'block';
 };
 // 1. Auth Change Listener (Login/Logout button badalne ke liye)
+// 1. Auth Change Listener: Jo Button ka Look badlega
 firebase.auth().onAuthStateChanged(user => {
     const authBtn = document.getElementById('authBtn');
     const authText = document.getElementById('authText');
     const authIcon = document.getElementById('authIcon');
 
     if (authBtn) {
-        // Sabse pehle button ko force show karo
-        authBtn.setAttribute('style', 'display: block !important; padding: 5px 10px; border-radius: 8px; color: white; border: none; font-weight: 600; cursor: pointer;');
+        authBtn.style.display = 'block'; // Force show
 
         if (user) {
-            // LOGIN USER: Red color (Jo aapki CSS mein hai)
+            // LOGIN HAI: Red Logout Button
             authBtn.style.backgroundColor = '#ff4d4f'; 
-            if(authText) authText.innerText = "Logout";
-            if(authIcon) authIcon.className = "fas fa-sign-out-alt";
-            console.log("Button Status: Red Logout Shown");
+            authText.innerText = "Logout";
+            authIcon.className = "fas fa-sign-out-alt";
         } else {
-            // GUEST USER: Green color
+            // GUEST HAI: Green Login Button
             authBtn.style.backgroundColor = '#28a745'; 
-            if(authText) authText.innerText = "Login";
-            if(authIcon) authIcon.className = "fas fa-sign-in-alt";
-            console.log("Button Status: Green Login Shown");
+            authText.innerText = "Login";
+            authIcon.className = "fas fa-sign-in-alt";
         }
     }
 });
 
-// Click hone par function
+// 2. Button Click Function: Jo Login ya Logout karega
 window.handleAuthClick = function() {
     const user = firebase.auth().currentUser;
     if (user) {
-        // Logout logic
+        // Agar user login hai, toh Logout karo
         firebase.auth().signOut().then(() => {
-            location.reload(); 
+            alert("सफलतापूर्वक लॉगआउट हो गया!");
+            location.reload(); // Page refresh must hai taaki guest mode active ho
+        }).catch((error) => {
+            alert("Error: " + error.message);
         });
     } else {
-        // Guest ke liye login screen dikhao
+        // Agar guest hai, toh Login Screen dikhao
         document.getElementById('mainApp').style.display = 'none';
         document.getElementById('registrationScreen').style.display = 'block';
     }
 };
 
+// 3. Purana Logout function backup (Taki koi conflict na ho)
+window.logOut = window.handleAuthClick;
