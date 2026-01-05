@@ -80,22 +80,29 @@ function renderProviderCard(p) {
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
     
-    <!-- 🔥 STAR RATING SECTION -->
-    <div style="margin-top: 8px; text-align: center; padding-top: 8px; border-top: 1px solid #eee;">
+    <!-- 🔥 STAR RATING SECTION - UPDATED SIZE -->
+    <div style="margin-top: 12px; text-align: center; padding-top: 10px; border-top: 1px solid #eee;">
         <!-- Average Rating Display -->
-        <div id="rating-display-${ratingId}" style="margin-bottom: 5px;">
-            <span style="color: #FF9800; font-size: 16px;">☆☆☆☆☆</span>
-            <span style="color: #666; font-size: 12px; margin-left: 5px;">(0/5)</span>
+        <div id="rating-display-${ratingId}" style="margin-bottom: 8px;">
+            <span style="color: #FF9800; font-size: 18px;">☆☆☆☆☆</span>
+            <span style="color: #666; font-size: 13px; margin-left: 8px;">(0/5)</span>
         </div>
         
         <!-- Star Buttons (Only for logged-in users) -->
         <div id="star-buttons-${ratingId}" style="display: none;">
-            <small style="color: #666;">Tap to rate: </small>
-            <span onclick="giveRating('${ratingId}', 1)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
-            <span onclick="giveRating('${ratingId}', 2)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
-            <span onclick="giveRating('${ratingId}', 3)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
-            <span onclick="giveRating('${ratingId}', 4)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
-            <span onclick="giveRating('${ratingId}', 5)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+            <small style="color: #666; font-size: 13px; display: block; margin-bottom: 5px;">Tap to rate:</small>
+            <div style="display: flex; justify-content: center; gap: 8px;">
+                <span onclick="giveRating('${ratingId}', 1)" 
+                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
+                <span onclick="giveRating('${ratingId}', 2)" 
+                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
+                <span onclick="giveRating('${ratingId}', 3)" 
+                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
+                <span onclick="giveRating('${ratingId}', 4)" 
+                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
+                <span onclick="giveRating('${ratingId}', 5)" 
+                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
+            </div>
         </div>
     </div>
     
