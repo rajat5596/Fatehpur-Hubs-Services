@@ -953,6 +953,9 @@ window.goJobs = function() {
         jobsScreen.style.display = 'block';
     }
 
+    // 🔥 YEH NAYA CODE ADD KARO - Job form ka access check
+    checkJobFormAccess();
+    
     // Jobs load karne wala function call karein
     try {
         if (typeof loadJobs === 'function') {
