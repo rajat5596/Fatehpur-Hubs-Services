@@ -942,28 +942,31 @@ window.goService = function() {
     }
 };
 
-
 window.goJobs = function() {
     console.log("Navigating to Jobs - Guest Mode enabled");
     
-    // Sabse pehle screen dikhao (Bina login check ke)
+    // Sabse pehle screen dikhao
     const jobsScreen = document.getElementById('jobs-screen');
     if (jobsScreen) {
         document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
         jobsScreen.style.display = 'block';
     }
 
-    // 🔥 YEH NAYA CODE ADD KARO - Job form ka access check
-    checkJobFormAccess();
-    
-    // Jobs load karne wala function call karein
+    // PEHLE JOBS LOAD KARO
     try {
         if (typeof loadJobs === 'function') {
-            loadJobs();
+            loadJobs(); // Jobs list load karo
         }
     } catch (e) {
         console.error("Jobs load error:", e);
     }
+    
+    // PHIR JOB FORM KA ACCESS CHECK KARO (500ms baad)
+    setTimeout(() => {
+        if (typeof checkJobFormAccess === 'function') {
+            checkJobFormAccess();
+        }
+    }, 500);
 };
 
 // Job Form dikhane ya chhupane wala function (Login check ke sath)
