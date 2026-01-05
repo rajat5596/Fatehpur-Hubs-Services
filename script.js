@@ -1473,3 +1473,74 @@ window.addEventListener('load', function() {
 // setTimeout(initializeRatings, 1000);
 
 console.log("✅ Rating System Initialization Complete");
+// 1. Give Rating Function - UPDATED WITH BETTER ERROR HANDLING
+function giveRating(ratingId, stars) {
+    console.log(`🎯 giveRating called: ${ratingId}, ${stars} stars`);
+    
+    // Check login
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Rate karne ke liye login karein!");
+        showLoginScreen();
+        return;
+    }
+    
+    // Extract phone number from ratingId
+    const phoneNumber = ratingId.replace('rate-', '');
+    if (phoneNumber === '0000000000') {
+        alert("Invalid provider. Cannot rate.");
+        return;
+    }
+    
+    // Find provider ID from phone number
+    findProviderByPhone(phoneNumber).then(providerId => {
+        if (!providerId) {
+            alert("Provider not found in database.");
+            return;
+        }
+        
+        // Confirm rating
+        if (!confirm(`Kya aap ${stars} star rating dena chahte hain?`)) {
+            return;
+        }
+        
+        // Save to Firebase under provider's ID
+        const ratingRef = firebase.database().ref(`services/${providerId}/ratings`).push();
+        
+        return ratingRef.set({
+            stars: stars,
+            timestamp: Date.now(),
+            userId: user.uid,
+            userPhone: user.phoneNumber || 'User'
+        });
+    })
+    .then(() => {
+        // Update stars display
+        updateStarsDisplay(ratingId, stars);
+        alert(`✅ ${stars} star rating submitted!`);
+        
+        // Reload average rating
+        loadAverageRating(ratingId);
+    })
+    .catch(error => {
+        console.error("Rating save error:", error);
+        alert("❌ Rating save nahi hui: " + (error.message || "Unknown error"));
+    });
+}
+
+// Helper function to find provider by phone
+function findProviderByPhone(phone) {
+    return new Promise((resolve) => {
+        firebase.database().ref('services').orderByChild('phone').equalTo(phone).once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        resolve(child.key); // Return provider ID
+                    });
+                } else {
+                    resolve(null);
+                }
+            })
+            .catch(() => resolve(null));
+    });
+}
