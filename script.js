@@ -67,6 +67,9 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
+    // Create unique ID for rating (phone number use karo)
+    const ratingId = 'rate-' + (p.phone || '0000000000');
+    
     return `<div class="profile-card">
     <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
     <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
@@ -76,6 +79,26 @@ function renderProviderCard(p) {
         <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
+    
+    <!-- 🔥 STAR RATING SECTION -->
+    <div style="margin-top: 8px; text-align: center; padding-top: 8px; border-top: 1px solid #eee;">
+        <!-- Average Rating Display -->
+        <div id="rating-display-${ratingId}" style="margin-bottom: 5px;">
+            <span style="color: #FF9800; font-size: 16px;">☆☆☆☆☆</span>
+            <span style="color: #666; font-size: 12px; margin-left: 5px;">(0/5)</span>
+        </div>
+        
+        <!-- Star Buttons (Only for logged-in users) -->
+        <div id="star-buttons-${ratingId}" style="display: none;">
+            <small style="color: #666;">Tap to rate: </small>
+            <span onclick="giveRating('${ratingId}', 1)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+            <span onclick="giveRating('${ratingId}', 2)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+            <span onclick="giveRating('${ratingId}', 3)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+            <span onclick="giveRating('${ratingId}', 4)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+            <span onclick="giveRating('${ratingId}', 5)" style="cursor:pointer; font-size:20px; margin:0 2px;">☆</span>
+        </div>
+    </div>
+    
 </div>`;
 }
         
@@ -626,6 +649,7 @@ firebase.auth().onAuthStateChanged(user => {
     
     // 🔥 YEH LINE ADD KARO - UI update karne ke liye
     setTimeout(updateAuthUI, 100);
+    setTimeout(updateRatingButtons, 500);
 });
     // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1)
     document.getElementById('sendOtpBtn').onclick = () => {
@@ -1266,3 +1290,174 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
+// ============ STAR RATING SYSTEM ============
+
+// 1. Give Rating Function
+function giveRating(ratingId, stars) {
+    // Check login
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("Rate karne ke liye login karein!");
+        showLoginScreen();
+        return;
+    }
+    
+    // Confirm rating
+    if (!confirm(`Kya aap ${stars} star rating dena chahte hain?`)) {
+        return;
+    }
+    
+    // Save to Firebase - Simple structure
+    firebase.database().ref(`ratings/${ratingId}`).push().set({
+        stars: stars,
+        timestamp: Date.now(),
+        userId: user.uid,
+        userPhone: user.phoneNumber || 'User'
+    })
+    .then(() => {
+        // Update stars display
+        updateStarsDisplay(ratingId, stars);
+        alert(`✅ ${stars} star rating submitted!`);
+        
+        // Reload average rating
+        loadAverageRating(ratingId);
+    })
+    .catch(error => {
+        console.error("Rating save error:", error);
+        alert("❌ Rating save nahi hui. Try again.");
+    });
+}
+
+// 2. Update Stars Display (When user rates)
+function updateStarsDisplay(ratingId, userRating) {
+    // Highlight the stars user clicked
+    for (let i = 1; i <= 5; i++) {
+        const starElement = document.querySelector(`#star-buttons-${ratingId} span:nth-child(${i + 1})`);
+        if (starElement) {
+            if (i <= userRating) {
+                starElement.textContent = '⭐';
+                starElement.style.color = '#FFD700';
+            } else {
+                starElement.textContent = '☆';
+                starElement.style.color = '#ccc';
+            }
+        }
+    }
+}
+
+// 3. Load Average Rating from Firebase
+function loadAverageRating(ratingId) {
+    if (!ratingId) return;
+    
+    firebase.database().ref(`ratings/${ratingId}`).once('value')
+        .then(snapshot => {
+            if (!snapshot.exists()) {
+                // No ratings yet
+                updateRatingUI(ratingId, 0, 0);
+                return;
+            }
+            
+            const ratings = snapshot.val();
+            let totalStars = 0;
+            let ratingCount = 0;
+            
+            // Calculate average
+            Object.values(ratings).forEach(rating => {
+                totalStars += rating.stars;
+                ratingCount++;
+            });
+            
+            const average = ratingCount > 0 ? (totalStars / ratingCount).toFixed(1) : 0;
+            
+            // Update UI
+            updateRatingUI(ratingId, average, ratingCount);
+        })
+        .catch(error => {
+            console.error("Rating load error:", error);
+        });
+}
+
+// 4. Update Rating UI Display
+function updateRatingUI(ratingId, averageRating, totalRatings) {
+    const displayElement = document.getElementById(`rating-display-${ratingId}`);
+    if (!displayElement) return;
+    
+    // Convert average to stars (1-5)
+    const starCount = Math.round(parseFloat(averageRating));
+    
+    // Create star string
+    let starsHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= starCount) {
+            starsHTML += '⭐'; // Filled star
+        } else {
+            starsHTML += '☆'; // Empty star
+        }
+    }
+    
+    // Update display
+    displayElement.innerHTML = `
+        <span style="color: #FF9800; font-size: 16px;">${starsHTML}</span>
+        <span style="color: #666; font-size: 12px; margin-left: 5px;">
+            (${averageRating}/5 from ${totalRatings} ${totalRatings === 1 ? 'rating' : 'ratings'})
+        </span>
+    `;
+}
+
+// 5. Show/Hide Rating Buttons based on Login
+function updateRatingButtons() {
+    const user = firebase.auth().currentUser;
+    
+    // Find all star button containers
+    document.querySelectorAll('[id^="star-buttons-"]').forEach(container => {
+        if (user) {
+            // Logged in - Show rating buttons
+            container.style.display = 'block';
+        } else {
+            // Guest - Hide rating buttons
+            container.style.display = 'none';
+        }
+    });
+}
+
+// 6. Initialize ratings when page loads
+function initializeRatings() {
+    console.log("Initializing star ratings...");
+    
+    // Update rating buttons based on login
+    updateRatingButtons();
+    
+    // Load ratings for all visible providers
+    document.querySelectorAll('[id^="rating-display-"]').forEach(element => {
+        const id = element.id.replace('rating-display-', '');
+        if (id) {
+            loadAverageRating(id);
+        }
+    });
+}
+
+console.log("✅ Star Rating System Functions Loaded");
+    // ============ PAGE LOAD INITIALIZATION ============
+
+// 7. Page load hone par ratings initialize karo
+window.addEventListener('load', function() {
+    console.log("Page loaded, setting up ratings...");
+    
+    // Thoda wait karo taaki sab load ho jaye
+    setTimeout(() => {
+        // Update rating buttons (show/hide based on login)
+        updateRatingButtons();
+        
+        // Load all ratings (thoda aur wait)
+        setTimeout(() => {
+            initializeRatings();
+        }, 1000);
+    }, 1500);
+});
+
+// 8. Services load hone ke baad bhi ratings load karo
+// Agar aapka koi function hai jo services load karta hai, usme yeh add karo
+// Example: loadCategories() ke andar last mein:
+// setTimeout(initializeRatings, 1000);
+
+console.log("✅ Rating System Initialization Complete");
