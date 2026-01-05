@@ -67,7 +67,7 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
-    // Create unique ID for rating (phone number use karo)
+    // Create unique ID for rating
     const ratingId = 'rate-' + (p.phone || '0000000000');
     
     return `<div class="profile-card">
@@ -80,33 +80,38 @@ function renderProviderCard(p) {
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
     
-    <!-- 🔥 STAR RATING SECTION - UPDATED SIZE -->
-    <div style="margin-top: 12px; text-align: center; padding-top: 10px; border-top: 1px solid #eee;">
-        <!-- Average Rating Display -->
-        <div id="rating-display-${ratingId}" style="margin-bottom: 8px;">
+    <!-- SIMPLE STAR RATING -->
+    <div style="margin-top: 10px; text-align: center; padding-top: 10px; border-top: 1px solid #eee;">
+        <div id="rating-display-${ratingId}">
             <span style="color: #FF9800; font-size: 18px;">☆☆☆☆☆</span>
-            <span style="color: #666; font-size: 13px; margin-left: 8px;">(0/5)</span>
+            <span style="color: #666; font-size: 13px;"> (0/5)</span>
         </div>
         
-        <!-- Star Buttons (Only for logged-in users) -->
-        <div id="star-buttons-${ratingId}" style="display: none;">
-            <small style="color: #666; font-size: 13px; display: block; margin-bottom: 5px;">Tap to rate:</small>
-            <div style="display: flex; justify-content: center; gap: 8px;">
-                <span onclick="giveRating('${ratingId}', 1)" 
-                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
-                <span onclick="giveRating('${ratingId}', 2)" 
-                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
-                <span onclick="giveRating('${ratingId}', 3)" 
-                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
-                <span onclick="giveRating('${ratingId}', 4)" 
-                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
-                <span onclick="giveRating('${ratingId}', 5)" 
-                      style="cursor:pointer; font-size:28px; color:#ccc; transition: all 0.2s;">☆</span>
-            </div>
+        <div id="star-buttons-${ratingId}" style="display:none; margin-top:5px;">
+            <small style="color:#666;">Rate:</small>
+            <span onclick="rateNow('${ratingId}',1)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
+            <span onclick="rateNow('${ratingId}',2)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
+            <span onclick="rateNow('${ratingId}',3)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
+            <span onclick="rateNow('${ratingId}',4)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
+            <span onclick="rateNow('${ratingId}',5)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
         </div>
     </div>
     
 </div>`;
+}
+
+// Simple rating function
+function rateNow(ratingId, stars) {
+    if (!firebase.auth().currentUser) {
+        alert("Login to rate");
+        showLoginScreen();
+        return;
+    }
+    
+    if (confirm(`Give ${stars} stars?`)) {
+        alert(`Rated ${stars} stars!`);
+        // Save logic yahan aayega
+    }
 }
         
 // जॉब कार्ड रेंडर करें
