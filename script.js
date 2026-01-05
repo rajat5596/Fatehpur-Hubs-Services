@@ -618,21 +618,15 @@ firebase.auth().onAuthStateChanged(user => {
         console.log("Logged In User:", user.phoneNumber);
         // Agar user login hai, toh data load karo
         startFirebaseListener();
-        
-        // Header mein Logout button dikhao (Agar aapne logout button ki ID 'logout-nav-btn' rakhi hai)
-        if(document.querySelector('.logout-btn')) document.querySelector('.logout-btn').style.display = 'block';
     } else {
         console.log("Guest Mode Active");
-        // Guest ke liye bhi data load hona chahiye taaki wo services dekh sake
+        // Guest ke liye bhi data load karo
         startFirebaseListener();
-
-        // Header mein Logout button chhupa do kyunki guest logout nahi kar sakta
-        if(document.querySelector('.logout-btn')) document.querySelector('.logout-btn').style.display = 'none';
     }
+    
+    // 🔥 YEH LINE ADD KARO - UI update karne ke liye
+    setTimeout(updateAuthUI, 100);
 });
-
-
-
     // 3. सुरक्षित: OTP भेजें (लॉगिन स्टेप 1)
     document.getElementById('sendOtpBtn').onclick = () => {
         const name = document.getElementById('userName').value.trim();
@@ -1038,9 +1032,6 @@ window.goDeals = function() {
         console.error("Deals load karne mein error:", error);
     }
 };
-
-
-
 // Functions globally available karo
 window.goHome = goHome;
 window.goService = goService;
@@ -1082,7 +1073,7 @@ window.handleAuthClick = function() {
         if(confirm('Kya aap logout karna chahte hain?')) {
             firebase.auth().signOut().then(() => {
                 console.log("Logged out successfully");
-                // IMPORTANT: Reload nahi, bas UI update karo
+                // FORCE UI UPDATE - NO DELAY
                 updateAuthUI();
                 // Guest ko home screen par le jao
                 goHome();
@@ -1098,59 +1089,72 @@ window.handleAuthClick = function() {
     }
 };
 
-// 4. SINGLE UI UPDATE FUNCTION - Yeh har state change par chalega
+// 4. SINGLE UI UPDATE FUNCTION - Yeh button ko sahi se update karega
 function updateAuthUI() {
     const authBtn = document.getElementById('authBtn');
     const authText = document.getElementById('authText');
     const authIcon = document.getElementById('authIcon');
     
     if (!authBtn) {
-        console.error("Auth button not found in HTML!");
+        console.error("Auth button not found!");
         return;
     }
     
     const user = firebase.auth().currentUser;
     
+    console.log("🔄 UI Update - User:", user ? "Logged In" : "Guest");
+    
     if (user) {
-        // LOGGED IN STATE - Red Logout Button
-        authBtn.style.backgroundColor = '#ff4d4f'; 
+        // LOGGED IN - RED LOGOUT BUTTON
+        authBtn.style.backgroundColor = '#ff4d4f';
         authBtn.style.color = 'white';
+        authBtn.style.border = 'none';
+        authBtn.style.padding = '8px 15px';
+        authBtn.style.fontWeight = 'bold';
+        
         if(authText) authText.innerText = "Logout";
         if(authIcon) authIcon.className = "fas fa-sign-out-alt";
-        authBtn.title = "Click to Logout";
-        console.log("UI Updated: Logout Button");
+        
+        console.log("✅ Button set to RED - Logout");
     } else {
-        // GUEST STATE - Green Login Button
-        authBtn.style.backgroundColor = '#28a745'; 
+        // GUEST - GREEN LOGIN BUTTON  
+        authBtn.style.backgroundColor = '#28a745';
         authBtn.style.color = 'white';
+        authBtn.style.border = 'none';
+        authBtn.style.padding = '8px 15px';
+        authBtn.style.fontWeight = 'bold';
+        
         if(authText) authText.innerText = "Login";
         if(authIcon) authIcon.className = "fas fa-sign-in-alt";
-        authBtn.title = "Click to Login/Signup";
-        console.log("UI Updated: Login Button");
+        
+        console.log("✅ Button set to GREEN - Login");
     }
 }
 
-// 5. Ek hi Auth State Listener (Line 620 wale ko UPDATE karo)
-// Purane onAuthStateChanged listener (line 620-641) ko REPLACE karein:
+// 5. FIXED AUTH STATE LISTENER
 firebase.auth().onAuthStateChanged(user => {
-    console.log("Auth State Changed:", user ? "Logged In" : "Guest");
+    console.log("🔥 Auth State Changed:", user ? "Logged In" : "Guest");
     
     // Always show main app
     document.getElementById('mainApp').style.display = 'block';
     document.getElementById('registrationScreen').style.display = 'none';
     
-    // Always load data (for both guest and logged in)
+    // Load data for both
     if(typeof startFirebaseListener === 'function') {
         startFirebaseListener();
     }
     
-    // Update the header button (MOST IMPORTANT)
+    // IMMEDIATE UI UPDATE - NO DELAY
     updateAuthUI();
 });
 
-// 6. Page load par UI update karo
-window.addEventListener('load', function() {
-    setTimeout(updateAuthUI, 1000);
-});
+// 6. FIXED LOGOUT BUTTON OVERRIDE
+window.logOut = window.handleAuthClick;
+
+// 7. PAGE LOAD PAR UI CHECK
+setTimeout(function() {
+    console.log("🔄 Page Load - Checking Auth Status...");
+    updateAuthUI();
+}, 1000);
 
 console.log("✅ Single Auth System Loaded");
