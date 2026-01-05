@@ -774,36 +774,141 @@ function loadDailyDeals() {
         }
 
         const now = Date.now();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         const expiredDeals = [];
+        let activeDealsCount = 0;
 
         Object.keys(data).reverse().forEach(id => {
             const deal = data[id];
-            const expiry = deal.endDate || deal.validTill || 0;
+            const expiryDate = deal.endDate || deal.validTill || 0;
 
             // Expired check
-            if (expiry > 0 && expiry < now) {
+            if (expiryDate > 0 && expiryDate < now) {
                 expiredDeals.push(id);
                 return; 
             }
 
-            // Deal Card HTML
+            // Days left calculation
+            const expiry = new Date(expiryDate);
+            expiry.setHours(0, 0, 0, 0);
+            const daysLeft = Math.ceil((expiry - today) / (24 * 60 * 60 * 1000));
+            
+            // Skip if negative (just in case)
+            if (daysLeft < 0) {
+                expiredDeals.push(id);
+                return;
+            }
+
+            activeDealsCount++;
+
+            // Days left badge (Jaisa jobs mein hai)
+            let daysBadge = '';
+            if (daysLeft === 0) {
+                daysBadge = `<span style="background:#f44336; color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:bold; float:right;">
+                                ⏳ LAST DAY
+                            </span>`;
+            } else if (daysLeft === 1) {
+                daysBadge = `<span style="background:#FF9800; color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:bold; float:right;">
+                                🟢 ${daysLeft} DAY LEFT
+                            </span>`;
+            } else if (daysLeft <= 3) {
+                daysBadge = `<span style="background:#FF9800; color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:bold; float:right;">
+                                🟡 ${daysLeft} DAYS LEFT
+                            </span>`;
+            } else if (daysLeft <= 7) {
+                daysBadge = `<span style="background:#4CAF50; color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:bold; float:right;">
+                                🟢 ${daysLeft} days left
+                            </span>`;
+            } else {
+                daysBadge = `<span style="background:#2196F3; color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:bold; float:right;">
+                                📅 ${daysLeft} days left
+                            </span>`;
+            }
+
+            // Format dates
+            const startDate = deal.startDate ? 
+                new Date(deal.startDate).toLocaleDateString('hi-IN', { 
+                    day: 'numeric', 
+                    month: 'short' 
+                }) : 'Today';
+            
+            const endDate = new Date(expiryDate).toLocaleDateString('hi-IN', { 
+                day: 'numeric', 
+                month: 'short',
+                year: 'numeric'
+            });
+
+            // Deal Card HTML (Updated with days badge)
             const card = `
                 <div style="background:white; border:1px solid #ddd; border-radius:10px; padding:15px; margin-bottom:15px; text-align:left; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                    <h4 style="margin:0; color:#2a5298;">${deal.title || 'Offer'}</h4>
-                    <p style="margin:5px 0; font-size:0.9rem;"><strong>🏪 Shop:</strong> ${deal.shopName || 'Local Shop'}</p>
-                    <p style="font-size:0.85rem; color:#444; background:#f9f9f9; padding:8px; border-radius:5px;">${deal.description || ''}</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <span style="color:#2196F3; font-size:0.8rem; font-weight:bold;">📅 Valid Till: ${deal.endDate ? new Date(deal.endDate).toLocaleDateString() : 'Soon'}</span>
-                        <a href="https://wa.me/91${deal.phone}" target="_blank" style="background:#25D366; color:white; padding:6px 12px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:0.8rem;">WhatsApp</a>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                        <h4 style="margin:0; color:#2a5298; font-size:1.1rem; flex:1;">
+                            ${deal.title || 'Offer'}
+                        </h4>
+                        ${daysBadge}
+                    </div>
+                    
+                    <p style="margin:5px 0; font-size:0.9rem;">
+                        <strong>🏪 Shop:</strong> ${deal.shopName || 'Local Shop'}
+                    </p>
+                    
+                    <p style="font-size:0.85rem; color:#444; background:#f9f9f9; padding:8px; border-radius:5px; margin:8px 0;">
+                        ${deal.description || ''}
+                    </p>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:5px;">
+                        <span style="color:#666; background:#f0f0f0; padding:4px 10px; border-radius:3px; font-size:0.8rem;">
+                            ${deal.category || 'Other'}
+                        </span>
+                        
+                        <span style="color:#2196F3; font-size:0.8rem; font-weight:bold;">
+                            📅 ${startDate} - ${endDate}
+                        </span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+                        <small style="color:#777; font-size:0.75rem;">
+                            Posted: ${new Date(deal.timestamp).toLocaleDateString('hi-IN')}
+                        </small>
+                        
+                        <a href="https://wa.me/91${deal.phone}" 
+                           target="_blank" 
+                           style="background:#25D366; color:white; padding:6px 12px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:0.8rem;">
+                            📱 WhatsApp
+                        </a>
                     </div>
                 </div>`;
             dealsList.innerHTML += card;
         });
 
+        // Summary counter
+        if (activeDealsCount > 0) {
+            const summary = `<div style="text-align:center; padding:10px; background:#f5f5f5; border-radius:8px; margin:15px 0;">
+                                <p style="margin:5px 0; color:#666; font-size:0.9rem;">
+                                    ✅ ${activeDealsCount} active offers available
+                                    ${expiredDeals.length > 0 ? 
+                                      `<br><small style="color:#f44336; font-size:0.8rem;">🗑️ ${expiredDeals.length} expired offers auto-deleted</small>` : 
+                                      ''}
+                                </p>
+                            </div>`;
+            dealsList.innerHTML += summary;
+        }
+
         // Auto-Delete logic (Sirf login user ke liye)
         const user = firebase.auth().currentUser;
         if (user && expiredDeals.length > 0) {
-            expiredDeals.forEach(id => firebase.database().ref('deals/' + id).remove());
+            const updates = {};
+            expiredDeals.forEach(id => {
+                updates[`deals/${id}`] = null;
+            });
+            firebase.database().ref().update(updates)
+                .then(() => {
+                    console.log(`✅ Auto-deleted ${expiredDeals.length} expired deals`);
+                })
+                .catch(err => {
+                    console.error("Auto-delete error:", err);
+                });
         }
 
     }).catch((err) => {
@@ -811,8 +916,6 @@ function loadDailyDeals() {
         dealsList.innerHTML = '<p style="text-align:center;color:red;">Loading failed. Refresh karein.</p>';
     });
 }
-
-
 // Simple save function
 window.saveDailyDeal = function() {
     console.log("saveDailyDeal called");
