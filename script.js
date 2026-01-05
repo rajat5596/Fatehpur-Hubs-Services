@@ -1033,17 +1033,16 @@ function goHome() {
     }
 }
 
-window.goService = function() {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        showScreen('add-service-screen');
-    } else {
-        // Login screen dikhao
-        document.getElementById('mainApp').style.display = 'none';
-        document.getElementById('registrationScreen').style.display = 'block';
-        alert("अपनी सर्विस रजिस्टर करने के लिए पहले लॉगिन करें।");
-    }
-};
+function goService() {
+    console.log("Going to Services");
+    // Sab screens hide
+    document.getElementById('deals-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('jobs-screen').style.display = 'none';
+    document.getElementById('share-screen').style.display = 'none';
+    // Services show
+    document.getElementById('add-service-screen').style.display = 'block';
+}
 
 window.goJobs = function() {
     console.log("Navigating to Jobs - Guest Mode enabled");
