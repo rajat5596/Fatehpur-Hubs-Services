@@ -59,14 +59,17 @@
         <div id="mainApp" style="display: none;">
 
             <!-- Header with Logout Button -->
-            <header id="app-header">
-    <div class="logo">Fatehpur Hubs</div>
-    <button id="authBtn" class="logout-btn" onclick="handleAuthClick()" style="display: block !important;">
-        <i id="authIcon" class="fas fa-sign-out-alt"></i> <span id="authText">Logout</span>
+            <header id="app-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #2a5298; color: white;">
+    <div class="logo" style="font-weight: bold; font-size: 1.2rem;">Fatehpur Hubs</div>
+    
+    <!-- SINGLE AUTH BUTTON - Guest: Green Login, Logged In: Red Logout -->
+    <button id="authBtn" 
+            onclick="handleAuthClick()" 
+            style="background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+        <i id="authIcon" class="fas fa-sign-in-alt"></i>
+        <span id="authText">Login</span>
     </button>
 </header>
-
-
 
             <!-- Main Content Screens -->
             <div id="mainAppContent">
