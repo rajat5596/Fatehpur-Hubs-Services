@@ -1,17 +1,4 @@
-// ============ DEBUG RATING CLICKS ============
 
-// Override onclick to see if it's being called
-document.addEventListener('click', function(e) {
-    if (e.target.hasAttribute('onclick') && 
-        e.target.getAttribute('onclick').includes('giveRating')) {
-        console.log("🌟 STAR CLICK DETECTED!");
-        console.log("Element:", e.target);
-        console.log("onclick attribute:", e.target.getAttribute('onclick'));
-    }
-});
-
-// Test if giveRating function is accessible
-console.log("giveRating function available:", typeof window.giveRating);
 // =======================================================
 // ⭐ 1. GLOBAL VARIABLES & CONFIGURATION (सबसे ऊपर रखें) ⭐
 // =======================================================
@@ -96,23 +83,16 @@ function renderProviderCard(p) {
     <!-- SIMPLE STAR RATING -->
     // Inside renderProviderCard() - star buttons section:
 `
-<div id="star-buttons-${ratingId}" style="display: none; margin-top: 8px;">
-    <div style="display: flex; justify-content: center; gap: 10px; padding: 5px;">
-        <span onclick="window.giveRating('${ratingId}', 1)" 
-              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
-        <span onclick="window.giveRating('${ratingId}', 2)" 
-              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
-        <span onclick="window.giveRating('${ratingId}', 3)" 
-              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
-        <span onclick="window.giveRating('${ratingId}', 4)" 
-              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
-        <span onclick="window.giveRating('${ratingId}', 5)" 
-              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
+function renderProviderCard(p) {
+    return `<div class="profile-card">
+    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+
+    <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+        <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+        <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+        <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
-    <small style="color:#666; display:block; text-align:center; margin-top:3px;">
-        Click star to rate
-    </small>
-</div>
 </div>`;
 }
 
