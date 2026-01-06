@@ -67,23 +67,6 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
-    // Create unique ID for rating
-    const ratingId = 'rate-' + (p.phone || '0000000000');
-    
-    return `<div class="profile-card">
-    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
-
-    <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-        <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-        <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-        <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-    </div>
-    
-    <!-- SIMPLE STAR RATING -->
-    // Inside renderProviderCard() - star buttons section:
-`
-function renderProviderCard(p) {
     return `<div class="profile-card">
     <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
     <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
@@ -94,20 +77,6 @@ function renderProviderCard(p) {
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
 </div>`;
-}
-
-// Simple rating function
-function rateNow(ratingId, stars) {
-    if (!firebase.auth().currentUser) {
-        alert("Login to rate");
-        showLoginScreen();
-        return;
-    }
-    
-    if (confirm(`Give ${stars} stars?`)) {
-        alert(`Rated ${stars} stars!`);
-        // Save logic yahan aayega
-    }
 }
         
 // जॉब कार्ड रेंडर करें
