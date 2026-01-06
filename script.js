@@ -68,6 +68,7 @@ window.shareProviderDetails = (name, phone, category) => {
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
     return `<div class="profile-card">
+        ${p.daysBadge || ''}
         <h4 style="color:#2a5298;">\( {p.name || 'No Name'} - ( \){p.category || 'No Category'})</h4>
         <p style="font-size:12px;color:#555;">📍 ${p.area || 'Fatehpur'} | Experience: ${p.experience || 'N/A'}</p>
 
