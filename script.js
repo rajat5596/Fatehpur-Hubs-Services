@@ -76,6 +76,17 @@ function renderProviderCard(p) {
         <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
     </div>
+    <p style="margin-top: 10px;">रेटिंग दें: 
+  <select id="rating-${job.id}" style="margin-right: 5px;">
+    <option value="1">1 ⭐</option>
+    <option value="2">2 ⭐</option>
+    <option value="3">3 ⭐</option>
+    <option value="4">4 ⭐</option>
+    <option value="5">5 ⭐</option>
+  </select>
+  <button onclick="submitRating('${job.id}')">Submit</button>
+</p>
+<p id="average-rating-${job.id}" style="margin-top: 5px; color: #ff9800;">औसत रेटिंग: Calculating...</p>
 </div>`;
 }
         
@@ -1267,3 +1278,53 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
+// Service Provider Rating System
+function submitRating(serviceId) {
+    const rating = document.getElementById(`rating-${serviceId}`).value;
+    if (!rating) {
+        alert("Rating select karo!");
+        return;
+    }
+
+    const db = firebase.database();
+    const ratingRef = db.ref('ratings/' + serviceId).push();
+    ratingRef.set({
+        rating: parseInt(rating),
+        timestamp: Date.now()
+    }).then(() => {
+        alert("✅ रेटिंग सबमिट हो गई!");
+        loadAverageRating(serviceId); // Average refresh kar do
+    }).catch(err => {
+        alert("Error: " + err.message);
+    });
+}
+
+// Average Rating Load Karo
+function loadAverageRating(serviceId) {
+    const avgElement = document.getElementById(`average-rating-${serviceId}`);
+    const db = firebase.database();
+    db.ref('ratings/' + serviceId).once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+            avgElement.innerHTML = "औसत रेटिंग: No ratings yet";
+            return;
+        }
+
+        let total = 0;
+        let count = 0;
+        snapshot.forEach(child => {
+            total += child.val().rating;
+            count++;
+        });
+
+        const average = (total / count).toFixed(1);
+        avgElement.innerHTML = `औसत रेटिंग: ${average} ⭐ (from ${count} users)`;
+    }).catch(err => {
+        avgElement.innerHTML = "Error loading rating";
+    });
+}
+
+// App load hone par sab services ke average load kar do
+window.addEventListener('load', () => {
+    // Tera purana loadCategories function call hone par yeh call kar de (ya manual)
+    // Agar service cards load hone par, each card ke liye loadAverageRating(serviceId) call kar de
+});
