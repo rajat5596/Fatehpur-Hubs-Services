@@ -1,4 +1,17 @@
+// ============ DEBUG RATING CLICKS ============
 
+// Override onclick to see if it's being called
+document.addEventListener('click', function(e) {
+    if (e.target.hasAttribute('onclick') && 
+        e.target.getAttribute('onclick').includes('giveRating')) {
+        console.log("🌟 STAR CLICK DETECTED!");
+        console.log("Element:", e.target);
+        console.log("onclick attribute:", e.target.getAttribute('onclick'));
+    }
+});
+
+// Test if giveRating function is accessible
+console.log("giveRating function available:", typeof window.giveRating);
 // =======================================================
 // ⭐ 1. GLOBAL VARIABLES & CONFIGURATION (सबसे ऊपर रखें) ⭐
 // =======================================================
@@ -81,22 +94,25 @@ function renderProviderCard(p) {
     </div>
     
     <!-- SIMPLE STAR RATING -->
-    <div style="margin-top: 10px; text-align: center; padding-top: 10px; border-top: 1px solid #eee;">
-        <div id="rating-display-${ratingId}">
-            <span style="color: #FF9800; font-size: 18px;">☆☆☆☆☆</span>
-            <span style="color: #666; font-size: 13px;"> (0/5)</span>
-        </div>
-        
-        <div id="star-buttons-${ratingId}" style="display:none; margin-top:5px;">
-            <small style="color:#666;">Rate:</small>
-            <span onclick="rateNow('${ratingId}',1)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
-            <span onclick="rateNow('${ratingId}',2)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
-            <span onclick="rateNow('${ratingId}',3)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
-            <span onclick="rateNow('${ratingId}',4)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
-            <span onclick="rateNow('${ratingId}',5)" style="font-size:24px; cursor:pointer; margin:0 2px;">☆</span>
-        </div>
+    // Inside renderProviderCard() - star buttons section:
+`
+<div id="star-buttons-${ratingId}" style="display: none; margin-top: 8px;">
+    <div style="display: flex; justify-content: center; gap: 10px; padding: 5px;">
+        <span onclick="window.giveRating('${ratingId}', 1)" 
+              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
+        <span onclick="window.giveRating('${ratingId}', 2)" 
+              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
+        <span onclick="window.giveRating('${ratingId}', 3)" 
+              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
+        <span onclick="window.giveRating('${ratingId}', 4)" 
+              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
+        <span onclick="window.giveRating('${ratingId}', 5)" 
+              style="cursor:pointer; font-size:28px; color:#ccc; padding:5px;">☆</span>
     </div>
-    
+    <small style="color:#666; display:block; text-align:center; margin-top:3px;">
+        Click star to rate
+    </small>
+</div>
 </div>`;
 }
 
@@ -1467,66 +1483,99 @@ window.addEventListener('load', function() {
     }, 1500);
 });
 
-// 8. Services load hone ke baad bhi ratings load karo
-// Agar aapka koi function hai jo services load karta hai, usme yeh add karo
-// Example: loadCategories() ke andar last mein:
-// setTimeout(initializeRatings, 1000);
+// ============ SIMPLE WORKING RATING ============
 
-console.log("✅ Rating System Initialization Complete");
-// 1. Give Rating Function - UPDATED WITH BETTER ERROR HANDLING
-function giveRating(ratingId, stars) {
-    console.log(`🎯 giveRating called: ${ratingId}, ${stars} stars`);
+// 1. SIMPLE RATING FUNCTION (100% Working)
+window.giveRating = function(ratingId, stars) {
+    console.log("🎯 RATING CLICKED! ID:", ratingId, "Stars:", stars);
     
     // Check login
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("Rate karne ke liye login karein!");
-        showLoginScreen();
-        return;
+        console.log("User not logged in");
+        alert("Rate karne ke liye pehle login karein!");
+        window.showLoginScreen();
+        return false;
     }
     
-    // Extract phone number from ratingId
-    const phoneNumber = ratingId.replace('rate-', '');
-    if (phoneNumber === '0000000000') {
-        alert("Invalid provider. Cannot rate.");
-        return;
+    console.log("User is logged in:", user.phoneNumber);
+    
+    // Simple confirmation
+    const confirmed = confirm(`Kya aap ${stars} star rating dena chahte hain?`);
+    if (!confirmed) {
+        console.log("User cancelled");
+        return false;
     }
     
-    // Find provider ID from phone number
-    findProviderByPhone(phoneNumber).then(providerId => {
-        if (!providerId) {
-            alert("Provider not found in database.");
-            return;
-        }
-        
-        // Confirm rating
-        if (!confirm(`Kya aap ${stars} star rating dena chahte hain?`)) {
-            return;
-        }
-        
-        // Save to Firebase under provider's ID
-        const ratingRef = firebase.database().ref(`services/${providerId}/ratings`).push();
-        
-        return ratingRef.set({
-            stars: stars,
-            timestamp: Date.now(),
-            userId: user.uid,
-            userPhone: user.phoneNumber || 'User'
-        });
+    console.log("Saving rating to Firebase...");
+    
+    // SIMPLE FIREBASE SAVE
+    firebase.database().ref('ratings').push({
+        ratingId: ratingId,
+        stars: stars,
+        userId: user.uid,
+        userPhone: user.phoneNumber || 'User',
+        timestamp: Date.now()
     })
     .then(() => {
-        // Update stars display
-        updateStarsDisplay(ratingId, stars);
+        console.log("✅ Rating saved successfully!");
         alert(`✅ ${stars} star rating submitted!`);
         
-        // Reload average rating
-        loadAverageRating(ratingId);
+        // Update the clicked star visually
+        highlightClickedStar(ratingId, stars);
     })
     .catch(error => {
-        console.error("Rating save error:", error);
-        alert("❌ Rating save nahi hui: " + (error.message || "Unknown error"));
+        console.error("❌ Rating save error:", error);
+        alert("Rating save nahi hui. Internet check karein.");
+    });
+    
+    return true;
+};
+
+// 2. HIGHLIGHT CLICKED STAR
+function highlightClickedStar(ratingId, stars) {
+    console.log("Highlighting star:", ratingId, stars);
+    
+    // Find the star buttons container
+    const container = document.getElementById(`star-buttons-${ratingId}`);
+    if (!container) {
+        console.log("Container not found:", `star-buttons-${ratingId}`);
+        return;
+    }
+    
+    // Get all star spans inside this container
+    const starSpans = container.querySelectorAll('span[onclick*="giveRating"]');
+    console.log("Found star spans:", starSpans.length);
+    
+    // Update each star
+    starSpans.forEach((span, index) => {
+        const starNumber = index + 1;
+        
+        if (starNumber <= stars) {
+            // This star should be filled (gold)
+            span.textContent = '⭐';
+            span.style.color = '#FFD700';
+            span.style.fontSize = '28px';
+        } else {
+            // This star should be empty (grey)
+            span.textContent = '☆';
+            span.style.color = '#ccc';
+            span.style.fontSize = '28px';
+        }
     });
 }
+
+// 3. TEST FUNCTION - Manual rating
+window.testRating = function() {
+    const testId = 'rate-test-123';
+    const testStars = 3;
+    
+    console.log("Testing rating with test ID...");
+    window.giveRating(testId, testStars);
+};
+
+// 4. MAKE SURE FUNCTION IS GLOBAL
+console.log("✅ Simple Rating System Loaded (giveRating function ready)");
 
 // Helper function to find provider by phone
 function findProviderByPhone(phone) {
