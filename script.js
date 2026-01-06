@@ -68,28 +68,28 @@ window.shareProviderDetails = (name, phone, category) => {
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
     return `<div class="profile-card">
-    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+    <h4 style="color:#2a5298;">\( {p.name} - ( \){p.category})</h4>
     <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
 
     <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
         <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
         <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-        <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-        <p style="margin-top: 10px;">रेटिंग दें: 
-  <select id="rating-${job.id}" style="margin-right: 5px;">
-    <option value="1">1 ⭐</option>
-    <option value="2">2 ⭐</option>
-    <option value="3">3 ⭐</option>
-    <option value="4">4 ⭐</option>
-    <option value="5">5 ⭐</option>
-  </select>
-  <button onclick="submitRating('${job.id}')">Submit</button>
-</p>
-<p id="average-rating-${job.id}" style="margin-top: 5px; color: #ff9800;">औसत रेटिंग: Calculating...</p>
+        <button class="share-btn flex-1" onclick="shareProviderDetails('\( {p.name}', ' \){p.phone}', '${p.category}')">Share</button>
     </div>
+
+    <p style="margin-top: 10px;">रेटिंग दें: 
+      <select id="rating-${p.id}" style="margin-right: 5px;">
+        <option value="1">1 ⭐</option>
+        <option value="2">2 ⭐</option>
+        <option value="3">3 ⭐</option>
+        <option value="4">4 ⭐</option>
+        <option value="5">5 ⭐</option>
+      </select>
+      <button onclick="submitRating('${p.id}')">Submit</button>
+    </p>
+    <p id="average-rating-${p.id}" style="margin-top: 5px; color: #ff9800;">औसत रेटिंग: Calculating...</p>
 </div>`;
 }
-        
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
     // Days Left Badge
