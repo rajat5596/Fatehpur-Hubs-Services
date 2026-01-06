@@ -75,8 +75,7 @@ function renderProviderCard(p) {
         <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
         <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
         <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-    </div>
-    <p style="margin-top: 10px;">रेटिंग दें: 
+        <p style="margin-top: 10px;">रेटिंग दें: 
   <select id="rating-${job.id}" style="margin-right: 5px;">
     <option value="1">1 ⭐</option>
     <option value="2">2 ⭐</option>
@@ -87,6 +86,7 @@ function renderProviderCard(p) {
   <button onclick="submitRating('${job.id}')">Submit</button>
 </p>
 <p id="average-rating-${job.id}" style="margin-top: 5px; color: #ff9800;">औसत रेटिंग: Calculating...</p>
+    </div>
 </div>`;
 }
         
