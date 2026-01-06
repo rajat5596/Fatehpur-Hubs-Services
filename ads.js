@@ -6,6 +6,7 @@
 // *************************************************************
 const promotionAds = [
     { name: "Johnson Square", image: "https://i.ibb.co/MDcL6w49/IMG-20251029-120527.jpg", link: "https://wa.me/919889904191", endDate: "2026-01-15" },
+    { name: "VC Motors", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/images%20(2).jpeg?alt=media&token=3e6655be-1fa3-4954-839d-d2447149a30a", link: "https://wa.me/919888888888", endDate: "2026-01-15" },
     { name: "Fatehpur Hubs", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/imgandroid-chrome-512x512.png?alt=media&token=7c5af6e6-f88c-4bbb-ac82-68dd4801e35d", link: "https://wa.me/919889904191", endDate: null },
     { name: "Raj Ratan", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/images.jpeg?alt=media&token=dc80f256-00b6-43e6-9912-c3794b87a4ac", link: "https://wa.me/919888888888", endDate: "2026-01-15" },
     // Naye Ad ki expiry date yahan set karein
