@@ -66,25 +66,28 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p, id) { // id ko bhi pass karein agar possible ho
-    const mistryId = id || p.id || ''; // Ensure mistryId is defined
+function renderProviderCard(p, id) {
+    // Unique ID hona zaroori hai rating ke liye
+    const mistryId = id || p.id || ''; 
     const currentRating = p.rating || 0;
 
-    return `<div class="profile-card">
-    <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-    <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+    return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff;">
+        <h4 style="color:#2a5298; margin: 0;">${p.name} - (${p.category})</h4>
+        <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area} | Experience: ${p.experience}</p>
 
-    <div class="rating-area" style="margin-bottom: 10px;">
-        ${renderStars(mistryId, currentRating)}
-    </div>
+        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+        </div>
 
-    <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-        <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-        <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-        <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-    </div>
-</div>`;
+        <div class="rating-area" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
+            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Rate this service:</p>
+            ${renderStars(mistryId, currentRating)}
+        </div>
+    </div>`;
 }
+
 
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
@@ -1274,21 +1277,25 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
-// 1. Stars dikhane ka function
+// Star render logic (Clickable)
 function renderStars(mistryId, currentRating) {
     let starsHtml = '<div class="star-rating-container" style="display: flex; align-items: center;">';
     for (let i = 1; i <= 5; i++) {
-        // Round off rating to show filled stars
+        // Star fill logic
         let starClass = i <= Math.round(currentRating) ? 'fas fa-star' : 'far fa-star';
-        starsHtml += `<i class="${starClass}" onclick="submitGlobalRating('${mistryId}', ${i})" style="color: #ffc107; cursor: pointer; margin-right: 5px; font-size: 18px;"></i>`;
+        // Inline function taaki click register ho
+        starsHtml += `<i class="${starClass}" onclick="event.stopPropagation(); submitGlobalRating('${mistryId}', ${i})" style="color: #ffc107; cursor: pointer; margin-right: 8px; font-size: 22px; padding: 5px;"></i>`;
     }
-    starsHtml += `<span style="font-size: 13px; color: #666; font-weight: bold;"> (${currentRating || 0})</span></div>`;
+    starsHtml += `<span style="font-size: 14px; color: #444; font-weight: bold; margin-left: 5px;"> ${currentRating || 0}</span></div>`;
     return starsHtml;
 }
 
-// 2. Rating submit karne ka function
+// Global Sync Rating Function
 window.submitGlobalRating = function(mistryId, selectedStar) {
-    if(!mistryId) return alert("Error: ID not found!");
+    if(!mistryId) {
+        console.error("Mistry ID Missing!");
+        return;
+    }
     
     const mistryRef = firebase.database().ref('service_providers/' + mistryId);
 
@@ -1305,6 +1312,6 @@ window.submitGlobalRating = function(mistryId, selectedStar) {
             totalRatings: newTotalVotes
         });
     }).then(() => {
-        alert("रेटिंग देने के लिए धन्यवाद!");
-    }).catch(err => alert("Error: " + err.message));
+        alert("Aapki rating submit ho gayi hai!");
+    }).catch(err => alert("Rating Error: " + err.message));
 };
