@@ -66,10 +66,17 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p) {
+function renderProviderCard(p, id) { // id ko bhi pass karein agar possible ho
+    const mistryId = id || p.id || ''; // Ensure mistryId is defined
+    const currentRating = p.rating || 0;
+
     return `<div class="profile-card">
     <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
     <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+
+    <div class="rating-area" style="margin-bottom: 10px;">
+        ${renderStars(mistryId, currentRating)}
+    </div>
 
     <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
         <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
@@ -78,6 +85,7 @@ function renderProviderCard(p) {
     </div>
 </div>`;
 }
+
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
     // Days Left Badge
@@ -1266,3 +1274,37 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
+// 1. Stars dikhane ka function
+function renderStars(mistryId, currentRating) {
+    let starsHtml = '<div class="star-rating-container" style="display: flex; align-items: center;">';
+    for (let i = 1; i <= 5; i++) {
+        // Round off rating to show filled stars
+        let starClass = i <= Math.round(currentRating) ? 'fas fa-star' : 'far fa-star';
+        starsHtml += `<i class="${starClass}" onclick="submitGlobalRating('${mistryId}', ${i})" style="color: #ffc107; cursor: pointer; margin-right: 5px; font-size: 18px;"></i>`;
+    }
+    starsHtml += `<span style="font-size: 13px; color: #666; font-weight: bold;"> (${currentRating || 0})</span></div>`;
+    return starsHtml;
+}
+
+// 2. Rating submit karne ka function
+window.submitGlobalRating = function(mistryId, selectedStar) {
+    if(!mistryId) return alert("Error: ID not found!");
+    
+    const mistryRef = firebase.database().ref('service_providers/' + mistryId);
+
+    mistryRef.once('value').then(snapshot => {
+        const data = snapshot.val() || {};
+        let oldRating = parseFloat(data.rating || 0);
+        let totalVotes = parseInt(data.totalRatings || 0);
+
+        let newTotalVotes = totalVotes + 1;
+        let newAverage = ((oldRating * totalVotes) + selectedStar) / newTotalVotes;
+
+        return mistryRef.update({
+            rating: parseFloat(newAverage.toFixed(1)),
+            totalRatings: newTotalVotes
+        });
+    }).then(() => {
+        alert("रेटिंग देने के लिए धन्यवाद!");
+    }).catch(err => alert("Error: " + err.message));
+};
