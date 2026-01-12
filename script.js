@@ -66,27 +66,19 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p, id) {
-    // Unique ID hona zaroori hai rating ke liye
-    const mistryId = id || p.id || ''; 
-    const currentRating = p.rating || 0;
-
-    return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff;">
-        <h4 style="color:#2a5298; margin: 0;">${p.name} - (${p.category})</h4>
-        <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area} | Experience: ${p.experience}</p>
-
-        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-        </div>
-
-        <div class="rating-area" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee;">
-            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Rate this service:</p>
-            ${renderStars(mistryId, currentRating)}
-        </div>
-    </div>`;
+function renderStars(mistryId, currentRating) {
+    let starsHtml = '<div class="star-rating-container" style="display: flex; align-items: center; gap: 10px; padding: 5px 0; position: relative; z-index: 10;">';
+    for (let i = 1; i <= 5; i++) {
+        let starClass = i <= Math.round(currentRating) ? 'fas fa-star' : 'far fa-star';
+        // onClick ko aur mazboot banaya hai
+        starsHtml += `<i class="${starClass}" 
+            onclick="console.log('Star Clicked'); window.submitGlobalRating('${mistryId}', ${i});" 
+            style="color: #ffc107; cursor: pointer; font-size: 26px; -webkit-tap-highlight-color: transparent;"></i>`;
+    }
+    starsHtml += `<span style="font-size: 14px; color: #444; font-weight: bold; margin-left: 5px;"> (${currentRating || 0})</span></div>`;
+    return starsHtml;
 }
+
 
 
 // जॉब कार्ड रेंडर करें
