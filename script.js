@@ -67,16 +67,27 @@ window.shareProviderDetails = (name, phone, category) => {
       
 // प्रोवाइडर कार्ड रेंडर करें
 function renderProviderCard(p) {
-        return `<div class="profile-card">
-            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
-            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
-            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-            </div>
-        </div>`;
-    }
+    // Ab 'id' p ke andar hi hai
+    const mistryId = p.id || ''; 
+    const currentRating = p.rating || 0;
+
+    return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h4 style="color:#2a5298; margin: 0;">${p.name} - (${p.category})</h4>
+        <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area} | Exp: ${p.experience}</p>
+
+        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+        </div>
+
+        <div class="rating-area" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; position: relative; z-index: 99;">
+            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Tap a star to rate:</p>
+            ${renderStars(mistryId, currentRating)}
+        </div>
+    </div>`;
+}
+
 
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
