@@ -66,20 +66,17 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderStars(mistryId, currentRating) {
-    let starsHtml = '<div class="star-rating-container" style="display: flex; align-items: center; gap: 10px; padding: 5px 0; position: relative; z-index: 10;">';
-    for (let i = 1; i <= 5; i++) {
-        let starClass = i <= Math.round(currentRating) ? 'fas fa-star' : 'far fa-star';
-        // onClick ko aur mazboot banaya hai
-        starsHtml += `<i class="${starClass}" 
-            onclick="console.log('Star Clicked'); window.submitGlobalRating('${mistryId}', ${i});" 
-            style="color: #ffc107; cursor: pointer; font-size: 26px; -webkit-tap-highlight-color: transparent;"></i>`;
+function renderProviderCard(p) {
+        return `<div class="profile-card">
+            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
+                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
+            </div>
+        </div>`;
     }
-    starsHtml += `<span style="font-size: 14px; color: #444; font-weight: bold; margin-left: 5px;"> (${currentRating || 0})</span></div>`;
-    return starsHtml;
-}
-
-
 
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
