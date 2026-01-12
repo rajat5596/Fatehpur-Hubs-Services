@@ -66,28 +66,32 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p) {
-    // Ab 'id' p ke andar hi hai
-    const mistryId = p.id || ''; 
-    const currentRating = p.rating || 0;
+function renderProviderCard(p, id) {
+    try {
+        // Agar 'p' khali hai toh crash na ho
+        if (!p) return "";
+        
+        const mistryId = id || p.id || 'no-id'; 
+        const currentRating = p.rating || 0;
 
-    return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h4 style="color:#2a5298; margin: 0;">${p.name} - (${p.category})</h4>
-        <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area} | Exp: ${p.experience}</p>
+        return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h4 style="color:#2a5298; margin: 0;">${p.name || 'Unknown'}</h4>
+            <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area || 'Fatehpur'}</p>
 
-        <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
-            <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
-            <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-            <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
-        </div>
+            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px; margin-bottom:10px;">
+                <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
+                <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
+            </div>
 
-        <div class="rating-area" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; position: relative; z-index: 99;">
-            <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Tap a star to rate:</p>
-            ${renderStars(mistryId, currentRating)}
-        </div>
-    </div>`;
+            <div class="rating-area" style="padding-top: 10px; border-top: 1px solid #eee;">
+                ${renderStars(mistryId, currentRating)}
+            </div>
+        </div>`;
+    } catch (e) {
+        console.error("Render Error:", e);
+        return ""; // Error aane par khali card dikhayega, white screen nahi karega
+    }
 }
-
 
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
