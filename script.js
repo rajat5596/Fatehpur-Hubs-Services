@@ -66,44 +66,17 @@ window.shareProviderDetails = (name, phone, category) => {
 }
       
 // प्रोवाइडर कार्ड रेंडर करें
-function renderProviderCard(p, id) {
-    try {
-        // Agar 'p' khali hai toh crash na ho
-        if (!p) return "";
-        
-        const mistryId = id || p.id || 'no-id'; 
-        const currentRating = p.rating || 0;
-
-        return `<div class="profile-card" style="margin-bottom: 15px; padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h4 style="color:#2a5298; margin: 0;">${p.name || 'Unknown'}</h4>
-            <p style="font-size:12px; color:#555; margin: 5px 0;">📍 ${p.area || 'Fatehpur'}</p>
-
-            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px; margin-bottom:10px;">
+function renderProviderCard(p) {
+        return `<div class="profile-card">
+            <h4 style="color:#2a5298;">${p.name} - (${p.category})</h4>
+            <p style="font-size:12px;color:#555;">📍 ${p.area} | Experience: ${p.experience}</p>
+            <div style="margin-top:10px; display: flex; justify-content: space-between; gap: 5px;">
                 <button class="whatsapp-btn flex-1" onclick="openWhatsApp('${p.phone}')">WhatsApp</button>
                 <button class="contact-btn flex-1" onclick="window.location.href='tel:${p.phone}'">Call Now</button>
-            </div>
-
-            <div class="rating-area" style="padding-top: 10px; border-top: 1px solid #eee;">
-                ${renderStars(mistryId, currentRating)}
+                <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
             </div>
         </div>`;
-    } catch (e) {
-        console.error("Render Error:", e);
-        return ""; // Error aane par khali card dikhayega, white screen nahi karega
     }
-}
-function renderStars(mistryId, currentRating) {
-    let starsHtml = '<div class="star-rating-container" style="display: flex; gap: 8px; margin-top: 5px;">';
-    for (let i = 1; i <= 5; i++) {
-        let isFilled = i <= Math.round(currentRating);
-        let starIcon = isFilled ? 'fas fa-star' : 'far fa-star';
-        starsHtml += `<i class="${starIcon}" 
-            onclick="event.stopPropagation(); window.submitGlobalRating('${mistryId}', ${i})" 
-            style="color: #ffc107; cursor: pointer; font-size: 22px;"></i>`;
-    }
-    starsHtml += `<span style="font-size: 14px; color: #666; margin-left: 5px;">(${currentRating})</span></div>`;
-    return starsHtml;
-}
 
 
 // जॉब कार्ड रेंडर करें
@@ -1309,34 +1282,3 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
-// Star render logic (Clickable)
-function renderStars(mistryId, currentRating) {
-    let starsHtml = '<div class="star-rating-container" style="display: flex; align-items: center;">';
-    for (let i = 1; i <= 5; i++) {
-        // Star fill logic
-        let starClass = i <= Math.round(currentRating) ? 'fas fa-star' : 'far fa-star';
-        // Inline function taaki click register ho
-        starsHtml += `<i class="${starClass}" onclick="event.stopPropagation(); submitGlobalRating('${mistryId}', ${i})" style="color: #ffc107; cursor: pointer; margin-right: 8px; font-size: 22px; padding: 5px;"></i>`;
-    }
-    starsHtml += `<span style="font-size: 14px; color: #444; font-weight: bold; margin-left: 5px;"> ${currentRating || 0}</span></div>`;
-    return starsHtml;
-}
-
-// Global Sync Rating Function
-window.submitGlobalRating = function(mistryId, selectedStar) {
-    if(!mistryId || mistryId === 'no-id') return alert("Error: ID missing");
-    
-    const mistryRef = firebase.database().ref('service_providers/' + mistryId);
-    mistryRef.once('value').then(snapshot => {
-        const data = snapshot.val() || {};
-        let oldRating = parseFloat(data.rating || 0);
-        let totalVotes = parseInt(data.totalRatings || 0);
-        let newTotal = totalVotes + 1;
-        let newAvg = ((oldRating * totalVotes) + selectedStar) / newTotal;
-
-        return mistryRef.update({
-            rating: parseFloat(newAvg.toFixed(1)),
-            totalRatings: newTotal
-        });
-    }).then(() => alert("Rating saved!"));
-};
