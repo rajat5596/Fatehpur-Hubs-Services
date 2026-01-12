@@ -76,9 +76,7 @@ function renderProviderCard(p) {
                 <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
             </div>
         </div>`;
-    }
-
-
+}
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
     // Days Left Badge
@@ -315,6 +313,7 @@ window.filterByCategory = (category, loadMore = false) => {
         }, 100);
     }
 };
+
 
 // 3.4 सामान्य सर्च (Ads injected)
 window.searchServices = () => {
