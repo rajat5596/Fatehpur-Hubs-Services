@@ -92,6 +92,19 @@ function renderProviderCard(p, id) {
         return ""; // Error aane par khali card dikhayega, white screen nahi karega
     }
 }
+function renderStars(mistryId, currentRating) {
+    let starsHtml = '<div class="star-rating-container" style="display: flex; gap: 8px; margin-top: 5px;">';
+    for (let i = 1; i <= 5; i++) {
+        let isFilled = i <= Math.round(currentRating);
+        let starIcon = isFilled ? 'fas fa-star' : 'far fa-star';
+        starsHtml += `<i class="${starIcon}" 
+            onclick="event.stopPropagation(); window.submitGlobalRating('${mistryId}', ${i})" 
+            style="color: #ffc107; cursor: pointer; font-size: 22px;"></i>`;
+    }
+    starsHtml += `<span style="font-size: 14px; color: #666; margin-left: 5px;">(${currentRating})</span></div>`;
+    return starsHtml;
+}
+
 
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
@@ -1312,26 +1325,19 @@ function renderStars(mistryId, currentRating) {
 
 // Global Sync Rating Function
 window.submitGlobalRating = function(mistryId, selectedStar) {
-    if(!mistryId) {
-        console.error("Mistry ID Missing!");
-        return;
-    }
+    if(!mistryId || mistryId === 'no-id') return alert("Error: ID missing");
     
     const mistryRef = firebase.database().ref('service_providers/' + mistryId);
-
     mistryRef.once('value').then(snapshot => {
         const data = snapshot.val() || {};
         let oldRating = parseFloat(data.rating || 0);
         let totalVotes = parseInt(data.totalRatings || 0);
-
-        let newTotalVotes = totalVotes + 1;
-        let newAverage = ((oldRating * totalVotes) + selectedStar) / newTotalVotes;
+        let newTotal = totalVotes + 1;
+        let newAvg = ((oldRating * totalVotes) + selectedStar) / newTotal;
 
         return mistryRef.update({
-            rating: parseFloat(newAverage.toFixed(1)),
-            totalRatings: newTotalVotes
+            rating: parseFloat(newAvg.toFixed(1)),
+            totalRatings: newTotal
         });
-    }).then(() => {
-        alert("Aapki rating submit ho gayi hai!");
-    }).catch(err => alert("Rating Error: " + err.message));
+    }).then(() => alert("Rating saved!"));
 };
