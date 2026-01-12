@@ -297,52 +297,30 @@ function renderFilteredPage(listElement, loadMoreBtn, isLoadMore = false) {
 window.filterByCategory = (category, loadMore = false) => {
     const listElement = document.getElementById('mistri-list');
     const loadMoreBtn = document.getElementById('load-more-providers');
-    loadMoreBtn.style.display = 'none';
-    
-    providersLastTimestamp = null;
-    providersLastKey = null;
-    
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.classList.remove('selected');
-        if(btn.innerText === category) {
-            btn.classList.add('selected');
-        }
-    });
+    if (loadMoreBtn) loadMoreBtn.style.display = 'none';
 
     if (!loadMore) {
         currentCategory = category;
-        filteredPageIndex = 0;
-        listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#2a5298;">${category} सर्विस लोड हो रही है... (पूरी लिस्ट फेच की जा रही है)</p>`;
-
+        listElement.innerHTML = `<h3>Available Services (${category})</h3>`;
+        
         window.providersRef.orderByChild('category').equalTo(category).once('value', (snapshot) => {
             if (!snapshot.exists()) {
-                listElement.innerHTML = `<h3>Available Services (${category})</h3><p style="text-align:center;color:#ff6666;">इस कैटेगरी में कोई सर्विस नहीं है।</p>`;
+                listElement.innerHTML = `<h3>No services found in ${category}</h3>`;
                 return;
             }
-
-            filteredProviders = [];
+            let filteredProviders = [];
             snapshot.forEach(childSnapshot => {
-                filteredProviders.push(childSnapshot.val());
+                // Yahan ID pass karna zaroori hai rating ke liye
+                filteredProviders.push({ ...childSnapshot.val(), id: childSnapshot.key });
             });
-
-            filteredProviders.sort((a, b) => b.timestamp - a.timestamp);
-
-            renderFilteredPage(listElement, loadMoreBtn);
+            filteredProviders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            renderFilteredPage(listElement, loadMoreBtn, filteredProviders);
         }, (error) => {
-            console.error("Error loading filtered services:", error);
-            listElement.innerHTML = '<p style="text-align:center;color:red;">डेटा लोड करने में एरर आई।</p>';
+            console.error("Error loading services:", error);
+            listElement.innerHTML = '<p style="text-align:center;color:red;">Data load karne mein dikkat hui</p>';
         });
-
-    } else {
-        listElement.insertAdjacentHTML('beforeend', '<p id="loading-more" style="text-align:center;color:#2a5298;">और लोड हो रहा है...</p>');
-        
-        setTimeout(() => { 
-            document.getElementById('loading-more')?.remove();
-            renderFilteredPage(listElement, loadMoreBtn, true);
-        }, 100);
     }
-};
-
+}; // Is bracket ka dhyan rakhein, ye function yahan khatam hona chahiye
 
 // 3.4 सामान्य सर्च (Ads injected)
 window.searchServices = () => {
