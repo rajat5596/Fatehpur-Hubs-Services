@@ -76,7 +76,9 @@ function renderProviderCard(p) {
                 <button class="share-btn flex-1" onclick="shareProviderDetails('${p.name}', '${p.phone}', '${p.category}')">Share</button>
             </div>
         </div>`;
-}
+    }
+
+        
 // जॉब कार्ड रेंडर करें
 function renderJobCard(job) {
     // Days Left Badge
@@ -329,33 +331,17 @@ window.searchServices = () => {
     document.getElementById('load-more-providers').style.display = 'none'; 
     
     window.providersRef.once('value', (snapshot) => { 
-    const providers = snapshot.val();
-    let results = [];
-    
-    if (providers) {
-        // ID aur Data dono ko ek saath 'results' mein daalne ka sahi tareeka:
-        results = Object.entries(providers).map(([key, val]) => {
-            return { ...val, id: key }; // Yahan humne Firebase ki unique ID ko 'id' naam se data mein jod diya
-        }).filter(p => 
-            (p.name && p.name.toLowerCase().includes(searchTerm)) || 
-            (p.category && p.category.toLowerCase().includes(searchTerm)) ||
-            (p.area && p.area.toLowerCase().includes(searchTerm))
-        );
-        
-        results.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    }
-
-    // Ab niche container mein data bhejte waqt 'p.id' ka use hoga
-    let container = document.getElementById('providers-container'); 
-    if(container) {
-        container.innerHTML = ""; 
-        results.forEach(p => {
-            // Yahan p.id pass ho rahi hai jo humne upar banayi hai
-            container.innerHTML += renderProviderCard(p, p.id); 
-        });
-    }
-});
-
+        const providers = snapshot.val();
+        let results = [];
+        if (providers) {
+            results = Object.values(providers).filter(p => 
+                (p.name && p.name.toLowerCase().includes(searchTerm)) || 
+                (p.category && p.category.toLowerCase().includes(searchTerm)) ||
+                (p.area && p.area.toLowerCase().includes(searchTerm))
+            );
+            
+            results.sort((a, b) => b.timestamp - a.timestamp);
+        }
         
         // --- AD INJECTION LOGIC (Search Results) ---
         let contentArray = [];
@@ -475,7 +461,7 @@ window.registerJob = function(event) {
         return false; 
     }
 
-    // --- LOGGED IN USER CODE: Agar login hai toh ye niche wala chalega ---
+     // --- LOGGED IN USER CODE: Agar login hai toh ye niche wala chalega ---
     const posterId = user.uid; 
     
     const title = document.getElementById('jobTitle').value;
@@ -532,8 +518,6 @@ window.registerJob = function(event) {
 
     return false;
 };
-
-
 // --- 4.3 MOCK JOB LOAD FUNCTION ---
 function loadJobs() {
     const listElement = document.getElementById('job-list');
