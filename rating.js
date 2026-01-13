@@ -1,15 +1,50 @@
-// rating.js - SIMPLE RATING SYSTEM FOR FATEHPUR HUBS
-console.log("⭐ Rating System Loaded");
+// rating.js - FIXED PERMANENT RATING SYSTEM
+console.log("⭐ Rating System Loaded - Permanent Fix");
 
-// ============ RATING FUNCTIONS ============
+// ============ CORE RATING FUNCTIONS ============
 
-// 1. SUBMIT RATING
-function submitRating(providerId, rating, providerName) {
-    console.log("Submitting rating for", providerId, "stars:", rating);
+// 1. GET PROVIDER PHONE FROM CARD
+function getProviderPhoneFromCard(card) {
+    // Try WhatsApp button
+    const whatsappBtn = card.querySelector('button[onclick*="openWhatsApp"]');
+    if (whatsappBtn) {
+        const onclick = whatsappBtn.getAttribute('onclick') || '';
+        const match = onclick.match(/openWhatsApp\('([^']+)'/);
+        if (match && match[1]) {
+            return match[1].replace(/\D/g, ''); // Sirf numbers
+        }
+    }
     
-    // Check if user is logged in
-    if (typeof firebase === 'undefined' || !firebase.auth().currentUser) {
-        alert("कृपया रेटिंग देने के लिए पहले लॉगिन करें");
+    // Try Call button
+    const callBtn = card.querySelector('button[onclick*="tel:"]');
+    if (callBtn) {
+        const onclick = callBtn.getAttribute('onclick') || '';
+        const match = onclick.match(/tel:([^']+)/);
+        if (match && match[1]) {
+            return match[1].replace(/\D/g, '');
+        }
+    }
+    
+    return null;
+}
+
+// 2. GET PROVIDER NAME FROM CARD
+function getProviderNameFromCard(card) {
+    const nameElement = card.querySelector('h4');
+    if (nameElement) {
+        let name = nameElement.textContent.split('-')[0].trim();
+        name = name.replace(/'/g, '').replace(/"/g, '').substring(0, 30);
+        return name;
+    }
+    return "Unknown Provider";
+}
+
+// 3. SUBMIT RATING (FIXED - Permanent save)
+function submitRating(providerPhone, rating, providerName) {
+    console.log("Submitting rating for phone:", providerPhone);
+    
+    if (!firebase.auth().currentUser) {
+        alert("कृपया पहले लॉगिन करें");
         return;
     }
     
@@ -17,36 +52,54 @@ function submitRating(providerId, rating, providerName) {
     const userId = user.uid;
     const userName = user.displayName || localStorage.getItem('user_name') || 'User';
     
+    // ✅ FIXED: Create proper provider ID
+    const providerId = 'provider_' + providerPhone;
+    
     const ratingData = {
         rating: rating,
         userName: userName,
         userId: userId,
-        timestamp: Date.now()
+        providerName: providerName,
+        providerPhone: providerPhone,
+        timestamp: Date.now(),
+        date: new Date().toISOString().split('T')[0]
     };
     
-    // Save to Firebase
-    firebase.database().ref('ratings/' + providerId + '/' + userId).set(ratingData)
+    console.log("Saving rating for providerId:", providerId);
+    
+    // ✅ FIXED: Use correct Firebase path
+    const db = firebase.database();
+    
+    // Save rating under provider
+    db.ref('ratings/' + providerId + '/' + userId).set(ratingData)
         .then(() => {
-            console.log("✅ Rating submitted");
-            // Show success message
-            showRatingSuccess(providerName, rating);
-            // Refresh rating display
-            setTimeout(() => {
-                loadRatingForProvider(providerId);
-            }, 500);
+            console.log("✅ Rating saved permanently");
+            showSuccessMessage(`आपने ${providerName} को ${rating} ⭐ दिए`);
+            
+            // Immediately update display
+            const ratingDiv = document.getElementById('rating-' + providerId);
+            if (ratingDiv) {
+                loadRatingForProvider(providerPhone);
+            }
         })
         .catch(error => {
-            console.error("❌ Rating error:", error);
-            alert("रेटिंग सेव नहीं हुई: " + error.message);
+            console.error("❌ Save error:", error);
+            alert("Rating save नहीं हुई: " + error.message);
         });
 }
 
-// 2. LOAD RATING FOR A PROVIDER
-function loadRatingForProvider(providerId) {
-    if (!providerId || typeof firebase === 'undefined') return;
-    
+// 4. LOAD RATING (FIXED - Always show saved ratings)
+function loadRatingForProvider(providerPhone) {
+    const providerId = 'provider_' + providerPhone;
     const ratingDiv = document.getElementById('rating-' + providerId);
-    if (!ratingDiv) return;
+    
+    if (!ratingDiv) {
+        console.log("Rating div not found for:", providerId);
+        return;
+    }
+    
+    // Show loading
+    ratingDiv.innerHTML = '<span style="color:#ccc; font-size:12px;">⏳ Loading...</span>';
     
     firebase.database().ref('ratings/' + providerId).once('value')
         .then(snapshot => {
@@ -55,201 +108,333 @@ function loadRatingForProvider(providerId) {
                 return;
             }
             
+            // Calculate statistics
             let total = 0;
             let count = 0;
+            let ratings = [];
             
             snapshot.forEach(child => {
-                total += child.val().rating;
-                count++;
+                const data = child.val();
+                if (data.rating && data.rating >= 1 && data.rating <= 5) {
+                    total += data.rating;
+                    count++;
+                    ratings.push(data);
+                }
             });
             
-            const average = (total / count).toFixed(1);
-            const stars = getStarHTML(average);
+            if (count === 0) {
+                ratingDiv.innerHTML = '<span style="color:#999; font-size:12px;">No ratings yet</span>';
+                return;
+            }
             
+            const average = (total / count).toFixed(1);
+            const stars = getStarsHTML(average);
+            
+            // ✅ PERMANENT DISPLAY - Refresh hone par bhi rahega
             ratingDiv.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <div style="color: #ff9800; font-size: 14px;">
-                        ${stars}
-                    </div>
-                    <span style="font-weight: bold; color: #666;">${average}</span>
-                    <small style="color: #888;">(${count})</small>
+                <div onclick="showAllRatings('${providerPhone}')" 
+                     style="cursor:pointer; display:flex; align-items:center; gap:5px;">
+                    <div style="color:#ff9800; font-size:14px;">${stars}</div>
+                    <span style="font-weight:bold; color:#333;">${average}</span>
+                    <span style="color:#666; font-size:11px; background:#f0f0f0; padding:1px 6px; border-radius:10px;">
+                        ${count} ratings
+                    </span>
                 </div>
             `;
+            
+            // Also save to local storage as backup
+            localStorage.setItem('rating_' + providerId, JSON.stringify({
+                average: average,
+                count: count,
+                lastUpdated: Date.now()
+            }));
         })
         .catch(error => {
-            console.error("Rating load error:", error);
-            ratingDiv.innerHTML = '<span style="color:#999">Rating error</span>';
+            console.error("Load error:", error);
+            
+            // Try local storage backup
+            const localData = localStorage.getItem('rating_' + providerId);
+            if (localData) {
+                const data = JSON.parse(localData);
+                ratingDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <div style="color:#ff9800; font-size:14px;">${getStarsHTML(data.average)}</div>
+                        <span style="font-weight:bold;">${data.average}</span>
+                        <small style="color:#999;">(${data.count})</small>
+                    </div>
+                `;
+            }
         });
 }
 
-// 3. GET STAR HTML
-function getStarHTML(average) {
-    const fullStars = Math.floor(average);
-    const halfStar = (average % 1) >= 0.5 ? 1 : 0;
-    const emptyStars = 5 - fullStars - halfStar;
+// 5. SHOW ALL RATINGS
+function showAllRatings(providerPhone) {
+    const providerId = 'provider_' + providerPhone;
     
+    firebase.database().ref('ratings/' + providerId).once('value')
+        .then(snapshot => {
+            if (!snapshot.exists()) {
+                alert("No ratings available");
+                return;
+            }
+            
+            let html = `
+                <div style="max-height:400px; overflow-y:auto; padding:10px;">
+                    <h4 style="color:#2a5298; margin-bottom:15px; text-align:center;">
+                        ⭐ All Ratings
+                    </h4>
+            `;
+            
+            let ratings = [];
+            snapshot.forEach(child => {
+                ratings.push(child.val());
+            });
+            
+            // Sort by newest first
+            ratings.sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (ratings.length === 0) {
+                html += '<p style="text-align:center; color:#666;">No ratings yet</p>';
+            } else {
+                ratings.forEach(r => {
+                    const date = new Date(r.timestamp).toLocaleDateString('hi-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    
+                    html += `
+                        <div style="border-bottom:1px solid #eee; padding:8px 0; margin:5px 0;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <strong style="color:#333;">${r.userName}</strong>
+                                <span style="color:#ff9800; font-size:16px;">${'★'.repeat(r.rating)}</span>
+                            </div>
+                            <div style="color:#666; font-size:12px; margin-top:3px;">
+                                📅 ${date}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += '</div>';
+            
+            // Show modal
+            showModal('All Ratings', html);
+        });
+}
+
+// 6. ADD RATING SECTION TO CARDS (FIXED)
+function addRatingToCards() {
+    const cards = document.querySelectorAll('.profile-card');
+    
+    cards.forEach((card, index) => {
+        // Skip if already has rating section
+        if (card.querySelector('.rating-section-permanent')) return;
+        
+        const phone = getProviderPhoneFromCard(card);
+        const name = getProviderNameFromCard(card);
+        
+        if (!phone || phone.length < 10) {
+            console.log("Invalid phone for card", index);
+            return;
+        }
+        
+        const providerId = 'provider_' + phone;
+        
+        // Create rating section
+        const ratingHTML = `
+            <div class="rating-section-permanent" style="margin:12px 0; padding:10px; background:#f8f9fa; border-radius:8px; border:1px solid #e0e0e0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <small style="color:#666; font-weight:bold;">⭐ इस प्रोवाइडर को रेट करें:</small>
+                    <div id="rating-${providerId}" style="color:#ff9800; font-size:12px;">
+                        Loading...
+                    </div>
+                </div>
+                <div style="display:flex; gap:3px; justify-content:center;">
+                    <button onclick="submitRating('${phone}', 1, '${name}')" 
+                            style="background:#ffd700; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                        1★
+                    </button>
+                    <button onclick="submitRating('${phone}', 2, '${name}')" 
+                            style="background:#ffd700; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                        2★
+                    </button>
+                    <button onclick="submitRating('${phone}', 3, '${name}')" 
+                            style="background:#ffd700; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                        3★
+                    </button>
+                    <button onclick="submitRating('${phone}', 4, '${name}')" 
+                            style="background:#ffd700; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                        4★
+                    </button>
+                    <button onclick="submitRating('${phone}', 5, '${name}')" 
+                            style="background:#ffd700; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; flex:1;">
+                        5★
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Insert before buttons
+        const buttonsDiv = card.querySelector('div[style*="display: flex; justify-content: space-between"]');
+        if (buttonsDiv) {
+            buttonsDiv.insertAdjacentHTML('beforebegin', ratingHTML);
+        } else {
+            card.insertAdjacentHTML('beforeend', ratingHTML);
+        }
+        
+        // Load rating after 1 second
+        setTimeout(() => {
+            loadRatingForProvider(phone);
+        }, 1000 + (index * 200)); // Staggered loading
+    });
+}
+
+// 7. HELPER FUNCTIONS
+function getStarsHTML(average) {
+    const full = Math.floor(average);
+    const half = (average % 1) >= 0.5;
     let stars = '';
     
-    // Full stars
-    for (let i = 0; i < fullStars; i++) {
-        stars += '★';
-    }
-    
-    // Half star
-    if (halfStar) {
-        stars += '½';
-    }
-    
-    // Empty stars
-    for (let i = 0; i < emptyStars; i++) {
-        stars += '☆';
-    }
+    for (let i = 0; i < full; i++) stars += '★';
+    if (half) stars += '½';
+    for (let i = stars.length; i < 5; i++) stars += '☆';
     
     return stars;
 }
 
-// 4. SHOW RATING SUCCESS MESSAGE
-function showRatingSuccess(providerName, rating) {
-    // Create success message
-    const successDiv = document.createElement('div');
-    successDiv.style.cssText = `
+function showSuccessMessage(text) {
+    // Remove existing messages
+    document.querySelectorAll('.rating-success-msg').forEach(el => el.remove());
+    
+    const msg = document.createElement('div');
+    msg.className = 'rating-success-msg';
+    msg.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
         background: #4CAF50;
         color: white;
-        padding: 10px 15px;
-        border-radius: 5px;
+        padding: 12px 18px;
+        border-radius: 8px;
         z-index: 99999;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        max-width: 300px;
     `;
+    msg.innerHTML = `<strong>✅ Success!</strong><br>${text}`;
+    document.body.appendChild(msg);
     
-    successDiv.innerHTML = `
-        <strong>✅ Rating Submitted!</strong><br>
-        You gave ${'★'.repeat(rating)}${'☆'.repeat(5-rating)} to ${providerName}
-    `;
-    
-    document.body.appendChild(successDiv);
-    
-    // Remove after 3 seconds
     setTimeout(() => {
-        successDiv.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            if (successDiv.parentNode) {
-                successDiv.parentNode.removeChild(successDiv);
-            }
-        }, 300);
+        msg.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => msg.remove(), 300);
     }, 3000);
 }
 
-// 5. ADD RATING TO EXISTING CARDS
-function addRatingToCards() {
-    console.log("Adding rating system to cards...");
+function showModal(title, content) {
+    // Remove existing modal
+    document.querySelectorAll('.rating-modal').forEach(el => el.remove());
     
-    // Wait for cards to load
-    setTimeout(() => {
-        const cards = document.querySelectorAll('.profile-card');
-        console.log("Found", cards.length, "cards");
-        
-        cards.forEach((card, index) => {
-            // Check if rating already added
-            if (card.querySelector('.rating-section')) return;
-            
-            // Get provider info from card
-            const nameElement = card.querySelector('h4');
-            if (!nameElement) return;
-            
-            const providerName = nameElement.textContent.split('-')[0].trim();
-            const providerId = 'provider_' + index + '_' + Date.now();
-            
-            // Create rating section
-            const ratingSection = document.createElement('div');
-            ratingSection.className = 'rating-section';
-            ratingSection.style.cssText = `
-                margin: 8px 0;
-                padding: 8px;
-                background: #f9f9f9;
-                border-radius: 5px;
-                border: 1px solid #eee;
-            `;
-            
-            ratingSection.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <small style="color:#666;">Rate this provider:</small>
-                    <div id="rating-${providerId}" style="color:#ff9800; font-size:12px;">
-                        Loading...
-                    </div>
-                </div>
-                <div style="display: flex; gap: 3px; margin-top: 5px;">
-                    ${[1,2,3,4,5].map(star => `
-                        <button onclick="submitRating('${providerId}', ${star}, '${providerName.replace(/'/g, "\\'")}')"
-                                style="background: #ffd700; 
-                                       border: none; 
-                                       border-radius: 3px; 
-                                       width: 30px; 
-                                       height: 30px; 
-                                       font-size: 14px; 
-                                       cursor: pointer;
-                                       color: #333;">
-                            ${star}★
-                        </button>
-                    `).join('')}
-                </div>
-            `;
-            
-            // Insert after name
-            nameElement.parentNode.insertBefore(ratingSection, nameElement.nextSibling);
-            
-            // Load rating
-            setTimeout(() => {
-                loadRatingForProvider(providerId);
-            }, 500);
-        });
-    }, 1000);
+    const modal = document.createElement('div');
+    modal.className = 'rating-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 100000;
+        width: 90%;
+        max-width: 450px;
+        max-height: 80vh;
+        overflow: hidden;
+    `;
+    
+    modal.innerHTML = `
+        <div style="margin-bottom:15px;">
+            <h3 style="color:#2a5298; margin:0; text-align:center;">${title}</h3>
+        </div>
+        ${content}
+        <div style="text-align:center; margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
+            <button onclick="this.closest('.rating-modal').remove()" 
+                    style="background:#2a5298; color:white; border:none; padding:10px 25px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                Close
+            </button>
+        </div>
+    `;
+    
+    // Add overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 99999;
+    `;
+    overlay.onclick = () => {
+        modal.remove();
+        overlay.remove();
+    };
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
 }
 
-// 6. AUTO-RUN WHEN PAGE LOADS
+// 8. INITIALIZE
 window.addEventListener('load', function() {
-    console.log("Page loaded, initializing rating system...");
+    console.log("🚀 Initializing Permanent Rating System");
     
-    // Run every 2 seconds to catch new cards
-    setInterval(addRatingToCards, 2000);
+    // Add CSS animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .rating-section-permanent button {
+            transition: all 0.2s;
+        }
+        .rating-section-permanent button:hover {
+            background: #ffc107 !important;
+            transform: scale(1.05);
+        }
+        .rating-section-permanent button:active {
+            transform: scale(0.95);
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Run rating system
+    setTimeout(addRatingToCards, 1500);
+    
+    // Check every 3 seconds for new cards
+    setInterval(addRatingToCards, 3000);
     
     // Also run when screen changes
-    const originalShowScreen = window.showScreen;
-    if (originalShowScreen) {
-        window.showScreen = function(screenId) {
-            originalShowScreen(screenId);
-            setTimeout(addRatingToCards, 500);
+    if (typeof goHome === 'function') {
+        const originalGoHome = goHome;
+        window.goHome = function() {
+            originalGoHome();
+            setTimeout(addRatingToCards, 1000);
         };
     }
 });
 
-// 7. CSS FOR ANIMATIONS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    .rating-section button:hover {
-        background: #ffc107 !important;
-        transform: scale(1.1);
-        transition: all 0.2s;
-    }
-`;
-document.head.appendChild(style);
-
-// ============ GLOBAL FUNCTIONS ============
+// 9. GLOBAL FUNCTIONS
 window.submitRating = submitRating;
 window.loadRatingForProvider = loadRatingForProvider;
+window.showAllRatings = showAllRatings;
 window.addRatingToCards = addRatingToCards;
 
-console.log("✅ Rating system ready!");
+console.log("✅ Permanent Rating System Ready!");
