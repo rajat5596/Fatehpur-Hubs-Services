@@ -20,52 +20,37 @@ const promotionAds = [
  * इंजेक्ट किए गए एड कंटेनरों में प्रमोशन एड्स को लोड करता है।
  */
 window.loadInjectedPromotionAds = function() {
-    // उन सभी div's को ढूँढें जिनकी class 'promotion-ad-block' है
     const adContainers = document.querySelectorAll('.promotion-ad-block');
-    
     if (adContainers.length === 0) return; 
 
-    // **SCHEDULING LOGIC**
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
     
-    // Filter out ads that have expired
+    // 1. Pehle Expired Ads filter karein
     const activeAds = promotionAds.filter(ad => {
-        if (!ad.endDate) {
-            return true;
-        }
+        if (!ad.endDate) return true;
         const expiryDate = new Date(ad.endDate);
         expiryDate.setHours(23, 59, 59, 999); 
         return today <= expiryDate;
     });
-    // **END SCHEDULING LOGIC**
 
     if (activeAds.length === 0) {
         adContainers.forEach(container => container.style.display = 'none');
         return; 
     }
     
-    // 1. RANDOMIZE: Active Ads का order हर बार बदलेगा
-    const shuffledAds = activeAds.sort(() => 0.5 - Math.random());
-    
-    adContainers.forEach((container, containerIndex) => {
-        // हर कंटेनर में एक ही रोटेटिंग एड सेट को लोड करें
+    adContainers.forEach((container) => {
+        // ⭐ UNIQUE LOGIC: Har container ke liye alag se shuffle karein
+        const adsForThisContainer = [...activeAds].sort(() => 0.5 - Math.random());
         
         let adHTML = '';
-        
-        // Ads को HTML string में jod dein
-        shuffledAds.forEach((ad, index) => {
-            // हर कंटेनर में, पहला एड दिखाएँ
+        adsForThisContainer.forEach((ad, index) => {
             const displayStyle = (index === 0) ? 'display: block;' : 'display: none;';
-
             adHTML += `
                 <div class="ad-slide" data-index="${index}" style="${displayStyle}">
-                    <a href="${ad.link}" target="_blank" class="promotion-link" style="text-decoration: none; color: inherit; display: block;">
-                        <img src="${ad.image}" 
-                             alt="${ad.name}" 
-                             class="promotion-banner"
-                             style="width: 100%; height: auto; display: block; border-radius: 5px;">
-                        <p class="business-name" style="text-align: center; font-weight: bold; margin-top: 5px; color: #ff6666;">
+                    <a href="${ad.link}" target="_blank" style="text-decoration: none; color: inherit; display: block;">
+                        <img src="${ad.image}" alt="${ad.name}" style="width: 100%; height: auto; display: block; border-radius: 5px;">
+                        <p style="text-align: center; font-weight: bold; margin-top: 5px; color: #ff6666;">
                             ${ad.name}
                         </p> 
                     </a>
@@ -73,24 +58,22 @@ window.loadInjectedPromotionAds = function() {
             `;
         });
         
-        container.querySelector('.ad-placeholder-dynamic').innerHTML = adHTML;
-
-        // 2. SLIDER LOGIC
-        const slides = container.querySelectorAll('.ad-slide');
-        
-        // Slider tabhi chalega jab 1 se zyada active ads honge
-        if(slides.length > 1) {
-            let currentAdIndex = 0;
+        const placeholder = container.querySelector('.ad-placeholder-dynamic');
+        if (placeholder) {
+            placeholder.innerHTML = adHTML;
             
-            function showNextAd() {
-                slides[currentAdIndex].style.display = 'none';
-                currentAdIndex = (currentAdIndex + 1) % slides.length;
-                slides[currentAdIndex].style.display = 'block';
+            // 2. SLIDER LOGIC (Is container ke liye private slider)
+            const slides = placeholder.querySelectorAll('.ad-slide');
+            if(slides.length > 1) {
+                let currentAdIndex = 0;
+                setInterval(() => {
+                    slides[currentAdIndex].style.display = 'none';
+                    currentAdIndex = (currentAdIndex + 1) % slides.length;
+                    slides[currentAdIndex].style.display = 'block';
+                }, 15000); // 15 Seconds Timer
             }
-
-            // Slider को हर 15 सेकंड में चलाएँ
-            setInterval(showNextAd, 15000); 
         }
     });
 }
+    
 // document.addEventListener('DOMContentLoaded', loadPromotionAds);  <--- यह लाइन हटा दी गई है
