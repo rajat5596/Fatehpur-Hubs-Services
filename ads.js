@@ -26,7 +26,7 @@ window.loadInjectedPromotionAds = function() {
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
     
-    // 1. Pehle Expired Ads filter karein
+    // 1. Expired Ads filter karein
     const activeAds = promotionAds.filter(ad => {
         if (!ad.endDate) return true;
         const expiryDate = new Date(ad.endDate);
@@ -38,16 +38,26 @@ window.loadInjectedPromotionAds = function() {
         adContainers.forEach(container => container.style.display = 'none');
         return; 
     }
-    
-    adContainers.forEach((container) => {
-        // ⭐ UNIQUE LOGIC: Har container ke liye alag se shuffle karein
-        const adsForThisContainer = [...activeAds].sort(() => 0.5 - Math.random());
+
+    // 2. Har container ke liye loop chalayein
+    adContainers.forEach((container, containerIndex) => {
         
+        // ⭐ SUPER UNIQUE LOGIC: 
+        // Har container ke liye ads ko alag order mein rotate karenge
+        // containerIndex ka use karke hum starting point badal denge
+        let adsForThisContainer = [...activeAds];
+        
+        // Array ko rotate karna (taaki har container alag ad se start ho)
+        for (let i = 0; i < containerIndex; i++) {
+            adsForThisContainer.push(adsForThisContainer.shift());
+        }
+
         let adHTML = '';
         adsForThisContainer.forEach((ad, index) => {
+            // Sirf pehla ad dikhega (index 0)
             const displayStyle = (index === 0) ? 'display: block;' : 'display: none;';
             adHTML += `
-                <div class="ad-slide" data-index="${index}" style="${displayStyle}">
+                <div class="ad-slide" style="${displayStyle}">
                     <a href="${ad.link}" target="_blank" style="text-decoration: none; color: inherit; display: block;">
                         <img src="${ad.image}" alt="${ad.name}" style="width: 100%; height: auto; display: block; border-radius: 5px;">
                         <p style="text-align: center; font-weight: bold; margin-top: 5px; color: #ff6666;">
@@ -62,18 +72,19 @@ window.loadInjectedPromotionAds = function() {
         if (placeholder) {
             placeholder.innerHTML = adHTML;
             
-            // 2. SLIDER LOGIC (Is container ke liye private slider)
             const slides = placeholder.querySelectorAll('.ad-slide');
             if(slides.length > 1) {
                 let currentAdIndex = 0;
+                // Private timer for this container
                 setInterval(() => {
                     slides[currentAdIndex].style.display = 'none';
                     currentAdIndex = (currentAdIndex + 1) % slides.length;
                     slides[currentAdIndex].style.display = 'block';
-                }, 15000); // 15 Seconds Timer
+                }, 15000); 
             }
         }
     });
 }
+
     
 // document.addEventListener('DOMContentLoaded', loadPromotionAds);  <--- यह लाइन हटा दी गई है
