@@ -1265,3 +1265,20 @@ setTimeout(function() {
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
+// Copy and Paste this at the bottom of script.js
+window.shareApp = function() {
+    const shareData = {
+        title: 'Fatehpur Hubs',
+        text: 'फतेहपुर की सभी सर्विस और जॉब्स अब एक ही जगह पर। अभी डाउनलोड करें:',
+        url: 'https://play.google.com/store/apps/details?id=in.co.fatehpurhubs'
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData)
+            .then(() => console.log('Shared successfully'))
+            .catch((err) => console.log('Error: ' + err));
+    } else {
+        // Agar mobile share kaam na kare toh link copy karne ka option
+        window.prompt("App लिंक कॉपी करें और शेयर करें:", "https://play.google.com/store/apps/details?id=in.co.fatehpurhubs");
+    }
+}
