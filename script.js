@@ -1,4 +1,3 @@
-
 // =======================================================
 // ⭐ 1. GLOBAL VARIABLES & CONFIGURATION (सबसे ऊपर रखें) ⭐
 // =======================================================
@@ -13,10 +12,20 @@ const firebaseConfig = {
     appId: "1:294360741451:web:5a4a6ac0838f8542fabfce"
 };
 
+// Initialize Firebase (SIRF EK BAAR)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const database = firebase.database();
+
+// Fatehpur Hubs ke liye specific path (KBC se alag)
+const FH_DB_PATH = 'fatehpur_hubs_users';
+
 // Google Sign-In ke liye
 let currentUser = null;
-let tempUserData = {}; 
-    
+
 // ⭐ GLOBAL STATE AND LIMITS ⭐
 const providersLimit = 10; // Firebase लोड लिमिट 
 let providersLastTimestamp = null; 
@@ -594,55 +603,50 @@ window.showScreen = (id) => {
     if(id === 'home-screen') loadCategories(); 
 };
 
-
 // 5.3 यह फ़ंक्शन पूरे ऐप को initialize करता है
 window.onload = () => {
-    firebase.initializeApp(firebaseConfig);
+    // Firebase already initialized above, so just get references
     window.database = firebase.database();
     window.providersRef = database.ref('service_providers'); 
     window.jobsRef = database.ref('local_jobs'); 
 
-    // 1. अदृश्य reCAPTCHA सेटअप
-    recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible'
-    });
-    recaptchaVerifier.render();
-
-    // 2. परसिस्टेंस चेक: यूज़र ऑथेंटिकेशन स्टेट लिसनर (GUEST MODE UPDATED)
-firebase.auth().onAuthStateChanged(user => {
-    // Guest ho ya Login, ab hamesha Main App dikhega
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('registrationScreen').style.display = 'none';
-
-    if (user) {
-        console.log("Logged In User:", user.phoneNumber);
-        // Agar user login hai, toh data load karo
-        startFirebaseListener();
-    } else {
-        console.log("Guest Mode Active");
-        // Guest ke liye bhi data load karo
-        startFirebaseListener();
+    // Google Sign-In Initialize
+    if (typeof initGoogleSignIn === 'function') {
+        initGoogleSignIn();
     }
-    
-    // 🔥 YEH LINE ADD KARO - UI update karne ke liye
-    setTimeout(updateAuthUI, 100);
-    setTimeout(updateRatingButtons, 500);
-});
-    
- // window.onload का क्लोजिंग ब्रैकेट
 
-// 5.4 Service Worker Registration (PWA)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            })
-            .catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
-            });
+    // Check Auth State (NO OTP/Recaptcha)
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log("✅ Logged In User:", user.email);
+            currentUser = user;
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('registrationScreen').style.display = 'none';
+            startFirebaseListener();
+        } else {
+            console.log("👤 No user logged in - showing login screen");
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('registrationScreen').style.display = 'block';
+            // Google button will show here
+        }
+        
+        setTimeout(updateRatingButtons, 500);
     });
-}
+    
+    // Service Worker Registration (PWA)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
+};
+
 // ============ DAILY DEALS SIMPLE WORKING CODE ============
 
 // Function to open deals screen
@@ -831,6 +835,7 @@ function loadDailyDeals() {
         dealsList.innerHTML = '<p style="text-align:center;color:red;">Loading failed. Refresh karein.</p>';
     });
 }
+
 // Simple save function
 window.saveDailyDeal = function() {
     console.log("saveDailyDeal called");
@@ -838,14 +843,10 @@ window.saveDailyDeal = function() {
     // 1. SABSE PEHLE LOGIN CHECK (GUEST USERS KE LIYE)
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("अपना ऑफर डालने के लिए कृपया पहले लॉगिन करें।");
+        alert("अपना ऑफर डालने के लिए कृपया पहले Google Sign-In से लॉगिन करें।");
         // App chhupao aur login dikhao
         document.getElementById('mainApp').style.display = 'none';
         document.getElementById('registrationScreen').style.display = 'block';
-        
-        // Reset login screen view
-        document.getElementById('profileInputSection').style.display = 'block';
-        document.getElementById('otpSection').style.display = 'none';
         return; // Function ko yahan rok do
     }
     
@@ -868,7 +869,6 @@ window.saveDailyDeal = function() {
         alert("❌ Please enter valid 10 digit phone number!");
         return;
     }
-    
     // 4. DATE VALIDATION
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -1074,10 +1074,13 @@ console.log("✅ Simple footer functions loaded");
 // 1. Login Screen dikhane ka function
 window.showLoginScreen = function() {
     document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('registrationScreen').style.display = 'flex';
-    document.getElementById('profileInputSection').style.display = 'block';
-    document.getElementById('otpSection').style.display = 'none';
+    document.getElementById('registrationScreen').style.display = 'block';
     console.log("Login Screen shown");
+    
+    // Re-initialize Google button if needed
+    if (typeof initGoogleSignIn === 'function') {
+        setTimeout(initGoogleSignIn, 100);
+    }
 };
 
 // 2. Guest mode mein wapas aane ka function
@@ -1096,7 +1099,13 @@ window.handleAuthClick = function() {
         if(confirm('Kya aap logout karna chahte hain?')) {
             firebase.auth().signOut().then(() => {
                 console.log("Logged out successfully");
-                // FORCE UI UPDATE - NO DELAY
+                // Clear localStorage
+                localStorage.removeItem('fh_user_name');
+                localStorage.removeItem('fh_user_email');
+                localStorage.removeItem('fh_user_area');
+                localStorage.removeItem('fh_user_uid');
+                localStorage.removeItem('fh_isLoggedIn');
+                // FORCE UI UPDATE
                 updateAuthUI();
                 // Guest ko home screen par le jao
                 goHome();
@@ -1154,34 +1163,18 @@ function updateAuthUI() {
     }
 }
 
-// 5. FIXED AUTH STATE LISTENER
-firebase.auth().onAuthStateChanged(user => {
-    console.log("🔥 Auth State Changed:", user ? "Logged In" : "Guest");
-    
-    // Always show main app
-    document.getElementById('mainApp').style.display = 'block';
-    document.getElementById('registrationScreen').style.display = 'none';
-    
-    // Load data for both
-    if(typeof startFirebaseListener === 'function') {
-        startFirebaseListener();
-    }
-    
-    // IMMEDIATE UI UPDATE - NO DELAY
-    updateAuthUI();
-});
-
-// 6. FIXED LOGOUT BUTTON OVERRIDE
+// 5. FIXED LOGOUT BUTTON OVERRIDE
 window.logOut = window.handleAuthClick;
 
-// 7. PAGE LOAD PAR UI CHECK
+// 6. PAGE LOAD PAR UI CHECK
 setTimeout(function() {
     console.log("🔄 Page Load - Checking Auth Status...");
     updateAuthUI();
 }, 1000);
 
 console.log("✅ Single Auth System Loaded");
-// Copy and Paste this at the bottom of script.js
+
+// Share App Function (Keep only one version)
 window.shareApp = function() {
     const shareData = {
         title: 'Fatehpur Hubs',
@@ -1197,4 +1190,4 @@ window.shareApp = function() {
         // Agar mobile share kaam na kare toh link copy karne ka option
         window.prompt("App लिंक कॉपी करें और शेयर करें:", "https://play.google.com/store/apps/details?id=in.co.fatehpurhubs");
     }
-}
+};
