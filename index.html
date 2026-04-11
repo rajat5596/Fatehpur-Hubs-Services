@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fatehpur Hubs - Local Services & Jobs</title>
@@ -25,33 +27,33 @@
     
     <div id="app-container">
 
-        <!-- -------------------- LOGOUT AND AUTH SCREEN -------------------- -->
-        <div id="registrationScreen" style="display: none; padding: 20px; text-align: center;">
-    <h2>Fatehpur Hubs: Services & Jobs</h2>
-    <div id="loginMsg" style="margin-bottom: 20px; font-weight: bold; color: #2a5298;">कृपया लॉगिन करें</div>
-
+        
+        <!-- -------------------- GOOGLE SIGN-IN SCREEN (NEW) -------------------- -->
+<div id="registrationScreen" style="display: none; padding: 20px; text-align center;">
+    <h2>🔥 Fatehpur Hubs</h2>
+    <p style="color: #666; margin-bottom: 20px;">Local Services & Jobs</p>
+    
     <div id="profileInputSection" class="input-group">
-        <input type="text" id="userName" placeholder="आपका नाम (Name)" required style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
-        <input type="text" id="userArea" placeholder="आपका एरिया/मोहल्ला (Area)" required style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
-        <input type="number" id="phoneInput" placeholder="10 अंक का फ़ोन नंबर" maxlength="10" required style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
-        <button id="sendOtpBtn" class="main-btn" style="width: 100%; padding: 12px; background: #2a5298; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Send OTP & Sign Up</button>
-    </div>
-
-    <div id="otpSection" class="input-group" style="display: none;">
-        <input type="number" id="otpInput" placeholder="6 अंक का OTP" maxlength="6" required style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
-        <button id="verifyOtpBtn" class="main-btn" style="width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Verify OTP & Login</button>
+        <input type="text" id="userName" placeholder="आपका नाम (Name)" required 
+               style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
+        <input type="text" id="userArea" placeholder="आपका एरिया/मोहल्ला (Area)" required 
+               style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;">
+        
+        <!-- Google Sign-In Button -->
+        <div id="google-signin-btn" style="display: flex; justify-content: center; margin: 20px 0;"></div>
+        
+        <div style="margin-top: 10px; text-align: center; position: relative;">
+            <hr style="margin: 15px 0;">
+            <span style="background: white; padding: 0 10px; color: #999;">या</span>
+        </div>
+        
+        <button onclick="document.getElementById('registrationScreen').style.display='none'; document.getElementById('mainApp').style.display='block';" 
+                style="background: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px;">
+            👥 Guest Mode (बगैर लॉगिन के)
+        </button>
     </div>
     
-    <div style="margin-top: 20px;">
-    <button onclick="document.getElementById('registrationScreen').style.display='none'; document.getElementById('mainApp').style.display='block';" 
-            style="background: #f0f0f0; color: #333; border: 1px solid #ccc; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold;">
-        बगैर लॉगिन के वापस जाएँ (Guest Mode)
-    </button>
-</div>
-
-
-    <p style="font-size: 0.8rem; color: #777; margin-top: 20px;">Firebase Phone Authentication द्वारा सुरक्षित।</p>
-    <div id="recaptcha-container" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+    <p style="font-size: 0.8rem; color: #777; margin-top: 20px;">Google Sign-In द्वारा सुरक्षित।</p>
 </div>
 
 
