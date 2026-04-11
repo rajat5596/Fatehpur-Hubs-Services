@@ -2,17 +2,19 @@
 // =======================================================
 // ⭐ 1. GLOBAL VARIABLES & CONFIGURATION (सबसे ऊपर रखें) ⭐
 // =======================================================
+// ========== FIREBASE CONFIG (UPDATED) ==========
 const firebaseConfig = {
-    apiKey: "AIzaSyA37JsLUIG-kypZ55vdpLTp3WKHgRH2IwY",
+    apiKey: "AIzaSyCFccfNZzNSTcfBCYEh3kcXPjI4HRETCa0",
     authDomain: "fatehpur-hubs-a3a9f.firebaseapp.com",
     databaseURL: "https://fatehpur-hubs-a3a9f-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "fatehpur-hubs-a3a9f",
-    storageBucket: "fatehpur-hubs-a3a9f.appspot.com",
+    storageBucket: "fatehpur-hubs-a3a9f.firebasestorage.app",
     messagingSenderId: "294360741451",
-    appId: "1:294360741451:web:3bc85078805750b9fabfce"
+    appId: "1:294360741451:web:5a4a6ac0838f8542fabfce"
 };
 
-let recaptchaVerifier, confirmationResult;
+// Google Sign-In ke liye
+let currentUser = null;
 let tempUserData = {}; 
     
 // ⭐ GLOBAL STATE AND LIMITS ⭐
