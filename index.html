@@ -533,7 +533,25 @@ window.addEventListener("load", function() {
         }
     }, 1500);
 });
+                function enterGuestMode() {
+    const registrationScreen = document.getElementById("registrationScreen");
+    const mainApp = document.getElementById("mainApp");
+
+    if (registrationScreen) registrationScreen.style.display = "none";
+    if (mainApp) mainApp.style.display = "block";
+
+    // Auth button update
+    if (typeof updateAuthButton === "function") {
+        updateAuthButton(false);
+    }
+
+    // Guest mode flag
+    localStorage.setItem("authMode", "guest");
+    
+    console.log("✅ User entered as Guest Mode");
+                }
 </script>
+            
 </body>
         </html>
             
