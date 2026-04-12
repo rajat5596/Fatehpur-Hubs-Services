@@ -447,91 +447,86 @@
   }
 </script>
             <script>
-// ==================== GOOGLE SIGN IN SETUP ====================
+// ==================== GOOGLE SIGN-IN - FINAL WORKING VERSION ====================
 
 let googleUserCredential = null;
 
 function initializeGoogleSignIn() {
-    const clientId = "YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com";   // ←←← YAHAN APNA REAL CLIENT ID DAALO
-
-    if (!clientId || clientId.includes("YOUR_GOOGLE")) {
-        console.error("❌ Google Client ID nahi daala hai!");
-        return;
-    }
+    const clientId = "294360741451-adh3gmqrimmc7b38i882p0cpftv191l7.apps.googleusercontent.com";
 
     window.google.accounts.id.initialize({
         client_id: clientId,
-        callback: handleGoogleCredentialResponse,   // Jab user sign in karega
+        callback: handleGoogleCredentialResponse,
         auto_select: false,
         cancel_on_tap_outside: true
     });
 
-    // Button render karo
+    // Button render kar rahe hain (mobile ke liye width 320 best hai)
     window.google.accounts.id.renderButton(
         document.getElementById("google-signin-btn"),
         {
-            type: "standard",      // ya "icon" bhi kar sakte ho
+            type: "standard",
             size: "large",
             text: "signin_with",
             shape: "rectangular",
             logo_alignment: "left",
-            width: "100%",         // mobile ke liye accha rahega
-            locale: "hi"           // Hindi mein button text
+            width: 320,
+            locale: "hi"
         }
     );
 
-    console.log("✅ Google Sign-In button initialized");
+    console.log("✅ Google Sign-In Button Render ho gaya");
 }
 
-// Google se token aane par yeh function chalega
+// Google se response aane par yeh function chalega
 function handleGoogleCredentialResponse(response) {
-    console.log("Google ID Token received");
+    console.log("Google ID Token mila");
 
-    googleUserCredential = response.credential;
-
-    // Ab Firebase se sign in karo
     const credential = firebase.auth.GoogleAuthProvider.credential(response.credential);
-    
+
     firebase.auth().signInWithCredential(credential)
         .then((userCredential) => {
             const user = userCredential.user;
-            console.log("✅ Firebase Google Sign-In successful:", user.email);
+            console.log("✅ Firebase Google Sign-In Successful:", user.email || user.uid);
 
-            // User ka naam aur area save karo (jo input fields mein daala hai)
+            // Naam aur Area le lo jo user ne daala hai
             const name = document.getElementById("userName").value.trim();
             const area = document.getElementById("userArea").value.trim();
 
             if (name && area) {
-                // Yahan apna existing function call karo jo user data Firebase mein save karta tha
-                // Jaise saveUserProfile(name, area, user.uid);  // aapke script.js mein jo function hai
-                console.log("User details:", name, area);
+                console.log("User Details -> Name:", name, "| Area:", area);
+                // Agar aapka purana function hai user ko Firebase mein save karne ka, toh yahan call kar sakte ho
+                // saveUserProfile(name, area, user.uid);
             }
 
-            // Registration screen hide + main app show
+            // Registration screen hide + Main app show
             document.getElementById("registrationScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
 
-            // Auth button update kar do (logout wala bana do)
-            updateAuthButton(true);
+            // Auth button update (agar function hai)
+            if (typeof updateAuthButton === "function") {
+                updateAuthButton(true);
+            }
         })
         .catch((error) => {
-            console.error("❌ Firebase Google Sign-In error:", error.code, error.message);
-            alert("Sign in mein problem ho rahi hai. Dobara try karo.");
+            console.error("❌ Firebase Sign-In Error:", error.code, error.message);
+            alert("Google sign-in mein problem aa rahi hai.\nGuest Mode use kar sakte ho.");
         });
 }
 
-// Page load hone par initialize karo
+// Page load hone par Google button initialize karo
 window.addEventListener("load", function() {
-    // Thoda delay de sakte ho agar Firebase pehle load ho
+    console.log("Page loaded → Google Sign-In initialize ho raha hai...");
+
     setTimeout(() => {
-        if (typeof window.google !== "undefined" && window.google.accounts) {
+        if (window.google && window.google.accounts && window.google.accounts.id) {
             initializeGoogleSignIn();
         } else {
-            console.error("Google GSI library load nahi hui");
+            console.error("❌ Google GSI library load nahi hui. Internet check karo.");
         }
-    }, 800);
+    }, 1500);
 });
-            </script>
+</script>
 </body>
         </html>
             
