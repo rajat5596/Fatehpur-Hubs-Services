@@ -5,7 +5,7 @@
 // Note: endDate ko "YYYY-MM-DD" format mein daalen. Agar hamesha chalana hai, toh null rakhen.
 // *************************************************************
 const promotionAds = [
-    { name: "Johnson Square", image: "https://i.ibb.co/MDcL6w49/IMG-20251029-120527.jpg", link: "https://wa.me/919889904191", endDate: "2026-09-30" },
+    { name: "Rajat Paints & Hardware", image: "https://raw.githubusercontent.com/rajat5596/Fatehpur-Hubs-Services/main/img/IMG-20261018-WA0024.jpg", link: "https://wa.me/919889904191", endDate: "2026-12-30" },
     { name: "Lal Babu Jwellers", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/WhatsApp-Image-2024-11-18-at-4.51.41-PM-1-scaled.jpeg?alt=media&token=fe30eaba-523b-4a0e-a175-980bbd927361", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
     { name: "Sivam Medical Store", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/shivam-medical-store-fatehpur-ho-fatehpur-uttar-pradesh-chemists-nx9g5ya4cs-250.jpg?alt=media&token=f67700dd-d795-4a38-89c2-7cffe5ae99eb", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
     { name: "Domino's Pizza", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/unnamed.webp?alt=media&token=7bf61c95-77cf-4648-8e4e-6135cc5fb8e8", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
