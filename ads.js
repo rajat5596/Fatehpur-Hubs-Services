@@ -6,7 +6,7 @@
 // *************************************************************
 const promotionAds = [
     { name: "Rajat Paints & Hardware", image: "https://raw.githubusercontent.com/rajat5596/Fatehpur-Hubs-Services/main/img/IMG-20261018-WA0024.jpg", link: "https://wa.me/919889904191", endDate: "2026-12-30" },
-    { name: "Lal Babu Jwellers", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/WhatsApp-Image-2024-11-18-at-4.51.41-PM-1-scaled.jpeg?alt=media&token=fe30eaba-523b-4a0e-a175-980bbd927361", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
+    { name: "Vaishnavi Enterprises", image: "https://raw.githubusercontent.com/rajat5596/Fatehpur-Hubs-Services/main/img/IMG_20261024_151835.jpg", link: "https://wa.me/919936567765", endDate: "2026-12-30" },
     { name: "Sivam Medical Store", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/shivam-medical-store-fatehpur-ho-fatehpur-uttar-pradesh-chemists-nx9g5ya4cs-250.jpg?alt=media&token=f67700dd-d795-4a38-89c2-7cffe5ae99eb", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
     { name: "Domino's Pizza", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/unnamed.webp?alt=media&token=7bf61c95-77cf-4648-8e4e-6135cc5fb8e8", link: "https://wa.me/919999999999", endDate: "2026-09-30" },
     { name: "VC Motors", image: "https://firebasestorage.googleapis.com/v0/b/fatehpur-hubs-a3a9f.firebasestorage.app/o/images%20(2).jpeg?alt=media&token=3e6655be-1fa3-4954-839d-d2447149a30a", link: "https://wa.me/919888888888", endDate: "2026-09-30" },
